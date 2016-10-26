@@ -381,4 +381,14 @@ class PermissionSearchView(FacetedSearchView):
     def build_form(self):
         form = super(self.__class__, self).build_form()
         form.request = self.request
+        form.request.GET = self.clean_facets(self.request)
         return form
+
+    def clean_facets(self, request):
+        get = request.GET.copy()
+        for k, val in get.items():
+            if k.startswith('f__'):
+                get.pop(k)
+                k = k[4:]
+                get.update({'f': '%s::%s' % (k, val)})
+        return get

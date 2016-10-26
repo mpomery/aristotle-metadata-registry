@@ -252,6 +252,8 @@
     {% if query or form.filter_search %}
         {% if page.object_list %}
         <div class="col-md-3 facets">
+                <form method="get" class="row"> {# open main_search_form #}
+                <input type="hidden" name="q" value="{{form.q.value}}">
             <header>Refine your results</header>
             <dl class="panel-body">
                 {% if form.facets.fields.facet_model_ct %}
@@ -285,16 +287,16 @@
                     </dd>
                 {% endfor %}
                 {% endif %}
-                {% if request.user.is_active and form.facets.fields.restriction %}
-                <dt>Restriction</dt>
-                {% for f in form.facets.fields.restriction %}
-                    <dd>
-                        <a href="{{ request.get_full_path }}&amp;res={{ f.0|urlencode }}">
-                            {{ f.0|restriction_to_text }}</a>{{f.o}}
-                        ({{ f.1 }})
-                    </dd>
-                {% endfor %}
-                {% endif %}
+                <!--{% if request.user.is_active and form.facets.fields.restriction %}-->
+                <!--<dt>Restriction</dt>-->
+                <!--{% for f in form.facets.fields.restriction %}-->
+                <!--    <dd>-->
+                <!--        <a href="{{ request.get_full_path }}&amp;res={{ f.0|urlencode }}">-->
+                <!--            {{ f.0|restriction_to_text }}</a>{{f.o}}-->
+                <!--        ({{ f.1 }})-->
+                <!--    </dd>-->
+                <!--{% endfor %}-->
+                <!--{% endif %}-->
                 {% if form.facets.fields.statuses %}
                 <dt>Status</dt>
                 {% for f in form.facets.fields.statuses %}
@@ -305,21 +307,29 @@
                     </dd>
                 {% endfor %}
                 {% endif %}
-                {% if request.user.is_active and form.facets.fields.workgroup %}
-                <dt>Workgroup</dt>
-                {% for f in form.facets.fields.workgroup %}
-                    <dd>
-                        {% with wg='wg'|get_item_from_facet:f.0 %}
-                        <a href="{{ request.get_full_path }}&amp;wg{{ f.0|urlencode }}">{{ wg.name }}</a>
-                        ({{ f.1 }})
-                        {% endwith %}
-                    </dd>
-                {% endfor %}
-                {% endif %}
+                <!--{% if request.user.is_active and form.facets.fields.workgroup %}-->
+                <!--<dt>Workgroup</dt>-->
+                <!--{% for f in form.facets.fields.workgroup %}-->
+                <!--    <dd>-->
+                <!--        {% with wg='wg'|get_item_from_facet:f.0 %}-->
+                <!--        <a href="{{ request.get_full_path }}&amp;wg{{ f.0|urlencode }}">{{ wg.name }}</a>-->
+                <!--        ({{ f.1 }})-->
+                <!--        {% endwith %}-->
+                <!--    </dd>-->
+                <!--{% endfor %}-->
+                <!--{% endif %}-->
 
                 {% for field,details in form.extra_facet_fields %}
-                    {% if details.values %}
+                    {% if details.values|length > 1 %}
                     <dt>{{details.details.title}}</dt>
+                    <dd>
+                        {% if details.details.allow_search %}
+                        <label>
+                        <input name="f___{{field}}">
+                        </label>
+                        {% endif %}
+
+                    </dd>
                     {% if details.details.applied %}
                     <dd>
                     Active facets
@@ -327,8 +337,9 @@
                         {% for af in details.details.applied %}
                         <li>
                             <a href='?{% unfacet request field af|urlencode %}'>
-                                <span class='badge'><i class="fa fa-times"></i></span>
                                 {% facet_display details.details af %}
+                                <span class='badge pull-right'><i class="fa fa-times"></i></span>
+                                
                             </a>
                         </li>
                         {% endfor %}
@@ -340,13 +351,14 @@
                     <dd>
                         <a href="{{ request.get_full_path }}&amp;f={{field}}::{{ f|urlencode }}">
                             {% facet_display details.details f %}</a>
-                        ({{ count }})
+                        <span>({{ count }})</span>
                     </dd>
                     {% endif %}
                     {% endfor %}
                     {% endif %}
                 {% endfor %}
             </dl>
+            </form>
         </div>
         <div class="col-md-9">
 

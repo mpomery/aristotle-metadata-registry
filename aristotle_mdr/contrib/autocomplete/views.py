@@ -1,5 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.template.loader import get_template
 from django.template import Context
@@ -64,7 +65,13 @@ class GenericConceptAutocomplete(GenericAutocomplete):
             qs = self.model.objects.visible(self.request.user)
 
         if self.q:
-            qs = qs.filter(name__icontains=self.q)
+            q = Q(name__icontains=self.q)
+            try:
+                int(self.q)
+                q |= Q(pk=self.q)
+            except:
+                pass
+            qs = qs.filter(q)
         return qs
 
 
