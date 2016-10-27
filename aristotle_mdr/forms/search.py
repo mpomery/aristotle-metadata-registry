@@ -390,7 +390,7 @@ class PermissionSearchForm(TokenSearchForm):
 
         for _facet in facets_opts:
             _facet, value = _facet.split("::", 1)
-            sqs = sqs.filter(**{"%s__exact"%_facet: value})  # Force exact as otherwise we don't match when there are spaces.
+            sqs = sqs.filter(**{"%s__exact" % _facet: value})  # Force exact as otherwise we don't match when there are spaces.
             facets_details = extra_facets_details.get(_facet, {'applied': []})
             facets_details['applied'] = list(set(facets_details['applied'] + [value]))
             print facets_details['applied']
@@ -445,7 +445,7 @@ class PermissionSearchForm(TokenSearchForm):
         from haystack.fields import FacetField
         for model_index in registered_indexes:
             for name, field in model_index.fields.items():
-                if field.faceted : #or FacetField in type(field).__bases__:  # Yay, OOP!
+                if field.faceted:  # or FacetField in type(field).__bases__:  # Yay, OOP!
                     if name not in (filters_to_facets.values() + logged_in_facets.values()):
                         extra_facets.append(name)
 
@@ -471,16 +471,16 @@ class PermissionSearchForm(TokenSearchForm):
             self.extra_facet_fields = [
                 (k, {
                     'values': [
-                        f for f in 
+                        f for f in
                         sorted(v, key=lambda x: -x[1])
-                        if f[0] not in extra_facets_details.get(k,{}).get('applied',[])
+                        if f[0] not in extra_facets_details.get(k, {}).get('applied', [])
                         ][:10],
                     'details': extra_facets_details[k]
                 })
                 for k, v in self.facets['fields'].items()
                 if k in extra_facets
             ]
-            
+
             for facet, counts in self.facets['fields'].items():
                 # Return the 5 top results for each facet in order of number of results.
                 self.facets['fields'][facet] = sorted(counts, key=lambda x: -x[1])[:10]
