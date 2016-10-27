@@ -433,11 +433,11 @@ class PermissionSearchForm(TokenSearchForm):
             'wg': 'workgroup',
             'res': 'restriction'
         }
-        # if self.request.user.is_active:
-        #     for _filter, facet in logged_in_facets.items():
-        #         if _filter not in self.applied_filters:
-        #             # Don't do this: sqs = sqs.facet(facet, sort='count')
-        #             sqs = sqs.facet(facet)
+        if self.request.user.is_active:
+            for _filter, facet in logged_in_facets.items():
+                if _filter not in self.applied_filters:
+                    # Don't do this: sqs = sqs.facet(facet, sort='count')
+                    sqs = sqs.facet(facet)
 
         extra_facets = []
 

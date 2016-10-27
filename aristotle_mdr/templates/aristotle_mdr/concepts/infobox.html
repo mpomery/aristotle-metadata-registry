@@ -50,8 +50,11 @@
             </dd>
             {% block includes %}{% endblock %}
             {% endcomment %}
+            
+            {% if item.registerable %}
             {% include "aristotle_mdr/statuses.html" with statuses=item.current_statuses infoBox=True %}
-
+            {% endif %}
+            
             {% if item.publicationrecord and not item.current_statuses %}
                 {% include "aristotle_self_publish/concepts/publication_details.html" with item=item %}
             {% endif %}

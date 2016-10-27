@@ -287,16 +287,16 @@
                     </dd>
                 {% endfor %}
                 {% endif %}
-                <!--{% if request.user.is_active and form.facets.fields.restriction %}-->
-                <!--<dt>Restriction</dt>-->
-                <!--{% for f in form.facets.fields.restriction %}-->
-                <!--    <dd>-->
-                <!--        <a href="{{ request.get_full_path }}&amp;res={{ f.0|urlencode }}">-->
-                <!--            {{ f.0|restriction_to_text }}</a>{{f.o}}-->
-                <!--        ({{ f.1 }})-->
-                <!--    </dd>-->
-                <!--{% endfor %}-->
-                <!--{% endif %}-->
+                {% if request.user.is_active and form.facets.fields.restriction %}
+                <dt>Restriction</dt>
+                {% for f in form.facets.fields.restriction %}
+                    <dd>
+                        <a href="{{ request.get_full_path }}&amp;res={{ f.0|urlencode }}">
+                            {{ f.0|restriction_to_text }}</a>{{f.o}}
+                        ({{ f.1 }})
+                    </dd>
+                {% endfor %}
+                {% endif %}
                 {% if form.facets.fields.statuses %}
                 <dt>Status</dt>
                 {% for f in form.facets.fields.statuses %}
@@ -307,17 +307,17 @@
                     </dd>
                 {% endfor %}
                 {% endif %}
-                <!--{% if request.user.is_active and form.facets.fields.workgroup %}-->
-                <!--<dt>Workgroup</dt>-->
-                <!--{% for f in form.facets.fields.workgroup %}-->
-                <!--    <dd>-->
-                <!--        {% with wg='wg'|get_item_from_facet:f.0 %}-->
-                <!--        <a href="{{ request.get_full_path }}&amp;wg{{ f.0|urlencode }}">{{ wg.name }}</a>-->
-                <!--        ({{ f.1 }})-->
-                <!--        {% endwith %}-->
-                <!--    </dd>-->
-                <!--{% endfor %}-->
-                <!--{% endif %}-->
+                {% if request.user.is_active and form.facets.fields.workgroup %}
+                <dt>Workgroup</dt>
+                {% for f in form.facets.fields.workgroup %}
+                    <dd>
+                        {% with wg='wg'|get_item_from_facet:f.0 %}
+                        <a href="{{ request.get_full_path }}&amp;wg{{ f.0|urlencode }}">{{ wg.name }}</a>
+                        ({{ f.1 }})
+                        {% endwith %}
+                    </dd>
+                {% endfor %}
+                {% endif %}
 
                 {% for field,details in form.extra_facet_fields %}
                     {% if details.values|length > 1 %}
