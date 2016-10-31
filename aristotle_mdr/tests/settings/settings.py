@@ -47,14 +47,18 @@ if 'TRAVIS' in os.environ:
     if os.environ.get('SEARCH') == 'whoosh':
         print("Running TRAVIS-CI test-suite with whoosh")
         if os.environ.get('VARIANT') == 'haystack':
+            print("Vanilla haystack variant")
             from aristotle_mdr.tests.settings.templates.search.haystack_whoosh import HAYSTACK_CONNECTIONS
         else:
+            print("Aristotle specific variant")
             from aristotle_mdr.tests.settings.templates.search.whoosh import HAYSTACK_CONNECTIONS
     elif os.environ.get('SEARCH') == 'elasticsearch':
         print("Running TRAVIS-CI test-suite with elasticsearch")
         if os.environ.get('VARIANT') == 'haystack':
+            print("Vanilla haystack variant")
             from aristotle_mdr.tests.settings.templates.search.haystack_elasticsearch import HAYSTACK_CONNECTIONS
         else:
+            print("Aristotle specific variant")
             from aristotle_mdr.tests.settings.templates.search.elasticsearch import HAYSTACK_CONNECTIONS
 
 if 'ARISTOTLE_DEV_SKIP_MIGRATIONS' in os.environ or os.environ.get('DB') == 'mysql':  # pragma: no cover
