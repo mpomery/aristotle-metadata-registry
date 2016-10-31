@@ -42,6 +42,15 @@ def get_download_template_path_for_item(item, download_type, subpath=''):
         template = "%s/downloads/%s/%s/%s.html" % (app_label, download_type, subpath, model_name)
     else:
         template = "%s/downloads/%s/%s.html" % (app_label, download_type, model_name)
+    
+    from django.template.loader import get_template
+    from django.template import TemplateDoesNotExist
+    try:
+        get_template(template)
+    except TemplateDoesNotExist:
+        # This is ok. If a template doesn't exists pass a default one
+        # Maybe in future log an error?
+        template = "%s/downloads/%s/%s/%s.html" % ("aristotle_mdr", download_type, subpath, "managedContent")
     return template
 
 

@@ -14,10 +14,10 @@ class BulkActionsTest(utils.LoggedInViewPages):
 
         # There would be too many tests to test every item type against every other
         # But they all have identical logic, so one test should suffice
-        self.item1 = models.ObjectClass.objects.create(name="OC1", workgroup=self.wg1)
-        self.item2 = models.ObjectClass.objects.create(name="OC2", workgroup=self.wg1)
-        self.item3 = models.ObjectClass.objects.create(name="OC3", workgroup=self.wg1)
-        self.item4 = models.Property.objects.create(name="Prop4", workgroup=self.wg2)
+        self.item1 = models.ObjectClass.objects.create(name="OC1", definition="OC1 definition", workgroup=self.wg1)
+        self.item2 = models.ObjectClass.objects.create(name="OC2", definition="OC2 definition", workgroup=self.wg1)
+        self.item3 = models.ObjectClass.objects.create(name="OC3", definition="OC3 definition", workgroup=self.wg1)
+        self.item4 = models.Property.objects.create(name="Prop4", definition="Prop4 definition", workgroup=self.wg2)
 
 
 class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
@@ -455,4 +455,31 @@ class BulkDownloadTests(BulkActionsTest, TestCase):
             )+"?title=The%20title"+"&items=%s&items=%s"%(self.item1.id, self.item4.id)
         )
 
+    def test_content_exists_in_bulk_pdf_download_on_permitted_items(self):
+        self.login_editor()
+
+        self.item5 = models.DataElementConcept.objects.create(name="DEC1", definition="DEC5 definition", objectClass=self.item2, workgroup=self.wg1)
+
+        response = self.client.get(
+            reverse(
+                'aristotle:bulk_download',
+                kwargs={
+                    "download_type": self.download_type,
+                }
+            ),
+            {
+                "items": [self.item1.id, self.item5.id],
+                "title": "The title",
+                "html": True  # Force HTML to debug content
+            }
+        )
+        print response.content
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.item1.name)
+        self.assertContains(response, self.item2.name)  # Will be in as its a component of DEC5
+        self.assertContains(response, self.item5.name)
+
+        self.assertContains(response, self.item1.definition)
+        self.assertContains(response, self.item2.definition)  # Will be in as its a component of DEC5
+        self.assertContains(response, self.item5.definition)
 
