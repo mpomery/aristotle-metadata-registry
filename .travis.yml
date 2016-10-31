@@ -13,6 +13,7 @@ env:
   - DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=whoosh
   - DJANGO_VERSION='1.8,<1.9' DB=postgres     SEARCH=whoosh
   - DJANGO_VERSION='1.8,<1.9' DB=mysql        SEARCH=whoosh
+  - DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=whoosh  VARIANT=haystack
   - DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=elasticsearch
   - DJANGO_VERSION='1.8,<1.9' DB=postgres     SEARCH=elasticsearch
   - DJANGO_VERSION='1.8,<1.9' DB=mysql        SEARCH=elasticsearch
@@ -75,3 +76,4 @@ matrix:
     - env: DJANGO_VERSION='1.8,<1.9' DB=mysql        SEARCH=whoosh
     - env: DJANGO_VERSION='1.8,<1.9' DB=mysql        SEARCH=elasticsearch
     - env: DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=elasticsearch  VARIANT=haystack
+    - env: DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=whoosh  VARIANT=haystack
