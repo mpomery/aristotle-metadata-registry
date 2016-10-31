@@ -18,7 +18,7 @@ item_register = {
 }
 
 
-def render_to_pdf(template_src, context_dict):
+def render_to_pdf(template_src, context_dict, debug_as_html=False):
     # If the request template doesnt exist, we will give a default one.
     template = select_template([
         template_src,
@@ -26,6 +26,8 @@ def render_to_pdf(template_src, context_dict):
     ])
     context = Context(context_dict)
     html = template.render(context)
+    if debug_as_html:
+        return HttpResponse(html)
     result = StringIO.StringIO()
     pdf = pisa.pisaDocument(
         StringIO.StringIO(html.encode("UTF-8")),
@@ -131,6 +133,8 @@ def bulk_download(request, download_type, items, title=None, subtitle=None):
     if download_type == "pdf":
         subItems = []
 
+        debug_as_html = bool(request.GET.get('html', ''))
+
         return render_to_pdf(
             template,
             {
@@ -139,5 +143,6 @@ def bulk_download(request, download_type, items, title=None, subtitle=None):
                 'items': items,
                 'included_items': sorted([(k, v) for k, v in item_querysets.items()], key=lambda (k, v): k._meta.model_name),
                 'pagesize': request.GET.get('pagesize', page_size),
-            }
+            },
+            debug_as_html=debug_as_html
         )

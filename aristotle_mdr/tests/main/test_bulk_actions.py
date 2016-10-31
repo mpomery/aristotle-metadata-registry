@@ -36,6 +36,20 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(self.editor.profile.favourites.count(), 2)
 
+
+    def test_bulk_add_favourite_on_permitted_items_by_anonymous(self):
+        self.logout()
+
+        response = self.client.post(
+            reverse('aristotle:bulk_action'),
+            {
+                'bulkaction': 'add_favourites',
+                'items': [self.item1.id, self.item2.id],
+            }
+        )
+        self.assertRedirects(response,reverse('friendly_login')+"?next="+reverse('aristotle:bulk_action'))
+        self.assertEqual(response.status_code, 302)
+
     def test_bulk_add_favourite_on_forbidden_items(self):
         self.login_editor()
 
@@ -389,7 +403,6 @@ class BulkDownloadTests(BulkActionsTest, TestCase):
     def test_bulk_pdf_download_on_forbidden_items(self):
         self.login_editor()
 
-        self.assertEqual(self.editor.profile.favourites.count(), 0)
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
@@ -403,3 +416,41 @@ class BulkDownloadTests(BulkActionsTest, TestCase):
         )
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertEqual(response.redirect_chain[0][1], 302)
+
+
+    def test_bulk_pdf_download_on_forbidden_items_by_anonymous_user(self):
+        self.logout()
+
+        response = self.client.post(
+            reverse('aristotle:bulk_action'),
+            {
+                'bulkaction': 'bulk_download',
+                'items': [self.item1.id, self.item4.id],
+                "title": "The title",
+                "download_type": self.download_type,
+                'confirmed': 'confirmed',
+            },
+            follow=True
+        )
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertEqual(response.redirect_chain[0][1], 302)
+
+        response = self.client.post(
+            reverse('aristotle:bulk_action'),
+            {
+                'bulkaction': 'bulk_download',
+                'items': [self.item1.id, self.item4.id],
+                "title": "The title",
+                "download_type": self.download_type,
+                'confirmed': 'confirmed',
+            },
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                'aristotle:bulk_download',
+                kwargs={
+                    "download_type": self.download_type,
+                }
+            )+"?title=The%20title"+"&items=%s&items=%s"%(self.item1.id, self.item4.id)
+        )

@@ -21,22 +21,36 @@ from aristotle_mdr import exceptions as registry_exceptions
 from aristotle_mdr import models as MDR
 
 
-# TODO: Check permissions for this
 class BulkAction(FormView):
-    @method_decorator(login_required)
+
     def dispatch(self, *args, **kwargs):
+        action = self.get_action()
+        if not action:
+            return HttpResponseRedirect(self.request.GET.get("next", "/"))
+        if not action['can_use'](self.request.user):
+            if self.request.user.is_anonymous():
+                return redirect(
+                    reverse('friendly_login') + '?next=%s' % self.request.path
+                )
+            else:
+                raise PermissionDenied
         return super(BulkAction, self).dispatch(*args, **kwargs)
+
+    def get_action(self):
+        actions = get_bulk_actions()
+        action = self.request.POST.get("bulkaction", None)
+        return actions.get(action, None)
 
     def post(self, request, *args, **kwargs):
         url = request.GET.get("next", "/")
         message = ""
-        actions = get_bulk_actions()
-        action = request.POST.get("bulkaction", None)
+        #actions = get_bulk_actions()
+        action = self.get_action() #.POST.get("bulkaction", None)
 
         if action is None:
             # no action, messed up, redirect
             return HttpResponseRedirect(url)
-        action_form = actions[action]['form']
+        action_form = action['form']
         if action_form.confirm_page is None:
             # if there is no confirm page or extra details required, do the action and redirect
             form = action_form(request.POST, user=request.user, request=request)  # A form bound to the POST data

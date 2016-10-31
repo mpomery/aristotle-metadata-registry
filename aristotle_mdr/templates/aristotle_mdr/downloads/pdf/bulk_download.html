@@ -1,4 +1,4 @@
-{% load i18n aristotle_help %}
+{% load i18n aristotle_help aristotle_tags %}
 
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -7,7 +7,7 @@
       <meta http-equiv="content-type" content="text/html; charset=UTF-8">
       <style type="text/css">
             * {
-                font-size:12pt;
+                font-size:11pt;
             }
 
             h1 {
@@ -58,7 +58,7 @@
             a {
                 text-decoration: none;
                 color:black;
-                padding:100px;
+                padding-left:1px;
             }
 
             pdftoc {
@@ -82,6 +82,10 @@
             td, td * , th, th *{
                 vertical-align:top;
             }
+            cite {
+                font-style:italic;
+            }
+
             @page {
                 size: {{ pagesize }};
                 margin: 1cm;
@@ -130,7 +134,9 @@
                     {% endif %}
                 {% endwith %}
                 {% for item in dict.qs.all %}
-                    {% include 'aristotle_mdr/downloads/pdf/inline/managedContent.html' with item=item.item %}
+                    <div style="page-break-after:always;">
+                        {% include item|template_path:'pdf,inline' with item=item.item %}
+                    </div>
                 {% endfor %}
             {% endfor %}
             <div>
