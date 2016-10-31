@@ -49,7 +49,7 @@ if 'TRAVIS' in os.environ:
         from aristotle_mdr.tests.settings.templates.search.whoosh import HAYSTACK_CONNECTIONS
     elif os.environ.get('SEARCH') == 'elasticsearch':
         print("Running TRAVIS-CI test-suite with elasticsearch")
-        if os.environ.get('SEARCH') == 'haystack':
+        if os.environ.get('VARIANT') == 'haystack':
             from aristotle_mdr.tests.settings.templates.search.haystack_elasticsearch import HAYSTACK_CONNECTIONS
         else:
             from aristotle_mdr.tests.settings.templates.search.elasticsearch import HAYSTACK_CONNECTIONS
