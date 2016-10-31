@@ -473,7 +473,7 @@ class BulkDownloadTests(BulkActionsTest, TestCase):
                 "html": True  # Force HTML to debug content
             }
         )
-        print response.content
+
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.item1.name)
         self.assertContains(response, self.item2.name)  # Will be in as its a component of DEC5
