@@ -44,8 +44,7 @@ class BulkAction(FormView):
     def post(self, request, *args, **kwargs):
         url = request.GET.get("next", "/")
         message = ""
-        #actions = get_bulk_actions()
-        action = self.get_action() #.POST.get("bulkaction", None)
+        action = self.get_action()
 
         if action is None:
             # no action, messed up, redirect

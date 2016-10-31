@@ -454,3 +454,5 @@ class BulkDownloadTests(BulkActionsTest, TestCase):
                 }
             )+"?title=The%20title"+"&items=%s&items=%s"%(self.item1.id, self.item4.id)
         )
+
+
