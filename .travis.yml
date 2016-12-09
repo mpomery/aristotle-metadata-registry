@@ -19,6 +19,8 @@ env:
   - DJANGO_VERSION='1.8,<1.9' DB=mysql        SEARCH=elasticsearch
   - DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=whoosh  VARIANT=haystack
   - DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=elasticsearch  VARIANT=haystack
+
+  - DJANGO_VERSION='1.10,<1.11' DB=sqlitefile   SEARCH=whoosh
 #   - DJANGO_VERSION='1.10,<1.11' DB=sqlitememory
 #   - DJANGO_VERSION='1.10,<1.11' DB=sqlitefile
 #   - DJANGO_VERSION='1.10,<1.11' DB=postgres
