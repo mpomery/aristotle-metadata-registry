@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 import aristotle_mdr.models as MDR
 from aristotle_mdr.forms.creation_wizards import UserAwareModelForm, UserAwareForm
 from aristotle_mdr.forms import ChangeStatusForm
-from bootstrap3_datetime.widgets import DateTimePicker
+from bootstrap_datepicker.widgets import DatePicker as DateTimePicker
 
 
 class RequestReviewForm(UserAwareModelForm):

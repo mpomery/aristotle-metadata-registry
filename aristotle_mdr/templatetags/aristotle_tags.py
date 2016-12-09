@@ -17,6 +17,7 @@ from django import template
 from django.core.urlresolvers import reverse, resolve
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
+from django.utils.html import mark_safe
 
 from aristotle_mdr import perms
 import aristotle_mdr.models as MDR
@@ -187,20 +188,22 @@ def ternary(condition, a, b):
 
 @register.filter
 def paginator_range(page, mode):
+    page_range = list(page.paginator.page_range)
+    print(page.paginator.page_range)
     if mode=="start":
         if page.number <= 5:
             # show 4,5,6 if page is 4, 5,6,7 if page is 5...
-            return page.paginator.page_range[:max(5, page.number + 2)]
+            return page_range[:max(5, page.number + 2)]
         else:
-            return page.paginator.page_range[:3]
+            return page_range[:3]
     if mode=="middle":
         if page.number > 5 and page.number < page.paginator.num_pages - 5:
-            return page.paginator.page_range[page.number - 3:page.number + 2]
+            return page_range[page.number - 3:page.number + 2]
     if mode=="end":
         if page.number > page.paginator.num_pages - 5:
-            return page.paginator.page_range[-5:]
+            return page_range[-5:]
         else:
-            return page.paginator.page_range[-1:]
+            return page_range[-1:]
 
 
 @register.filter
@@ -348,7 +351,7 @@ def bootstrap_modal(_id, size=None):
         size_class = "modal-sm"
 
     modal = '<div id="%s" class="modal fade"><div class="modal-dialog %s"><div class="modal-content"></div></div></div>'
-    return modal % (_id, size_class)
+    return mark_safe(modal % (_id, size_class))
 
 
 @register.simple_tag

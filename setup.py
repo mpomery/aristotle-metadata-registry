@@ -62,7 +62,7 @@ setup(
         'django-static-precompiler',
         'django-autocomplete-light>=3.0.0',
         'django-bootstrap3',
-        'django-bootstrap3-datetimepicker',
+        'django-bootstrap-datepicker',
 
         # This was migrated out of django1.7, needed for django1.8
         'django-formtools',
