@@ -123,11 +123,12 @@ def get_bulk_actions():
                 # Invalid download_type
                 raise registry_exceptions.BadBulkActionModuleName("Bulk action isn't a valid Python module name.")
 
-            module, form = form.rsplit('.', 1)
-            exec('from %s import %s as f' % (module, form))
-
+            from django.utils.module_loading import import_string
+            # module, form = form.rsplit('.', 1)
+            # f = exec('from %s import %s as f' % (module, form))
+            f = import_string(form)
             # We need to make this a dictionary, not a class as otherwise
-            # the template engire tries to instantiate it.
+            # the template engine tries to instantiate it.
             frm = {'form': f}
             for prop in ['classes', 'can_use', 'text']:
                 frm[prop] = getattr(f, prop, None)

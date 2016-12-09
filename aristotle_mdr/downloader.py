@@ -1,6 +1,12 @@
 from aristotle_mdr.utils import get_download_template_path_for_item
 import cgi
-import cStringIO as StringIO
+
+try:  # Python 2
+    from cStringIO import StringIO as BytesIO
+except:  # Python 3
+    from io import BytesIO
+
+
 from django.http import HttpResponse, Http404
 # from django.shortcuts import render
 from django.template.loader import select_template
@@ -26,11 +32,12 @@ def render_to_pdf(template_src, context_dict, debug_as_html=False):
     ])
     context = Context(context_dict)
     html = template.render(context)
+
     if debug_as_html:
         return HttpResponse(html)
-    result = StringIO.StringIO()
+    result = BytesIO()
     pdf = pisa.pisaDocument(
-        StringIO.StringIO(html.encode("UTF-8")),
+        BytesIO(html.encode("UTF-8")),
         result,
         encoding='UTF-8'
     )
@@ -141,7 +148,10 @@ def bulk_download(request, download_type, items, title=None, subtitle=None):
                 'title': title,
                 'subtitle': subtitle,
                 'items': items,
-                'included_items': sorted([(k, v) for k, v in item_querysets.items()], key=lambda (k, v): k._meta.model_name),
+                'included_items': sorted(
+                    [(k, v) for k, v in item_querysets.items()],
+                    key=lambda k_v: k_v[0]._meta.model_name
+                ),
                 'pagesize': request.GET.get('pagesize', page_size),
             },
             debug_as_html=debug_as_html

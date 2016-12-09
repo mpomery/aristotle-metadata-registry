@@ -240,7 +240,9 @@ def zws(string):
         <h1>{% zws item.name %}</h1>
 
     """
-    string = string.encode('utf-8', 'xmlcharrefreplace')
+    import sys  # Python 2
+    if sys.version_info[0] == 2:
+        string = string.encode('utf-8', 'xmlcharrefreplace')
     return string.replace("—", "&shy;—")
 
 

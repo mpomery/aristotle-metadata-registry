@@ -11,7 +11,7 @@ import ckeditor_uploader.fields
 
 class Migration(migrations.Migration):
 
-    replaces = [(b'aristotle_mdr', '0001_initial'), (b'aristotle_mdr', '0002_auto_20150409_0656'), (b'aristotle_mdr', '0003_auto_20150416_0024'), (b'aristotle_mdr', '0004_auto_20150424_0059'), (b'aristotle_mdr', '0005_auto_20150526_1058'), (b'aristotle_mdr', '0006_remove_status_indictionary'), (b'aristotle_mdr', '0007_rename_description_fields'), (b'aristotle_mdr', '0008_auto_20151216_0339'), (b'aristotle_mdr', '0009_add_explicit_related_name_for_values'), (b'aristotle_mdr', '0010_auto_20160106_1814'), (b'aristotle_mdr', '0011_update_ckeditor_remove_d19_errors'), (b'aristotle_mdr', '0012_better_workflows')]
+    replaces = [('aristotle_mdr', '0001_initial'), ('aristotle_mdr', '0002_auto_20150409_0656'), ('aristotle_mdr', '0003_auto_20150416_0024'), ('aristotle_mdr', '0004_auto_20150424_0059'), ('aristotle_mdr', '0005_auto_20150526_1058'), ('aristotle_mdr', '0006_remove_status_indictionary'), ('aristotle_mdr', '0007_rename_description_fields'), ('aristotle_mdr', '0008_auto_20151216_0339'), ('aristotle_mdr', '0009_add_explicit_related_name_for_values'), ('aristotle_mdr', '0010_auto_20160106_1814'), ('aristotle_mdr', '0011_update_ckeditor_remove_d19_errors'), ('aristotle_mdr', '0012_better_workflows')]
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
@@ -105,7 +105,7 @@ class Migration(migrations.Migration):
                 ('responsible_organisation', models.CharField(max_length=256, blank=True)),
                 ('derivation_rule', models.TextField(blank=True)),
                 ('derives', models.ForeignKey(related_name='derived_from', blank=True, to='aristotle_mdr.DataElement', null=True)),
-                ('inputs', models.ManyToManyField(related_name='input_to_derivation', to=b'aristotle_mdr.DataElement', blank=True)),
+                ('inputs', models.ManyToManyField(related_name='input_to_derivation', to='aristotle_mdr.DataElement', blank=True)),
                 ('superseded_by', models.ForeignKey(related_name='supersedes', blank=True, to='aristotle_mdr.DataElementDerivation', null=True)),
             ],
             options={
@@ -394,7 +394,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='possumprofile',
             name='favourites',
-            field=models.ManyToManyField(related_name='favourited_by', to=b'aristotle_mdr._concept', blank=True),
+            field=models.ManyToManyField(related_name='favourited_by', to='aristotle_mdr._concept', blank=True),
         ),
         migrations.AddField(
             model_name='possumprofile',
@@ -420,7 +420,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='discussionpost',
             name='relatedItems',
-            field=models.ManyToManyField(related_name='relatedDiscussions', to=b'aristotle_mdr._concept', blank=True),
+            field=models.ManyToManyField(related_name='relatedDiscussions', to='aristotle_mdr._concept', blank=True),
         ),
         migrations.AddField(
             model_name='discussionpost',
@@ -592,7 +592,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='reviewrequest',
             name='concepts',
-            field=models.ManyToManyField(related_name='review_requests', to=b'aristotle_mdr._concept'),
+            field=models.ManyToManyField(related_name='review_requests', to='aristotle_mdr._concept'),
         ),
         migrations.AddField(
             model_name='reviewrequest',

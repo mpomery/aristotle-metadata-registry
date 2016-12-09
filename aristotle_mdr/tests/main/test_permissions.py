@@ -189,18 +189,31 @@ class CustomConceptQuerySetTest(TestCase):
         self.assertEqual(len(models.ValueDomain.objects.all().public()),0)
 
         # Register OC1 only
-        ra.register(oc1,models.STATES.standard,user)
+        ra.register(oc1,models.STATES.standard,user,registrationDate=datetime.date(2010,10,1))
 
         # Assert only OC1 is public
         self.assertEqual(len(models.ValueDomain.objects.all().public()),1)
         self.assertTrue(oc1 in models.ValueDomain.objects.all().public())
         self.assertTrue(oc2 not in models.ValueDomain.objects.all().public())
 
+        from time import sleep
+        sleep(2)
+        # Sleep for 2 seconds, as MMSQL is seeing both registrations as having the 'same' creation time
+
         # Deregister OC1
         state=models.STATES.incomplete
-        ra.register(oc1,state,user)
+        regDate=datetime.date(2010,10,1)
+        registration_attempt = ra.register(oc1,state,user,registrationDate=regDate)
+
+        oc1 = models.ValueDomain.objects.get(pk=oc1.pk)
+
+        self.assertTrue(registration_attempt['failed'] == [])
+        self.assertTrue(len(oc1.current_statuses()) == 1)
+        self.assertTrue(oc1.current_statuses().first().registrationDate == regDate)
+        self.assertFalse(oc1._is_public)
 
         # Assert no public items
+        self.assertTrue(oc1 not in models.ValueDomain.objects.all().public())
         self.assertEqual(len(models.ValueDomain.objects.all().public()),0)
 
 class RegistryCascadeTest(TestCase):

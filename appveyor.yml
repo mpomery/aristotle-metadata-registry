@@ -5,34 +5,45 @@ services:
 
 environment:
   global:
-    PYTHON_HOME: "C:/Python27"
     APPVEYOR: 1
   matrix:
       - DJANGO_VERSION: '1.8,<1.9'
         DB: mssql
         SEARCH: whoosh
+        PYTHON_HOME: "C:/Python35"
+        PYODBC_FILE: "./aristotle_mdr/tests/bin/pyodbc-3.0.10-cp35-cp35m-win32.whl"
       - DJANGO_VERSION: '1.8,<1.9'
-        DB: sqlitefile
+        DB: mssql
         SEARCH: whoosh
+        PYTHON_HOME: "C:/Python35-x64"
+        PYODBC_FILE: "./aristotle_mdr/tests/bin/pyodbc-3.0.10-cp35-cp35m-win_amd64.whl"
+      - DJANGO_VERSION: '1.8,<1.9'
+        DB: mssql
+        SEARCH: whoosh
+        PYTHON_HOME: "C:/Python27"
+        PYODBC_FILE: pyodbc
 
 install:
   - cmd: |
-        "%PYTHON_HOME%/Scripts/pip.exe" install codecov
-        "%PYTHON_HOME%/Scripts/pip.exe" install pep8
-        "%PYTHON_HOME%/python.exe" -m pip install --upgrade pip
-        "%PYTHON_HOME%/Scripts/pip.exe" install setuptools -U
-        "%PYTHON_HOME%/Scripts/pip.exe" install -q "django_pyodbc_azure>%DJANGO_VERSION%"
-        "%PYTHON_HOME%/Scripts/pip.exe" install -r requirements-test.txt
-        "%PYTHON_HOME%/Scripts/pip.exe" install .
-        "%PYTHON_HOME%/Scripts/pip.exe" install "Django>%DJANGO_VERSION%"
+        set PATH=%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%PATH%
+        "pip.exe" install codecov
+        "pip.exe" install pep8
+        "python.exe" -m pip install --upgrade pip
+        "pip.exe" install setuptools -U
+        "pip.exe" install %PYODBC_FILE%
+        "pip.exe" install "django_pyodbc_azure>%DJANGO_VERSION%"
+        "pip.exe" install -r requirements-test.txt
+        "pip.exe" install -r requirements.txt
+        "pip.exe" install .
+        "pip.exe" install "Django>%DJANGO_VERSION%"
 
 before_test:
 # Make a posgres database, run PEP tests, check documentation builds cleanly.
   - cmd: |
-        "%PYTHON_HOME%/Scripts/pip.exe" list
+        "pip.exe" list
 
 # command to run tests
 test_script:
   - cmd: |
-        "%PYTHON_HOME%/python.exe" manage.py test aristotle_mdr.tests --settings=aristotle_mdr.tests.settings.settings
+        "python.exe" manage.py test aristotle_mdr.tests --settings=aristotle_mdr.tests.settings.settings
 

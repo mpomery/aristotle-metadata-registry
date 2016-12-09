@@ -1,22 +1,21 @@
 language: python
 python:
+  - "3.5"
   - "2.7"
-#  - "3.5" # No 3 support for notifications, yet.
 
 services:
   - postgresql
   - redis-server
   - elasticsearch
-  - mysql
+  - mariadb
 
 env:
   - DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=whoosh
   - DJANGO_VERSION='1.8,<1.9' DB=postgres     SEARCH=whoosh
-  - DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=elasticsearch
   - DJANGO_VERSION='1.8,<1.9' DB=postgres     SEARCH=elasticsearch
   # Possible failures:
-  - DJANGO_VERSION='1.8,<1.9' DB=mysql        SEARCH=whoosh
-  - DJANGO_VERSION='1.8,<1.9' DB=mysql        SEARCH=elasticsearch
+  - DJANGO_VERSION='1.8,<1.9' DB=mariadb        SEARCH=whoosh
+  - DJANGO_VERSION='1.8,<1.9' DB=mariadb        SEARCH=elasticsearch
   - DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=whoosh  VARIANT=haystack
   - DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=elasticsearch  VARIANT=haystack
 
@@ -30,12 +29,18 @@ before_install:
   - pip install pep8
 
 before_script:
-# Make a posgres database, run PEP tests, check documentation builds cleanly.
-  - if [[ $DB == mysql ]]; then mysql -e 'create database aristotle_test_db;' -u root ; fi
+# Make a MariaDB database
+# Fix wierdness wiht MySQLdb on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0  
+  - if [[ $DB == mariadb ]]; then mysql -e 'create database aristotle_test_db;' -u root ; fi
+  - if [[ $DB == mariadb ]]; then mysql -e 'SET GLOBAL wait_timeout = 36000;' ; fi
+  - if [[ $DB == mariadb ]]; then mysql -e 'SET GLOBAL max_allowed_packet = 134209536;' ; fi
   - if [[ $SEARCH == elasticsearch ]]; then sleep 10; fi
   - if [[ $SEARCH == elasticsearch ]]; then pip install 'elasticsearch>2.0,<5.0'; fi
+# Make a posgres database
   - if [[ $DB == postgres ]]; then psql -c 'create database aristotle_test_db;' -U postgres; fi
+# Ensure PEP8 style guide is followed
   - pep8 --exclude=migrations,tests,example_mdr,'aristotle_mdr/contrib/search_backends/elasticsearch2.py' --ignore=E501,E225,E123 aristotle_mdr
+# check documentation builds cleanly
   - cd docs ; sphinx-build -nW -b html -d _build/doctrees . _build/html ; cd ..
   - pip list
 
@@ -43,10 +48,10 @@ install:
   - "pip install --upgrade pip"
   - "pip uninstall setuptools -y && pip install setuptools" # needed for updated version of html5lib
   - if [[ $DB == postgres ]]; then pip install -q psycopg2; fi
-  - if [[ $DB == mysql ]]; then pip install -q mysqlclient; fi
-#  - if [[ $DB == mysql ]]; then pip install -q mysql-python; fi
+  - if [[ $DB == mariadb ]]; then pip install -q mysqlclient; fi
   - pip install 'Django>$DJANGO_VERSION' # So we can test multiple versions (once we support that)
   - "pip install -r requirements-test.txt"
+  - "pip install -r requirements.txt"
   - "pip install ."
   - pip install 'Django>$DJANGO_VERSION' # So we can test multiple versions (once we support that)
 # Tell us exactly what versions we are running on!
@@ -66,17 +71,16 @@ after_success:
 sudo: false
 
 addons:
-  code_climate:
-    repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
   apt:
     sources:
       - elasticsearch-2.x
     packages:
       - elasticsearch
+  code_climate:
+    repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
+  mariadb: '10.1'
 
 matrix:
   allow_failures:
-    - env: DJANGO_VERSION='1.8,<1.9' DB=mysql        SEARCH=whoosh
-    - env: DJANGO_VERSION='1.8,<1.9' DB=mysql        SEARCH=elasticsearch
     - env: DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=elasticsearch  VARIANT=haystack
     - env: DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=whoosh  VARIANT=haystack

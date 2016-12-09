@@ -92,7 +92,7 @@ class ManagedObjectVisibility(object):
             concept=self.item,
             registrationAuthority=self.ra,
             registrationDate=datetime.date(2005, 1, 1),
-            until_date=datetime.date(2005, 06, 29),
+            until_date=datetime.date(2005, 6, 29),
             state=self.ra.public_state,
             changeDetails="s2",
         )
@@ -202,7 +202,7 @@ class ManagedObjectVisibility(object):
         self.assertEqual(self.item.check_is_locked(when=d), True)
         self.assertEqual(list(self.item.current_statuses(when=d)), [s6])
 
-        d = date(2008, 07, 30)
+        d = date(2008, 7, 30)
         self.assertEqual(self.item.check_is_public(when=d), True)
         self.assertEqual(self.item.check_is_locked(when=d), True)
         self.assertEqual(list(self.item.current_statuses(when=d)), [s6])

@@ -109,8 +109,8 @@ class ConceptWizardPage(utils.LoggedInViewPages):
         self.assertEqual(response.status_code,200)
 
     def do_test_for_issue333(self,response):
-        self.assertTrue(self.extra_wg.name in response.content)
-        self.assertTrue(response.content.count(self.extra_wg.name) == 1)
+        self.assertContains(response, self.extra_wg.name)
+        self.assertTrue(response.content.decode('utf-8').count(self.extra_wg.name) == 1)
 
     def test_editor_can_make_object(self):
         self.login_editor()

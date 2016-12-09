@@ -18,9 +18,6 @@ MEDIA_ROOT = os.path.join(BASE, "media")
 MEDIA_URL = '/media/'
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 
-DATABASES = None
-HAYSTACK_CONNECTIONS = None
-
 ci_runner = ""
 if 'TRAVIS' in os.environ:
     ci_runner = "Travis-CI"
@@ -39,10 +36,10 @@ if 'TRAVIS' in os.environ or 'APPVEYOR' in os.environ:
     elif os.environ.get('DB') == 'postgres':
         print("Running %s test-suite with POSTGRESQL" % ci_runner)
         from aristotle_mdr.tests.settings.templates.db.postgres import DATABASES
-    elif os.environ.get('DB') == 'mysql':
-        print("Running %s test-suite with MySQL" % ci_runner)
+    elif os.environ.get('DB') == 'mariadb':
+        print("Running %s test-suite with MariaDB" % ci_runner)
         skip_migrations = True
-        from aristotle_mdr.tests.settings.templates.db.mysql import DATABASES
+        from aristotle_mdr.tests.settings.templates.db.mariadb import DATABASES
     elif os.environ.get('DB') == 'mssql':
         print("Running %s test-suite with MSSQL" % ci_runner)
         skip_migrations = True  # Sadly, this may not be possible until after migration 0018
@@ -65,6 +62,7 @@ if 'TRAVIS' in os.environ or 'APPVEYOR' in os.environ:
             print("Aristotle specific variant")
             from aristotle_mdr.tests.settings.templates.search.elasticsearch import HAYSTACK_CONNECTIONS
 
+
 if skip_migrations:  # pragma: no cover
     print("Skipping migrations")
     class DisableMigrations(object):
@@ -85,13 +83,6 @@ INSTALLED_APPS = (
     'extension_test',
     'text_download_test',
 ) + INSTALLED_APPS
-
-if os.environ.get('DB') == 'mysql':
-    if 'aristotle_mdr.contrib.slots' in INSTALLED_APPS:
-        # Mysql has issues with 
-        INSTALLED_APPS = list(INSTALLED_APPS)
-        INSTALLED_APPS.pop('aristotle_mdr.contrib.slots')
-        INSTALLED_APPS = tuple(INSTALLED_APPS)
 
 
 # https://docs.djangoproject.com/en/1.6/topics/testing/overview/#speeding-up-the-tests
@@ -148,4 +139,3 @@ __LOGGING__ = {
             },
         }
     }
-

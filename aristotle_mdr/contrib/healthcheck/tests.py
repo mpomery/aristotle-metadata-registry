@@ -39,7 +39,7 @@ class TestChaosMonkey(TestCase):
     @override_settings(CACHES={})
     def test_dead_cache(self):
         response = self.client.get(reverse('aristotle_mdr_hb:health'))
-        details = json.loads(response.content)
+        details = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response.status_code, 500)
         self.assertEqual(details['status_code'], 500)

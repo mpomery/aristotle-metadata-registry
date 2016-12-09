@@ -59,10 +59,10 @@ def setup_mdr(name="", extensions=[], force_install=False, dry_install=False):
     try:
         download_example_mdr()
     except:
-        print ("Downloading of example settings failed, this script requires subversion to be installed and executable from the command line.")
-        print ("Try running the script again, if this continues to fail, try:")
-        print ("   1. manually downloading the folder to this directory and ALL its contents from github: https://github.com/aristotle-mdr/aristotle-metadata-registry/tree/master/example_mdr")
-        print ("   2. creating a new project using the django-admin tools and manually setting up a project")
+        print("Downloading of example settings failed, this script requires subversion to be installed and executable from the command line.")
+        print("Try running the script again, if this continues to fail, try:")
+        print("   1. manually downloading the folder to this directory and ALL its contents from github: https://github.com/aristotle-mdr/aristotle-metadata-registry/tree/master/example_mdr")
+        print("   2. creating a new project using the django-admin tools and manually setting up a project")
         raise
 
     rename_example_mdr(name)
@@ -195,8 +195,8 @@ def main(argv=None):
             raise Usage(msg)
         # more code, unchanged
     except Usage as err:
-        print >>sys.stderr, err.msg
-        print >>sys.stderr, "for help use --help"
+        print(err.msg, file=sys.stderr)
+        print("for help use --help", file=sys.stderr)
         return 2
     if is_opt(opts, '-h', '--help'):
         print(__doc__)

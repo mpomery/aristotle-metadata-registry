@@ -44,10 +44,10 @@ class AristotleAutocompletes(utils.LoggedInViewPages, TestCase):
             }
         )
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('AC1' in response.content)
-        self.assertTrue('AC2' in response.content)
-        self.assertTrue('AC3' not in response.content)
-        self.assertTrue('AC4' in response.content)
+        self.assertContains(response, 'AC1')
+        self.assertContains(response, 'AC2')
+        self.assertNotContains(response, 'AC3')
+        self.assertContains(response, 'AC4')
         
         response = self.client.get(
             reverse(
@@ -59,10 +59,10 @@ class AristotleAutocompletes(utils.LoggedInViewPages, TestCase):
             }
         )
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('AC1' in response.content)
-        self.assertTrue('AC2' in response.content)
-        self.assertTrue('AC3' not in response.content)
-        self.assertTrue('AC4' not in response.content)
+        self.assertContains(response, 'AC1')
+        self.assertContains(response, 'AC2')
+        self.assertNotContains(response, 'AC3')
+        self.assertNotContains(response, 'AC4')
         
         self.item1.save()
 
@@ -89,10 +89,10 @@ class AristotleAutocompletes(utils.LoggedInViewPages, TestCase):
             }
         )
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('AC1' in response.content)
-        self.assertTrue('AC2' not in response.content)
-        self.assertTrue('AC3' not in response.content)
-        self.assertTrue('AC4' not in response.content)
+        self.assertContains(response, 'AC1')
+        self.assertNotContains(response, 'AC2')
+        self.assertNotContains(response, 'AC3')
+        self.assertNotContains(response, 'AC4')
 
     def test_concept_autocomplete_statuses(self):
         # see also
@@ -142,5 +142,5 @@ class AristotleAutocompletes(utils.LoggedInViewPages, TestCase):
             }
         )
 
-        self.assertTrue('standard' in response.content.lower())
-        self.assertTrue('incomplete' not in response.content.lower())
+        self.assertContains(response, 'Standard')
+        self.assertNotContains(response, 'Incomplete')

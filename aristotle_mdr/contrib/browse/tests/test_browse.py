@@ -23,7 +23,11 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
         self.item1 = self.itemType.objects.create(name="Test Item 1 (visible to tested viewers)",definition=" ",workgroup=self.wg1,**self.defaults)
         self.item2 = self.itemType.objects.create(name="Test Item 2 (NOT visible to tested viewers)",definition=" ",workgroup=self.wg2,**self.defaults)
         self.item3 = self.itemType.objects.create(name="Test Item 3 (visible to tested viewers)",definition=" ",workgroup=self.wg1,**self.defaults)
-        self.item4 = self.itemType.objects.create(name="Test Item 3 (visible to tested viewers)",definition=" ",workgroup=self.wg1,**self.defaults)
+
+        # Item 3 and 4 need to have a shared string in their name for `test_editor_can_view_browse_with_filters`
+        # So, the character `3` *must* be in the name below!
+        self.item4 = self.itemType.objects.create(name="Test Item 4 also like item 3 (visible to tested viewers)",definition=" ",workgroup=self.wg1,**self.defaults)
+
         self.ra.register(self.item4,self.ra.public_state,self.su)
 
     def test_browse_pages_load(self):
@@ -38,8 +42,8 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name])
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item4.name in response.content)
-        self.assertTrue(self.item2.name not in response.content)
+        self.assertContains(response, self.item4.name)
+        self.assertNotContains(response, self.item2.name)
 
     def test_zero_item_should_not_show(self):
         self.logout()
@@ -49,9 +53,9 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
 
         self.assertEqual(response.status_code, 200)
         if(self.itemType.objects.all().count() == 0):
-            self.assertTrue(self.itemType._meta.model_name not in response.content)
+            self.assertNotContains(response, self.itemType._meta.model_name)
         else:
-            self.assertTrue(self.itemType._meta.model_name in response.content)
+            self.assertContains(response, self.itemType._meta.model_name)
 
     def test_editor_can_view_browse(self):
         self.login_editor()
@@ -59,9 +63,9 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name])
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name in response.content)
-        self.assertTrue(self.item4.name in response.content)
-        self.assertTrue(self.item2.name not in response.content)
+        self.assertContains(response, self.item1.name)
+        self.assertContains(response, self.item4.name)
+        self.assertNotContains(response, self.item2.name)
 
     def test_editor_can_view_browse_with_filters(self):
         self.login_editor()
@@ -70,30 +74,30 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
             {'f':'name__icontains:3'}
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name not in response.content)
-        self.assertTrue(self.item2.name not in response.content)
-        self.assertTrue(self.item3.name in response.content)
-        self.assertTrue(self.item4.name in response.content)
+        self.assertNotContains(response, self.item1.name)
+        self.assertNotContains(response, self.item2.name)
+        self.assertContains(response, self.item3.name)
+        self.assertContains(response, self.item4.name)
 
         response = self.client.get(
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name]),
             {'f':'a_fake_query_that_fails:3'}
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name in response.content)
-        self.assertTrue(self.item2.name not in response.content)
-        self.assertTrue(self.item3.name in response.content)
-        self.assertTrue(self.item4.name in response.content)
+        self.assertContains(response, self.item1.name)
+        self.assertNotContains(response, self.item2.name)
+        self.assertContains(response, self.item3.name)
+        self.assertContains(response, self.item4.name)
 
         response = self.client.get(
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name]),
             {'f':'another_fake_query_that_fails'}
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name in response.content)
-        self.assertTrue(self.item2.name not in response.content)
-        self.assertTrue(self.item3.name in response.content)
-        self.assertTrue(self.item4.name in response.content)
+        self.assertContains(response, self.item1.name)
+        self.assertNotContains(response, self.item2.name)
+        self.assertContains(response, self.item3.name)
+        self.assertContains(response, self.item4.name)
 
     def test_editor_can_view_browse_with_slot_filters(self):
         from aristotle_mdr.contrib.slots.models import Slot, SlotDefinition
@@ -109,10 +113,10 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
             {'sf':'%s:hello'%_type.slot_name}
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name not in response.content)
-        self.assertTrue(self.item2.name not in response.content)
-        self.assertTrue(self.item3.name not in response.content)
-        self.assertTrue(self.item4.name not in response.content)
+        self.assertNotContains(response, self.item1.name)
+        self.assertNotContains(response, self.item2.name)
+        self.assertNotContains(response, self.item3.name)
+        self.assertNotContains(response, self.item4.name)
 
         slot = Slot.objects.create(concept=self.item1.concept, type=_type, value="hello")
 
@@ -121,30 +125,30 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
             {'sf':'%s:hello'%_type.slot_name}
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name in response.content)
-        self.assertTrue(self.item2.name not in response.content)
-        self.assertTrue(self.item3.name not in response.content)
-        self.assertTrue(self.item4.name not in response.content)
+        self.assertContains(response, self.item1.name)
+        self.assertNotContains(response, self.item2.name)
+        self.assertNotContains(response, self.item3.name)
+        self.assertNotContains(response, self.item4.name)
 
         response = self.client.get(
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name]),
             {'sf':['%s:hello'%_type.slot_name,'%s:bye'%_type.slot_name]}
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name in response.content)
-        self.assertTrue(self.item2.name not in response.content)
-        self.assertTrue(self.item3.name not in response.content)
-        self.assertTrue(self.item4.name not in response.content)
+        self.assertContains(response, self.item1.name)
+        self.assertNotContains(response, self.item2.name)
+        self.assertNotContains(response, self.item3.name)
+        self.assertNotContains(response, self.item4.name)
 
         response = self.client.get(
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name]),
             {'sf':'another_fake_query_that_fails'}
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name in response.content)
-        self.assertTrue(self.item2.name not in response.content)
-        self.assertTrue(self.item3.name in response.content)
-        self.assertTrue(self.item4.name in response.content)
+        self.assertContains(response, self.item1.name)
+        self.assertNotContains(response, self.item2.name)
+        self.assertContains(response, self.item3.name)
+        self.assertContains(response, self.item4.name)
 
     def test_editor_can_view_browse_with_two_slot_filters(self):
         from aristotle_mdr.contrib.slots.models import Slot, SlotDefinition
@@ -165,8 +169,8 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
             {'sf':'%s:hello'%slot_type_1.slot_name}
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name not in response.content)
-        self.assertTrue(self.item3.name not in response.content)
+        self.assertNotContains(response, self.item1.name)
+        self.assertNotContains(response, self.item3.name)
 
         # Make some slots
         Slot.objects.create(concept=self.item1.concept, type=slot_type_1, value="hello")
@@ -180,8 +184,8 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
             {'sf':'%s:hello'%slot_type_1.slot_name}
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name in response.content)
-        self.assertTrue(self.item3.name in response.content)
+        self.assertContains(response, self.item1.name)
+        self.assertContains(response, self.item3.name)
 
         response = self.client.get(
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name]),
@@ -191,10 +195,10 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
             ]}
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name in response.content)
-        self.assertTrue(self.item2.name not in response.content)
-        self.assertTrue(self.item3.name not in response.content)
-        self.assertTrue(self.item4.name not in response.content)
+        self.assertContains(response, self.item1.name)
+        self.assertNotContains(response, self.item2.name)
+        self.assertNotContains(response, self.item3.name)
+        self.assertNotContains(response, self.item4.name)
 
     def test_itemtypes_with_no_items_dont_show_up(self):
         self.login_editor()
@@ -251,7 +255,7 @@ class DataElementViewPage(LoggedInViewConceptBrowsePages,TestCase):
         response = self.client.get(
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name])
         )
-        self.assertTrue(check_text in response.content)
+        self.assertContains(response, check_text)
 
 class DataElementDerivationViewPage(LoggedInViewConceptBrowsePages,TestCase):
     url_name='dataelementderivation'

@@ -5,13 +5,13 @@ The Aristotle Metadata Registry is built on the django framework which supports 
 operating systems and databases. While Aristotle-MDR should support most of these
 only a small set of configurations have been thoroughly tested on the
 `Travis-CI <https://travis-ci.org/aristotle-mdr/aristotle-metadata-registry/>`_
-or Appveyor
+or `Appveyor <https://ci.appveyor.com/project/LegoStormtroopr/aristotle-metadata-registry-361e5>`_
 continuous integration systems as "supported infrastucture".
 
 Operating system support
 ------------------------
 
-* Ubuntu Linux 12.04 LTS
+* Ubuntu Linux 12.04 LTS (verification courtesy of Travis-CI)
 * Windows Server 2016 (verification courtesy of Appveyor)
 
 Travis-CI does not yet have containerised support for the Ubuntu 14.04 or 16.04
@@ -19,7 +19,10 @@ long-term support releases.
 
 Python
 ------
+Only the latest releases of Python are supported. New users are recommended to use Python 3.
+
 * Python 2.7
+* Python 3.5+
 
 Some modules are incompatible with Python 3 (support coming soon).
 

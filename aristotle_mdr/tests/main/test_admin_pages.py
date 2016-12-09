@@ -442,8 +442,8 @@ class AdminPageForConcept(utils.LoggedInViewPages):
             }
         )
         self.assertResponseStatusCodeEqual(response,200)
-        self.assertTrue("change 2" in response.content)
-        self.assertTrue('statuses' in response.content)
+        self.assertContains(response, "change 2")
+        self.assertContains(response, 'statuses')
         
         self.item1 = self.itemType.objects.get(pk=self.item1.pk) #decache
         self.assertTrue(self.item1.name == "change 2")
@@ -526,7 +526,7 @@ class OrganizationAdminPage(utils.LoggedInViewPages, TestCase):
         )
         msg = "Are you sure you want to promote the selected organizations to Registration Authorities"
 
-        self.assertTrue(msg in response.content)
+        self.assertContains(response, msg)
         self.assertTrue(ra_count == models.RegistrationAuthority.objects.count())
         self.assertTrue(org_count == models.Organization.objects.count())
 
@@ -545,4 +545,4 @@ class OrganizationAdminPage(utils.LoggedInViewPages, TestCase):
         self.assertTrue(org_count == models.Organization.objects.count())
 
         msg = "Successfully promoted 1 organization."
-        self.assertTrue(msg in response.content)
+        self.assertContains(response, msg)

@@ -441,7 +441,7 @@ class PermissionSearchForm(TokenSearchForm):
         for model_index in registered_indexes:
             for name, field in model_index.fields.items():
                 if field.faceted:
-                    if name not in (filters_to_facets.values() + logged_in_facets.values()):
+                    if name not in (list(filters_to_facets.values()) + list(logged_in_facets.values())):
                         extra_facets.append(name)
 
                         x = extra_facets_details.get(name, {})
@@ -471,7 +471,11 @@ class PermissionSearchForm(TokenSearchForm):
         if self.query_text:
             original_query = self.cleaned_data.get('q', "")
 
-            from urllib import quote_plus
+            try:  # Python 2
+                from urllib import quote_plus
+            except:  # Python 3
+                from urllib.parse import quote_plus
+
             suggestions = []
             has_suggestions = False
             suggested_query = []

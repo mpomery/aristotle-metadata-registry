@@ -42,8 +42,8 @@ setup(
         'pyyaml',
         'lesscpy',
 
-        'django-model-utils==2.3.1',
-        'django-notifications-hq>=1.0', #At least 0.8 for live notifications.
+        'django-model-utils>=2.3.1',
+        'django-notifications-hq>=1.0',
         'docutils',
 
         #Search requirements
@@ -64,11 +64,10 @@ setup(
         'django-bootstrap3',
         'django-bootstrap-datepicker',
 
-        # This was migrated out of django1.7, needed for django1.8
         'django-formtools',
 
-        'html5lib==1.0b8',
-        'xhtml2pdf',
+        'html5lib==1.0b10',
+        'xhtml2pdf>=0.2b1',
         #'django-tastypie'
 
         # required for help, but thats required

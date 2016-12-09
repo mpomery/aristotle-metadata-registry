@@ -18,21 +18,21 @@ import datetime
 
 class AnonymousUserViewingThePages(TestCase):
     def test_homepage(self):
-        home = self.client.get("/")
-        self.assertEqual(home.status_code,200)
+        response = self.client.get("/")
+        self.assertEqual(response.status_code,200)
 
     def test_notifications_for_anon_users(self):
-        home = self.client.get("/")
-        self.assertEqual(home.status_code,200)
+        response = self.client.get("/")
+        self.assertEqual(response.status_code,200)
         # Make sure notifications library isn't loaded for anon users as they'll never have notifications.
-        self.assertTrue("notifications/notify.js" not in home.content)
+        self.assertNotContains(response, "notifications/notify.js")
         # At some stage this might need a better test to check the 500 page doesn't show... after notifications is fixed.
 
     def test_sitemaps(self):
-        home = self.client.get("/sitemap.xml")
-        self.assertEqual(home.status_code,200)
-        home = self.client.get("/sitemaps/sitemap_0.xml")
-        self.assertEqual(home.status_code,200)
+        response = self.client.get("/sitemap.xml")
+        self.assertEqual(response.status_code,200)
+        response = self.client.get("/sitemaps/sitemap_0.xml")
+        self.assertEqual(response.status_code,200)
 
     def test_visible_item(self):
         wg = models.Workgroup.objects.create(name="Setup WG")
@@ -44,13 +44,13 @@ class AnonymousUserViewingThePages(TestCase):
                 registrationDate=timezone.now(),
                 state=ra.locked_state
                 )
-        home = self.client.get(url_slugify_concept(item))
+        response = self.client.get(url_slugify_concept(item))
         # Anonymous users requesting a hidden page will be redirected to login
-        self.assertEqual(home.status_code,302)
+        self.assertEqual(response.status_code,302)
         s.state = ra.public_state
         s.save()
-        home = self.client.get(url_slugify_concept(item))
-        self.assertEqual(home.status_code,200)
+        response = self.client.get(url_slugify_concept(item))
+        self.assertEqual(response.status_code,200)
 
 def setUpModule():
     from django.core.management import call_command
@@ -943,7 +943,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
             if sub_item is not None and perms.user_can_change_status(self.registrar,sub_item) :
                 if not sub_item.is_registered: # pragma: no cover
                     # This is debug code, and should never happen
-                    print sub_item
+                    print(sub_item)
                 self.assertTrue(sub_item.is_registered)
 
 

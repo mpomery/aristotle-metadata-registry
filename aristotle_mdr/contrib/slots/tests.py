@@ -37,8 +37,8 @@ class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):
         # Test with no value
         response = self.client.get(reverse('aristotle_slots:similar_slots', args=[_type.id]))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(oc1.name in response.content)
-        self.assertTrue(oc2.name in response.content)
+        self.assertContains(response, oc1.name)
+        self.assertContains(response, oc2.name)
 
         # Test with value is 1
         response = self.client.get(
@@ -46,15 +46,15 @@ class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):
             {'value': 1}
         )
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(oc1.name in response.content)
-        self.assertTrue(oc2.name not in response.content)
+        self.assertContains(response, oc1.name)
+        self.assertNotContains(response, oc2.name)
 
         self.logout()
         # Test with no value
         response = self.client.get(reverse('aristotle_slots:similar_slots', args=[_type.id]))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(oc1.name not in response.content)
-        self.assertTrue(oc2.name not in response.content)
+        self.assertNotContains(response, oc1.name)
+        self.assertNotContains(response, oc2.name)
 
     def test_long_slots(self):
         _type = models.SlotDefinition.objects.create(

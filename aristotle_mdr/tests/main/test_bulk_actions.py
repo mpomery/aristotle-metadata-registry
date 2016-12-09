@@ -66,7 +66,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         )
         self.assertEqual(self.editor.profile.favourites.count(), 1)
         self.assertFalse(self.item4 in self.editor.profile.favourites.all())
-        self.assertTrue("Some items failed, they had the id&#39;s: %s" % self.item4.id in response.content)
+        self.assertContains(response, "Some items failed, they had the id&#39;s: %s" % self.item4.id)
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertEqual(response.redirect_chain[0][1], 302)
 
@@ -105,7 +105,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(self.item1.concept in self.new_workgroup.items.all())
         self.assertTrue(self.item2.concept in self.new_workgroup.items.all())
 
-        self.assertTrue("Forbbiden" in response.content)
+        self.assertEqual(response.status_code, 403)
 
     @override_settings(ARISTOTLE_SETTINGS=dict(settings.ARISTOTLE_SETTINGS, WORKGROUP_CHANGES=['submitter']))
     def test_bulk_change_workgroup_for_editor__for_some_items(self):
@@ -132,13 +132,15 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(self.item2.concept in self.new_workgroup.items.all())
         self.assertTrue(self.item4.concept not in self.new_workgroup.items.all())
 
-        self.assertTrue("Some items failed, they had the id&#39;s: %(bad_ids)s" % {
-            'bad_ids': ",".join(map(str,[self.item4.pk]))
-        } in response.content)
+        self.assertContains(
+            response,
+            "Some items failed, they had the id&#39;s: %(bad_ids)s" % {
+                'bad_ids': ",".join(map(str,[self.item4.pk]))
+            }
+        )
 
         self.logout()
         self.login_superuser()
-
 
         response = self.client.post(
             reverse('aristotle:bulk_action'),
@@ -155,7 +157,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(self.item2.concept in self.wg1.items.all())
         self.assertTrue(self.item4.concept in self.wg1.items.all())
 
-        self.assertTrue("Some items failed, they had the id&#39;s" not in response.content)
+        self.assertNotContains(response, "Some items failed, they had the id&#39;s")
 
     def test_bulk_remove_favourite(self):
         self.login_editor()
@@ -264,8 +266,8 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         err1 = "Some items failed"
         err2 = "s: %s" % ','.join(sorted([str(self.item2.id), str(self.item4.id)]))
 
-        self.assertTrue(err1 in response.content)
-        self.assertTrue(err2 in response.content)
+        self.assertContains(response, err1)
+        self.assertContains(response, err2)
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertEqual(response.redirect_chain[0][1], 302)
 

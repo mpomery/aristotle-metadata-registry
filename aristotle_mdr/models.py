@@ -19,6 +19,8 @@ from model_utils.models import TimeStampedModel
 from model_utils import Choices, FieldTracker
 from aristotle_mdr.contrib.channels.utils import fire
 
+from django.utils.encoding import python_2_unicode_compatible  # Python 2
+
 import reversion  # import revisions
 
 import datetime
@@ -69,6 +71,7 @@ VERY_RECENTLY_SECONDS = 15
 concept_visibility_updated = Signal(providing_args=["concept"])
 
 
+@python_2_unicode_compatible  # Python 2
 class baseAristotleObject(TimeStampedModel):
     name = models.TextField(
         help_text=_("The primary name used for human identification purposes.")
@@ -105,9 +108,6 @@ class baseAristotleObject(TimeStampedModel):
         return d
 
     def __str__(self):
-        return "{name}".format(name=self.name).encode('utf-8')
-
-    def __unicode__(self):
         return "{name}".format(name=self.name)
 
     # Defined so we can access it during templates.
@@ -957,6 +957,7 @@ class ReviewRequest(TimeStampedModel):
         )
 
 
+@python_2_unicode_compatible  # Python 2
 class Status(TimeStampedModel):
     """
     8.1.2.6 - Registration_State class
@@ -992,7 +993,7 @@ class Status(TimeStampedModel):
     def state_name(self):
         return STATES[self.state]
 
-    def __unicode__(self):
+    def __str__(self):
         return "{obj} is {stat} for {ra} on {date} - {desc}".format(
             obj=self.concept.name,
             stat=self.state_name,
@@ -1084,6 +1085,7 @@ class ConceptualDomain(concept):
     )
 
 
+@python_2_unicode_compatible  # Python 2
 class ValueMeaning(aristotleComponent):
     """
     Value_Meaning is a class each instance of which models a value meaning (3.2.141),
@@ -1109,7 +1111,7 @@ class ValueMeaning(aristotleComponent):
         help_text='Date at which the value meaning ceased to be valid'
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s: %s - %s" % (
             self.conceptual_domain.name,
             self.value,
@@ -1182,6 +1184,7 @@ class ValueDomain(concept):
         return self.supplementaryvalue_set.all()
 
 
+@python_2_unicode_compatible  # Python 2
 class AbstractValue(aristotleComponent):
     """
     Implementation note: Not the best name, but there will be times to
@@ -1224,7 +1227,7 @@ class AbstractValue(aristotleComponent):
         help_text='Date at which the value ceased to be valid'
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s: %s - %s" % (
             self.valueDomain.name,
             self.value,

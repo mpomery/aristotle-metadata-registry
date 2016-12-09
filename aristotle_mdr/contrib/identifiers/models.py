@@ -7,6 +7,7 @@ These are based on the Identification metadamodel region in ISO/IEC 11179 Part 3
 
 from django.apps import apps
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible  # Python 2
 from django.utils.translation import ugettext_lazy as _
 
 from model_utils.models import TimeStampedModel
@@ -22,6 +23,7 @@ class Namespace(TimeStampedModel):
     )
 
 
+@python_2_unicode_compatible  # Python 2
 class ScopedIdentifier(TimeStampedModel):
     namespace = models.ForeignKey(Namespace)
     concept = models.ForeignKey(MDR._concept, related_name='identifiers')
@@ -39,5 +41,5 @@ class ScopedIdentifier(TimeStampedModel):
     class Meta:
         unique_together = ("namespace", "identifier", "version")
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{0}:{1}:{2}".format(self.namespace.naming_authority.name, self.identifier, self.version)

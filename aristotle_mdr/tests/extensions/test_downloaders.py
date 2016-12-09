@@ -26,8 +26,8 @@ class TextDownloader(utils.LoggedInViewPages, TestCase):
 
         response = self.client.get(reverse('aristotle:download', args=['txt', de.id]))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(de.name in str(response))
-        self.assertTrue(de.definition in str(response))
+        self.assertContains(response, de.name)
+        self.assertContains(response, de.definition)
 
         response = self.client.get(reverse('aristotle:download', args=['txt', de2.id]))
         # This item is not visible to the logged in user and will throw an error

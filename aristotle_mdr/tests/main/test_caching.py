@@ -38,7 +38,7 @@ class CachingForRawPermissions(TestCase):
         reg, c = models.Status.objects.get_or_create(
             concept=self.item,
             registrationAuthority=self.ra,
-            registrationDate=datetime.date(2009, 04, 28),
+            registrationDate=datetime.date(2009, 4, 28),
             state=models.STATES.standard
         )
         self.assertFalse(perms.user_can_edit(self.submitter, self.item))
@@ -62,7 +62,7 @@ class CachingForRawPermissions(TestCase):
         reg, c = models.Status.objects.get_or_create(
             concept=self.item,
             registrationAuthority=self.ra,
-            registrationDate=datetime.date(2009, 04, 28),
+            registrationDate=datetime.date(2009, 4, 28),
             state=models.STATES.standard
         )
         self.assertTrue(perms.user_can_view(self.submitter, self.item))
