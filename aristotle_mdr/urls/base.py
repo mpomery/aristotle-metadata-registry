@@ -11,7 +11,7 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^login/?$', friendly_redirect_login, name='friendly_login'),
-    url(r'^logout/?$', views.logout, {'next_page': '/'}),
+    url(r'^logout/?$', views.logout, {'next_page': '/'}, name='logout'),
     url(r'^django/admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^django/admin/', include(admin.site.urls)),
     url(r'^ckeditor/', include('aristotle_mdr.urls.ckeditor_uploader')),
