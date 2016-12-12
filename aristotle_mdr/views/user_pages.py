@@ -253,7 +253,7 @@ def my_review_list(request):
 
 @login_required
 def django_admin_wrapper(request, page_url):
-    return render(request, "aristotle_mdr/user/admin.html", {'page_url':page_url})
+    return render(request, "aristotle_mdr/user/admin.html", {'page_url': page_url})
 
 
 class ReviewDetailsView(DetailView):
