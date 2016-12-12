@@ -21,7 +21,8 @@ class NameSuggestInput(TextInput):
 
 # Thanks http://stackoverflow.com/questions/6727372/
 class RegistrationAuthoritySelect(forms.Select):
-    def render(self, name, value, attrs=None, choices=()):
+    def render(self, name, value, **kwargs):
+        attrs = kwargs.get('attrs', None)
         if value is not None:
             attrs['disabled']='disabled'
             _id = attrs.get('id')
@@ -30,10 +31,10 @@ class RegistrationAuthoritySelect(forms.Select):
             hidden_input_with_value = '<input type="hidden" id="%s" name="%s" value="%s" />' % (_id, name, value)
             attrs['id'] = _id + "_disabled"
             name = name + "_disabled"
-            rendered = super(RegistrationAuthoritySelect, self).render(name, value, attrs, choices)
+            rendered = super(RegistrationAuthoritySelect, self).render(name, value, **kwargs)
             return mark_safe(rendered + hidden_input_with_value)
         else:
-            return super(RegistrationAuthoritySelect, self).render(name, value, attrs, choices)
+            return super(RegistrationAuthoritySelect, self).render(name, value, **kwargs)
 
 
 class BootstrapChoiceInput(ChoiceInput):

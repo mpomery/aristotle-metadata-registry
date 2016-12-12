@@ -1,4 +1,4 @@
-{% extends is_popup|yesno:"admin/base.html,admin/aristotle_admin_base.html" %}
+{% extends "admin/base.html" %}
 {% load i18n %}
 {% load staticfiles bootstrap3 compile_static %}
 {% load notifications_tags %}
@@ -6,43 +6,21 @@
 {% block title %}{{ title }} - {{ config.SITE_NAME }}{% endblock %}
 
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
+<h1 id="site-name"><a href="{% url 'admin:index' %}">
+    {{ site_header|default:_('Django administration') }} - {{ config.SITE_NAME }}</a></h1>
 {% endblock %}
 
 {% block extrahead %}
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.js" type="text/javascript"></script>
-
-    {% if not is_popup %}
-
-        {% bootstrap_css %}
-        {% bootstrap_javascript %}
-        <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.less' %}" />
-        <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.dashboard.less' %}" />
-        <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.admin.less' %}" />
-        <script src="{% static 'aristotle_mdr/aristotle.admin.js' %}" type="text/javascript"></script>
-        <script src="{% static 'notifications/notify.js' %}" type="text/javascript"></script>
-        <script src="{% static 'aristotle_mdr/aristotle.js' %}" type="text/javascript"></script>
-        {% register_notify_callbacks callbacks='fill_aristotle_notification_menu,fill_notification_badge' %}
-
-    {% endif %}
-    
-    <link rel="icon" type="image/png" href="{% static 'aristotle_mdr/images/favicon.png' %}"/>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />
+    <script src="{% static 'aristotle_mdr/aristotle.admin.js' %}" type="text/javascript"></script>
     {% include 'autocomplete_light/static.html' %}
 {% endblock %}
 
-{% block admin_title %}
-    <h1 id="grp-admin-title">
-        <a href="{% url 'aristotle:home' %}" id="logo">
-            <img height="48px" src="{{ config.SITE_BRAND }}" alt="{{ config.SITE_NAME }}" title="{% trans 'Return to the main site' %} - {{ config.SITE_NAME }}">
-        </a>
-    </h1>
-{% endblock %}
 
 {% block userlinks %}
     <!-- Documentation -->
     {% url 'django-admindocs-docroot' as docsroot %}
-    {% if docsroot %}
-        <li><a href="{{ docsroot }}" title={% trans 'Browse live documentation' %}>{% trans 'Documentation' %}</a></li>
-    {% endif %}
+    <a href="/account" title={% trans 'Return to Dashboard' %}>{% trans 'Return to Dashboard' %}</a>
+        <a href="{{ docsroot }}" title={% trans 'Browse live documentation' %}>{% trans 'Documentation' %}</a>
 {% endblock %}

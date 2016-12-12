@@ -49,14 +49,14 @@ TEMPLATE_DEBUG = DEBUG
 
 MEDIA_URL = '/media/'
 CKEDITOR_UPLOAD_PATH = 'uploads/'
-
+ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Required for admindocs, see: https://code.djangoproject.com/ticket/21386
 SITE_ID=None
 
-# This gets called because of teh DataElementConcept.property attribute.
+# This gets called because of the DataElementConcept.property attribute.
 # Not sure how to resolve this one yet.
-SILENCED_SYSTEM_CHECKS = ['models.E006'] 
+SILENCED_SYSTEM_CHECKS = ['models.E006']
 
 ALLOWED_HOSTS = []
 
