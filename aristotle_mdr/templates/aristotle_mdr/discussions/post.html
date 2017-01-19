@@ -14,9 +14,10 @@
     </li>
 {% endblock %}
 
+{% block discussions_header %}{{ post.title }}{% endblock %}
+
 {% block discussion_content %}
 
-<h1>{{ post.title }}</h1>
 {% if post.closed %}
         <div class=" alert alert-warning">
             This discussion thread is now closed.

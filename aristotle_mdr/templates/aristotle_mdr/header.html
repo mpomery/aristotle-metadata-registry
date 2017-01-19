@@ -27,7 +27,7 @@
             {% endcomment %}
             <form id="quickSearch" action="{% url 'aristotle:search' %}" method="get"
             class="navbar-form navbar-left" role="search">
-                <label style="display:none;" for="searchText">Search:</label>
+                <label class="sr-only" for="searchText">Search:</label>
                 <div class="input-group">
                     <input type="text" class="form-control" id="searchText" name="q" accesskey="q">
                     <span class="input-group-btn">
