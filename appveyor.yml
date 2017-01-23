@@ -26,15 +26,17 @@ environment:
 install:
   - cmd: |
         set PATH=%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%PATH%
+        "python.exe" -m pip install --upgrade pip
         "pip.exe" install codecov
         "pip.exe" install pep8
-        "python.exe" -m pip install --upgrade pip
+        "pip.exe" install pypiwin32
         "pip.exe" install setuptools -U
         "pip.exe" install %PYODBC_FILE%
         "pip.exe" install "django_pyodbc_azure>%DJANGO_VERSION%"
         "pip.exe" install -r requirements-test.txt
         "pip.exe" install -r requirements.txt
         "pip.exe" install .
+        "pip.exe" install "daphne==0.15.0"
         "pip.exe" install "Django>%DJANGO_VERSION%"
 
 before_test:
