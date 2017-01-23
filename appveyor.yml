@@ -36,6 +36,7 @@ install:
         "pip.exe" install -r requirements-test.txt
         "pip.exe" install -r requirements.txt
         "pip.exe" install .
+        "pip.exe" install "channels==0.17.3"
         "pip.exe" install "daphne==0.15.0"
         "pip.exe" install "Django>%DJANGO_VERSION%"
 
