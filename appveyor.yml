@@ -17,11 +17,16 @@ environment:
         SEARCH: whoosh
         PYTHON_HOME: "C:/Python35-x64"
         PYODBC_FILE: "./aristotle_mdr/tests/bin/pyodbc-3.0.10-cp35-cp35m-win_amd64.whl"
-      - DJANGO_VERSION: '1.8,<1.9'
+      - DJANGO_VERSION: '1.10,<1.11'
         DB: mssql
         SEARCH: whoosh
-        PYTHON_HOME: "C:/Python27"
-        PYODBC_FILE: pyodbc
+        PYTHON_HOME: "C:/Python35"
+        PYODBC_FILE: "./aristotle_mdr/tests/bin/pyodbc-3.0.10-cp35-cp35m-win32.whl"
+      - DJANGO_VERSION: '1.10,<1.11'
+        DB: mssql
+        SEARCH: whoosh
+        PYTHON_HOME: "C:/Python35-x64"
+        PYODBC_FILE: "./aristotle_mdr/tests/bin/pyodbc-3.0.10-cp35-cp35m-win_amd64.whl"
 
 install:
   - cmd: |
