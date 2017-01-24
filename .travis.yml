@@ -36,11 +36,11 @@ install:
   - pip uninstall setuptools -y && pip install 'setuptools>34.0' --ignore-installed # needed for updated version of html5lib
   - if [[ $DB == postgres ]]; then pip install -q psycopg2; fi
   - if [[ $DB == mariadb ]]; then pip install -q mysqlclient; fi
-  - pip install 'Django$DJANGO_VERSION' # So we can test multiple versions (once we support that)
+  - pip install "Django$DJANGO_VERSION" # So we can test multiple versions (once we support that)
   - "pip install -r requirements-test.txt"
   - "pip install -r requirements.txt"
   - "pip install ."
-  - pip install 'Django$DJANGO_VERSION' # So we can test multiple versions (once we support that)
+  - pip install "Django$DJANGO_VERSION" # So we can test multiple versions (once we support that)
 # Tell us exactly what versions we are running on!
 
 
