@@ -77,7 +77,6 @@ if False and skip_migrations:  # pragma: no cover
 INSTALLED_APPS = (
     # The good stuff
     'aristotle_mdr.contrib.self_publish',
-    'aristotle_mdr.contrib.links',
     'templatetags',
     'extension_test',
     'text_download_test',
