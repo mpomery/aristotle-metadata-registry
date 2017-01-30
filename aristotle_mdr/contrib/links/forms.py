@@ -1,20 +1,18 @@
-from __future__ import division
-
 from django.forms import ValidationError, ModelForm
 from django.forms.models import inlineformset_factory
 from django.utils.translation import ugettext_lazy as _
 from aristotle_mdr import models as MDR
-from aristotle_mdr.contrib.slots.models import Slot, SlotDefinition
+from aristotle_mdr.contrib.links.models import Link, SlotDefinition
 
 
 # TODO: Fix this method, it is a hot mess!... But it works.
 # But it will require Django 1.9 - https://docs.djangoproject.com/en/1.9/topics/forms/formsets/#passing-custom-parameters-to-formset-forms
 # Or some funky functional stuff - http://stackoverflow.com/a/624013/764357
-def slot_inlineformset_factory(model):
+def link_inlineformset_factory(model):
 
-    class SlotForm(ModelForm):
+    class LinkForm(ModelForm):
         class Meta:
-            model = Slot
+            model = Link
             fields = ('concept', 'type', 'value')
 
         def __init__(self, *args, **kwargs):

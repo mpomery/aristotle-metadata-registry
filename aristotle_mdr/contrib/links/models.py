@@ -30,11 +30,11 @@ class Relation(MDR.concept):  # 9.1.2.4
     )
 
 
-class RelationRole(aristotleComponent):  # 9.1.2.5
+class RelationRole(MDR.aristotleComponent):  # 9.1.2.5
     name = models.TextField(
         help_text=_("The primary name used for human identification purposes.")
     )
-    definition = RichTextField(
+    definition = MDR.RichTextField(
         _('definition'),
         help_text=_("Representation of a concept by a descriptive statement "
                     "which serves to differentiate it from related concepts. (3.2.39)")
@@ -49,8 +49,7 @@ class RelationRole(aristotleComponent):  # 9.1.2.5
     ordinal = models.PositiveIntegerField(  # 9.1.2.5.3.2
         help_text=_(
             'order of the relation role among other relation roles in the relation.'
-        ),
-        validators=[MinValueValidator(2)]
+        )
     )
     relation = models.ForeignKey(Relation)
     @property

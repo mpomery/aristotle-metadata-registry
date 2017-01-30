@@ -597,6 +597,12 @@ class ConceptQuerySet(InheritanceQuerySet):
         """
         return self.filter(_is_public=True)
 
+    def __contains__(self, item):
+        if not issubclass(type(item), _concept):
+            return False
+        else:
+            return self.all().filter(pk=item.concept.pk).exists()
+
 
 class ConceptManager(InheritanceManager):
     """

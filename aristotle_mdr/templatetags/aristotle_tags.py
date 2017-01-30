@@ -14,6 +14,7 @@ Available tags and filters
 --------------------------
 """
 from django import template
+from django.conf import settings
 from django.core.urlresolvers import reverse, resolve
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
@@ -45,6 +46,10 @@ def can_alter_post(user, post):
 def is_in(item, iterable):
     return item in iterable
 
+
+@register.filter
+def is_installed_app(app_name):
+    return app_name in settings.INSTALLED_APPS
 
 @register.filter
 def in_workgroup(user, workgroup):
@@ -290,7 +295,6 @@ def downloadMenu(item):
 
         {% downloadMenu item %}
     """
-    from django.conf import settings
     from django.template.loader import get_template
     from django.template import Context
     downloadOpts = getattr(settings, 'ARISTOTLE_DOWNLOADS', "")

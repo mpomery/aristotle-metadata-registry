@@ -1,12 +1,12 @@
-{% load i18n slot_tags util_tags %}
-{% if item.slots.exists %}
+{% load i18n util_tags %}
+{% if True %}
 <div>
-<h2>Additional Attributes</h2>
+<h2>Relationships</h2>
 <table class="table">
     <thead>
         <tr>
             <th>
-                {% trans 'Slot name' %}
+                {% trans 'Relationship' %}
             </th>
             <th>
                 {% trans 'Details' %}
@@ -35,7 +35,6 @@
             </td>
             <td>
                 <a href="{% url 'aristotle_slots:similar_slots' slot.type.id %}?value={{slot.value}}">
-                {% count_similar request.user slot %}
                 </a>
             </td>
         </tr>
