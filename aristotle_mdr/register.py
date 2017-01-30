@@ -116,7 +116,10 @@ def register_concept_admin(concept_class, *args, **kwargs):
     if not extra_fieldsets and auto_fieldsets:
         # returns every field that isn't in a concept
         field_names = [f.name for f in concept._meta.get_fields()] + ['supersedes']
-        m2ms = [m[0] for m in concept_class._meta.get_m2m_with_model()]
+        m2ms = [
+            f for f in concept_class._meta.get_fields()
+            if f.many_to_many and not f.auto_created
+        ]
         m2m_rel = [y.related_model for y in concept_class._meta.get_all_related_objects()]
         auto_fieldset = []
         auto_inlines = []
