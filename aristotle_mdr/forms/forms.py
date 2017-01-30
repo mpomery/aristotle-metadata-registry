@@ -3,7 +3,7 @@ from __future__ import division
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from bootstrap_datepicker.widgets import DatePicker as DateTimePicker
+from bootstrap3_datetime.widgets import DateTimePicker
 
 import aristotle_mdr.models as MDR
 from aristotle_mdr.perms import user_can_edit, user_can_view
