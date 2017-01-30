@@ -115,7 +115,7 @@ def register_concept_admin(concept_class, *args, **kwargs):
     from django.db.models.fields.related import ManyToManyField, ManyToOneRel
     if not extra_fieldsets and auto_fieldsets:
         # returns every field that isn't in a concept
-        field_names = concept._meta.get_all_field_names() + ['supersedes']
+        field_names = [f.name for f in concept._meta.get_fields()] + ['supersedes']
         m2ms = [m[0] for m in concept_class._meta.get_m2m_with_model()]
         m2m_rel = [y.related_model for y in concept_class._meta.get_all_related_objects()]
         auto_fieldset = []
