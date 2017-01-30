@@ -7,12 +7,27 @@ BASE = os.path.join(os.path.dirname(os.path.dirname(__file__)),'..')
 sys.path.insert(1, BASE)
 sys.path.insert(1, os.path.join(BASE, "tests"))
 sys.path.insert(1, os.path.join(BASE, "tests/apps"))
-TEMPLATE_DIRS = [
-    os.path.join(BASE_DIR, 'tests/apps/bulk_actions_test/templates')
+
+TEMPLATES += [
+    {
+        'NAME': 'test_templates',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'tests/apps/bulk_actions_test/templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.request',
+                'django.template.context_processors.static',
+                'aristotle_mdr.context_processors.settings',
+                'django.contrib.messages.context_processors.messages',
+            ],
+            'debug': DEBUG
+        },
+    },
 ]
 
 SECRET_KEY = 'inara+vtkprm7@0(fsc$+grbz9-s+tmo9d)e#k(9uf8m281&$7xhdkjr'
-SOUTH_TESTS_MIGRATE = True
 
 MEDIA_ROOT = os.path.join(BASE, "media")
 MEDIA_URL = '/media/'

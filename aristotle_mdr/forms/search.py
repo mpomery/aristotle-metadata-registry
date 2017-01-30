@@ -10,7 +10,7 @@ from haystack.constants import DEFAULT_ALIAS
 from haystack.forms import SearchForm, FacetedSearchForm
 from haystack.query import EmptySearchQuerySet, SearchQuerySet, SQ
 
-from bootstrap_datepicker.widgets import DatePicker as DateTimePicker
+from bootstrap3_datetime.widgets import DateTimePicker
 
 import aristotle_mdr.models as MDR
 from aristotle_mdr.widgets import BootstrapDropdownSelectMultiple, BootstrapDropdownIntelligentDate, BootstrapDropdownSelect
@@ -239,8 +239,8 @@ class TokenSearchForm(FacetedSearchForm):
 
 datePickerOptions = {
     "format": "YYYY-MM-DD",
-    "pickTime": False,
-    "pickDate": True,
+    # "pickTime": False,
+    # "pickDate": True,
     "defaultDate": "",
     "useCurrent": False,
 }
