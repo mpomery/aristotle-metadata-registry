@@ -122,7 +122,7 @@ def register_concept_admin(concept_class, *args, **kwargs):
         ]
         m2m_rel = [
             f.related_model
-            for f in MyModel._meta.get_fields()
+            for f in concept_class._meta.get_fields()
             if (f.one_to_many or f.one_to_one) and f.auto_created and not f.concrete
         ]
         auto_fieldset = []
