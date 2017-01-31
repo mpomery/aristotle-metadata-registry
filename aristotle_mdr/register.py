@@ -120,7 +120,11 @@ def register_concept_admin(concept_class, *args, **kwargs):
             f for f in concept_class._meta.get_fields()
             if f.many_to_many and not f.auto_created
         ]
-        m2m_rel = [y.related_model for y in concept_class._meta.get_all_related_objects()]
+        m2m_rel = [
+            f.related_model
+            for f in MyModel._meta.get_fields()
+            if (f.one_to_many or f.one_to_one) and f.auto_created and not f.concrete
+        ]
         auto_fieldset = []
         auto_inlines = []
         for f in concept_class._meta.get_fields():
