@@ -61,7 +61,7 @@ if 'TRAVIS' in os.environ or 'APPVEYOR' in os.environ:
             from aristotle_mdr.tests.settings.templates.search.elasticsearch import HAYSTACK_CONNECTIONS
 
 
-if False and skip_migrations:  # pragma: no cover
+if skip_migrations:  # pragma: no cover
     print("Skipping migrations")
     class DisableMigrations(object):
     

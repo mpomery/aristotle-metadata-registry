@@ -463,7 +463,7 @@ class LoggedInViewPages(object):
         return url_slugify_concept(item)
 
     def logout(self):
-        self.client.post(reverse('django.contrib.auth.views.logout'), {})
+        self.client.post(reverse('logout'), {})
 
     def login_superuser(self):
         self.logout()
