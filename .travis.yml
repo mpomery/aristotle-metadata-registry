@@ -13,9 +13,9 @@ services:
   - mariadb
 
 env:
+  - DJANGO_VERSION='>1.8,<1.9' DB=postgres      SEARCH=elasticsearch   MAIN=1
   - DJANGO_VERSION='>1.8,<1.9' DB=sqlitefile    SEARCH=whoosh
   - DJANGO_VERSION='>1.8,<1.9' DB=postgres      SEARCH=whoosh
-  - DJANGO_VERSION='>1.8,<1.9' DB=postgres      SEARCH=elasticsearch
   - DJANGO_VERSION='>1.8,<1.9' DB=mariadb       SEARCH=whoosh
   - DJANGO_VERSION='>1.8,<1.9' DB=mariadb       SEARCH=elasticsearch
 
@@ -66,6 +66,7 @@ script:
 # Start a few workers
 #  - ./manage.py runworker --settings=aristotle_mdr.tests.settings.settings > worker1.log 2>&1 &
   - coverage run --branch --source=aristotle_mdr manage.py test aristotle_mdr.tests --settings=aristotle_mdr.tests.settings.settings;
+  - if [[ $MAIN == 1 ]]; then ./manage.py test aristotle_mdr.tests.accessibility --settings=aristotle_mdr.tests.settings.settings fi
 #  - cat worker1.log
 after_success:
   - coveralls

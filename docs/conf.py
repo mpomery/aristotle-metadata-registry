@@ -22,6 +22,10 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'aristotle_mdr.required_settings'
 import django
 django.setup()
 
+suppress_warnings = [
+    'image.nonlocal_uri',
+]
+
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
