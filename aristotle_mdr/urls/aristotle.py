@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
@@ -14,9 +14,7 @@ from aristotle_mdr.contrib.generic.views import (
 from django.utils.translation import ugettext_lazy as _
 
 
-urlpatterns = patterns(
-    'aristotle_mdr.views',
-
+urlpatterns = [
     url(r'^/?$', TemplateView.as_view(template_name='aristotle_mdr/static/home.html'), name="home"),
     url(r'^manifest.json$', TemplateView.as_view(template_name='aristotle_mdr/manifest.json', content_type='application/json')),
     url(r'^sitemap.xml$', views.sitemaps.main, name='sitemap_xml'),
@@ -116,6 +114,8 @@ urlpatterns = patterns(
     url(r'^account/workgroups/archives/?$', views.user_pages.workgroup_archives, name='user_workgroups_archives'),
     url(r'^account/notifications(?:/folder/(?P<folder>all))?/?$', views.user_pages.inbox, name='userInbox'),
 
+    url(r'^account/django/(.*)?$', views.user_pages.django_admin_wrapper, name='django_admin'),
+
 
     url(r'^action/review/(?P<iid>\d+)?$', views.actions.SubmitForReviewView.as_view(), name='request_review'),
     url(r'^account/registrartools/?$', views.user_pages.registrar_tools, name='userRegistrarTools'),
@@ -147,4 +147,4 @@ urlpatterns = patterns(
             ),
         name='search'
     ),
-)
+]

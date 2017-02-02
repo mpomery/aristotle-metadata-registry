@@ -24,12 +24,12 @@ Only the latest releases of Python are supported. New users are recommended to u
 * Python 2.7
 * Python 3.5+
 
-Some modules are incompatible with Python 3 (support coming soon).
-
 Django
 ------
 
 * Django version 1.8 LTS
+* Django version 1.10
+
 
 Database support
 ----------------
@@ -37,8 +37,10 @@ Database support
 * SQLite
 * Postgres
 * Microsoft SQL Server 2016 (Windows deployments only)
+* MariaDB
 
-MySQL has a number of small issues in the test suite (full coverage coming soon).
+Note, MySQL has issues incompatible with Aristotle that prevent it from being used.
+Consider using an alternative like MariaDB if you need MySQL-like support.
 
 Search index support
 --------------------

@@ -26,6 +26,23 @@ CACHES = {
     }
 }
 
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': TEMPLATE_DIRS,
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.request',
+                'django.template.context_processors.static',
+                'aristotle_mdr.context_processors.settings',
+                'django.contrib.messages.context_processors.messages',
+            ]
+        },
+    },
+]
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -37,6 +54,9 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 # Required for admindocs, see: https://code.djangoproject.com/ticket/21386
 SITE_ID=None
 
+# This gets called because of the DataElementConcept.property attribute.
+# Not sure how to resolve this one yet.
+SILENCED_SYSTEM_CHECKS = ['models.E006']
 
 ALLOWED_HOSTS = []
 
@@ -71,7 +91,7 @@ INSTALLED_APPS = (
 
     'static_precompiler',
     'bootstrap3',
-    'bootstrap3_datetime',
+    'bootstrap_datepicker',
     'reversion',  # https://github.com/etianen/django-reversion
     'reversion_compare',  # https://github.com/jedie/django-reversion-compare
 
@@ -96,14 +116,6 @@ MIDDLEWARE_CLASSES = (
     # 'reversion.middleware.RevisionMiddleware',
 )
 
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.request',
-    'django.core.context_processors.static',
-    'aristotle_mdr.context_processors.settings',
-    'django.contrib.messages.context_processors.messages',
-)
 
 ROOT_URLCONF = 'aristotle_mdr.urls'
 LOGIN_REDIRECT_URL = '/account/home'

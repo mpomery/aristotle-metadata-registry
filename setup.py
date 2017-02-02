@@ -62,7 +62,7 @@ setup(
         'django-static-precompiler',
         'django-autocomplete-light>=3.0.0',
         'django-bootstrap3',
-        'django-bootstrap3-datetimepicker',
+        'django-bootstrap-datepicker',
 
         'django-formtools',
 

@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from bootstrap3_datetime.widgets import DateTimePicker
+from bootstrap_datepicker.widgets import DatePicker as DateTimePicker
 
 import aristotle_mdr.models as MDR
 from aristotle_mdr.forms import ChangeStatusForm

@@ -1270,7 +1270,7 @@ class DataElementConcept(concept):
     )
     property = models.ForeignKey(  # 11.2.3.1
         Property, blank=True, null=True,
-        help_text=_('references a Property that is part of the specification of the Data_Element_Concept')
+        help_text=_('references a Property that is part of the specification of the Data_Element_Concept'),
     )
     conceptualDomain = models.ForeignKey(  # 11.2.3.2
         ConceptualDomain, blank=True, null=True,
