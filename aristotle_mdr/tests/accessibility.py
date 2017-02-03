@@ -43,8 +43,8 @@ class TestWebPageAccessibility(utils.LoggedInViewPages, TestCase):
         )
         dir_listing = process.communicate()[0]
         # Verify the static files are in the right place.
-        self.assertTrue('admin' in dir_listing)
-        self.assertTrue('aristotle_mdr' in dir_listing)
+        self.assertTrue(b'admin' in dir_listing)
+        self.assertTrue(b'aristotle_mdr' in dir_listing)
         print("All setup")
 
     def tearDown(self):
