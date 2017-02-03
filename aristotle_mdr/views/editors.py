@@ -62,6 +62,12 @@ class PermissionFormView(FormView):
 class EditItemView(PermissionFormView):
     template_name = "aristotle_mdr/actions/advanced_editor.html"
 
+    def __init__(self, *args, **kwargs):
+        super(EditItemView, self).__init__(*args, **kwargs)
+        self.slots_active = 'aristotle_mdr.contrib.slots' in settings.INSTALLED_APPS
+        self.links_active = False and 'aristotle_mdr.contrib.links' in settings.INSTALLED_APPS
+        print(self.links_active)
+
     def get_form_class(self):
         return MDRForms.wizards.subclassed_edit_modelform(self.model)
 
@@ -119,7 +125,8 @@ class EditItemView(PermissionFormView):
                 queryset=Slot.objects.filter(concept=self.item.id),
                 instance=self.item.concept
                 )
-        context['show_slots_tab'] = True
+        context['show_slots_tab'] = self.slots_active
+        context['show_links_tab'] = self.links_active
         context['concept_slots'] = SlotDefinition.objects.filter(app_label=self.model._meta.app_label, concept_type=self.model._meta.model_name)
         return context
 
