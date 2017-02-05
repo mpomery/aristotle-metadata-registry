@@ -103,9 +103,6 @@ class TestWebPageAccessibility(utils.LoggedInViewPages, TestCase):
         self.assertTrue(response.status_code == 200)
         html = response.content
 
-        if hasattr(html, 'decode'):  # Forgive me: Python 2 compatability
-            html = html.decode('utf-8')
-        
         results = parade.Parade(
             level='AA', staticpath=self.staticpath,
             ignore_these_classes=['sr-only']
