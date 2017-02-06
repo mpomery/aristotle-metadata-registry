@@ -68,14 +68,14 @@ class TestWebPageAccessibility(utils.LoggedInViewPages, TestCase):
         super(TestWebPageAccessibility, cls).tearDownClass()
 
 
-    def pages_tester(self, pages):
+    def pages_tester(self, pages, media_types=MEDIA_TYPES):
         self.login_superuser()
         failures = 0
         for url in pages:
             print()
             print("Testing url for WCAG compliance [%s] " % url, end="", flush=True, file=sys.stderr)
             print('*', end="", flush=True, file=sys.stderr)
-            for media in MEDIA_TYPES:
+            for media in media_types:
                 response = self.client.get(url, follow=True)
                 self.assertTrue(response.status_code == 200)
                 html = response.content
@@ -87,7 +87,7 @@ class TestWebPageAccessibility(utils.LoggedInViewPages, TestCase):
                 ).validate_document(html)
                 if len(results['failures']) != 0:  # NOQA - This shouldn't ever happen, so no coverage needed
                     pp = pprint.PrettyPrinter(indent=4)
-                    pp.pprint("Failues for '%s' with media rule [%s]" % (url, media))
+                    pp.pprint("Failures for '%s' with media rules [%s]" % (url, media))
                     pp.pprint(results['failures'])
                     pp.pprint(results['warnings'])
                     print("%s failures!!" % len(results['failures']) )
@@ -120,11 +120,6 @@ class TestWebPageAccessibility(utils.LoggedInViewPages, TestCase):
         ]
         self.pages_tester(pages)
 
-    def test_review_object_pages(self):
-        self.login_superuser()
-
-        self.pages_tester(pages)
-
     def test_metadata_object_action_pages(self):
         self.login_superuser()
 
@@ -154,4 +149,4 @@ class TestWebPageAccessibility(utils.LoggedInViewPages, TestCase):
         ]
         # We skip those pages that don't exist (like object class 'child metadata' pages)
 
-        self.pages_tester(pages)
+        self.pages_tester(pages, media_types = [[], ['(min-width: 600px)']])
