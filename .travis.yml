@@ -87,15 +87,15 @@ addons:
 
 matrix:
   exclude:
-    - TRAVIS_PYTHON_VERSION: 2.7
+    - python: "2.7"
       env: A11Y=1
-    - TRAVIS_PYTHON_VERSION: 2.7
+    - python: "2.7"
       env: DOCS=1
-    - TRAVIS_PYTHON_VERSION: 2.7
+    - python: "2.7"
       env: DJANGO_VERSION='>1.10,<1.11'
-    - TRAVIS_PYTHON_VERSION: 2.7
+    - python: "2.7"
       env: DJANGO_VERSION='==1.11a1'
-    - TRAVIS_PYTHON_VERSION: 2.7
+    - python: "2.7"
       env: VARIANT=haystack
   allow_failures:
     - env: DJANGO_VERSION='>1.8,<1.9' DB=sqlitefile    SEARCH=whoosh  VARIANT=haystack
