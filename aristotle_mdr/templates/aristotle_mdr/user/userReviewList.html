@@ -22,7 +22,7 @@
     {% include "aristotle_mdr/helpers/paginated_review_list.html" with page=page actions='reviewer' %}
     </form>
 {% else %}
-    <h3>You currently have no items to review.</h3>
+    <strong>You currently have no items to review.</strong>
 {% endif %}
 
 {% bootstrap_modal "review_box" size='lg' %}

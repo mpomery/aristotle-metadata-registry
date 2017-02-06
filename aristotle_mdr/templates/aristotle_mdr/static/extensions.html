@@ -2,7 +2,6 @@
 
 {% block content %}
 <h1>{% block title %}Aristotle Extensions{% endblock %}</h1>
-<div class="row">
 
 {% if content_extensions or download_extensions %}
     <p>
@@ -10,6 +9,7 @@
     click any of the headings below for more information.
     </p>
     {% if content_extensions %}
+        <h2>The following content extensions are available in this registry</h2>
         <dl>
         {% for ext in content_extensions %}
             <dt>
@@ -25,7 +25,7 @@
     {% endif %}
 
     {% if download_extensions %}
-        <h4>The following download formats are available in this registry</h4>
+        <h2>The following download formats are available in this registry</h2>
         {% for key,ext in download_extensions.items %}
         <strong>
             {% if ext.about_url %}
@@ -46,6 +46,5 @@
 {% else %}
     No extensions have been installed on this site.
 {% endif %}
-</div>
 
 {% endblock %}
