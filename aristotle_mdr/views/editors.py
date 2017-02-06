@@ -8,7 +8,7 @@ from django.forms import ValidationError, ModelForm
 from django.forms.models import modelformset_factory, inlineformset_factory
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template import RequestContext, TemplateDoesNotExist
+from django.template import TemplateDoesNotExist
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView

@@ -9,7 +9,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
-from django.template.loader import select_template
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
@@ -89,17 +88,14 @@ def concept(*args, **kwargs):
 
 def measure(request, iid, model_slug, name_slug):
     item = get_object_or_404(MDR.Measure, pk=iid).item
-    template = select_template([item.template])
-    context = RequestContext(
-        request,
+    return render(
+        request, [item.template],
         {
             'item': item,
             # 'view': request.GET.get('view', '').lower(),
             # 'last_edit': last_edit
         }
     )
-
-    return HttpResponse(template.render(context))
 
     # return render_if_user_can_view(MDR.Measure, *args, **kwargs)
 
@@ -124,9 +120,8 @@ def render_if_condition_met(request, condition, objtype, iid, model_slug=None, n
     last_edit = Version.objects.get_for_object(item).first()
 
     default_template = "%s/concepts/%s.html" % (item.__class__._meta.app_label, item.__class__._meta.model_name)
-    template = select_template([default_template, item.template])
-    context = RequestContext(
-        request,
+    return render(
+        request, [default_template, item.template],
         {
             'item': item,
             # 'view': request.GET.get('view', '').lower(),
@@ -134,8 +129,6 @@ def render_if_condition_met(request, condition, objtype, iid, model_slug=None, n
             'last_edit': last_edit
         }
     )
-
-    return HttpResponse(template.render(context))
 
 
 def registrationHistory(request, iid):
