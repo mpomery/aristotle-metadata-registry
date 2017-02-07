@@ -51,6 +51,7 @@ def is_in(item, iterable):
 def is_installed_app(app_name):
     return app_name in settings.INSTALLED_APPS
 
+
 @register.filter
 def in_workgroup(user, workgroup):
     """
