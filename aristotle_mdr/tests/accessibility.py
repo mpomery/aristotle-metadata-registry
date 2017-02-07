@@ -31,12 +31,12 @@ MEDIA_TYPES = [
     # ['(min-width: 1200px)'],
 ]
 
-class TestWebPageAccessibility(utils.LoggedInViewPages, TestCase):
+class TestWebPageAccessibilityBase(utils.LoggedInViewPages):
 
     @classmethod
     @override_settings(STATIC_ROOT = STATICPATH)
     def setUpClass(self):
-        super(TestWebPageAccessibility, self).setUpClass()
+        super(TestWebPageAccessibilityBase, self).setUpClass()
         self.ra = models.RegistrationAuthority.objects.create(name="Test RA")
         self.wg = models.Workgroup.objects.create(name="Test WG 1")
         self.oc = models.ObjectClass.objects.create(name="Test OC 1")
@@ -65,8 +65,7 @@ class TestWebPageAccessibility(utils.LoggedInViewPages, TestCase):
             ["rm", TMP_STATICPATH, '-rf'],
             stdout=subprocess.PIPE
         )
-        super(TestWebPageAccessibility, cls).tearDownClass()
-
+        super(TestWebPageAccessibilityBase, cls).tearDownClass()
 
     def pages_tester(self, pages, media_types=MEDIA_TYPES):
         self.login_superuser()
@@ -96,6 +95,8 @@ class TestWebPageAccessibility(utils.LoggedInViewPages, TestCase):
 
         self.assertTrue(len(results['failures']) == 0)            
 
+
+class TestStaticPageAccessibility(TestWebPageAccessibilityBase, TestCase):
     def test_static_pages(self):
         from aristotle_mdr.urls.aristotle import urlpatterns
         pages = [
@@ -106,6 +107,7 @@ class TestWebPageAccessibility(utils.LoggedInViewPages, TestCase):
 
         self.pages_tester(pages)
 
+class TestMetadataItemPageAccessibility(TestWebPageAccessibilityBase, TestCase):
     def test_metadata_object_pages(self):
         self.login_superuser()
 
@@ -120,6 +122,7 @@ class TestWebPageAccessibility(utils.LoggedInViewPages, TestCase):
         ]
         self.pages_tester(pages)
 
+class TestMetadataActionPageAccessibility(TestWebPageAccessibilityBase, TestCase):
     def test_metadata_object_action_pages(self):
         self.login_superuser()
 

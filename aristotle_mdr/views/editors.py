@@ -51,8 +51,8 @@ class PermissionFormView(FormView):
         })
         return kwargs
 
-    def get_context_data(self, form, **kwargs):
-        context = super(PermissionFormView, self).get_context_data(form=form, **kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super(PermissionFormView, self).get_context_data(*args, **kwargs)
         context.update({'model': self.model._meta.model_name,
                         'app_label': self.model._meta.app_label,
                         'item': self.item})
@@ -66,7 +66,6 @@ class EditItemView(PermissionFormView):
         super(EditItemView, self).__init__(*args, **kwargs)
         self.slots_active = 'aristotle_mdr.contrib.slots' in settings.INSTALLED_APPS
         self.links_active = False and 'aristotle_mdr.contrib.links' in settings.INSTALLED_APPS
-        print(self.links_active)
 
     def get_form_class(self):
         return MDRForms.wizards.subclassed_edit_modelform(self.model)
@@ -115,9 +114,9 @@ class EditItemView(PermissionFormView):
         """
         return self.render_to_response(self.get_context_data(form=form, slots_FormSet=slots_FormSet))
 
-    def get_context_data(self, form, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         from aristotle_mdr.contrib.slots.models import Slot, SlotDefinition
-        context = super(EditItemView, self).get_context_data(form=form, **kwargs)
+        context = super(EditItemView, self).get_context_data(*args, **kwargs)
         if kwargs.get('slots_FormSet', None):
             context['slots_FormSet'] = kwargs['slots_FormSet']
         else:
