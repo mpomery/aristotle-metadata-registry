@@ -453,6 +453,45 @@ class AdminPageForConcept(utils.LoggedInViewPages):
                 '%s is %s'%(self.item1.name,s.get_state_display())
             )
 
+    def test_editor_make_item_has_submitter(self):
+        # Fixes #595
+        self.login_editor()
+        # make an item
+        response = self.client.get(reverse("admin:%s_%s_add"%(self.itemType._meta.app_label,self.itemType._meta.model_name)))
+
+        data = {'name':"admin_page_test_oc_has_submitter",'definition':"test","workgroup":self.wg1.id,
+                    'statuses-TOTAL_FORMS': 0, 'statuses-INITIAL_FORMS': 0 # no substatuses
+                }
+        data.update(self.form_defaults)
+
+        response = self.client.post(
+            reverse("admin:%s_%s_add"%(self.itemType._meta.app_label,self.itemType._meta.model_name)),
+            data
+        )
+        new_item = self.itemType.objects.order_by('-created').first()
+        self.assertEqual(new_item.name,"admin_page_test_oc_has_submitter")
+        self.assertEqual(new_item.submitter,self.editor)
+
+        self.login_superuser()
+        updated_item = dict((k,v) for (k,v) in model_to_dict(self.item1).items() if v is not None)
+        updated_item['name'] = 'admin_page_test_oc_has_submitter_that_hasnt_changed'
+
+        updated_item.update({
+            'statuses-TOTAL_FORMS': 0, 'statuses-INITIAL_FORMS': 0, # no statuses
+        })
+
+        response = self.client.post(
+            reverse(
+                "admin:%s_%s_change"%(self.itemType._meta.app_label,self.itemType._meta.model_name),
+                args=[new_item.pk]
+            ),
+            updated_item
+        )
+        print(response.content)
+        new_item = self.itemType.objects.get(pk=new_item.pk)  # decache
+        self.assertEqual(new_item.name,"admin_page_test_oc_has_submitter_that_hasnt_changed")
+        self.assertEqual(new_item.submitter,self.editor)
+
 
 class ObjectClassAdminPage(AdminPageForConcept,TestCase):
     itemType=models.ObjectClass
