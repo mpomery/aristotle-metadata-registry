@@ -271,7 +271,7 @@ class CheckCascadedStates(ItemSubpageView, DetailView):
                 states.append(s)
 
         for i in item.item.registry_cascade_items:
-            sub_states = [(None,None)] * len(ras)
+            sub_states = [(None, None)] * len(ras)
             extras = []
             for s in i.current_statuses():
                 ra = s.registrationAuthority
