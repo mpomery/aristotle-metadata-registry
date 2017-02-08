@@ -104,7 +104,7 @@ class AdminConceptForm(ConceptForm, WorkgroupVerificationMixin):
         for i in self.cleaned_data['deprecated']:
             if user_can_edit(self.request.user, i):  # Would check item.supersedes but its a set
                 kwargs = {}
-                if django_version > (1,9):
+                if django_version > (1, 9):
                     kwargs = {'bulk': False}
                 instance.supersedes.add(i, **kwargs)
 

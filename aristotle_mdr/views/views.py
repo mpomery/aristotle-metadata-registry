@@ -326,7 +326,7 @@ def deprecate(request, iid):
                 for i in form.cleaned_data['olderItems']:
                     if user_can_edit(request.user, i):  # Would check item.supersedes but its a set
                         kwargs = {}
-                        if django_version > (1,9):
+                        if django_version > (1, 9):
                             kwargs = {'bulk': False}
                         item.supersedes.add(i, **kwargs)
             return HttpResponseRedirect(url_slugify_concept(item))
