@@ -324,7 +324,7 @@ def deprecate(request, iid):
                         item.supersedes.remove(i)
                 for i in form.cleaned_data['olderItems']:
                     if user_can_edit(request.user, i):  # Would check item.supersedes but its a set
-                        item.supersedes.add(i)
+                        item.supersedes.add(i, bulk=False)
             return HttpResponseRedirect(url_slugify_concept(item))
     else:
         form = MDRForms.DeprecateForm(user=request.user, item=item, qs=qs)

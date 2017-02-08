@@ -102,7 +102,7 @@ class AdminConceptForm(ConceptForm, WorkgroupVerificationMixin):
                 instance.supersedes.remove(i)
         for i in self.cleaned_data['deprecated']:
             if user_can_edit(self.request.user, i):  # Would check item.supersedes but its a set
-                instance.supersedes.add(i)
+                instance.supersedes.add(i, bulk=False)
 
         return instance
 

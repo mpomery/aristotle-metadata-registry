@@ -624,6 +624,22 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(reverse('aristotle:deprecate',args=[self.item3.id]))
         self.assertEqual(response.status_code,200)
 
+    def test_editor_can_deprecate_item(self):
+        self.login_editor()
+        response = self.client.get(reverse('aristotle:deprecate',args=[self.item1.id]))
+        self.assertEqual(response.status_code,200)
+        response = self.client.get(reverse('aristotle:deprecate',args=[self.item2.id]))
+        self.assertEqual(response.status_code,403)
+        response = self.client.get(reverse('aristotle:deprecate',args=[self.item3.id]))
+        self.assertEqual(response.status_code,200)
+
+        response = self.client.post(
+            reverse('aristotle:deprecate',args=[self.item3.id]),{'olderItems':[self.item1.id]})
+        self.assertEqual(response.status_code,302)
+        
+        self.item1 = models.ObjectClass.objects.get(id=self.item1.id) # Stupid cache
+        self.assertTrue(self.item1.superseded_by == self.item3.concept)
+
     def test_help_page_exists(self):
         self.logout()
         response = self.client.get(
