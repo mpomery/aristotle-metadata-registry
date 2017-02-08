@@ -844,9 +844,9 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
             reverse('aristotle:toggleFavourite', args=[self.item1.id]),
             follow=True
         )
-        self.assertEqual(
-            response.redirect_chain,
-            [('http://testserver'+url_slugify_concept(self.item1),302)]
+        self.assertRedirects(
+            response,
+            url_slugify_concept(self.item1)
         )
         self.assertEqual(self.viewer.profile.favourites.count(),1)
         self.assertEqual(self.viewer.profile.favourites.first().item,self.item1)
@@ -856,9 +856,9 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
             reverse('aristotle:toggleFavourite', args=[self.item1.id]),
             follow=True
         )
-        self.assertEqual(
-            response.redirect_chain,
-            [('http://testserver'+url_slugify_concept(self.item1),302)]
+        self.assertRedirects(
+            response,
+            url_slugify_concept(self.item1)
         )
         self.assertEqual(self.viewer.profile.favourites.count(),0)
         self.assertContains(response, "removed from favourites")

@@ -540,10 +540,6 @@ class LoggedInViewPages(object):
                 debug_response(response, msg="%s" % e)  # from django-tools
                 raise
 
-    def assertRedirects(self, *args, **kwargs):
-        self.assertResponseStatusCodeEqual(args[0], 302)
-        super(LoggedInViewPages, self).assertRedirects(*args, **kwargs)
-
     def assertResponseStatusCodeEqual(self, response, code):
             try:
                 self.assertEqual(response.status_code, code)

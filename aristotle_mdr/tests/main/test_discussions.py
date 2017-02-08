@@ -420,9 +420,7 @@ class WorkgroupMembersCanMakePostsAndComments(utils.LoggedInViewPages,TestCase):
         )
 
         self.assertEqual(p1.comments.count(),1)
-        # self.assertRedirects(response,reverse('aristotle:discussionsPost',args=[p1.id]))
-        # We can't use assertRedirect as we are forcing a follow, instead...
-        self.assertEqual(response.redirect_chain,[('http://testserver'+reverse('aristotle:discussionsPost',args=[p1.id]),302)])
+        self.assertRedirects(response,reverse('aristotle:discussionsPost',args=[p1.id]))
 
         _messages = list(response.context['messages'])
         self.assertEqual(len(_messages),1)
