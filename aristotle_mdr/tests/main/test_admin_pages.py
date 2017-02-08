@@ -487,7 +487,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
             ),
             updated_item
         )
-        print(response.content)
+
         new_item = self.itemType.objects.get(pk=new_item.pk)  # decache
         self.assertEqual(new_item.name,"admin_page_test_oc_has_submitter_that_hasnt_changed")
         self.assertEqual(new_item.submitter,self.editor)

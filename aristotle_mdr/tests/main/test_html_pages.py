@@ -196,8 +196,6 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         updated_item['change_comments'] = change_comment
         response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
         self.item1 = self.itemType.objects.get(pk=self.item1.pk)
-        
-        print(response.content)
 
         self.assertRedirects(response,url_slugify_concept(self.item1))
         self.assertEqual(self.item1.name,updated_name)

@@ -13,10 +13,10 @@ setup_test_environment()
 
 class UtilsTests(TestCase):
     def test_reverse_slugs(self):
-        item = models.ObjectClass.objects.create(name="my name",definition="my definition",submitter=None)
-        ra = models.RegistrationAuthority.objects.create(name="my name",definition="my definition")
-        org = models.Organization.objects.create(name="my name",definition="my definition")
-        wg = models.Workgroup.objects.create(name="my name",definition="my definition")
+        item = models.ObjectClass.objects.create(name=" ",definition="my definition",submitter=None)
+        ra = models.RegistrationAuthority.objects.create(name=" ",definition="my definition")
+        org = models.Organization.objects.create(name=" ",definition="my definition")
+        wg = models.Workgroup.objects.create(name=" ",definition="my definition")
         
         from aristotle_mdr import utils
         
