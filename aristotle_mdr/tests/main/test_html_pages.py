@@ -1351,7 +1351,7 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages,TestCase):
     url_name='dataelementderivation'
     # @property
     # def defaults(self):
-    #     return {'derives':models.DataElement.objects.create(name='derivedDE',definition="",workgroup=self.wg1)}
+    #     return {'derives':models.DataElement.objects.create(name='derivedDE',definition="my definition",workgroup=self.wg1)}
     itemType=models.DataElementDerivation
 
 class LoggedInViewUnmanagedPages(utils.LoggedInViewPages):

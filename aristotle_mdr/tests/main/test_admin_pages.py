@@ -155,7 +155,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
             self.create_items()
 
     def create_items(self):
-        self.item1 = self.itemType.objects.create(name="admin_page_test_oc",definition=" ",workgroup=self.wg1,**self.create_defaults)
+        self.item1 = self.itemType.objects.create(name="admin_page_test_oc",definition="my definition",workgroup=self.wg1,**self.create_defaults)
 
     def test_registration_authority_inline_not_in_editor_admin_page(self):
         self.login_editor()
@@ -317,8 +317,8 @@ class AdminPageForConcept(utils.LoggedInViewPages):
 
 # deprecated
     def test_supersedes_saves(self):
-        self.item2 = self.itemType.objects.create(name="admin_page_test_oc_2",definition=" ",workgroup=self.wg1,**self.create_defaults)
-        self.item3 = self.itemType.objects.create(name="admin_page_test_oc_2",definition=" ",workgroup=self.wg1,**self.create_defaults)
+        self.item2 = self.itemType.objects.create(name="admin_page_test_oc_2",definition="my definition",workgroup=self.wg1,**self.create_defaults)
+        self.item3 = self.itemType.objects.create(name="admin_page_test_oc_2",definition="my definition",workgroup=self.wg1,**self.create_defaults)
 
         self.login_editor()
         response = self.client.get(reverse("admin:%s_%s_change"%(self.itemType._meta.app_label,self.itemType._meta.model_name),args=[self.item1.pk]))
@@ -346,7 +346,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
         self.assertTrue(self.item3 in self.item1.supersedes.all().select_subclasses())
 
     def test_superseded_by_saves(self):
-        self.item2 = self.itemType.objects.create(name="admin_page_test_oc_2",definition=" ",workgroup=self.wg1,**self.create_defaults)
+        self.item2 = self.itemType.objects.create(name="admin_page_test_oc_2",definition="my definition",workgroup=self.wg1,**self.create_defaults)
 
         self.login_editor()
         response = self.client.get(reverse("admin:%s_%s_change"%(self.itemType._meta.app_label,self.itemType._meta.model_name),args=[self.item1.pk]))
@@ -522,7 +522,7 @@ class DataElementDerivationAdminPage(AdminPageForConcept,TestCase):
         from reversion import revisions as reversion
         with reversion.create_revision():
             self.ded_wg = models.Workgroup.objects.create(name="Derived WG")
-            self.derived_de = models.DataElement.objects.create(name='derivedDE',definition="",workgroup=self.ded_wg)
+            self.derived_de = models.DataElement.objects.create(name='derivedDE',definition="my definition",workgroup=self.ded_wg)
         x=self.ra.register(self.derived_de,models.STATES.standard,self.su)
         self.create_defaults = {'derives':self.derived_de}
         self.form_defaults = {'derives':self.derived_de.id}
