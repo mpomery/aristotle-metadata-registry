@@ -479,6 +479,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
         updated_item.update({
             'statuses-TOTAL_FORMS': 0, 'statuses-INITIAL_FORMS': 0, # no statuses
         })
+        updated_item.update(self.form_defaults)
 
         response = self.client.post(
             reverse(
