@@ -19,9 +19,21 @@ class TestNotifications(utils.LoggedInViewPages, TestCase):
     def setUp(self):
         super(TestNotifications, self).setUp()
 
-        self.item1 = models.ObjectClass.objects.create(name="Test Item 1 (visible to tested viewers)",definition=" ",workgroup=self.wg1,**self.defaults)
-        self.item2 = models.ObjectClass.objects.create(name="Test Item 2 (NOT visible to tested viewers)",definition=" ",workgroup=self.wg2,**self.defaults)
-        self.item3 = models.ObjectClass.objects.create(name="Test Item 3 (visible to tested viewers)",definition=" ",workgroup=self.wg1,**self.defaults)
+        self.item1 = models.ObjectClass.objects.create(
+            name="Test Item 1 (visible to tested viewers)",
+            definition="my definition",
+            workgroup=self.wg1,
+        )
+        self.item2 = models.ObjectClass.objects.create(
+            name="Test Item 2 (NOT visible to tested viewers)",
+            definition="my definition",
+            workgroup=self.wg2,
+        )
+        self.item3 = models.ObjectClass.objects.create(
+            name="Test Item 3 (visible to tested viewers)",
+            definition="my definition",
+            workgroup=self.wg1,
+        )
 
     def test_subscriber_is_notified_of_supersede(self):
         user1 = User.objects.create_user('subscriber','subscriber')

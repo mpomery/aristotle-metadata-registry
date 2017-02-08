@@ -14,8 +14,8 @@ class SimilarSlotsView(ListView):
     template_name = "aristotle_mdr/slots/similar_slots_list.html"
     model = _concept
 
-    def get_context_data(self, **kwargs):
-        context = super(SimilarSlotsView, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super(SimilarSlotsView, self).get_context_data(*args, **kwargs)
         context.update({'slot_type': self.get_slot_type()})
         context.update({'value': self.request.GET.get('value', None)})
         return context

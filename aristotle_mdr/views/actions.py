@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template import RequestContext, TemplateDoesNotExist
+from django.template import TemplateDoesNotExist
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, DetailView
@@ -36,8 +36,8 @@ class ItemSubpageView(object):
 
 
 class ItemSubpageFormView(ItemSubpageView, FormView):
-    def get_context_data(self, **kwargs):
-        kwargs = super(ItemSubpageFormView, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        kwargs = super(ItemSubpageFormView, self).get_context_data(*args, **kwargs)
         kwargs['item'] = self.get_item()
         return kwargs
 
@@ -46,8 +46,8 @@ class SubmitForReviewView(ItemSubpageFormView):
     form_class = actions.RequestReviewForm
     template_name = "aristotle_mdr/actions/request_review.html"
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(SubmitForReviewView, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        kwargs = super(SubmitForReviewView, self).get_context_data(*args, **kwargs)
         kwargs['reviews'] = self.get_item().review_requests.filter(status=MDR.REVIEW_STATES.submitted).all()
         return kwargs
 
@@ -88,8 +88,8 @@ class ReviewActionMixin(object):
         self.review = get_object_or_404(MDR.ReviewRequest, pk=self.kwargs['review_id'])
         return self.review
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(ReviewActionMixin, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        kwargs = super(ReviewActionMixin, self).get_context_data(*args, **kwargs)
         kwargs['review'] = self.get_review()
         return kwargs
 
@@ -160,9 +160,9 @@ class ReviewAcceptView(ReviewActionMixin, FormView):
     form_class = actions.RequestReviewAcceptForm
     template_name = "aristotle_mdr/user/user_request_accept.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         from aristotle_mdr.views.utils import generate_visibility_matrix
-        kwargs = super(ReviewAcceptView, self).get_context_data(**kwargs)
+        kwargs = super(ReviewAcceptView, self).get_context_data(*args, **kwargs)
         import json
         kwargs['status_matrix'] = json.dumps(generate_visibility_matrix(self.request.user))
         return kwargs
@@ -256,8 +256,8 @@ class CheckCascadedStates(ItemSubpageView, DetailView):
             raise Http404
         return super(CheckCascadedStates, self).dispatch(*args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(CheckCascadedStates, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        kwargs = super(CheckCascadedStates, self).get_context_data(*args, **kwargs)
 
         state_matrix = [
             # (item,[(states_ordered_alphabetically_by_ra_as_per_parent_item,state_of_parent_with_same_ra)],[extra statuses] )

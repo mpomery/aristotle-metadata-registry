@@ -20,13 +20,13 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
     def setUp(self):
         super(LoggedInViewConceptBrowsePages, self).setUp()
 
-        self.item1 = self.itemType.objects.create(name="Test Item 1 (visible to tested viewers)",definition=" ",workgroup=self.wg1,**self.defaults)
-        self.item2 = self.itemType.objects.create(name="Test Item 2 (NOT visible to tested viewers)",definition=" ",workgroup=self.wg2,**self.defaults)
-        self.item3 = self.itemType.objects.create(name="Test Item 3 (visible to tested viewers)",definition=" ",workgroup=self.wg1,**self.defaults)
+        self.item1 = self.itemType.objects.create(name="Test Item 1 (visible to tested viewers)",definition="my definition",workgroup=self.wg1,**self.defaults)
+        self.item2 = self.itemType.objects.create(name="Test Item 2 (NOT visible to tested viewers)",definition="my definition",workgroup=self.wg2,**self.defaults)
+        self.item3 = self.itemType.objects.create(name="Test Item 3 (visible to tested viewers)",definition="my definition",workgroup=self.wg1,**self.defaults)
 
         # Item 3 and 4 need to have a shared string in their name for `test_editor_can_view_browse_with_filters`
         # So, the character `3` *must* be in the name below!
-        self.item4 = self.itemType.objects.create(name="Test Item 4 also like item 3 (visible to tested viewers)",definition=" ",workgroup=self.wg1,**self.defaults)
+        self.item4 = self.itemType.objects.create(name="Test Item 4 also like item 3 (visible to tested viewers)",definition="my definition",workgroup=self.wg1,**self.defaults)
 
         self.ra.register(self.item4,self.ra.public_state,self.su)
 

@@ -51,6 +51,7 @@ def is_in(item, iterable):
 def is_installed_app(app_name):
     return app_name in settings.INSTALLED_APPS
 
+
 @register.filter
 def in_workgroup(user, workgroup):
     """
@@ -194,7 +195,6 @@ def ternary(condition, a, b):
 @register.filter
 def paginator_range(page, mode):
     page_range = list(page.paginator.page_range)
-    print(page.paginator.page_range)
     if mode=="start":
         if page.number <= 5:
             # show 4,5,6 if page is 4, 5,6,7 if page is 5...

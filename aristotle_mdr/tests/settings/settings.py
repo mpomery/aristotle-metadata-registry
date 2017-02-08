@@ -8,7 +8,9 @@ sys.path.insert(1, BASE)
 sys.path.insert(1, os.path.join(BASE, "tests"))
 sys.path.insert(1, os.path.join(BASE, "tests/apps"))
 
-TEMPLATES[0]['DIRS'] += [os.path.join(BASE_DIR, 'tests/apps/bulk_actions_test/templates')]
+TEMPLATES[0]['DIRS'] = [
+    os.path.join(BASE_DIR, 'tests/apps/bulk_actions_test/templates')
+]
 
 SECRET_KEY = 'inara+vtkprm7@0(fsc$+grbz9-s+tmo9d)e#k(9uf8m281&$7xhdkjr'
 
@@ -61,7 +63,7 @@ if 'TRAVIS' in os.environ or 'APPVEYOR' in os.environ:
             from aristotle_mdr.tests.settings.templates.search.elasticsearch import HAYSTACK_CONNECTIONS
 
 
-if False and skip_migrations:  # pragma: no cover
+if skip_migrations:  # pragma: no cover
     print("Skipping migrations")
     class DisableMigrations(object):
     

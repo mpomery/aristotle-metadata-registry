@@ -463,7 +463,7 @@ class LoggedInViewPages(object):
         return url_slugify_concept(item)
 
     def logout(self):
-        self.client.post(reverse('django.contrib.auth.views.logout'), {})
+        self.client.post(reverse('logout'), {})
 
     def login_superuser(self):
         self.logout()
@@ -539,10 +539,6 @@ class LoggedInViewPages(object):
                 # Needs no coverage as the test should pass to be successful
                 debug_response(response, msg="%s" % e)  # from django-tools
                 raise
-
-    def assertRedirects(self, *args, **kwargs):
-        self.assertResponseStatusCodeEqual(args[0], 302)
-        super(LoggedInViewPages, self).assertRedirects(*args, **kwargs)
 
     def assertResponseStatusCodeEqual(self, response, code):
             try:

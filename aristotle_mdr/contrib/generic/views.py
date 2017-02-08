@@ -57,8 +57,8 @@ class GenericWithItemURLFormView(FormView):
                 raise PermissionDenied
         return super(GenericWithItemURLFormView, self).dispatch(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super(GenericWithItemURLFormView, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super(GenericWithItemURLFormView, self).get_context_data(*args, **kwargs)
         context['item'] = self.item
         context['submit_url'] = self.request.get_full_path()
         return context
@@ -75,8 +75,8 @@ class GenericAlterManyToSomethingFormView(GenericWithItemURLFormView):
     form_title = None
     form_submit_text = _('Save')
 
-    def get_context_data(self, **kwargs):
-        context = super(GenericAlterManyToSomethingFormView, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super(GenericAlterManyToSomethingFormView, self).get_context_data(*args, **kwargs)
         context['model_to_add'] = self.model_to_add
         context['model_base'] = self.model_base
         context['item'] = self.item
@@ -112,8 +112,8 @@ class GenericAlterForeignKey(GenericAlterManyToSomethingFormView):
     model_to_add_field = None
     form = None
 
-    def get_context_data(self, **kwargs):
-        context = super(GenericAlterForeignKey, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super(GenericAlterForeignKey, self).get_context_data(*args, **kwargs)
         context['form_add_another_text'] = self.form_submit_text or _('Add another')
         form = self.form or self.get_form()(instance=self.item)
         context['form'] = form
@@ -183,8 +183,8 @@ class GenericAlterManyToManyView(GenericAlterManyToSomethingFormView):
 
     template_name = "aristotle_mdr/generic/actions/alter_many_to_many.html"
 
-    def get_context_data(self, **kwargs):
-        context = super(GenericAlterManyToManyView, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super(GenericAlterManyToManyView, self).get_context_data(*args, **kwargs)
         return context
 
     def get_form_class(self):
@@ -253,8 +253,8 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
 
     formset = None
 
-    def get_context_data(self, **kwargs):
-        context = super(GenericAlterOneToManyView, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super(GenericAlterOneToManyView, self).get_context_data(*args, **kwargs)
         context['form_add_another_text'] = self.form_add_another_text or _('Add another')
         num_items = getattr(self.item, self.model_base_field).count()
         context['formset'] = self.formset or self.get_formset()(

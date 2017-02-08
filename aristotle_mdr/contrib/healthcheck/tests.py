@@ -3,7 +3,7 @@ from django.db import DatabaseError
 from django.test import Client
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.utils.unittest import TestCase
+from django.test import TestCase
 from django.test import override_settings
 from django.test.utils import setup_test_environment
 import json
