@@ -1,3 +1,4 @@
+from django import VERSION as django_version
 from django import forms
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.utils.translation import ugettext_lazy as _
@@ -102,7 +103,10 @@ class AdminConceptForm(ConceptForm, WorkgroupVerificationMixin):
                 instance.supersedes.remove(i)
         for i in self.cleaned_data['deprecated']:
             if user_can_edit(self.request.user, i):  # Would check item.supersedes but its a set
-                instance.supersedes.add(i)
+                kwargs = {}
+                if django_version > (1, 9):
+                    kwargs = {'bulk': False}
+                instance.supersedes.add(i, **kwargs)
 
         return instance
 

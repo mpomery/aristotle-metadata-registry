@@ -1,3 +1,4 @@
+from django import VERSION as django_version
 from django.apps import apps
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -324,7 +325,10 @@ def deprecate(request, iid):
                         item.supersedes.remove(i)
                 for i in form.cleaned_data['olderItems']:
                     if user_can_edit(request.user, i):  # Would check item.supersedes but its a set
-                        item.supersedes.add(i)
+                        kwargs = {}
+                        if django_version > (1, 9):
+                            kwargs = {'bulk': False}
+                        item.supersedes.add(i, **kwargs)
             return HttpResponseRedirect(url_slugify_concept(item))
     else:
         form = MDRForms.DeprecateForm(user=request.user, item=item, qs=qs)
