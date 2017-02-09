@@ -1,3 +1,4 @@
+from django import VERSION as django_version
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase, override_settings
@@ -41,7 +42,11 @@ class TestNotifications(utils.LoggedInViewPages, TestCase):
         self.assertTrue(user1.profile in self.item1.favourited_by.all())
 
         self.assertEqual(user1.notifications.all().count(), 0)
-        self.item2.supersedes.add(self.item1, bulk=False)
+        kwargs = {}
+        if django_version > (1, 9):
+            kwargs = {'bulk': False}
+        self.item2.supersedes.add(self.item1, **kwargs)
+
         self.assertTrue(self.item1.superseded_by == self.item2)
         
         user1 = User.objects.get(pk=user1.pk)
@@ -81,7 +86,11 @@ class TestNotifications(utils.LoggedInViewPages, TestCase):
         user1.notifications.all().delete()
 
         self.assertEqual(user1.notifications.all().count(), 0)
-        self.item2.supersedes.add(self.item1, bulk=False)
+        kwargs = {}
+        if django_version > (1, 9):
+            kwargs = {'bulk': False}
+        self.item2.supersedes.add(self.item1, **kwargs)
+
         self.assertTrue(self.item1.superseded_by == self.item2)
         self.assertEqual(user1.notifications.all().count(), 1)
         self.assertTrue('item registered by your registration authority has been superseded' in user1.notifications.first().verb )

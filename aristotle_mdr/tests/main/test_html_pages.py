@@ -637,7 +637,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
             reverse('aristotle:deprecate',args=[self.item3.id]),{'olderItems':[self.item1.id]})
         self.assertEqual(response.status_code,302)
         
-        self.item1 = models.ObjectClass.objects.get(id=self.item1.id) # Stupid cache
+        self.item1 = self.itemType.objects.get(id=self.item1.id) # Stupid cache
         self.assertTrue(self.item1.superseded_by == self.item3.concept)
 
     def test_help_page_exists(self):

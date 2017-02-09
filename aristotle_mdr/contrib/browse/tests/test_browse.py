@@ -242,8 +242,8 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
             {'sf':'%s:hello'%slot_type_1.slot_name}
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name not in response.content)
-        self.assertTrue(self.item3.name not in response.content)
+        self.assertNotContains(response, self.item1.name)
+        self.assertNotContains(response, self.item3.name)
 
         # Make some slots
         Slot.objects.create(concept=self.item1.concept, type=slot_type_1, value="hello")
@@ -257,8 +257,8 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
             {'sf':'%s:hello'%slot_type_1.slot_name}
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name in response.content)
-        self.assertTrue(self.item3.name in response.content)
+        selfself.assertContains(response, self.item1.name)
+        self.assertContains(response, self.item3.name)
 
         response = self.client.get(
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name]),
@@ -268,10 +268,10 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
             ]}
             )
         self.assertEqual(response.status_code,200)
-        self.assertTrue(self.item1.name in response.content)
-        self.assertTrue(self.item2.name not in response.content)
-        self.assertTrue(self.item3.name not in response.content)
-        self.assertTrue(self.item4.name not in response.content)
+        self.assertContains(response, self.item1.name)
+        self.assertNotContains(response, self.item2.name)
+        self.assertNotContains(response, self.item3.name)
+        self.assertNotContains(response, self.item4.name)
 
 
 class ObjectClassViewPage(LoggedInViewConceptBrowsePages,TestCase):
