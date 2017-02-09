@@ -1,9 +1,11 @@
+import datetime
+import random
+import string
+
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-
-import datetime
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
@@ -40,6 +42,10 @@ def model_to_dict_with_change_time(item, fetch_time=None):
     d['slots-MAX_NUM_FORMS'] = 0
 
     return d
+
+
+def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 
 # Since all managed objects have the same rules, these can be used to cover everything
