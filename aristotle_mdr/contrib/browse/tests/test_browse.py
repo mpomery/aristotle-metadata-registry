@@ -257,7 +257,7 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
             {'sf':'%s:hello'%slot_type_1.slot_name}
             )
         self.assertEqual(response.status_code,200)
-        selfself.assertContains(response, self.item1.name)
+        self.assertContains(response, self.item1.name)
         self.assertContains(response, self.item3.name)
 
         response = self.client.get(
