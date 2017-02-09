@@ -30,21 +30,25 @@ class Relation(MDR.concept):  # 9.1.2.4
     )
 
 
+@python_2_unicode_compatible  # Python 2
 class RelationRole(MDR.aristotleComponent):  # 9.1.2.5
     name = models.TextField(
         help_text=_("The primary name used for human identification purposes.")
     )
-    definition = MDR.RichTextField(
+    definition = models.TextField(
         _('definition'),
         help_text=_("Representation of a concept by a descriptive statement "
                     "which serves to differentiate it from related concepts. (3.2.39)")
     )
     multiplicity = models.PositiveIntegerField(  # 9.1.2.5.3.1
+        # a.k.a the number of times it can appear in a link :(
         help_text=_(
             'number of links which must (logically) be members of the source '
             'relation of this role, differing only by an end with this role as '
             'an end_role.'
         ),
+        null=True,
+        blank=True,
     )
     ordinal = models.PositiveIntegerField(  # 9.1.2.5.3.2
         help_text=_(
@@ -54,7 +58,10 @@ class RelationRole(MDR.aristotleComponent):  # 9.1.2.5
     relation = models.ForeignKey(Relation)
     @property
     def parentItem(self):
-        return self.conceptual_domain
+        return self.relation
+
+    def __str__(self):
+        return "{0.name}".format(self)
 
 
 class Link(TimeStampedModel):
@@ -65,14 +72,16 @@ class Link(TimeStampedModel):
     Link is a subclass of Assertion (9.1.2.3), and as such is included in one or more
     Concept_Systems (9.1.2.2) through the assertion_inclusion (9.1.3.5) association.
     """
-    arity = models.PositiveIntegerField(
-        help_text=_('number of elements in the relation'),
-        validators=[MinValueValidator(2)]
-    )
-    link_end_concept = models.ForeignKey(Relation)
+    relation = models.ForeignKey(Relation)
 
 
-class LinkEnd(TimeStampedModel):
-    link = models.ForeignKey(Link, null=True)
+class LinkEnd(TimeStampedModel):  # 9.1.2.7
+    link = models.ForeignKey(Link)
     role = models.ForeignKey(RelationRole)
-    concept = models.ForeignKey(MDR._concept, null=True)
+    concept = models.ForeignKey(MDR._concept)
+
+    def clean(self):
+        if self.role.relation != self.link.relation:
+            raise ValidationError(
+                _('A link ends role relation must be from the relation itself')
+            )

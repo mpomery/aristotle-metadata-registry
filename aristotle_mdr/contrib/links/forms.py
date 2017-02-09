@@ -1,50 +1,69 @@
-from django.forms import ValidationError, ModelForm
+from django import forms
+from django.forms import ValidationError, ModelForm, modelform_factory, formset_factory
 from django.forms.models import inlineformset_factory
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
+
 from aristotle_mdr import models as MDR
-from aristotle_mdr.contrib.links.models import Link, SlotDefinition
+from aristotle_mdr.forms.fields import ModelMultipleChoiceField
+from aristotle_mdr.forms.creation_wizards import UserAwareForm
+from aristotle_mdr.contrib.links.models import Link, LinkEnd, Relation, RelationRole
+from aristotle_mdr.contrib.autocomplete import widgets
 
 
-# TODO: Fix this method, it is a hot mess!... But it works.
-# But it will require Django 1.9 - https://docs.djangoproject.com/en/1.9/topics/forms/formsets/#passing-custom-parameters-to-formset-forms
-# Or some funky functional stuff - http://stackoverflow.com/a/624013/764357
-def link_inlineformset_factory(model):
+class LinkEndEditorBase(UserAwareForm, forms.Form):
+    def __init__(self, roles, *args, **kwargs):
+        self.roles = roles
+        super(LinkEndEditorBase, self).__init__(*args, **kwargs)
+        for role in self.roles:
+            if role.multiplicity == 1:
+                self.fields['role_' + str(role.pk)] = forms.ModelChoiceField(
+                    queryset=MDR._concept.objects.all().visible(self.user),
+                    label=role.name,
+                    widget=widgets.ConceptAutocompleteSelect(model=MDR._concept),
+                )
+            else:
+                self.fields['role_' + str(role.pk)] = forms.ModelMultipleChoiceField(
+                    queryset=MDR._concept.objects.all().visible(self.user),
+                    label=role.name,
+                    widget=widgets.ConceptAutocompleteSelectMultiple(model=MDR._concept),
+                )
 
-    class LinkForm(ModelForm):
-        class Meta:
-            model = Link
-            fields = ('concept', 'type', 'value')
+    def clean(self, *args, **kwargs):
+        cleaned_data = super(LinkEndEditorBase, self).clean(*args, **kwargs)
+        for role in self.roles:
+            field_name = 'role_' + str(role.pk)
+            d = cleaned_data.get(field_name)
+            if role.multiplicity is not None and 1 < role.multiplicity < len(d):
+                msg = _("Only %s concepts are valid for this link" % role.multiplicity)
+                self.add_error(field_name, msg)
 
-        def __init__(self, *args, **kwargs):
-            super(SlotForm, self).__init__(*args, **kwargs)
-            self.fields['type'].queryset = SlotDefinition.objects.filter(
-                app_label=model._meta.app_label, concept_type=model._meta.model_name
-            )
+class LinkEndEditor(LinkEndEditorBase):
+    def __init__(self, link, roles, *args, **kwargs):
+        super(LinkEndEditor, self).__init__(roles, *args, **kwargs)
+        #end_concepts = MDR._concept.filter()
+        for role in self.roles:
+            if role.multiplicity == 1:
+                self.fields['role_' + str(role.pk)].initial = MDR._concept.objects.get(
+                    linkend__link=link, linkend__role=role
+                )
+            else:
+                self.fields['role_' + str(role.pk)].initial = MDR._concept.objects.filter(
+                    linkend__link=link, linkend__role=role
+                )
 
-    base_formset = inlineformset_factory(
-        MDR._concept, Slot,
-        can_delete=True,
-        fields=('concept', 'type', 'value'),
-        extra=1,
-        form=SlotForm
-        )
+class AddLink_SelectRelation_1(UserAwareForm, forms.Form):
+    relation = forms.ModelChoiceField(
+        queryset=Relation.objects.none(),
+        widget=widgets.ConceptAutocompleteSelect(model=Relation)
+    )
+    def __init__(self, link, roles, *args, **kwargs):
+        super(AddLink_SelectRelation_1, self).__init__(roles, *args, **kwargs)
+        self.fields['relation'].queryset = Relation.objects.all().visible(self.user)
 
-    class SlotFormset(base_formset):
-        def clean(self):
-            slot_types_seen = set()
-            for form in self.forms:
-                if 'type' in form.cleaned_data.keys():
-                    item = form.cleaned_data['concept'].item
-                    slot_type = form.cleaned_data['type']
 
-                    # Keep track of slot_types for cardinality
-                    slot_type_in_form = slot_type in slot_types_seen
-                    slot_types_seen.add(slot_type)
+class AddLink_SelectConcepts_2(LinkEndEditorBase):
+    pass
 
-                    model = item.__class__
-                    if not (slot_type.app_label == model._meta.app_label and slot_type.concept_type == model._meta.model_name):
-                        raise ValidationError(_("The selected slot type '%(slot_name)s' is not allowed on this concept type") % {'slot_name': slot_type.slot_name})
-
-                    if slot_type.cardinality == SlotDefinition.CARDINALITY.singleton and slot_type_in_form:
-                        raise ValidationError(_("The selected slot type '%(slot_name)s' is only allowed to be included once") % {'slot_name': slot_type.slot_name})
-    return SlotFormset
+class AddLink_Confirm_3(forms.Form):
+    pass

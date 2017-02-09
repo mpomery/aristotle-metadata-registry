@@ -20,6 +20,9 @@ if 'aristotle_mdr.contrib.browse' in settings.INSTALLED_APPS:
 if 'aristotle_mdr.contrib.help' in settings.INSTALLED_APPS:
     urlpatterns.append(url(r'^help/', include('aristotle_mdr.contrib.help.urls', app_name="aristotle_help", namespace="aristotle_help")))
 
+if 'aristotle_mdr.contrib.links' in settings.INSTALLED_APPS:
+    urlpatterns.append(url(r'^', include('aristotle_mdr.contrib.links.urls', app_name="aristotle_mdr_links", namespace="aristotle_links")))
+
 if 'aristotle_mdr.contrib.self_publish' in settings.INSTALLED_APPS:
     urlpatterns.append(url(r'^publish/', include('aristotle_mdr.contrib.self_publish.urls', app_name="aristotle_self_publish", namespace="aristotle_self_publish")))
 

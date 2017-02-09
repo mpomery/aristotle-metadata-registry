@@ -1031,16 +1031,16 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(check_url)
         self.assertTrue(response.status_code,404)
 
-class ObjectClassViewPage(LoggedInViewConceptPages,TestCase):
+class ObjectClassViewPage(LoggedInViewConceptPages, TestCase):
     url_name='objectClass'
     itemType=models.ObjectClass
-class PropertyViewPage(LoggedInViewConceptPages,TestCase):
+class PropertyViewPage(LoggedInViewConceptPages, TestCase):
     url_name='property'
     itemType=models.Property
-class UnitOfMeasureViewPage(LoggedInViewConceptPages,TestCase):
+class UnitOfMeasureViewPage(LoggedInViewConceptPages, TestCase):
     url_name='unitOfMeasure'
     itemType=models.UnitOfMeasure
-class ValueDomainViewPage(LoggedInViewConceptPages,TestCase):
+class ValueDomainViewPage(LoggedInViewConceptPages, TestCase):
     url_name='valueDomain'
     itemType=models.ValueDomain
     def setUp(self):
@@ -1190,10 +1190,10 @@ class ValueDomainViewPage(LoggedInViewConceptPages,TestCase):
         for sv in self.item1.supplementaryvalue_set.all():
             self.assertContains(response,sv.meaning,1)
 
-class ConceptualDomainViewPage(LoggedInViewConceptPages,TestCase):
+class ConceptualDomainViewPage(LoggedInViewConceptPages, TestCase):
     url_name='conceptualDomain'
     itemType=models.ConceptualDomain
-class DataElementConceptViewPage(LoggedInViewConceptPages,TestCase):
+class DataElementConceptViewPage(LoggedInViewConceptPages, TestCase):
     url_name='dataElementConcept'
     itemType=models.DataElementConcept
     run_cascade_tests = True
@@ -1328,7 +1328,7 @@ class DataElementConceptViewPage(LoggedInViewConceptPages,TestCase):
         self.assertContains(response, 'fa-times') # The property has a different status
 
 
-class DataElementViewPage(LoggedInViewConceptPages,TestCase):
+class DataElementViewPage(LoggedInViewConceptPages, TestCase):
     url_name='dataElement'
     itemType=models.DataElement
 
@@ -1345,7 +1345,7 @@ class DataElementViewPage(LoggedInViewConceptPages,TestCase):
         response = self.client.get(check_url)
         self.assertTrue(response.status_code,200)
 
-class DataElementDerivationViewPage(LoggedInViewConceptPages,TestCase):
+class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
     url_name='dataelementderivation'
     # @property
     # def defaults(self):
@@ -1373,7 +1373,7 @@ class LoggedInViewUnmanagedPages(utils.LoggedInViewPages):
         response = self.client.get(self.get_page(self.item1))
         self.assertEqual(response.status_code,200)
 
-class MeasureViewPage(LoggedInViewUnmanagedPages,TestCase):
+class MeasureViewPage(LoggedInViewUnmanagedPages, TestCase):
     url_name='measure'
     itemType=models.Measure
 
@@ -1382,7 +1382,7 @@ class MeasureViewPage(LoggedInViewUnmanagedPages,TestCase):
 
         self.item2 = models.UnitOfMeasure.objects.create(name="OC1",workgroup=self.wg1,measure=self.item1,**self.defaults)
 
-class RegistrationAuthorityViewPage(LoggedInViewUnmanagedPages,TestCase):
+class RegistrationAuthorityViewPage(LoggedInViewUnmanagedPages, TestCase):
     url_name='registrationAuthority'
     itemType=models.RegistrationAuthority
 
@@ -1406,7 +1406,7 @@ class RegistrationAuthorityViewPage(LoggedInViewUnmanagedPages,TestCase):
         response = self.client.get(reverse('aristotle:all_registration_authorities'))
         self.assertTrue(response.status_code,200)
 
-class OrganizationViewPage(LoggedInViewUnmanagedPages,TestCase):
+class OrganizationViewPage(LoggedInViewUnmanagedPages, TestCase):
     url_name='organization'
     itemType=models.Organization
 

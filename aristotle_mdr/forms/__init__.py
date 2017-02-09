@@ -7,3 +7,4 @@ from . import discussions
 from . import admin
 from . import bulk_actions
 from . import workgroups
+from . import fields
