@@ -8,7 +8,7 @@ from django.forms import ValidationError, ModelForm
 from django.forms.models import modelformset_factory, inlineformset_factory
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template import RequestContext, TemplateDoesNotExist
+from django.template import TemplateDoesNotExist
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView
@@ -51,8 +51,8 @@ class PermissionFormView(FormView):
         })
         return kwargs
 
-    def get_context_data(self, form, **kwargs):
-        context = super(PermissionFormView, self).get_context_data(form=form, **kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super(PermissionFormView, self).get_context_data(*args, **kwargs)
         context.update({'model': self.model._meta.model_name,
                         'app_label': self.model._meta.app_label,
                         'item': self.item})
@@ -61,6 +61,11 @@ class PermissionFormView(FormView):
 
 class EditItemView(PermissionFormView):
     template_name = "aristotle_mdr/actions/advanced_editor.html"
+
+    def __init__(self, *args, **kwargs):
+        super(EditItemView, self).__init__(*args, **kwargs)
+        self.slots_active = 'aristotle_mdr.contrib.slots' in settings.INSTALLED_APPS
+        self.links_active = False and 'aristotle_mdr.contrib.links' in settings.INSTALLED_APPS
 
     def get_form_class(self):
         return MDRForms.wizards.subclassed_edit_modelform(self.model)
@@ -109,9 +114,9 @@ class EditItemView(PermissionFormView):
         """
         return self.render_to_response(self.get_context_data(form=form, slots_FormSet=slots_FormSet))
 
-    def get_context_data(self, form, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         from aristotle_mdr.contrib.slots.models import Slot, SlotDefinition
-        context = super(EditItemView, self).get_context_data(form=form, **kwargs)
+        context = super(EditItemView, self).get_context_data(*args, **kwargs)
         if kwargs.get('slots_FormSet', None):
             context['slots_FormSet'] = kwargs['slots_FormSet']
         else:
@@ -119,7 +124,8 @@ class EditItemView(PermissionFormView):
                 queryset=Slot.objects.filter(concept=self.item.id),
                 instance=self.item.concept
                 )
-        context['show_slots_tab'] = True
+        context['show_slots_tab'] = self.slots_active
+        context['show_links_tab'] = self.links_active
         context['concept_slots'] = SlotDefinition.objects.filter(app_label=self.model._meta.app_label, concept_type=self.model._meta.model_name)
         return context
 

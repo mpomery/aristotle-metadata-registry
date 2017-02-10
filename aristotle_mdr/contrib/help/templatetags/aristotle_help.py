@@ -9,6 +9,7 @@ import aristotle_mdr.models as MDR
 from aristotle_mdr.contrib.help.models import ConceptHelp, HelpPage
 from aristotle_mdr.templatetags.aristotle_tags import doc
 from django.conf import settings
+from django.utils.html import mark_safe
 
 register = template.Library()
 
@@ -106,7 +107,7 @@ def make_relink(text, app_label=None):
         r"\[\[(?:c\|)?([[a-zA-Z _.]+)(\|[a-z]+)?\]\]",
         make_concept_link, text
     )
-    return text
+    return mark_safe(text)
 
 
 @register.filter

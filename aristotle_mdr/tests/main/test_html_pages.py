@@ -61,9 +61,24 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
     def setUp(self):
         super(LoggedInViewConceptPages, self).setUp()
 
-        self.item1 = self.itemType.objects.create(name="Test Item 1 (visible to tested viewers)",definition=" ",workgroup=self.wg1,**self.defaults)
-        self.item2 = self.itemType.objects.create(name="Test Item 2 (NOT visible to tested viewers)",definition=" ",workgroup=self.wg2,**self.defaults)
-        self.item3 = self.itemType.objects.create(name="Test Item 3 (visible to tested viewers)",definition=" ",workgroup=self.wg1,**self.defaults)
+        self.item1 = self.itemType.objects.create(
+            name="Test Item 1 (visible to tested viewers)",
+            definition="my definition",
+            workgroup=self.wg1,
+            **self.defaults
+        )
+        self.item2 = self.itemType.objects.create(
+            name="Test Item 2 (NOT visible to tested viewers)",
+            definition="my definition",
+            workgroup=self.wg2,
+            **self.defaults
+        )
+        self.item3 = self.itemType.objects.create(
+            name="Test Item 3 (visible to tested viewers)",
+            definition="my definition",
+            workgroup=self.wg1,
+            **self.defaults
+        )
 
     def test_su_can_view(self):
         self.login_superuser()
@@ -123,13 +138,13 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         self.assertEqual(response.status_code,403)
         response = self.client.get(reverse('aristotle:edit_item',args=[self.item2.id]))
         self.assertEqual(response.status_code,403)
-        self.regular_item = self.itemType.objects.create(name="regular item",definition=" ", submitter=self.regular,**self.defaults)
+        self.regular_item = self.itemType.objects.create(name="regular item",definition="my definition", submitter=self.regular,**self.defaults)
         response = self.client.get(reverse('aristotle:edit_item',args=[self.regular_item.id]))
         self.assertEqual(response.status_code,200)
 
     def test_regular_can_save_via_edit_page(self):
         self.login_regular_user()
-        self.regular_item = self.itemType.objects.create(name="regular item",definition=" ", submitter=self.regular,**self.defaults)
+        self.regular_item = self.itemType.objects.create(name="regular item",definition="my definition", submitter=self.regular,**self.defaults)
         response = self.client.get(reverse('aristotle:edit_item',args=[self.regular_item.id]))
         self.assertEqual(response.status_code,200)
 
@@ -156,7 +171,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
 
     def test_submitter_can_save_item_with_no_workgroup_via_edit_page(self):
         self.login_editor()
-        self.item1 = self.itemType.objects.create(name="Test Item 1 (visible to tested viewers)",submitter=self.editor,definition=" ",**self.defaults)
+        self.item1 = self.itemType.objects.create(name="Test Item 1 (visible to tested viewers)",submitter=self.editor,definition="my definition",**self.defaults)
         response = self.client.get(reverse('aristotle:edit_item',args=[self.item1.id]))
         self.assertEqual(response.status_code,200)
 
@@ -609,6 +624,22 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(reverse('aristotle:deprecate',args=[self.item3.id]))
         self.assertEqual(response.status_code,200)
 
+    def test_editor_can_deprecate_item(self):
+        self.login_editor()
+        response = self.client.get(reverse('aristotle:deprecate',args=[self.item1.id]))
+        self.assertEqual(response.status_code,200)
+        response = self.client.get(reverse('aristotle:deprecate',args=[self.item2.id]))
+        self.assertEqual(response.status_code,403)
+        response = self.client.get(reverse('aristotle:deprecate',args=[self.item3.id]))
+        self.assertEqual(response.status_code,200)
+
+        response = self.client.post(
+            reverse('aristotle:deprecate',args=[self.item3.id]),{'olderItems':[self.item1.id]})
+        self.assertEqual(response.status_code,302)
+        
+        self.item1 = self.itemType.objects.get(id=self.item1.id) # Stupid cache
+        self.assertTrue(self.item1.superseded_by == self.item3.concept)
+
     def test_help_page_exists(self):
         self.logout()
         response = self.client.get(
@@ -829,9 +860,9 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
             reverse('aristotle:toggleFavourite', args=[self.item1.id]),
             follow=True
         )
-        self.assertEqual(
-            response.redirect_chain,
-            [('http://testserver'+url_slugify_concept(self.item1),302)]
+        self.assertRedirects(
+            response,
+            url_slugify_concept(self.item1)
         )
         self.assertEqual(self.viewer.profile.favourites.count(),1)
         self.assertEqual(self.viewer.profile.favourites.first().item,self.item1)
@@ -841,9 +872,9 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
             reverse('aristotle:toggleFavourite', args=[self.item1.id]),
             follow=True
         )
-        self.assertEqual(
-            response.redirect_chain,
-            [('http://testserver'+url_slugify_concept(self.item1),302)]
+        self.assertRedirects(
+            response,
+            url_slugify_concept(self.item1)
         )
         self.assertEqual(self.viewer.profile.favourites.count(),0)
         self.assertContains(response, "removed from favourites")
@@ -1231,7 +1262,7 @@ class DataElementConceptViewPage(LoggedInViewConceptPages,TestCase):
 
         another_oc = models.ObjectClass.objects.create(
             name="editor can't see this",
-            definition="",
+            definition="my definition",
         )
         response = self.client.post(check_url,{'objectClass':another_oc.pk})
         self.assertTrue(response.status_code,200)
@@ -1246,7 +1277,7 @@ class DataElementConceptViewPage(LoggedInViewConceptPages,TestCase):
 
     def test_regular_cannot_save_a_property_they_cant_see_via_edit_page(self):
         self.login_regular_user()
-        self.regular_item = self.itemType.objects.create(name="regular item",definition=" ", submitter=self.regular,**self.defaults)
+        self.regular_item = self.itemType.objects.create(name="regular item",definition="my definition", submitter=self.regular,**self.defaults)
         response = self.client.get(reverse('aristotle:edit_item',args=[self.regular_item.id]))
         self.assertEqual(response.status_code,200)
 
@@ -1334,7 +1365,7 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages,TestCase):
     url_name='dataelementderivation'
     # @property
     # def defaults(self):
-    #     return {'derives':models.DataElement.objects.create(name='derivedDE',definition="",workgroup=self.wg1)}
+    #     return {'derives':models.DataElement.objects.create(name='derivedDE',definition="my definition",workgroup=self.wg1)}
     itemType=models.DataElementDerivation
 
 class LoggedInViewUnmanagedPages(utils.LoggedInViewPages):

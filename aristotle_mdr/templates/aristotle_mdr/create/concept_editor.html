@@ -187,7 +187,7 @@
         {% endif %}
         <div role="tabpanel" class="tab-pane" id="tab_tips">
 
-            <h4>How to use this creation wizard</h4>
+            <header class='editor'>How to use this creation wizard</header>
             <p>
                 This wizard is designed to help you create well-defined,
                 reusable metadata.
@@ -221,7 +221,7 @@
             </p>
             
             {% if help %}
-                <h4>Help on {{ model_name_plural }}</h4>
+                <header>Help on {{ model_name_plural }}</header>
                 <strong>For more information on {{model_name_plural}}, read the
                 <a href="{% url 'aristotle_help:concept_help' app_label model %}">
                 help page.</strong>

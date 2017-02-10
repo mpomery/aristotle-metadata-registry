@@ -7,12 +7,12 @@ BASE = os.path.join(os.path.dirname(os.path.dirname(__file__)),'..')
 sys.path.insert(1, BASE)
 sys.path.insert(1, os.path.join(BASE, "tests"))
 sys.path.insert(1, os.path.join(BASE, "tests/apps"))
-TEMPLATE_DIRS = [
-    os.path.join(BASE_DIR, 'tests/apps/bulk_actions_test/templates')
+
+TEMPLATES[0]['DIRS'] = [
+    os.path.join(BASE, 'tests/apps/bulk_actions_test/templates')
 ]
 
 SECRET_KEY = 'inara+vtkprm7@0(fsc$+grbz9-s+tmo9d)e#k(9uf8m281&$7xhdkjr'
-SOUTH_TESTS_MIGRATE = True
 
 MEDIA_ROOT = os.path.join(BASE, "media")
 MEDIA_URL = '/media/'

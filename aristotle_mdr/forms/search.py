@@ -239,8 +239,8 @@ class TokenSearchForm(FacetedSearchForm):
 
 datePickerOptions = {
     "format": "YYYY-MM-DD",
-    "pickTime": False,
-    "pickDate": True,
+    # "pickTime": False,
+    # "pickDate": True,
     "defaultDate": "",
     "useCurrent": False,
 }

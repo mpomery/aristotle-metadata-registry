@@ -155,7 +155,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
             self.create_items()
 
     def create_items(self):
-        self.item1 = self.itemType.objects.create(name="admin_page_test_oc",definition=" ",workgroup=self.wg1,**self.create_defaults)
+        self.item1 = self.itemType.objects.create(name="admin_page_test_oc",definition="my definition",workgroup=self.wg1,**self.create_defaults)
 
     def test_registration_authority_inline_not_in_editor_admin_page(self):
         self.login_editor()
@@ -317,8 +317,8 @@ class AdminPageForConcept(utils.LoggedInViewPages):
 
 # deprecated
     def test_supersedes_saves(self):
-        self.item2 = self.itemType.objects.create(name="admin_page_test_oc_2",definition=" ",workgroup=self.wg1,**self.create_defaults)
-        self.item3 = self.itemType.objects.create(name="admin_page_test_oc_2",definition=" ",workgroup=self.wg1,**self.create_defaults)
+        self.item2 = self.itemType.objects.create(name="admin_page_test_oc_2",definition="my definition",workgroup=self.wg1,**self.create_defaults)
+        self.item3 = self.itemType.objects.create(name="admin_page_test_oc_2",definition="my definition",workgroup=self.wg1,**self.create_defaults)
 
         self.login_editor()
         response = self.client.get(reverse("admin:%s_%s_change"%(self.itemType._meta.app_label,self.itemType._meta.model_name),args=[self.item1.pk]))
@@ -346,7 +346,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
         self.assertTrue(self.item3 in self.item1.supersedes.all().select_subclasses())
 
     def test_superseded_by_saves(self):
-        self.item2 = self.itemType.objects.create(name="admin_page_test_oc_2",definition=" ",workgroup=self.wg1,**self.create_defaults)
+        self.item2 = self.itemType.objects.create(name="admin_page_test_oc_2",definition="my definition",workgroup=self.wg1,**self.create_defaults)
 
         self.login_editor()
         response = self.client.get(reverse("admin:%s_%s_change"%(self.itemType._meta.app_label,self.itemType._meta.model_name),args=[self.item1.pk]))
@@ -453,6 +453,50 @@ class AdminPageForConcept(utils.LoggedInViewPages):
                 '%s is %s'%(self.item1.name,s.get_state_display())
             )
 
+    def test_editor_make_item_has_submitter(self):
+        # Fixes #595
+        self.login_editor()
+        # make an item
+        response = self.client.get(reverse("admin:%s_%s_add"%(self.itemType._meta.app_label,self.itemType._meta.model_name)))
+        
+        short_name = utils.id_generator()
+        data = {
+            'name':"admin_page_test_oc_has_submitter",
+            'definition':"test", "workgroup":self.wg1.id,
+            'short_name': short_name,
+            'statuses-TOTAL_FORMS': 0, 'statuses-INITIAL_FORMS': 0 # no substatuses
+        }
+        data.update(self.form_defaults)
+
+        response = self.client.post(
+            reverse("admin:%s_%s_add"%(self.itemType._meta.app_label,self.itemType._meta.model_name)),
+            data
+        )
+        new_item = self.itemType.objects.get(short_name=short_name)
+        self.assertEqual(new_item.name,"admin_page_test_oc_has_submitter")
+        self.assertEqual(new_item.submitter,self.editor)
+
+        self.login_superuser()
+        updated_item = dict((k,v) for (k,v) in model_to_dict(self.item1).items() if v is not None)
+        updated_item['name'] = 'admin_page_test_oc_has_submitter_that_hasnt_changed'
+
+        updated_item.update({
+            'statuses-TOTAL_FORMS': 0, 'statuses-INITIAL_FORMS': 0, # no statuses
+        })
+        updated_item.update(self.form_defaults)
+
+        response = self.client.post(
+            reverse(
+                "admin:%s_%s_change"%(self.itemType._meta.app_label,self.itemType._meta.model_name),
+                args=[new_item.pk]
+            ),
+            updated_item
+        )
+
+        new_item = self.itemType.objects.get(pk=new_item.pk)  # decache
+        self.assertEqual(new_item.name,"admin_page_test_oc_has_submitter_that_hasnt_changed")
+        self.assertEqual(new_item.submitter,self.editor)
+
 
 class ObjectClassAdminPage(AdminPageForConcept,TestCase):
     itemType=models.ObjectClass
@@ -483,7 +527,7 @@ class DataElementDerivationAdminPage(AdminPageForConcept,TestCase):
         from reversion import revisions as reversion
         with reversion.create_revision():
             self.ded_wg = models.Workgroup.objects.create(name="Derived WG")
-            self.derived_de = models.DataElement.objects.create(name='derivedDE',definition="",workgroup=self.ded_wg)
+            self.derived_de = models.DataElement.objects.create(name='derivedDE',definition="my definition",workgroup=self.ded_wg)
         x=self.ra.register(self.derived_de,models.STATES.standard,self.su)
         self.create_defaults = {'derives':self.derived_de}
         self.form_defaults = {'derives':self.derived_de.id}

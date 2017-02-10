@@ -11,10 +11,10 @@
         <a href="#">{{ post.title }}</a>
     </li>
 {% endblock %}
+{% block discussions_header %}Edit comment on post "{{ post.title }}"{% endblock %}
 
 {% block discussion_content %}
 
-<h1>Edit comment on post "{{ post.title }}"</h1>
 
 <form enctype="multipart/form-data" method='post'>
     {% csrf_token %}

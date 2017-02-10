@@ -1,9 +1,12 @@
+from django import VERSION as django_version
+import datetime
+import random
+import string
+
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-
-import datetime
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
@@ -40,6 +43,18 @@ def model_to_dict_with_change_time(item, fetch_time=None):
     d['slots-MAX_NUM_FORMS'] = 0
 
     return d
+
+
+def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+
+def get_json_from_response(response):
+    if django_version > (1, 9):
+        return response.json()
+    else:
+        import json
+        return json.loads(response.content.decode('utf-8'))
 
 
 # Since all managed objects have the same rules, these can be used to cover everything
@@ -463,7 +478,7 @@ class LoggedInViewPages(object):
         return url_slugify_concept(item)
 
     def logout(self):
-        self.client.post(reverse('django.contrib.auth.views.logout'), {})
+        self.client.post(reverse('logout'), {})
 
     def login_superuser(self):
         self.logout()
@@ -539,10 +554,6 @@ class LoggedInViewPages(object):
                 # Needs no coverage as the test should pass to be successful
                 debug_response(response, msg="%s" % e)  # from django-tools
                 raise
-
-    def assertRedirects(self, *args, **kwargs):
-        self.assertResponseStatusCodeEqual(args[0], 302)
-        super(LoggedInViewPages, self).assertRedirects(*args, **kwargs)
 
     def assertResponseStatusCodeEqual(self, response, code):
             try:

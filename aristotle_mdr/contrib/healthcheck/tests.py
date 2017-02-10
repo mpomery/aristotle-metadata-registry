@@ -3,10 +3,10 @@ from django.db import DatabaseError
 from django.test import Client
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.utils.unittest import TestCase
+from django.test import TestCase
 from django.test import override_settings
 from django.test.utils import setup_test_environment
-import json
+from aristotle_mdr.tests.utils import get_json_from_response
 
 setup_test_environment()
 
@@ -39,7 +39,7 @@ class TestChaosMonkey(TestCase):
     @override_settings(CACHES={})
     def test_dead_cache(self):
         response = self.client.get(reverse('aristotle_mdr_hb:health'))
-        details = json.loads(response.content.decode('utf-8'))
+        details = get_json_from_response(response)
 
         self.assertEqual(response.status_code, 500)
         self.assertEqual(details['status_code'], 500)

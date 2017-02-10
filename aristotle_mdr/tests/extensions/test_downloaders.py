@@ -6,7 +6,7 @@ import aristotle_mdr.tests.utils as utils
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
-from django.template.base import TemplateSyntaxError
+from django.template import TemplateSyntaxError
 
 from django.test.utils import setup_test_environment
 setup_test_environment()

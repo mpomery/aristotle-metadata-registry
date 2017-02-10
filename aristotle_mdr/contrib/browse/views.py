@@ -13,8 +13,8 @@ class BrowseApps(TemplateView):
     template_name = "aristotle_mdr_browse/apps_list.html"
     ordering = 'app_label'
 
-    def get_context_data(self, **kwargs):
-        context = super(BrowseApps, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super(BrowseApps, self).get_context_data(*args, **kwargs)
 
         aristotle_apps = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS', [])
         aristotle_apps += ["aristotle_mdr"]
@@ -37,9 +37,9 @@ class BrowseApps(TemplateView):
 
 
 class AppBrowser(ListView):
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         # Call the base implementation first to get a context
-        context = super(AppBrowser, self).get_context_data(**kwargs)
+        context = super(AppBrowser, self).get_context_data(*args, **kwargs)
         context['app_label'] = self.kwargs['app']
         context['app'] = apps.get_app_config(self.kwargs['app'])
         return context
@@ -120,9 +120,9 @@ class BrowseConcepts(AppBrowser):
 
         return queryset.visible(self.request.user)
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         # Call the base implementation first to get a context
-        context = super(BrowseConcepts, self).get_context_data(**kwargs)
+        context = super(BrowseConcepts, self).get_context_data(*args, **kwargs)
         context['model'] = self.model
         context['model_name'] = self.model._meta.model_name
         context['sort'] = self.order

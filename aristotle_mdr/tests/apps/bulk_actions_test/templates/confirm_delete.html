@@ -4,7 +4,9 @@
 {% block content %}
 {{ form.media }}
 <form method="post" action="{% url 'aristotle:bulk_action' %}?next={{next}}">{% csrf_token %}
-
+    <p>
+        Use this page to confirm you wish to delete the following items.
+    </p>
     <input type="hidden" name="bulkaction" value="{{action}}"/>
     <table>
         {{ form.as_table }}

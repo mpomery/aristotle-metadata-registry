@@ -3,7 +3,6 @@
 {% block content %}
     {% block extra_head_scripts %}
         <script src="{{ STATIC_URL }}aristotle_mdr/jqueryui/jquery-ui.min.js"></script>
-        {# <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle_search.less' %}" /> #}
     {% endblock %}
 
 
@@ -45,7 +44,7 @@
         <i class="fa fa-plus-circle"></i> Add a slot</a>
 
 {% endwith %}
-    <h3>Slots available for this metadata item</h3>
+    <header class='editor'>Slots available for this metadata item</header>
     <table class="table">
         <thead>
             <tr>

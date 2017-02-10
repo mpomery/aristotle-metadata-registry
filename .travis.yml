@@ -1,3 +1,6 @@
+# Lets run on the new infrastructure
+sudo: false
+
 language: python
 python:
   - "3.5"
@@ -10,22 +13,44 @@ services:
   - mariadb
 
 env:
-  - DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=whoosh
-  - DJANGO_VERSION='1.8,<1.9' DB=postgres     SEARCH=whoosh
-  - DJANGO_VERSION='1.8,<1.9' DB=postgres     SEARCH=elasticsearch
+  - DOCS=1
+  - A11Y='metadata_item'
+  - A11Y='metadata_action'
+  - A11Y='static'
+  - DJANGO_VERSION='>1.8,<1.9' DB=postgres      SEARCH=elasticsearch
+  - DJANGO_VERSION='>1.8,<1.9' DB=postgres      SEARCH=elasticsearch
+  - DJANGO_VERSION='>1.8,<1.9' DB=sqlitefile    SEARCH=whoosh
+  - DJANGO_VERSION='>1.8,<1.9' DB=postgres      SEARCH=whoosh
+  - DJANGO_VERSION='>1.8,<1.9' DB=mariadb       SEARCH=whoosh
+  - DJANGO_VERSION='>1.8,<1.9' DB=mariadb       SEARCH=elasticsearch
+
+  - DJANGO_VERSION='>1.10,<1.11' DB=sqlitefile  SEARCH=elasticsearch
+  - DJANGO_VERSION='>1.10,<1.11' DB=sqlitefile  SEARCH=whoosh
+
   # Possible failures:
-  - DJANGO_VERSION='1.8,<1.9' DB=mariadb        SEARCH=whoosh
-  - DJANGO_VERSION='1.8,<1.9' DB=mariadb        SEARCH=elasticsearch
-  - DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=whoosh  VARIANT=haystack
-  - DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=elasticsearch  VARIANT=haystack
+  - DJANGO_VERSION='>1.8,<1.9' DB=sqlitefile    SEARCH=whoosh  VARIANT=haystack
+  - DJANGO_VERSION='>1.8,<1.9' DB=sqlitefile    SEARCH=elasticsearch  VARIANT=haystack
+
+  - DJANGO_VERSION='==1.11a1'  DB=sqlitefile    SEARCH=whoosh
 
 before_install:
   - pip install codecov
   - pip install pep8
 
+install:
+  - "pip install --upgrade pip"
+  - pip uninstall setuptools -y && pip install 'setuptools>34.0' --ignore-installed # needed for updated version of html5lib
+  - if [[ $DB == postgres ]]; then pip install -q psycopg2; fi
+  - if [[ $DB == mariadb ]]; then pip install -q mysqlclient; fi
+  - pip install "Django$DJANGO_VERSION" # So we can test multiple versions (once we support that)
+  - "pip install -r requirements-test.txt"
+  - "pip install -r requirements.txt"
+  - "pip install ."
+  - pip install "Django$DJANGO_VERSION" # So we can test multiple versions (once we support that)
+
 before_script:
 # Make a MariaDB database
-# Fix wierdness wiht MySQLdb on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0  
+# Fix wierdness with MariaDB on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0  
   - if [[ $DB == mariadb ]]; then mysql -e 'create database aristotle_test_db;' -u root ; fi
   - if [[ $DB == mariadb ]]; then mysql -e 'SET GLOBAL wait_timeout = 36000;' ; fi
   - if [[ $DB == mariadb ]]; then mysql -e 'SET GLOBAL max_allowed_packet = 134209536;' ; fi
@@ -35,35 +60,24 @@ before_script:
   - if [[ $DB == postgres ]]; then psql -c 'create database aristotle_test_db;' -U postgres; fi
 # Ensure PEP8 style guide is followed
   - pep8 --exclude=migrations,tests,example_mdr,'aristotle_mdr/contrib/search_backends/elasticsearch2.py' --ignore=E501,E225,E123 aristotle_mdr
-# check documentation builds cleanly
-  - cd docs ; sphinx-build -nW -b html -d _build/doctrees . _build/html ; cd ..
-  - pip list
-
-install:
-  - "pip install --upgrade pip"
-  - "pip uninstall setuptools -y && pip install setuptools" # needed for updated version of html5lib
-  - if [[ $DB == postgres ]]; then pip install -q psycopg2; fi
-  - if [[ $DB == mariadb ]]; then pip install -q mysqlclient; fi
-  - pip install 'Django>$DJANGO_VERSION' # So we can test multiple versions (once we support that)
-  - "pip install -r requirements-test.txt"
-  - "pip install -r requirements.txt"
-  - "pip install ."
-  - pip install 'Django>$DJANGO_VERSION' # So we can test multiple versions (once we support that)
 # Tell us exactly what versions we are running on!
+  - pip list
 
 # command to run tests
 script:
 # Start a few workers
-  - ./manage.py runworker --settings=aristotle_mdr.tests.settings.settings > worker1.log 2>&1 &
-  - coverage run --branch --source=aristotle_mdr manage.py test aristotle_mdr.tests --settings=aristotle_mdr.tests.settings.settings;
-  - cat worker1.log
+#  - ./manage.py runworker --settings=aristotle_mdr.tests.settings.settings > worker1.log 2>&1 &
+  - if [[ "${A11Y}${DOCS}" == "" ]]; then coverage run --branch --source=aristotle_mdr manage.py test aristotle_mdr.tests --settings=aristotle_mdr.tests.settings.settings; fi
+  - if [[ $A11Y == 'static' ]]; then coverage run --branch --source=aristotle_mdr ./manage.py test aristotle_mdr.tests.accessibility.TestStaticPageAccessibility --settings=aristotle_mdr.tests.settings.settings; fi
+  - if [[ $A11Y == 'metadata_item' ]]; then coverage run --branch --source=aristotle_mdr ./manage.py test aristotle_mdr.tests.accessibility.TestMetadataItemPageAccessibility --settings=aristotle_mdr.tests.settings.settings; fi
+  - if [[ $A11Y == 'metadata_action' ]]; then coverage run --branch --source=aristotle_mdr ./manage.py test aristotle_mdr.tests.accessibility.TestMetadataActionPageAccessibility --settings=aristotle_mdr.tests.settings.settings; fi
+# check documentation builds cleanly
+  - if [[ $DOCS == 1 ]]; then cd docs ; sphinx-build -nW -b html -d _build/doctrees . _build/html ; cd ..; fi
+#  - cat worker1.log
 after_success:
   - coveralls
   - codecov
   - pep8 --exclude=migrations --ignore=E501,E225,E123 aristotle_mdr
-
-# Lets run on the new infrastructure
-sudo: false
 
 addons:
   apt:
@@ -76,6 +90,28 @@ addons:
   mariadb: '10.1'
 
 matrix:
+  exclude:
+    - python: "2.7"
+      env: A11Y='metadata_item'
+    - python: "2.7"
+      env: A11Y='metadata_action'
+    - python: "2.7"
+      env: A11Y='static'
+    - python: "2.7"
+      env: DOCS=1
+    - python: "2.7"
+      env: DJANGO_VERSION='>1.10,<1.11' DB=sqlitefile  SEARCH=elasticsearch
+    - python: "2.7"
+      env: DJANGO_VERSION='>1.10,<1.11' DB=sqlitefile  SEARCH=whoosh
+  # Possible failures:
+    - python: "2.7"
+      env: DJANGO_VERSION='>1.8,<1.9' DB=sqlitefile    SEARCH=whoosh  VARIANT=haystack
+    - python: "2.7"
+      env: DJANGO_VERSION='>1.8,<1.9' DB=sqlitefile    SEARCH=elasticsearch  VARIANT=haystack
+    - python: "2.7"
+      env: DJANGO_VERSION='==1.11a1'  DB=sqlitefile    SEARCH=whoosh
+
   allow_failures:
-    - env: DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=elasticsearch  VARIANT=haystack
-    - env: DJANGO_VERSION='1.8,<1.9' DB=sqlitefile   SEARCH=whoosh  VARIANT=haystack
+    - env: DJANGO_VERSION='>1.8,<1.9' DB=sqlitefile    SEARCH=whoosh  VARIANT=haystack
+    - env: DJANGO_VERSION='>1.8,<1.9' DB=sqlitefile    SEARCH=elasticsearch  VARIANT=haystack
+    - env: DJANGO_VERSION='==1.11a1'  DB=sqlitefile    SEARCH=whoosh

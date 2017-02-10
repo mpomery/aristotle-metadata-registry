@@ -18,9 +18,9 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
         # There would be too many tests to test every item type against every other
         # But they all have identical logic, so one test should suffice
-        self.item1 = models.ObjectClass.objects.create(name="Test Item 1 (visible to tested viewers)",definition=" ",workgroup=self.wg1)
-        self.item2 = models.ObjectClass.objects.create(name="Test Item 2 (NOT visible to tested viewers)",definition=" ",workgroup=self.wg2)
-        self.item3 = models.ObjectClass.objects.create(name="Test Item 3 (only visible to the editor)",definition=" ",workgroup=None,submitter=self.editor)
+        self.item1 = models.ObjectClass.objects.create(name="Test Item 1 (visible to tested viewers)",definition="my definition",workgroup=self.wg1)
+        self.item2 = models.ObjectClass.objects.create(name="Test Item 2 (NOT visible to tested viewers)",definition="my definition",workgroup=self.wg2)
+        self.item3 = models.ObjectClass.objects.create(name="Test Item 3 (only visible to the editor)",definition="my definition",workgroup=None,submitter=self.editor)
 
     def test_viewer_cannot_request_review_for_private_item(self):
         self.login_viewer()
@@ -64,10 +64,10 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
     def test_registrar_has_valid_items_in_review(self):
 
-        item1 = models.ObjectClass.objects.create(name="Test Item 1",definition=" ",workgroup=self.wg1)
-        item2 = models.ObjectClass.objects.create(name="Test Item 2",definition=" ",workgroup=self.wg2)
-        item3 = models.ObjectClass.objects.create(name="Test Item 3",definition=" ",workgroup=self.wg1)
-        item4 = models.ObjectClass.objects.create(name="Test Item 4",definition=" ",workgroup=self.wg2)
+        item1 = models.ObjectClass.objects.create(name="Test Item 1",definition="my definition",workgroup=self.wg1)
+        item2 = models.ObjectClass.objects.create(name="Test Item 2",definition="my definition",workgroup=self.wg2)
+        item3 = models.ObjectClass.objects.create(name="Test Item 3",definition="my definition",workgroup=self.wg1)
+        item4 = models.ObjectClass.objects.create(name="Test Item 4",definition="my definition",workgroup=self.wg2)
 
         self.login_registrar()
 
