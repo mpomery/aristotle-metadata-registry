@@ -10,11 +10,27 @@
     {{ item.derivation_rule }}
 </tt>
 <dl>
-    <dt>Derived Data Element</dt>
+    <dt>Derived Data Element
+        <a href="{% url 'aristotle_mdr:dataelementderivation_change_derives' iid=item.pk %}" 
+        class="btn btn-default"
+        data-toggle="modal" data-target="#derivation_editor"
+        >Edit derivations</a>
+    </dt>
     <dd>
-        {% include "aristotle_mdr/helpers/inlineDetails.html" with item=item.derives %}
+    {% for de in item.derives.all %}
+        <dd>
+            {% include "aristotle_mdr/helpers/inlineDetails.html" with item=de %}
+        </dd>
+    {% empty %}
+        <dd><em>None</em></dd>
+    {% endfor %}
     </dd>
-    <dt>Input Data Elements</dt>
+    <dt>Input Data Elements
+        <a href="{% url 'aristotle_mdr:dataelementderivation_change_inputs' iid=item.pk %}"
+        class="btn btn-default"
+        data-toggle="modal" data-target="#derivation_editor"
+        >Edit inputs</a>
+    </dt>
     {% for de in item.inputs.all %}
         <dd>
             {% include "aristotle_mdr/helpers/inlineDetails.html" with item=de %}
@@ -23,6 +39,7 @@
         <dd><em>None</em></dd>
     {% endfor %}
 </dl>
+{% bootstrap_modal 'derivation_editor' size='md' %}
 {% endblock %}
 
 {% block relationships %}
