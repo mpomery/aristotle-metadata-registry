@@ -3,4 +3,4 @@ coveralls
 Sphinx
 sphinx-rtd-theme
 mock
-wcag_zoo
+wcag-zoo==0.1.0
