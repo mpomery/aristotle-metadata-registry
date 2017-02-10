@@ -97,7 +97,7 @@ class EditItemView(PermissionFormView):
                     if not change_comments:
                         change_comments = construct_change_message(request, form, [slot_formset])
                     reversion.revisions.set_comment(change_comments)
-
+                    form.save_m2m()
                     item.save()
                     return HttpResponseRedirect(url_slugify_concept(self.item))
 
