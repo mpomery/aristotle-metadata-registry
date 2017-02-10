@@ -9,7 +9,7 @@ sys.path.insert(1, os.path.join(BASE, "tests"))
 sys.path.insert(1, os.path.join(BASE, "tests/apps"))
 
 TEMPLATES[0]['DIRS'] = [
-    os.path.join(BASE_DIR, 'tests/apps/bulk_actions_test/templates')
+    os.path.join(BASE, 'tests/apps/bulk_actions_test/templates')
 ]
 
 SECRET_KEY = 'inara+vtkprm7@0(fsc$+grbz9-s+tmo9d)e#k(9uf8m281&$7xhdkjr'
