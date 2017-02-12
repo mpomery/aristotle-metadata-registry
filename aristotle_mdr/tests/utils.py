@@ -1,3 +1,4 @@
+from django import VERSION as django_version
 import datetime
 import random
 import string
@@ -46,6 +47,14 @@ def model_to_dict_with_change_time(item, fetch_time=None):
 
 def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
+
+def get_json_from_response(response):
+    if django_version > (1, 9):
+        return response.json()
+    else:
+        import json
+        return json.loads(response.content.decode('utf-8'))
 
 
 # Since all managed objects have the same rules, these can be used to cover everything

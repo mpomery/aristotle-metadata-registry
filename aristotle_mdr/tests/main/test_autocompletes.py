@@ -12,6 +12,7 @@ setup_test_environment()
 from aristotle_mdr.tests import utils
 import datetime
 
+
 class LoggedInAutocompletes(utils.LoggedInViewPages, TestCase):
     defaults = {}
 
@@ -25,19 +26,19 @@ class LoggedInAutocompletes(utils.LoggedInViewPages, TestCase):
             reverse("aristotle-autocomplete:concept")
         )
 
-        data = response.json()
+        data = utils.get_json_from_response(response)
         self.assertEqual(len(data['results']), 0)
 
         self.login_superuser()
         response = self.client.get(
             reverse("aristotle-autocomplete:concept")
         )
-        data = response.json()
+        data = utils.get_json_from_response(response)
         self.assertEqual(len(data['results']), 2)
 
         response = self.client.get(
             reverse("aristotle-autocomplete:concept") + "?q=Not"  # Test case insensitivity
         )
-        data = response.json()
+        data = utils.get_json_from_response(response)
         self.assertEqual(len(data['results']), 1)
         self.assertEqual(data['results'][0]['id'], item2.id)
