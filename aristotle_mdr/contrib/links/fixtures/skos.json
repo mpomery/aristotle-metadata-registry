@@ -1,0 +1,77 @@
+[
+  {
+    "fields": {
+      "definition": "Generic relationship",
+      "created": "2016-05-02T22:23:10.208Z",
+      "modified": "2016-05-02T22:23:10.209Z",
+      "name": "Related to",
+      "responsible_organisation": "",
+      "comments": "",
+      "origin_URI": "",
+      "references": "",
+      "submitting_organisation": "",
+      "short_name": "",
+      "superseded_by": null,
+      "synonyms": "",
+      "version": ""
+    },
+    "model": "aristotle_mdr._concept",
+    "pk": 20000
+  },
+  {
+    "fields": {
+      "arity": 2
+    },
+    "model": "aristotle_mdr_links.relation",
+    "pk": 20000
+  },
+  {
+    "fields": {
+      "definition": "Member of a related to relationship",
+      "name": "Member",
+      "multiplicity": 1,
+      "ordinal": 1,
+      "relation": 20000
+    },
+    "model": "aristotle_mdr_links.relationrole",
+    "pk": 20001
+  },
+  {
+    "fields": {
+      "definition": "A different generic relationship",
+      "created": "2016-05-02T22:23:10.208Z",
+      "modified": "2016-05-02T22:23:10.209Z",
+      "name": "Similar to",
+      "responsible_organisation": "",
+      "comments": "",
+      "origin_URI": "",
+      "references": "",
+      "submitting_organisation": "",
+      "short_name": "",
+      "superseded_by": null,
+      "synonyms": "",
+      "version": ""
+    },
+    "model": "aristotle_mdr._concept",
+    "pk": 20009
+  },
+  {
+    "fields": {
+      "arity": 2
+    },
+    "model": "aristotle_mdr_links.relation",
+    "pk": 20009
+  },
+  {
+    "fields": {
+      "definition": "Member of a similar to relationship",
+      "name": "Member",
+      "multiplicity": 1,
+      "ordinal": 1,
+      "relation": 20009
+    },
+    "model": "aristotle_mdr_links.relationrole",
+    "pk": 20006
+  }
+
+]

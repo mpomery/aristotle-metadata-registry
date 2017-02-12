@@ -1,0 +1,7 @@
+{% load aristotle_tags i18n %}
+
+<li><a class="" href="{% url 'aristotle_links:add_link' %}?item={{item.id}}"
+    data-toggle="modal" data-target="#infobox_adv_edit">
+    <i class="fa fa-fw fa-link"></i>
+    {% trans 'Add link'%}
+</a></li>

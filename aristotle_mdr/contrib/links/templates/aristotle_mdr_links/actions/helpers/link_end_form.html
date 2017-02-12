@@ -1,0 +1,12 @@
+{% load i18n util_tags %}
+
+{% for f, role in form|izip:roles %}
+    <div>
+        <label for='{{f.id_for_label}}'>{{f.label}}</label>
+        <div>
+            [{{role}}] - {{role.definition}}
+            You can select up to {{ role.multiplicity }} concepts for this role.
+        </div>
+        {{f}}
+    </div>
+{% endfor %}
