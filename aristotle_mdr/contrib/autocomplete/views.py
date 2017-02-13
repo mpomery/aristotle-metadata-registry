@@ -88,11 +88,11 @@ class UserAutocomplete(autocomplete.Select2QuerySetView):
         if self.q:
             if self.request.user.is_superuser:
                 qs = User.objects.filter(
-                    Q(username__icontains=self.q) |  Q(email__icontains=self.q)
+                    Q(username__icontains=self.q) | Q(email__icontains=self.q)
                 )
             else:
                 qs = User.objects.filter(
-                    Q(username__iexact=self.q) |  Q(email__iexact=self.q)
+                    Q(username__iexact=self.q) | Q(email__iexact=self.q)
                 )
         else:
             if self.request.user.is_superuser:
@@ -101,24 +101,3 @@ class UserAutocomplete(autocomplete.Select2QuerySetView):
                 qs = self.model.objects.none()
 
         return qs
-
-    # def get_result_title(self, result):
-    #     """Return the title of a result."""
-    #     return six.text_type(result)
-
-    # def get_result_text(self, result):
-    #     """Return the label of a result."""
-
-    #     template = get_template(self.template_name)
-    #     context = Context({"result": result})
-    #     return template.render(context)
-
-    # def get_results(self, context):
-    #     """Return data for the 'results' key of the response."""
-    #     return [
-    #         {
-    #             'id': self.get_result_value(result),
-    #             'title': self.get_result_title(result),
-    #             'text': self.get_result_text(result),
-    #         } for result in context['object_list']
-    #     ]
