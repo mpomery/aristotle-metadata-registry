@@ -30,6 +30,12 @@
         </div>
         {% if form.oc_options %}
             <div class="panel-body">
+                <p>
+                    The following object classes were found with a name like <em>"{{ oc_name }}"</em>
+                    {% if oc_definition %} and definition like <em>"{{ oc_definition }}"</em> {% endif %}
+                    elligible for reuse.
+                </p>
+
                 {{ form.oc_options.label_tag }}
                 <ol class="searchResults">
                 {% for id, obj in form.oc_options.field.choices|slice:":-1" %}
@@ -53,7 +59,9 @@
         {% else %}
             <div class="panel-body">
                 <p>
-                    No matching object classes were found for reuse, so a new one will be created.
+                    No matching object classes were found for with a name like <em>"{{ oc_name }}"</em>
+                    {% if oc_definition %} and definition like <em>"{{ oc_definition }}"</em> {% endif %}
+                    for reuse, so a new one will be created.
                 </p>
             </div>
         {% endif %}
@@ -72,6 +80,11 @@
         </div>
         {% if form.pr_options %}
             <div class="panel-body">
+                <p>
+                    The following properties were found with a name like <em>"{{ pr_name }}"</em>
+                    {% if pr_definition %} and definition like <em>"{{ pr_definition }}"</em> {% endif %}
+                    elligible for reuse.
+                </p>
                 {{ form.pr_options.label_tag }}
                 <ol class="searchResults">
                 {% for id, obj in form.pr_options.field.choices|slice:":-1" %}
@@ -95,7 +108,9 @@
         {% else %}
             <div class="panel-body">
                 <p>
-                    No matching properties were found for reuse, so a new one will be created.
+                    No matching properties were found for with a name like <em>"{{ pr_name }}"</em>
+                    {% if pr_definition %} and definition like <em>"{{ pr_definition }}"</em> {% endif %}
+                    for reuse, so a new one will be created.
                 </p>
             </div>
         {% endif %}
@@ -114,6 +129,11 @@
         </div>
         {% if form.vd_options %}
             <div class="panel-body">
+                <p>
+                    The following value domains were found with a name like <em>"{{ vd_name }}"</em>
+                    {% if vd_definition %} and definition like <em>"{{ vd_definition }}"</em> {% endif %}
+                    elligible for reuse.
+                </p>
                 {{ form.vd_options.label_tag }}
                 <ol class="searchResults">
                 {% for id, obj in form.vd_options.field.choices|slice:":-1" %}
@@ -137,7 +157,9 @@
         {% else %}
             <div class="panel-body">
                 <p>
-                    No matching value domains were found for reuse, so a new one will be created.
+                    No matching value domains were found for with a name like <em>"{{ vd_name }}"</em>
+                    {% if vd_definition %} and definition like <em>"{{ vd_definition }}"</em> {% endif %}
+                    for reuse, so a new one will be created.
                 </p>
             </div>
         {% endif %}
