@@ -184,3 +184,7 @@ def user_can_move_to_workgroup(user, workgroup):
 def user_can_move_between_workgroups(user, workgroup_a, workgroup_b):
     """checks if a user can move an item from A to B"""
     return user_can_remove_from_workgroup(user, workgroup_a) and user_can_move_to_workgroup(user, workgroup_b)
+
+
+def user_can_query_user_list(user):
+    return user.is_superuser or user.profile.is_workgroup_manager() or user.profile.is_registrar
