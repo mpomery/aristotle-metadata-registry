@@ -7,7 +7,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, TemplateView
 from aristotle_mdr.utils import get_concepts_for_apps
-
+from collections import OrderedDict
 
 class BrowseApps(TemplateView):
     template_name = "aristotle_mdr_browse/apps_list.html"
@@ -32,7 +32,8 @@ class BrowseApps(TemplateView):
 
             app_models['models'].append(m)
             out[m.app_label] = app_models
-        context['apps'] = out
+
+        context['apps'] = OrderedDict(sorted(out.items(), key=lambda app: app[1]['app']))
         return context
 
 
@@ -52,9 +53,7 @@ class BrowseModels(AppBrowser):
 
     def get_queryset(self):
         app = self.kwargs['app']
-        models = ContentType.objects.filter(app_label=app)
-        models = get_concepts_for_apps([app])
-        return models
+        return get_concepts_for_apps([app])
 
 
 class BrowseConcepts(AppBrowser):
