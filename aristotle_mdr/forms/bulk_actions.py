@@ -22,13 +22,9 @@ from aristotle_mdr.contrib.autocomplete import widgets
 
 
 class ForbiddenAllowedModelMultipleChoiceField(forms.ModelMultipleChoiceField):
-    def __init__(self, queryset, validate_queryset, required=True, widget=None,
-                 label=None, initial=None, help_text='', *args, **kwargs):
-        self.validate_queryset = validate_queryset
-        super(ForbiddenAllowedModelMultipleChoiceField, self).__init__(
-            queryset, None, required, widget, label, initial, help_text,
-            *args, **kwargs
-        )
+    def __init__(self, *args, **kwargs):
+        self.validate_queryset = kwargs.pop('validate_queryset')
+        super(ForbiddenAllowedModelMultipleChoiceField, self).__init__(*args, **kwargs)
 
     def _check_values(self, value):
         """
@@ -75,16 +71,19 @@ class ForbiddenAllowedModelMultipleChoiceField(forms.ModelMultipleChoiceField):
         return qs
 
 
+from django.forms import HiddenInput
 class BulkActionForm(UserAwareForm):
     classes = ""
     confirm_page = None
     all_in_queryset = forms.BooleanField(
         label=_("All items"),
         required=False,
+        widget=HiddenInput()
     )
     qs = forms.CharField(
         label=_("All items"),
         required=False,
+        widget=HiddenInput()
     )
 
     # queryset is all as we try to be nice and process what we can in bulk
