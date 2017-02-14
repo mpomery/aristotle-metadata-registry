@@ -15,7 +15,7 @@ from aristotle_mdr.contrib.generic.views import (
 from django.utils.translation import ugettext_lazy as _
 
 
-urlpatterns = [
+urlpatterns=[
     url(r'^/?$', TemplateView.as_view(template_name='aristotle_mdr/static/home.html'), name="home"),
     url(r'^manifest.json$', TemplateView.as_view(template_name='aristotle_mdr/manifest.json', content_type='application/json')),
     url(r'^sitemap.xml$', views.sitemaps.main, name='sitemap_xml'),
@@ -47,15 +47,15 @@ urlpatterns = [
         ), name='supplementary_values_edit'),
     url(r'^item/(?P<iid>\d+)/dataelementderivation/change_inputs/?$',
         GenericAlterManyToManyView.as_view(
-            model_base = models.DataElementDerivation,
-            model_to_add = models.DataElement,
-            model_base_field = 'inputs'
+            model_base=models.DataElementDerivation,
+            model_to_add=models.DataElement,
+            model_base_field='inputs'
         ), name='dataelementderivation_change_inputs'),
     url(r'^item/(?P<iid>\d+)/dataelementderivation/change_derives/?$',
         GenericAlterManyToManyView.as_view(
-            model_base = models.DataElementDerivation,
-            model_to_add = models.DataElement,
-            model_base_field = 'derives'
+            model_base=models.DataElementDerivation,
+            model_to_add=models.DataElement,
+            model_base_field='derives'
         ), name='dataelementderivation_change_derives'),
 
     url(r'^item/(?P<iid>\d+)?/alter_relationship/(?P<fk_field>[A-Za-z\-_]+)/?$',

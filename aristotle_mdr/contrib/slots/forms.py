@@ -7,6 +7,7 @@ from aristotle_mdr import models as MDR
 from aristotle_mdr.contrib.slots.models import Slot, SlotDefinition
 from aristotle_mdr.forms.bulk_actions import LoggedInBulkActionForm
 
+
 # TODO: Fix this method, it is a hot mess!... But it works.
 # But it will require Django 1.9 - https://docs.djangoproject.com/en/1.9/topics/forms/formsets/#passing-custom-parameters-to-formset-forms
 # Or some funky functional stuff - http://stackoverflow.com/a/624013/764357
@@ -53,10 +54,10 @@ def slot_inlineformset_factory(model):
 
 
 class BulkAssignSlotsForm(LoggedInBulkActionForm):
-    classes = "fa-tags"  # An appropriate font awesome icon (maybe tags?)
+    classes = "fa-tags"
     action_text = _('Bulk add slots')
     items_label = "Add slot details to multiple metadata items"
-    confirm_page = "aristotle_mdr/slots/bulk_actions/add_slots.html" # <- this file needs to be made
+    confirm_page = "aristotle_mdr/slots/bulk_actions/add_slots.html"
 
     slot_type = forms.ModelChoiceField(
         label="Slot type",

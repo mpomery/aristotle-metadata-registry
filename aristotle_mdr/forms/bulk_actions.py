@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.forms import HiddenInput
 from django.utils import timezone
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -71,7 +72,6 @@ class ForbiddenAllowedModelMultipleChoiceField(forms.ModelMultipleChoiceField):
         return qs
 
 
-from django.forms import HiddenInput
 class BulkActionForm(UserAwareForm):
     classes = ""
     confirm_page = None

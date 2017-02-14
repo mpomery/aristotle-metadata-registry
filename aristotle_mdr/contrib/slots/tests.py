@@ -74,6 +74,7 @@ class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):
         self.assertTrue(slot.value=="a" * 512)
         self.assertTrue(len(slot.value) > 256)
 
+
 class TestSlotsBulkAction(BulkActionsTest, TestCase):
     def setUp(self, *args, **kwargs):
         super(TestSlotsBulkAction, self).setUp(*args, **kwargs)

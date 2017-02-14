@@ -9,6 +9,7 @@ from django.views.generic import ListView, TemplateView
 from aristotle_mdr.utils import get_concepts_for_apps
 from collections import OrderedDict
 
+
 class BrowseApps(TemplateView):
     template_name = "aristotle_mdr_browse/apps_list.html"
     ordering = 'app_label'
