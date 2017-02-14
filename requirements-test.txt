@@ -3,4 +3,5 @@ coveralls
 Sphinx
 sphinx-rtd-theme
 mock
+tox
 wcag_zoo
