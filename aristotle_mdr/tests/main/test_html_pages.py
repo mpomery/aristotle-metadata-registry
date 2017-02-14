@@ -1363,9 +1363,6 @@ class DataElementViewPage(LoggedInViewConceptPages,TestCase):
 
 class DataElementDerivationViewPage(LoggedInViewConceptPages,TestCase):
     url_name='dataelementderivation'
-    # @property
-    # def defaults(self):
-    #     return {'derives':models.DataElement.objects.create(name='derivedDE',definition="my definition",workgroup=self.wg1)}
     itemType=models.DataElementDerivation
 
     def derivation_m2m_concepts_save(self, url, attr):
