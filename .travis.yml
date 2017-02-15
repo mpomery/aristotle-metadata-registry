@@ -35,10 +35,9 @@ env:
 
 before_install:
   - pip install codecov
-  - pip install pep8
 
 install:
-  - "pip install --upgrade pip"
+  - pip install tox
 
 before_script:
 # Make a MariaDB database
