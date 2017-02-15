@@ -35,6 +35,7 @@ env:
 
 before_install:
   - pip install codecov
+  - pip install coveralls
 
 install:
   - pip install tox

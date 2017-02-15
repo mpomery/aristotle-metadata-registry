@@ -53,7 +53,7 @@ if 'TRAVIS' in os.environ or 'APPVEYOR' in os.environ:
         else:
             print("Aristotle specific variant")
             from aristotle_mdr.tests.settings.templates.search.whoosh import HAYSTACK_CONNECTIONS
-    elif os.environ.get('SEARCH') == 'elasticsearch':
+    elif os.environ.get('SEARCH') == 'elastic':
         print("Running %s test-suite with elasticsearch" % ci_runner)
         if os.environ.get('VARIANT') == 'haystack':
             print("Vanilla haystack variant")
