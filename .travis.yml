@@ -31,7 +31,7 @@ env:
   - DJANGO_VERSION='1.8' DB=sqlitefile    SEARCH=whoosh  VARIANT=haystack
   - DJANGO_VERSION='1.8' DB=sqlitefile    SEARCH=elasticsearch  VARIANT=haystack
 
-  - DJANGO_VERSION='1.11a1'  DB=sqlitefile    SEARCH=whoosh
+  - DJANGO_VERSION='1.11'  DB=sqlitefile    SEARCH=whoosh
 
 before_install:
   - pip install codecov
@@ -63,7 +63,6 @@ script:
 after_success:
   - coveralls
   - codecov
-  - pep8 --exclude=migrations --ignore=E501,E225,E123 aristotle_mdr
 
 addons:
   apt:
