@@ -143,7 +143,7 @@ class ConceptForm(WorkgroupVerificationMixin, UserAwareModelForm):
     def object_specific_fields(self):
         # returns every field that isn't in a concept
         obj_field_names = [
-            field.name for field in self._meta.model._meta.fields
+            field.name for field in self._meta.model._meta.get_fields()
             if field not in MDR.concept._meta.fields
             ]
         fields = []

@@ -128,7 +128,7 @@ def construct_change_message(request, form, formsets):
 def get_concepts_for_apps(app_labels):
     from django.contrib.contenttypes.models import ContentType
     from aristotle_mdr import models as MDR
-    models = ContentType.objects.filter(app_label__in=app_labels).all()
+    models = ContentType.objects.filter(app_label__in=app_labels).all().order_by('model')
     concepts = [
         m
         for m in models
