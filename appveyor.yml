@@ -10,23 +10,23 @@ environment:
       - DJANGO_VERSION: '1.8'
         DB: mssql
         SEARCH: whoosh
+        PLATFORM: x32bit
         PYTHON_HOME: "C:/Python35"
-        PYODBC_FILE: "./aristotle_mdr/tests/bin/pyodbc-3.0.10-cp35-cp35m-win32.whl"
       - DJANGO_VERSION: '1.8'
         DB: mssql
         SEARCH: whoosh
+        PLATFORM: x64bit
         PYTHON_HOME: "C:/Python35-x64"
-        PYODBC_FILE: "./aristotle_mdr/tests/bin/pyodbc-3.0.10-cp35-cp35m-win_amd64.whl"
       - DJANGO_VERSION: '1.10'
         DB: mssql
         SEARCH: whoosh
+        PLATFORM: x32bit
         PYTHON_HOME: "C:/Python35"
-        PYODBC_FILE: "./aristotle_mdr/tests/bin/pyodbc-3.0.10-cp35-cp35m-win32.whl"
       - DJANGO_VERSION: '1.10'
         DB: mssql
         SEARCH: whoosh
+        PLATFORM: x64bit
         PYTHON_HOME: "C:/Python35-x64"
-        PYODBC_FILE: "./aristotle_mdr/tests/bin/pyodbc-3.0.10-cp35-cp35m-win_amd64.whl"
 
 install:
   - cmd: |
@@ -36,5 +36,5 @@ install:
 # command to run tests
 test_script:
   - cmd: |
-        tox -e django-%DJANGO_VERSION%-test-windows-db-%DB%-search-%SEARCH% --skip-missing-interpreters
+        tox -e django-%DJANGO_VERSION%-test-windows-db-%DB%-search-%SEARCH%-%PLATFORM% --skip-missing-interpreters
 
