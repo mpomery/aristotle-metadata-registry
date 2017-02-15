@@ -23,44 +23,51 @@ if 'TRAVIS' in os.environ:
     ci_runner = "Travis-CI"
 elif 'APPVEYOR' in os.environ:
     ci_runner = "Appveyor"
+else:
+    ci_runner = "Tox"
 
 skip_migrations = (
     "ARISTOTLE_DEV_SKIP_MIGRATIONS" in os.environ or
-    os.environ.get('DB') in ['mysql', 'mssql']
+    os.environ.get('DB') in ['mssql']
 )
 
-if 'TRAVIS' in os.environ or 'APPVEYOR' in os.environ:
-    if os.environ.get('DB') == 'sqlitefile':
-        print("Running %s test-suite with file-based SQLite" % ci_runner)
-        from aristotle_mdr.tests.settings.templates.db.sqlite import DATABASES
-    elif os.environ.get('DB') == 'postgres':
-        print("Running %s test-suite with POSTGRESQL" % ci_runner)
-        from aristotle_mdr.tests.settings.templates.db.postgres import DATABASES
-    elif os.environ.get('DB') == 'mariadb':
-        print("Running %s test-suite with MariaDB" % ci_runner)
-        skip_migrations = True
-        from aristotle_mdr.tests.settings.templates.db.mariadb import DATABASES
-    elif os.environ.get('DB') == 'mssql':
-        print("Running %s test-suite with MSSQL" % ci_runner)
-        skip_migrations = True  # Sadly, this may not be possible until after migration 0018
-        from aristotle_mdr.tests.settings.templates.db.mssql import DATABASES
+if os.environ.get('DB') == 'sqlitefile':
+    print("Running %s test-suite with file-based SQLite" % ci_runner)
+    from aristotle_mdr.tests.settings.templates.db.sqlite import DATABASES
+elif os.environ.get('DB') == 'postgres':
+    print("Running %s test-suite with POSTGRESQL" % ci_runner)
+    from aristotle_mdr.tests.settings.templates.db.postgres import DATABASES
+elif os.environ.get('DB') == 'mariadb':
+    print("Running %s test-suite with MariaDB" % ci_runner)
+    skip_migrations = True
+    from aristotle_mdr.tests.settings.templates.db.mariadb import DATABASES
+elif os.environ.get('DB') == 'mssql':
+    print("Running %s test-suite with MSSQL" % ci_runner)
+    skip_migrations = True  # Sadly, this may not be possible until after migration 0018
+    from aristotle_mdr.tests.settings.templates.db.mssql import DATABASES
+else:
+    print("Running %s test-suite with tox file-based SQLite" % ci_runner)
+    from aristotle_mdr.tests.settings.tox import DATABASES
 
-    if os.environ.get('SEARCH') == 'whoosh':
-        print("Running %s test-suite with whoosh" % ci_runner)
-        if os.environ.get('VARIANT') == 'haystack':
-            print("Vanilla haystack variant")
-            from aristotle_mdr.tests.settings.templates.search.haystack_whoosh import HAYSTACK_CONNECTIONS
-        else:
-            print("Aristotle specific variant")
-            from aristotle_mdr.tests.settings.templates.search.whoosh import HAYSTACK_CONNECTIONS
-    elif os.environ.get('SEARCH') == 'elastic':
-        print("Running %s test-suite with elasticsearch" % ci_runner)
-        if os.environ.get('VARIANT') == 'haystack':
-            print("Vanilla haystack variant")
-            from aristotle_mdr.tests.settings.templates.search.haystack_elasticsearch import HAYSTACK_CONNECTIONS
-        else:
-            print("Aristotle specific variant")
-            from aristotle_mdr.tests.settings.templates.search.elasticsearch import HAYSTACK_CONNECTIONS
+if os.environ.get('SEARCH') == 'whoosh':
+    print("Running %s test-suite with whoosh" % ci_runner)
+    if os.environ.get('VARIANT') == 'haystack':
+        print("Vanilla haystack variant")
+        from aristotle_mdr.tests.settings.templates.search.haystack_whoosh import HAYSTACK_CONNECTIONS
+    else:
+        print("Aristotle specific variant")
+        from aristotle_mdr.tests.settings.templates.search.whoosh import HAYSTACK_CONNECTIONS
+elif os.environ.get('SEARCH') == 'elastic':
+    print("Running %s test-suite with elasticsearch" % ci_runner)
+    if os.environ.get('VARIANT') == 'haystack':
+        print("Vanilla haystack variant")
+        from aristotle_mdr.tests.settings.templates.search.haystack_elasticsearch import HAYSTACK_CONNECTIONS
+    else:
+        print("Aristotle specific variant")
+        from aristotle_mdr.tests.settings.templates.search.elasticsearch import HAYSTACK_CONNECTIONS
+else:
+    print("Running  %s test-suite with whoosh" % ci_runner)
+    from aristotle_mdr.tests.settings.tox import HAYSTACK_CONNECTIONS
 
 
 if skip_migrations:  # pragma: no cover
