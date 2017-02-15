@@ -38,6 +38,7 @@ before_install:
 
 install:
   - pip install tox
+  - "pip install --upgrade pip"
 
 before_script:
 # Make a MariaDB database
@@ -48,8 +49,6 @@ before_script:
   - if [[ $SEARCH == elasticsearch ]]; then sleep 10; fi
 # Make a posgres database
   - if [[ $DB == postgres ]]; then psql -c 'create database aristotle_test_db;' -U postgres; fi
-# Tell us exactly what versions we are running on!
-  - pip list
 
 # command to run tests
 script:
