@@ -1239,10 +1239,10 @@ class DataElementConceptViewPage(LoggedInViewConceptPages,TestCase):
 
         check_url = reverse('aristotle:generic_foreign_key_editor', args=[self.item1.pk, 'objectclass'])
         response = self.client.get(check_url)
-        self.assertEqual(response.status_code,403)
+        self.assertEqual(response.status_code,302)  # user must login too see
 
         response = self.client.post(check_url,{'objectClass':''})
-        self.assertEqual(response.status_code,403)
+        self.assertEqual(response.status_code,302)
         self.item1 = self.item1.__class__.objects.get(pk=self.item1.pk)
         self.assertTrue(self.item1.objectClass is not None)
 
@@ -1352,6 +1352,9 @@ class DataElementViewPage(LoggedInViewConceptPages,TestCase):
     def test_cascade_action(self):
         self.logout()
         check_url = reverse('aristotle:check_cascaded_states', args=[self.item1.pk])
+        self.dec1 = models.DataElementConcept.objects.create(name='DEC1 - visible',definition="my definition",workgroup=self.wg1)
+        self.item1.dataElementConcept = self.dec1
+        self.item1.save()
 
         response = self.client.get(check_url)
         self.assertEqual(response.status_code,403)
