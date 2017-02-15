@@ -48,7 +48,6 @@ setup(
 
         #Search requirements
         'django-haystack==2.5.0',
-        'Whoosh',
 
         #Rich text editors
         'django-ckeditor>=5.0.0',
