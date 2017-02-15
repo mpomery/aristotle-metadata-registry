@@ -36,5 +36,5 @@ install:
 # command to run tests
 test_script:
   - cmd: |
-        tox -e py%TRAVIS_PYTHON_VERSION%-django-%DJANGO_VERSION%-test-windows-db-%DB%-search-%SEARCH% --skip-missing-interpreters
+        tox -e django-%DJANGO_VERSION%-test-windows-db-%DB%-search-%SEARCH% --skip-missing-interpreters
 
