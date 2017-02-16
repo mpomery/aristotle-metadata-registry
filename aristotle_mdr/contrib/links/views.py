@@ -12,6 +12,7 @@ from django.views.generic import ListView, TemplateView, DetailView, FormView
 from aristotle_mdr import models as MDR
 from aristotle_mdr.contrib.links import forms as link_forms
 from aristotle_mdr.contrib.links import models as link_models
+from aristotle_mdr.contrib.links import perms
 
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
@@ -28,7 +29,7 @@ class EditLinkFormView(FormView):
         self.relation = self.link.relation
         if request.user.is_anonymous():
             return redirect(reverse('friendly_login') + '?next=%s' % request.path)
-        if not request.user.has_perm('aristotle_mdr_links.change_link'):
+        if not perms.user_can_change_link(request.user, self.link):
             raise PermissionDenied
         return super(EditLinkFormView, self).dispatch(request, *args, **kwargs)
 
@@ -43,7 +44,12 @@ class EditLinkFormView(FormView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(EditLinkFormView, self).get_context_data(*args, **kwargs)
-        context.update({'roles':self.link.relation.relationrole_set.all()})
+        context.update(
+            {
+                'roles': self.link.relation.relationrole_set.all(),
+                'link': self.link
+            }
+        )
         return context
 
     def get_success_url(self):

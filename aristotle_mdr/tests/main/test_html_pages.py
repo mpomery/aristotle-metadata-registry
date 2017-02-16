@@ -596,7 +596,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
 
     def test_editor_can_remove_supersede_relation(self):
         self.login_editor()
-        self.item2 = self.itemType.objects.create(name="supersede this",workgroup=self.wg1)
+        self.item2 = self.itemType.objects.create(name="supersede this",workgroup=self.wg1, **self.defaults)
         self.item1.superseded_by = self.item2
         self.item1.save()
 
@@ -645,6 +645,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(
             reverse('aristotle_help:concept_help',args=[self.itemType._meta.app_label,self.itemType._meta.model_name])
         )
+        print(response.content)
         self.assertEqual(response.status_code,200)
 
     def test_viewer_can_view_registration_history(self):

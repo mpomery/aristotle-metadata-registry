@@ -17,13 +17,11 @@
       <li class="active">Edit link</a></li>
     </ol>
     <div>
-        {% blocktrans %}
         You are about to add concepts to the roles for relation
-            <a href=''>{{ relation.name }}</a> for this link.
-        {% endblocktrans %}
-        <p class='well'>
-        {{ role.definition }}
-        </p>
+            <a href='{{link.relation.get_absolute_url}}'>{{ link.relation }}</a> for this link.
+        <div class='well'>
+        {{ link.relation.definition|safe }}
+        </div>
     </div>
     <div>
         <div>

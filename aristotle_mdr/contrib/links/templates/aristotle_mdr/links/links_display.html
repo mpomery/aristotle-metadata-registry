@@ -48,10 +48,13 @@
                 </td>
                 {% if forloop.first %}
                 <td rowspan="{{ linkend_count }}">
+                    can edit == [{{ request.user|can_edit_link:link }}]
+                    {% if request.user|can_edit_link:link %}
                     <a href="{% url 'aristotle_mdr_links:edit_link' link.pk %}?next={{item.get_absolute_url}}">
                         <span>Edit link</span>
                         <i class="fa fa-pencil"></i>
                     </a>
+                    {% endif %}
                 </td>
                 {% endif %}
                 {% endwith %}
