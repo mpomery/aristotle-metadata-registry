@@ -1,6 +1,3 @@
+coverage
 django_tools
-coveralls
-Sphinx
-sphinx-rtd-theme
 mock
-wcag_zoo
