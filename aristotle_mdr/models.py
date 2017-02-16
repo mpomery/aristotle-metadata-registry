@@ -1347,7 +1347,7 @@ class DataElementDerivation(concept):
     output :model:`aristotle_mdr.DataElement`\s (3.2.33)
     """
 
-    derives = models.ForeignKey(  # 11.5.3.5
+    derives = models.ManyToManyField(  # 11.5.3.5
         DataElement,
         related_name="derived_from",
         blank=True,

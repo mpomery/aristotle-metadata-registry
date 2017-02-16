@@ -1041,12 +1041,12 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         check_url = reverse('aristotle:check_cascaded_states', args=[self.item1.pk])
 
         response = self.client.get(check_url)
-        self.assertTrue(response.status_code,403)
+        self.assertEqual(response.status_code,403)
 
         self.login_editor()
 
         response = self.client.get(check_url)
-        self.assertTrue(response.status_code,404)
+        self.assertEqual(response.status_code,404)
 
 class ObjectClassViewPage(LoggedInViewConceptPages, TestCase):
     url_name='objectClass'
@@ -1236,28 +1236,28 @@ class DataElementConceptViewPage(LoggedInViewConceptPages, TestCase):
 
         check_url = reverse('aristotle:generic_foreign_key_editor', args=[self.item1.pk, 'objectclassarino'])
         response = self.client.get(check_url)
-        self.assertTrue(response.status_code,404)
+        self.assertEqual(response.status_code,404)
 
         check_url = reverse('aristotle:generic_foreign_key_editor', args=[self.item1.pk, 'objectclass'])
         response = self.client.get(check_url)
-        self.assertTrue(response.status_code,403)
+        self.assertEqual(response.status_code,302)  # user must login too see
 
         response = self.client.post(check_url,{'objectClass':''})
-        self.assertTrue(response.status_code,403)
+        self.assertEqual(response.status_code,302)
         self.item1 = self.item1.__class__.objects.get(pk=self.item1.pk)
         self.assertTrue(self.item1.objectClass is not None)
 
         self.login_editor()
         response = self.client.get(check_url)
-        self.assertTrue(response.status_code,200)
+        self.assertEqual(response.status_code,200)
 
         response = self.client.post(check_url,{'objectClass':''})
-        self.assertTrue(response.status_code,302)
+        self.assertEqual(response.status_code,302)
         self.item1 = self.item1.__class__.objects.get(pk=self.item1.pk)
         self.assertTrue(self.item1.objectClass is None)
 
         response = self.client.post(check_url,{'objectClass':self.prop.pk})
-        self.assertTrue(response.status_code,200)
+        self.assertEqual(response.status_code,200)
         self.item1 = self.item1.__class__.objects.get(pk=self.item1.pk)
         self.assertTrue(self.item1.objectClass is None)
 
@@ -1266,13 +1266,13 @@ class DataElementConceptViewPage(LoggedInViewConceptPages, TestCase):
             definition="my definition",
         )
         response = self.client.post(check_url,{'objectClass':another_oc.pk})
-        self.assertTrue(response.status_code,200)
+        self.assertEqual(response.status_code,200)
         self.item1 = self.item1.__class__.objects.get(pk=self.item1.pk)
         self.assertTrue(self.item1.objectClass is None)
 
 
         response = self.client.post(check_url,{'objectClass':self.oc.pk})
-        self.assertTrue(response.status_code,302)
+        self.assertEqual(response.status_code,302)
         self.item1 = self.item1.__class__.objects.get(pk=self.item1.pk)
         self.assertTrue(self.item1.objectClass == self.oc)
 
@@ -1308,12 +1308,12 @@ class DataElementConceptViewPage(LoggedInViewConceptPages, TestCase):
         check_url = reverse('aristotle:check_cascaded_states', args=[self.item1.pk])
 
         response = self.client.get(check_url)
-        self.assertTrue(response.status_code,403)
+        self.assertEqual(response.status_code,403)
 
         self.login_editor()
 
         response = self.client.get(check_url)
-        self.assertTrue(response.status_code,200)
+        self.assertEqual(response.status_code,200)
         self.assertContains(response, self.item1.objectClass.name)
         self.assertContains(response, self.item1.property.name)
 
@@ -1339,7 +1339,7 @@ class DataElementConceptViewPage(LoggedInViewConceptPages, TestCase):
                 )
 
         response = self.client.get(check_url)
-        self.assertTrue(response.status_code,200)
+        self.assertEqual(response.status_code,200)
         self.assertContains(response, self.item1.objectClass.name)
         self.assertContains(response, self.item1.property.name)
         self.assertContains(response, 'fa-times') # The property has a different status
@@ -1353,21 +1353,84 @@ class DataElementViewPage(LoggedInViewConceptPages, TestCase):
     def test_cascade_action(self):
         self.logout()
         check_url = reverse('aristotle:check_cascaded_states', args=[self.item1.pk])
+        self.dec1 = models.DataElementConcept.objects.create(name='DEC1 - visible',definition="my definition",workgroup=self.wg1)
+        self.item1.dataElementConcept = self.dec1
+        self.item1.save()
 
         response = self.client.get(check_url)
-        self.assertTrue(response.status_code,403)
+        self.assertEqual(response.status_code,403)
 
         self.login_editor()
 
         response = self.client.get(check_url)
-        self.assertTrue(response.status_code,200)
+        self.assertEqual(response.status_code,200)
 
 class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
     url_name='dataelementderivation'
-    # @property
-    # def defaults(self):
-    #     return {'derives':models.DataElement.objects.create(name='derivedDE',definition="my definition",workgroup=self.wg1)}
     itemType=models.DataElementDerivation
+
+    def derivation_m2m_concepts_save(self, url, attr):
+        self.de1 = models.DataElement.objects.create(name='DE1 - visible',definition="my definition",workgroup=self.wg1)
+        self.de2 = models.DataElement.objects.create(name='DE2 - not visible',definition="my definition",workgroup=self.wg2)
+        self.oc1 = models.ObjectClass.objects.create(name='OC - visible but wrong',definition="my definition",workgroup=self.wg1)
+
+        self.login_editor()
+
+        self.assertFalse(self.de2.can_view(self.editor))
+
+        response = self.client.get(
+            reverse(url, args=[self.item1.pk])
+        )
+        self.assertEqual(response.status_code,200)
+
+        response = self.client.post(
+            reverse(url, args=[self.item1.pk]),
+            {'items_to_add': [self.de2.pk]}
+        )
+        self.item1 = self.itemType.objects.get(pk=self.item1.pk)
+        self.assertTrue(self.de2 not in getattr(self.item1, attr).all())
+        self.assertEqual(response.status_code,200)
+        self.assertContains(response, 'Select a valid choice')
+
+        response = self.client.post(
+            reverse(url, args=[self.item1.pk]),
+            {'items_to_add': [self.de1.pk, self.de2.pk]},
+            follow=True
+        )
+        self.assertTrue(self.de2 not in getattr(self.item1, attr).all())
+        self.assertContains(response, 'Select a valid choice')
+        self.assertEqual(response.status_code,200)
+
+        # user can see OC1, but its the wrong type so expect failure
+        response = self.client.post(
+            reverse(url, args=[self.item1.pk]),
+            {'items_to_add': [self.de1.pk, self.oc1.pk]},
+            follow=True
+        )
+        self.assertTrue(self.de2 not in getattr(self.item1, attr).all())
+        self.assertContains(response, 'Select a valid choice')
+        self.assertEqual(response.status_code,200)
+
+        response = self.client.post(
+            reverse(url, args=[self.item1.pk]),
+            {'items_to_add': [self.de1.pk]},
+        )
+        self.assertTrue(self.de1 in getattr(self.item1, attr).all())
+        self.assertEqual(response.status_code,302)
+        self.assertRedirects(response, self.item1.get_absolute_url())
+
+    def test_derivation_derives_concepts_save(self):
+        self.derivation_m2m_concepts_save(
+            url="aristotle_mdr:dataelementderivation_change_derives",
+            attr='derives',
+        )
+
+    def test_derivation_inputs_concepts_save(self):
+        self.derivation_m2m_concepts_save(
+            url="aristotle_mdr:dataelementderivation_change_inputs",
+            attr='inputs',
+        )
+
 
 class LoggedInViewUnmanagedPages(utils.LoggedInViewPages):
     defaults = {}
@@ -1421,7 +1484,7 @@ class RegistrationAuthorityViewPage(LoggedInViewUnmanagedPages, TestCase):
     def test_view_all_ras(self):
         self.logout()
         response = self.client.get(reverse('aristotle:all_registration_authorities'))
-        self.assertTrue(response.status_code,200)
+        self.assertEqual(response.status_code,200)
 
 class OrganizationViewPage(LoggedInViewUnmanagedPages, TestCase):
     url_name='organization'
@@ -1436,4 +1499,4 @@ class OrganizationViewPage(LoggedInViewUnmanagedPages, TestCase):
     def test_view_all_orgs(self):
         self.logout()
         response = self.client.get(reverse('aristotle:all_organizations'))
-        self.assertTrue(response.status_code,200)
+        self.assertEqual(response.status_code,200)

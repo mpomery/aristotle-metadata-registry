@@ -101,6 +101,7 @@ ARISTOTLE_SETTINGS['BULK_ACTIONS'].update({
     'quick_pdf_download':'aristotle_mdr.forms.bulk_actions.QuickPDFDownloadForm',
     'delete': 'bulk_actions_test.actions.StaffDeleteActionForm',
     'incomplete': 'bulk_actions_test.actions.IncompleteActionForm',
+    'add_slots': 'aristotle_mdr.contrib.slots.forms.BulkAssignSlotsForm',
 })
 ROOT_URLCONF = 'extension_test.urls'
 

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.forms import HiddenInput
 from django.utils import timezone
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -22,13 +23,9 @@ from aristotle_mdr.contrib.autocomplete import widgets
 
 
 class ForbiddenAllowedModelMultipleChoiceField(forms.ModelMultipleChoiceField):
-    def __init__(self, queryset, validate_queryset, required=True, widget=None,
-                 label=None, initial=None, help_text='', *args, **kwargs):
-        self.validate_queryset = validate_queryset
-        super(ForbiddenAllowedModelMultipleChoiceField, self).__init__(
-            queryset, None, required, widget, label, initial, help_text,
-            *args, **kwargs
-        )
+    def __init__(self, *args, **kwargs):
+        self.validate_queryset = kwargs.pop('validate_queryset')
+        super(ForbiddenAllowedModelMultipleChoiceField, self).__init__(*args, **kwargs)
 
     def _check_values(self, value):
         """
@@ -81,10 +78,12 @@ class BulkActionForm(UserAwareForm):
     all_in_queryset = forms.BooleanField(
         label=_("All items"),
         required=False,
+        widget=HiddenInput()
     )
     qs = forms.CharField(
         label=_("All items"),
         required=False,
+        widget=HiddenInput()
     )
 
     # queryset is all as we try to be nice and process what we can in bulk
