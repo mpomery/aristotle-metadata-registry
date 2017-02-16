@@ -10,22 +10,22 @@ environment:
       - DJANGO_VERSION: '1.8'
         DB: mssql
         SEARCH: whoosh
-        PLATFORM: x32bit
+        PLATFORM: x32
         PYTHON_HOME: "C:/Python35"
       - DJANGO_VERSION: '1.8'
         DB: mssql
         SEARCH: whoosh
-        PLATFORM: x64bit
+        PLATFORM: x64
         PYTHON_HOME: "C:/Python35-x64"
       - DJANGO_VERSION: '1.10'
         DB: mssql
         SEARCH: whoosh
-        PLATFORM: x32bit
+        PLATFORM: x32
         PYTHON_HOME: "C:/Python35"
       - DJANGO_VERSION: '1.10'
         DB: mssql
         SEARCH: whoosh
-        PLATFORM: x64bit
+        PLATFORM: x64
         PYTHON_HOME: "C:/Python35-x64"
 
 install:
@@ -36,5 +36,5 @@ install:
 # command to run tests
 test_script:
   - cmd: |
-        tox -e django-%DJANGO_VERSION%-test-windows-db-%DB%-search-%SEARCH%-%PLATFORM% --skip-missing-interpreters
+        tox -e django-%DJANGO_VERSION%-test-windows-db-%DB%-search-%SEARCH%-platform-%PLATFORM% --skip-missing-interpreters
 

@@ -31,8 +31,8 @@ skip_migrations = (
     os.environ.get('DB') in ['mssql']
 )
 
-if os.environ.get('DB') == 'sqlitefile':
-    print("Running %s test-suite with file-based SQLite" % ci_runner)
+if os.environ.get('DB') == 'sqlite':
+    print("Running %s test-suite with SQLite" % ci_runner)
     from aristotle_mdr.tests.settings.templates.db.sqlite import DATABASES
 elif os.environ.get('DB') == 'postgres':
     print("Running %s test-suite with POSTGRESQL" % ci_runner)
@@ -46,7 +46,7 @@ elif os.environ.get('DB') == 'mssql':
     skip_migrations = True  # Sadly, this may not be possible until after migration 0018
     from aristotle_mdr.tests.settings.templates.db.mssql import DATABASES
 else:
-    print("Running %s test-suite with tox file-based SQLite" % ci_runner)
+    print("Running %s test-suite with tox SQLite" % ci_runner)
     from aristotle_mdr.tests.settings.tox import DATABASES
 
 if os.environ.get('SEARCH') == 'whoosh':
