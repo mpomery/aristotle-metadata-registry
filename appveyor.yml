@@ -10,22 +10,18 @@ environment:
       - DJANGO_VERSION: '1.8'
         DB: mssql
         SEARCH: whoosh
-        PLATFORM: x32
         PYTHON_HOME: "C:/Python35"
       - DJANGO_VERSION: '1.8'
         DB: mssql
         SEARCH: whoosh
-        PLATFORM: x64
         PYTHON_HOME: "C:/Python35-x64"
       - DJANGO_VERSION: '1.10'
         DB: mssql
         SEARCH: whoosh
-        PLATFORM: x32
         PYTHON_HOME: "C:/Python35"
       - DJANGO_VERSION: '1.10'
         DB: mssql
         SEARCH: whoosh
-        PLATFORM: x64
         PYTHON_HOME: "C:/Python35-x64"
 
 install:
@@ -36,5 +32,5 @@ install:
 # command to run tests
 test_script:
   - cmd: |
-        tox -e dj%DJANGO_VERSION%-test-azure-db-%DB%-search-%SEARCH%-sys%PLATFORM% --skip-missing-interpreters
+        tox -e dj%DJANGO_VERSION%-test-azure-db-%DB%-search-%SEARCH% --skip-missing-interpreters
 
