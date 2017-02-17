@@ -54,8 +54,8 @@ class AddLink_SelectRelation_1(UserAwareForm, forms.Form):
         queryset=Relation.objects.none(),
         widget=widgets.ConceptAutocompleteSelect(model=Relation)
     )
-    def __init__(self, link, roles, *args, **kwargs):
-        super(AddLink_SelectRelation_1, self).__init__(roles, *args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(AddLink_SelectRelation_1, self).__init__(*args, **kwargs)
         self.fields['relation'].queryset = Relation.objects.all().visible(self.user)
 
 
