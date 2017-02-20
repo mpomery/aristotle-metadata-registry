@@ -22,6 +22,9 @@ class Namespace(TimeStampedModel):
         help_text=_('prefix conventionally used as shorthand for a namespace, for greater readability, in text for human consumption.')
     )
 
+    def __str__(self):
+        return u"{0}:{1}".format(self.naming_authority.name, self.shorthand_prefix)
+
 
 @python_2_unicode_compatible  # Python 2
 class ScopedIdentifier(TimeStampedModel):

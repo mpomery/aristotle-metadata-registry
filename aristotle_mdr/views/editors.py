@@ -93,7 +93,7 @@ class EditItemView(PermissionFormView):
 
                         # Save the slots
                         slot_formset.save()
-    
+
                         # Save the change comments
                         if not has_change_comments:
                             change_comments += construct_change_message(request, form, [slot_formset])
@@ -106,7 +106,7 @@ class EditItemView(PermissionFormView):
 
                         # Save the slots
                         id_formset.save()
-    
+
                         if not has_change_comments:
                             change_comments += construct_change_message(request, form, [id_formset])
                     else:
