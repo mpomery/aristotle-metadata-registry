@@ -56,6 +56,7 @@ class RelationRole(MDR.aristotleComponent):  # 9.1.2.5
         )
     )
     relation = models.ForeignKey(Relation)
+
     @property
     def parentItem(self):
         return self.relation
@@ -79,6 +80,7 @@ class Link(TimeStampedModel):
 
     def add_link_end(self, role, concept):
         return LinkEnd.objects.create(link=self, role=role, concept=concept)
+
 
 class LinkEnd(TimeStampedModel):  # 9.1.2.7
     link = models.ForeignKey(Link)

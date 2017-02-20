@@ -24,4 +24,3 @@ def visible_count(model, user):
 @register.filter
 def izip(a, b):
     return zip(a, b)
-

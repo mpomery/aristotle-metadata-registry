@@ -43,3 +43,7 @@ class ScopedIdentifier(TimeStampedModel):
 
     def __str__(self):
         return u"{0}:{1}:{2}".format(self.namespace.naming_authority.name, self.identifier, self.version)
+
+    @property
+    def prefix(self):
+        return self.namespace.shorthand_prefix

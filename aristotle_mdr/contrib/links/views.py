@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, TemplateView, DetailView, FormView
@@ -14,7 +14,6 @@ from aristotle_mdr.contrib.links import forms as link_forms
 from aristotle_mdr.contrib.links import models as link_models
 from aristotle_mdr.contrib.links import perms
 
-from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 
 
@@ -63,7 +62,7 @@ class EditLinkFormView(FormView):
     def form_valid(self, form):
         role_concepts = form.cleaned_data
         roles = self.link.relation.relationrole_set.order_by('ordinal', 'name')
-        
+
         for role in roles:
             concepts = role_concepts['role_' + str(role.pk)]
             try:
@@ -133,23 +132,20 @@ class AddLinkWizard(SessionWizardView):
     def get_context_data(self, *args, **kwargs):
         context = super(AddLinkWizard, self).get_context_data(*args, **kwargs)
         if int(self.steps.current) == 1:
-            context.update({'roles':self.get_roles()})
+            context.update({'roles': self.get_roles()})
         return context
 
     @transaction.atomic
     def done(self, *args, **kwargs):
         self.relation = self.get_cleaned_data_for_step('0')['relation']
         role_concepts = self.get_cleaned_data_for_step('1')
-        
+
         link = link_models.Link.objects.create(relation=self.relation)
         for role, concepts in zip(self.get_roles(), role_concepts.values()):
             if role.multiplicity == 1:
                 concepts = [concepts]
             for concept in concepts:
                 link_models.LinkEnd.objects.create(link=link, role=role, concept=concept)
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
 
 
 def link_json_for_item(request, iid):
@@ -173,7 +169,7 @@ def link_json_for_item(request, iid):
                         'id': 'concept_%s' % end.concept.id,
                         'label': end.concept.name,
                         'group': 'regular',
-                        'title': '<a href="%s">%s</a>'%(end.concept.get_absolute_url(),end.concept.name),
+                        'title': '<a href="%s">%s</a>' % (end.concept.get_absolute_url(), end.concept.name),
                     })
             if end.concept == item.concept:
                 edges.append({
@@ -193,11 +189,10 @@ def link_json_for_item(request, iid):
                 'id': 'link_%s_%s' % (link.relation.id, link.id),
                 'label': link.relation.name,
                 'group': 'relation',
-                'title': '<a href="%s">%s</a>'%(link.relation.get_absolute_url(),link.relation.definition),
+                'title': '<a href="%s">%s</a>' % (link.relation.get_absolute_url(), link.relation.definition),
             })
-    
+
     return JsonResponse({
         'nodes': nodes,
         'edges': edges,
     })
-    

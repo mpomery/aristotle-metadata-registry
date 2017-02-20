@@ -35,10 +35,10 @@ class LinkEndEditorBase(UserAwareForm, forms.Form):
                 msg = _("Only %s concepts are valid for this link" % role.multiplicity)
                 self.add_error(field_name, msg)
 
+
 class LinkEndEditor(LinkEndEditorBase):
     def __init__(self, link, roles, *args, **kwargs):
         super(LinkEndEditor, self).__init__(roles, *args, **kwargs)
-        #end_concepts = MDR._concept.filter()
         for role in self.roles:
             if role.multiplicity == 1:
                 self.fields['role_' + str(role.pk)].initial = MDR._concept.objects.get(
@@ -49,11 +49,13 @@ class LinkEndEditor(LinkEndEditorBase):
                     linkend__link=link, linkend__role=role
                 )
 
+
 class AddLink_SelectRelation_1(UserAwareForm, forms.Form):
     relation = forms.ModelChoiceField(
         queryset=Relation.objects.none(),
         widget=widgets.ConceptAutocompleteSelect(model=Relation)
     )
+
     def __init__(self, *args, **kwargs):
         super(AddLink_SelectRelation_1, self).__init__(*args, **kwargs)
         self.fields['relation'].queryset = Relation.objects.all().visible(self.user)
@@ -61,6 +63,7 @@ class AddLink_SelectRelation_1(UserAwareForm, forms.Form):
 
 class AddLink_SelectConcepts_2(LinkEndEditorBase):
     pass
+
 
 class AddLink_Confirm_3(forms.Form):
     pass

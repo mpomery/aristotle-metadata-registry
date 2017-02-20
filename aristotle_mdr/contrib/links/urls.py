@@ -23,10 +23,9 @@ urlpatterns = [
             form_title=_('Change Relation Roles'),
         ), name='relation_roles_edit'),
     url(r'^relation/link/add/$',
-        views.AddLinkWizard.as_view() , name='add_link'),
+        views.AddLinkWizard.as_view(), name='add_link'),
     url(r'^relation/link/edit/(?P<iid>\d+)$',
-        views.EditLinkFormView.as_view() , name='edit_link'),
+        views.EditLinkFormView.as_view(), name='edit_link'),
     url(r'^relation/link/json/(?P<iid>\d+)$',
-        views.link_json_for_item , name='link_json_for_item'),
-    
+        views.link_json_for_item, name='link_json_for_item'),
 ]

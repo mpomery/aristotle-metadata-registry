@@ -1,4 +1,5 @@
-from aristotle_mdr import perms 
+from aristotle_mdr import perms
+
 
 def user_can_change_link(user, link):
     """
@@ -12,6 +13,7 @@ def user_can_change_link(user, link):
         return True
 
     return False
+
 
 def user_can_make_link(user):
     """
