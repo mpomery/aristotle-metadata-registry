@@ -42,6 +42,11 @@ def model_to_dict_with_change_time(item, fetch_time=None):
     d['slots-MIN_NUM_FORMS'] = 0
     d['slots-MAX_NUM_FORMS'] = 0
 
+    d['identifiers-TOTAL_FORMS'] = 0
+    d['identifiers-INITIAL_FORMS'] = 0
+    d['identifiers-MIN_NUM_FORMS'] = 0
+    d['identifiers-MAX_NUM_FORMS'] = 1
+
     return d
 
 

@@ -645,7 +645,6 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(
             reverse('aristotle_help:concept_help',args=[self.itemType._meta.app_label,self.itemType._meta.model_name])
         )
-        print(response.content)
         self.assertEqual(response.status_code,200)
 
     def test_viewer_can_view_registration_history(self):

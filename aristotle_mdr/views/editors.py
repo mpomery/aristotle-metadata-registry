@@ -86,7 +86,7 @@ class EditItemView(PermissionFormView):
                 item = form.save(commit=False)
 
                 has_change_comments = form.data.get('change_comments', False)
-                change_comments = form.data.get('change_comments', None)
+                change_comments = form.data.get('change_comments', "")
                 if self.slots_active:
                     slot_formset = self.get_slots_formset()(request.POST, request.FILES, item.concept)
                     if slot_formset.is_valid():
