@@ -447,13 +447,8 @@ class PermissionSearchForm(TokenSearchForm):
         from haystack.fields import FacetField
         for model_index in registered_indexes:
             for name, field in model_index.fields.items():
-# <<<<<<< HEAD
-#                 if field.faceted:  # or FacetField in type(field).__bases__:  # Yay, OOP!
-#                     if name not in (filters_to_facets.values() + logged_in_facets.values()):
-# =======
                 if field.faceted:
                     if name not in (list(filters_to_facets.values()) + list(logged_in_facets.values())):
-# >>>>>>> a9545f4301d598fd01666c7f076be7a48f1a97c3
                         extra_facets.append(name)
 
                         x = extra_facets_details.get(name, {})
@@ -463,7 +458,7 @@ class PermissionSearchForm(TokenSearchForm):
                             'allow_search': getattr(field, 'allow_search', False),
                         })
                         extra_facets_details[name]= x
-                        # Don't do this: sqs = sqs.facet(facet, sort='count')
+                        # Don't do this: sqs = sqs.facet(facet, sort='count')  # Why Sam, why?
                         sqs = sqs.facet(name)
 
         self.facets = sqs.facet_counts()
