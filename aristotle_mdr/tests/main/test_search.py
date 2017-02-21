@@ -446,6 +446,33 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertDelayedEqual(len(objs),1)
         self.assertTrue(objs[0].object.pk,de.pk)
 
+    def test_model_search(self):
+        self.logout()
+
+        with reversion.create_revision():
+            dec = models.DataElementConcept.objects.create(
+                name="Pokemon-CP",
+                definition="a Pokemons combat power"
+            )
+            de = models.DataElement.objects.create(
+                name="Pokemon-CP, Go",
+                definition="a Pokemons combat power as recorded in the Pokemon-Go scale",
+                dataElementConcept=dec
+            )
+
+        self.login_superuser()
+
+        from aristotle_mdr.forms.search import PermissionSearchQuerySet
+        response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
+        
+        objs = response.context['page'].object_list
+        self.assertDelayedEqual(len(objs),2)
+
+        response = self.client.get(reverse('aristotle:search')+"?q=pokemon&models=aristotle_mdr.dataelement")
+
+        objs = response.context['page'].object_list
+        self.assertDelayedEqual(len(objs),1)
+        self.assertTrue(objs[0].object.pk,de.pk)
 
 
 class TestTokenSearch(TestCase):

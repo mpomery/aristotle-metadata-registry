@@ -1,5 +1,6 @@
 import datetime
 from django import forms
+from django.apps import apps
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -308,7 +309,7 @@ class PermissionSearchForm(TokenSearchForm):
     state = forms.MultipleChoiceField(
         required=False,
         label=_("Registration status"),
-        choices=MDR.STATES + [-99],  # Allow unregistered as a selection
+        choices=MDR.STATES + [(-99, _('Unregistered'))],  # Allow unregistered as a selection
         widget=BootstrapDropdownSelectMultiple
     )
     public_only = forms.BooleanField(
@@ -341,7 +342,7 @@ class PermissionSearchForm(TokenSearchForm):
 
         if self.is_valid() and self.cleaned_data['models']:
             for model in self.cleaned_data['models']:
-                search_models.append(models.get_model(*model.split('.')))
+                search_models.append(apps.get_model(*model.split('.')))
 
         return search_models
 
@@ -390,10 +391,11 @@ class PermissionSearchForm(TokenSearchForm):
 
         for _facet in facets_opts:
             _facet, value = _facet.split("::", 1)
-            sqs = sqs.filter(**{"%s__exact" % _facet: value})  # Force exact as otherwise we don't match when there are spaces.
+            # Force exact as otherwise we don't match when there are spaces.
+            # Insensitive to improve matching
+            sqs = sqs.filter(**{"%s__iexact" % _facet: value})
             facets_details = extra_facets_details.get(_facet, {'applied': []})
             facets_details['applied'] = list(set(facets_details['applied'] + [value]))
-            print facets_details['applied']
             extra_facets_details[_facet] = facets_details
 
         self.has_spelling_suggestions = False
@@ -445,13 +447,13 @@ class PermissionSearchForm(TokenSearchForm):
         from haystack.fields import FacetField
         for model_index in registered_indexes:
             for name, field in model_index.fields.items():
-<<<<<<< HEAD
-                if field.faceted:  # or FacetField in type(field).__bases__:  # Yay, OOP!
-                    if name not in (filters_to_facets.values() + logged_in_facets.values()):
-=======
+# <<<<<<< HEAD
+#                 if field.faceted:  # or FacetField in type(field).__bases__:  # Yay, OOP!
+#                     if name not in (filters_to_facets.values() + logged_in_facets.values()):
+# =======
                 if field.faceted:
                     if name not in (list(filters_to_facets.values()) + list(logged_in_facets.values())):
->>>>>>> a9545f4301d598fd01666c7f076be7a48f1a97c3
+# >>>>>>> a9545f4301d598fd01666c7f076be7a48f1a97c3
                         extra_facets.append(name)
 
                         x = extra_facets_details.get(name, {})
