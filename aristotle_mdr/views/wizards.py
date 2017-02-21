@@ -406,6 +406,14 @@ class DataElementConceptWizard(MultiStepAristotleWizard):
             'completed': {'percent_complete': 100, 'step_title': _('Complete and Save')},
             }.get(self.steps.current, {}))
 
+        if self.steps.current == 'component_results':
+            ocp = self.get_cleaned_data_for_step('component_search')
+            context.update({
+                'oc_name': ocp.get('oc_name', ""),
+                'oc_definition': ocp.get('oc_desc', ""),
+                'pr_name': ocp.get('pr_name', ""),
+                'pr_definition': ocp.get('pr_desc', ""),
+            })
         if self.steps.current == 'make_oc':
             context.update({
                 'model_name': MDR.ObjectClass._meta.verbose_name,
@@ -681,6 +689,16 @@ class DataElementWizard(MultiStepAristotleWizard):
             },
             }.get(self.steps.current, {}))
 
+        if self.steps.current == 'component_results':
+            ocp = self.get_cleaned_data_for_step('component_search')
+            context.update({
+                'oc_name': ocp.get('oc_name', ""),
+                'oc_definition': ocp.get('oc_desc', ""),
+                'pr_name': ocp.get('pr_name', ""),
+                'pr_definition': ocp.get('pr_desc', ""),
+                'vd_name': ocp.get('vd_name', ""),
+                'vd_definition': ocp.get('vd_desc', "")
+            })
         if self.steps.current == 'make_vd':
             context.update({
                 'model_name': MDR.ValueDomain._meta.verbose_name,

@@ -6,7 +6,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template import RequestContext, TemplateDoesNotExist
+from django.template import TemplateDoesNotExist
 from django.template.defaultfilters import slugify
 from django.template.loader import select_template
 from django.utils.translation import ugettext_lazy as _
@@ -21,22 +21,35 @@ from aristotle_mdr import exceptions as registry_exceptions
 from aristotle_mdr import models as MDR
 
 
-# TODO: Check permissions for this
 class BulkAction(FormView):
-    @method_decorator(login_required)
+
     def dispatch(self, *args, **kwargs):
+        action = self.get_action()
+        if not action:
+            return HttpResponseRedirect(self.request.GET.get("next", "/"))
+        if not action['can_use'](self.request.user):
+            if self.request.user.is_anonymous():
+                return redirect(
+                    reverse('friendly_login') + '?next=%s' % self.request.path
+                )
+            else:
+                raise PermissionDenied
         return super(BulkAction, self).dispatch(*args, **kwargs)
+
+    def get_action(self):
+        actions = get_bulk_actions()
+        action = self.request.POST.get("bulkaction", None)
+        return actions.get(action, None)
 
     def post(self, request, *args, **kwargs):
         url = request.GET.get("next", "/")
         message = ""
-        actions = get_bulk_actions()
-        action = request.POST.get("bulkaction", None)
+        action = self.get_action()
 
         if action is None:
             # no action, messed up, redirect
             return HttpResponseRedirect(url)
-        action_form = actions[action]['form']
+        action_form = action['form']
         if action_form.confirm_page is None:
             # if there is no confirm page or extra details required, do the action and redirect
             form = action_form(request.POST, user=request.user, request=request)  # A form bound to the POST data
@@ -110,11 +123,12 @@ def get_bulk_actions():
                 # Invalid download_type
                 raise registry_exceptions.BadBulkActionModuleName("Bulk action isn't a valid Python module name.")
 
-            module, form = form.rsplit('.', 1)
-            exec('from %s import %s as f' % (module, form))
-
+            from django.utils.module_loading import import_string
+            # module, form = form.rsplit('.', 1)
+            # f = exec('from %s import %s as f' % (module, form))
+            f = import_string(form)
             # We need to make this a dictionary, not a class as otherwise
-            # the template engire tries to instantiate it.
+            # the template engine tries to instantiate it.
             frm = {'form': f}
             for prop in ['classes', 'can_use', 'text']:
                 frm[prop] = getattr(f, prop, None)

@@ -239,8 +239,8 @@ class TokenSearchForm(FacetedSearchForm):
 
 datePickerOptions = {
     "format": "YYYY-MM-DD",
-    "pickTime": False,
-    "pickDate": True,
+    # "pickTime": False,
+    # "pickDate": True,
     "defaultDate": "",
     "useCurrent": False,
 }
@@ -308,7 +308,7 @@ class PermissionSearchForm(TokenSearchForm):
     state = forms.MultipleChoiceField(
         required=False,
         label=_("Registration status"),
-        choices=MDR.STATES,
+        choices=MDR.STATES + [-99],  # Allow unregistered as a selection
         widget=BootstrapDropdownSelectMultiple
     )
     public_only = forms.BooleanField(
@@ -370,8 +370,8 @@ class PermissionSearchForm(TokenSearchForm):
             self.filter_search = True
             self.attempted_filter_search = True
 
-        states = self.cleaned_data['state']
-        ras = self.cleaned_data['ra']
+        states = self.cleaned_data.get('state', None)
+        ras = self.cleaned_data.get('ra', None)
         restriction = self.cleaned_data['res']
         sqs = sqs.apply_registration_status_filters(states, ras)
 
@@ -445,8 +445,13 @@ class PermissionSearchForm(TokenSearchForm):
         from haystack.fields import FacetField
         for model_index in registered_indexes:
             for name, field in model_index.fields.items():
+<<<<<<< HEAD
                 if field.faceted:  # or FacetField in type(field).__bases__:  # Yay, OOP!
                     if name not in (filters_to_facets.values() + logged_in_facets.values()):
+=======
+                if field.faceted:
+                    if name not in (list(filters_to_facets.values()) + list(logged_in_facets.values())):
+>>>>>>> a9545f4301d598fd01666c7f076be7a48f1a97c3
                         extra_facets.append(name)
 
                         x = extra_facets_details.get(name, {})
@@ -491,7 +496,11 @@ class PermissionSearchForm(TokenSearchForm):
         if self.query_text:
             original_query = self.cleaned_data.get('q', "")
 
-            from urllib import quote_plus
+            try:  # Python 2
+                from urllib import quote_plus
+            except:  # Python 3
+                from urllib.parse import quote_plus
+
             suggestions = []
             has_suggestions = False
             suggested_query = []

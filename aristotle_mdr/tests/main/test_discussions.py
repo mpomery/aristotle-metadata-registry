@@ -420,9 +420,7 @@ class WorkgroupMembersCanMakePostsAndComments(utils.LoggedInViewPages,TestCase):
         )
 
         self.assertEqual(p1.comments.count(),1)
-        # self.assertRedirects(response,reverse('aristotle:discussionsPost',args=[p1.id]))
-        # We can't use assertRedirect as we are forcing a follow, instead...
-        self.assertEqual(response.redirect_chain,[('http://testserver'+reverse('aristotle:discussionsPost',args=[p1.id]),302)])
+        self.assertRedirects(response,reverse('aristotle:discussionsPost',args=[p1.id]))
 
         _messages = list(response.context['messages'])
         self.assertEqual(len(_messages),1)
@@ -446,10 +444,17 @@ class ViewDiscussionPostPage(utils.LoggedInViewPages,TestCase):
 
         response = self.client.get(reverse('aristotle:discussionsWorkgroup',args=[self.wg1.id]))
         self.assertEqual(len(response.context['discussions']),2)
-        self.assertListEqual(list(response.context['discussions'].all()),[p2,p1])
+        
+        self.assertTrue(p1 in response.context['discussions'].all())
+        self.assertTrue(p2 in response.context['discussions'].all())
+        self.assertTrue(p3 not in response.context['discussions'].all())
+        
         response = self.client.get(reverse('aristotle:discussions'))
         self.assertEqual(len(response.context['discussions']),3)
-        self.assertListEqual(list(response.context['discussions']),[p3,p2,p1])
+
+        self.assertTrue(p1 in response.context['discussions'].all())
+        self.assertTrue(p2 in response.context['discussions'].all())
+        self.assertTrue(p3 in response.context['discussions'].all())
 
     def test_nonmember_cannot_see_posts(self):
         self.login_viewer()

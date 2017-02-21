@@ -42,6 +42,15 @@ def get_download_template_path_for_item(item, download_type, subpath=''):
         template = "%s/downloads/%s/%s/%s.html" % (app_label, download_type, subpath, model_name)
     else:
         template = "%s/downloads/%s/%s.html" % (app_label, download_type, model_name)
+
+    from django.template.loader import get_template
+    from django.template import TemplateDoesNotExist
+    try:
+        get_template(template)
+    except TemplateDoesNotExist:
+        # This is ok. If a template doesn't exists pass a default one
+        # Maybe in future log an error?
+        template = "%s/downloads/%s/%s/%s.html" % ("aristotle_mdr", download_type, subpath, "managedContent")
     return template
 
 
@@ -119,7 +128,7 @@ def construct_change_message(request, form, formsets):
 def get_concepts_for_apps(app_labels):
     from django.contrib.contenttypes.models import ContentType
     from aristotle_mdr import models as MDR
-    models = ContentType.objects.filter(app_label__in=app_labels).all()
+    models = ContentType.objects.filter(app_label__in=app_labels).all().order_by('model')
     concepts = [
         m
         for m in models

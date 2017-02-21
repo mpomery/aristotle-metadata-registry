@@ -6,6 +6,8 @@ import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 from aristotle_mdr.utils import url_slugify_concept
 
+import datetime
+
 from django.test.utils import setup_test_environment
 setup_test_environment()
 
@@ -16,9 +18,9 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
         # There would be too many tests to test every item type against every other
         # But they all have identical logic, so one test should suffice
-        self.item1 = models.ObjectClass.objects.create(name="Test Item 1 (visible to tested viewers)",definition=" ",workgroup=self.wg1)
-        self.item2 = models.ObjectClass.objects.create(name="Test Item 2 (NOT visible to tested viewers)",definition=" ",workgroup=self.wg2)
-        self.item3 = models.ObjectClass.objects.create(name="Test Item 3 (only visible to the editor)",definition=" ",workgroup=None,submitter=self.editor)
+        self.item1 = models.ObjectClass.objects.create(name="Test Item 1 (visible to tested viewers)",definition="my definition",workgroup=self.wg1)
+        self.item2 = models.ObjectClass.objects.create(name="Test Item 2 (NOT visible to tested viewers)",definition="my definition",workgroup=self.wg2)
+        self.item3 = models.ObjectClass.objects.create(name="Test Item 3 (only visible to the editor)",definition="my definition",workgroup=None,submitter=self.editor)
 
     def test_viewer_cannot_request_review_for_private_item(self):
         self.login_viewer()
@@ -51,7 +53,9 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
             {
                 'registration_authority': [str(self.ra.id)],
                 'state': self.ra.public_state,
+                'cascade_registration': 0,
                 'message': "Please review this",
+                'registration_date':datetime.date(2010,1,1)
             }
         )
 
@@ -60,10 +64,10 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
     def test_registrar_has_valid_items_in_review(self):
 
-        item1 = models.ObjectClass.objects.create(name="Test Item 1",definition=" ",workgroup=self.wg1)
-        item2 = models.ObjectClass.objects.create(name="Test Item 2",definition=" ",workgroup=self.wg2)
-        item3 = models.ObjectClass.objects.create(name="Test Item 3",definition=" ",workgroup=self.wg1)
-        item4 = models.ObjectClass.objects.create(name="Test Item 4",definition=" ",workgroup=self.wg2)
+        item1 = models.ObjectClass.objects.create(name="Test Item 1",definition="my definition",workgroup=self.wg1)
+        item2 = models.ObjectClass.objects.create(name="Test Item 2",definition="my definition",workgroup=self.wg2)
+        item3 = models.ObjectClass.objects.create(name="Test Item 3",definition="my definition",workgroup=self.wg1)
+        item4 = models.ObjectClass.objects.create(name="Test Item 4",definition="my definition",workgroup=self.wg2)
 
         self.login_registrar()
 
@@ -72,7 +76,13 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
         self.assertEqual(len(response.context['page']),0)
 
-        review = models.ReviewRequest.objects.create(requester=self.su,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.su,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(item1)
         review.concepts.add(item4)
 
@@ -80,7 +90,13 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.context['page']),1)
 
-        review = models.ReviewRequest.objects.create(requester=self.su,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.su,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(item1)
 
         response = self.client.get(reverse('aristotle:userReadyForReview',))
@@ -88,7 +104,13 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.assertEqual(len(response.context['page']),2)
 
         other_ra = models.RegistrationAuthority.objects.create(name="A different ra")
-        review = models.ReviewRequest.objects.create(requester=self.su,registration_authority=other_ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.su,
+            registration_authority=other_ra,
+            state=other_ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(item2)
 
         response = self.client.get(reverse('aristotle:userReadyForReview',))
@@ -104,13 +126,25 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.login_superuser()
         other_ra = models.RegistrationAuthority.objects.create(name="A different ra")
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=other_ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=other_ra,
+            state=other_ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewDetails',args=[review.pk]))
         self.assertEqual(response.status_code,200)
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewDetails',args=[review.pk]))
@@ -126,13 +160,25 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.login_registrar()
         other_ra = models.RegistrationAuthority.objects.create(name="A different ra")
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=other_ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=other_ra,
+            state=other_ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewDetails',args=[review.pk]))
         self.assertEqual(response.status_code,404)
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewDetails',args=[review.pk]))
@@ -147,7 +193,13 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
     def test_anon_cannot_see_review(self):
         self.logout()
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewDetails',args=[review.pk]))
@@ -157,7 +209,12 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
     def test_editor_can_see_review(self):
         self.login_editor()
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewDetails',args=[review.pk]))
@@ -173,13 +230,23 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.login_registrar()
         other_ra = models.RegistrationAuthority.objects.create(name="A different ra")
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=other_ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=other_ra,
+            state=other_ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewAccept',args=[review.pk]))
         self.assertEqual(response.status_code,403)
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewAccept',args=[review.pk]))
@@ -205,15 +272,7 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         review.status = models.REVIEW_STATES.submitted
         review.save()
 
-        response = self.client.post(reverse('aristotle:userReviewAccept',args=[review.pk]),
-            {
-                'response':"I can accept this!",
-                'registrationAuthorities':[other_ra.pk],
-                'state':[models.STATES.standard],
-                'cascadeRegistration':0, # no
-            })
-        self.assertTrue('registrationAuthorities' in response.context['form'].errors.keys())
-        self.assertEqual(response.status_code,200)
+        self.assertTrue(self.item1.current_statuses().count() == 0)
 
         self.item1 = models.ObjectClass.objects.get(pk=self.item1.pk) # decache
         self.assertFalse(self.item1.is_public())
@@ -221,11 +280,7 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         response = self.client.post(reverse('aristotle:userReviewAccept',args=[review.pk]),
             {
                 'response':"I can accept this!",
-                'registrationAuthorities':[self.ra.pk],
-                'state':[models.STATES.standard],
-                'cascadeRegistration':0, # no
             })
-        #self.assertEqual(response.status_code,200)
         self.assertRedirects(response,reverse('aristotle:userReadyForReview',))
 
         review = models.ReviewRequest.objects.get(pk=review.pk) #decache
@@ -235,19 +290,37 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
         self.item1 = models.ObjectClass.objects.get(pk=self.item1.pk) # decache
         self.assertTrue(self.item1.is_public())
+        self.assertTrue(self.item1.current_statuses().count() == 1)
+        state = self.item1.current_statuses().first()
+
+        self.assertTrue(state.registrationAuthority == review.registration_authority)
+        self.assertTrue(state.state == review.state)
+        self.assertTrue(state.registrationDate == review.registration_date)
 
 
     def test_registrar_can_reject_review(self):
         self.login_registrar()
         other_ra = models.RegistrationAuthority.objects.create(name="A different ra")
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=other_ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=other_ra,
+            state=other_ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewReject',args=[review.pk]))
         self.assertEqual(response.status_code,403)
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewReject',args=[review.pk]))
@@ -291,13 +364,25 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
     def test_user_can_cancel_review(self):
         self.login_editor()
 
-        review = models.ReviewRequest.objects.create(requester=self.viewer,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.viewer,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewCancel',args=[review.pk]))
         self.assertEqual(response.status_code,403)
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewCancel',args=[review.pk]))
@@ -309,7 +394,13 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         response = self.client.get(reverse('aristotle:userReviewCancel',args=[review.pk]))
         self.assertRedirects(response,reverse('aristotle:userReviewDetails',args=[review.pk]))
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         self.assertFalse(review.status == models.REVIEW_STATES.cancelled)        
@@ -323,7 +414,14 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.login_registrar()
         other_ra = models.RegistrationAuthority.objects.create(name="A different ra")
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=self.ra,status=models.REVIEW_STATES.accepted)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            status=models.REVIEW_STATES.accepted,
+            state=models.STATES.standard,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewReject',args=[review.pk]))
@@ -332,7 +430,14 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         response = self.client.get(reverse('aristotle:userReviewAccept',args=[review.pk]))
         self.assertRedirects(response,reverse('aristotle_mdr:userReviewDetails', args=[review.pk]))
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=self.ra,status=models.REVIEW_STATES.rejected)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            status=models.REVIEW_STATES.rejected,
+            state=models.STATES.standard,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewReject',args=[review.pk]))
@@ -341,7 +446,14 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         response = self.client.get(reverse('aristotle:userReviewAccept',args=[review.pk]))
         self.assertRedirects(response,reverse('aristotle_mdr:userReviewDetails', args=[review.pk]))
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=self.ra,status=models.REVIEW_STATES.cancelled)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            status=models.REVIEW_STATES.cancelled,
+            state=models.STATES.standard,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         response = self.client.get(reverse('aristotle:userReviewReject',args=[review.pk]))
@@ -352,7 +464,13 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
     def test_who_can_see_review(self):
         from aristotle_mdr.perms import user_can_view_review
 
-        review = models.ReviewRequest.objects.create(requester=self.editor,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
         review.concepts.add(self.item1)
 
         self.assertTrue(user_can_view_review(self.editor,review))
@@ -369,3 +487,32 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.assertFalse(user_can_view_review(self.registrar,review))
         self.assertTrue(user_can_view_review(self.su,review))
         self.assertFalse(user_can_view_review(self.viewer,review))
+
+    def test_notifications(self):
+        viewer_num_notifications = self.viewer.notifications.count()
+        registrar_num_notifications = self.registrar.notifications.count()
+        editor_num_notifications = self.editor.notifications.count()
+
+        review = models.ReviewRequest.objects.create(
+            requester=self.viewer,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
+        # Review requested, does a registrar get the notification?
+        self.assertTrue(self.viewer.notifications.count() == viewer_num_notifications)
+        self.assertTrue(self.registrar.notifications.count() == registrar_num_notifications + 1)
+        self.assertTrue(self.editor.notifications.count() == editor_num_notifications)
+
+        self.assertTrue(self.registrar.notifications.first().target == review)
+
+        review.status = models.REVIEW_STATES.accepted
+        review.save()
+
+        # Review updated, does the requester get the notification?
+        self.assertTrue(self.viewer.notifications.count() == viewer_num_notifications + 1)
+        self.assertTrue(self.registrar.notifications.count() == registrar_num_notifications + 1)
+        self.assertTrue(self.editor.notifications.count() == editor_num_notifications)
+
+        self.assertTrue(self.viewer.notifications.first().target == review)

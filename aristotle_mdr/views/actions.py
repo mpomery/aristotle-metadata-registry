@@ -2,9 +2,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured
 from django.core.urlresolvers import reverse
+from django.db import transaction
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template import RequestContext, TemplateDoesNotExist
+from django.template import TemplateDoesNotExist
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, DetailView
@@ -35,8 +36,8 @@ class ItemSubpageView(object):
 
 
 class ItemSubpageFormView(ItemSubpageView, FormView):
-    def get_context_data(self, **kwargs):
-        kwargs = super(ItemSubpageFormView, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        kwargs = super(ItemSubpageFormView, self).get_context_data(*args, **kwargs)
         kwargs['item'] = self.get_item()
         return kwargs
 
@@ -45,8 +46,8 @@ class SubmitForReviewView(ItemSubpageFormView):
     form_class = actions.RequestReviewForm
     template_name = "aristotle_mdr/actions/request_review.html"
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(SubmitForReviewView, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        kwargs = super(SubmitForReviewView, self).get_context_data(*args, **kwargs)
         kwargs['reviews'] = self.get_item().review_requests.filter(status=MDR.REVIEW_STATES.submitted).all()
         return kwargs
 
@@ -87,8 +88,8 @@ class ReviewActionMixin(object):
         self.review = get_object_or_404(MDR.ReviewRequest, pk=self.kwargs['review_id'])
         return self.review
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(ReviewActionMixin, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        kwargs = super(ReviewActionMixin, self).get_context_data(*args, **kwargs)
         kwargs['review'] = self.get_review()
         return kwargs
 
@@ -159,9 +160,9 @@ class ReviewAcceptView(ReviewActionMixin, FormView):
     form_class = actions.RequestReviewAcceptForm
     template_name = "aristotle_mdr/user/user_request_accept.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         from aristotle_mdr.views.utils import generate_visibility_matrix
-        kwargs = super(ReviewAcceptView, self).get_context_data(**kwargs)
+        kwargs = super(ReviewAcceptView, self).get_context_data(*args, **kwargs)
         import json
         kwargs['status_matrix'] = json.dumps(generate_visibility_matrix(self.request.user))
         return kwargs
@@ -171,16 +172,76 @@ class ReviewAcceptView(ReviewActionMixin, FormView):
         review = self.get_review()
 
         if form.is_valid():
+
+            message = self.register_items(form)
+
             review.reviewer = request.user
             review.response = form.cleaned_data['response']
             review.status = MDR.REVIEW_STATES.accepted
             review.save()
-            message = form.make_changes(items=review.concepts.all())
-            # message = _("Review accepted")
+
             messages.add_message(request, messages.INFO, message)
             return HttpResponseRedirect(reverse('aristotle_mdr:userReadyForReview'))
         else:
             return self.form_invalid(form)
+
+    def register_items(self, form):
+        review = self.get_review()
+        ras = [review.registration_authority]  # Make into an iterable, as this may change in future
+        state = review.state
+        regDate = review.registration_date
+        cascade = review.cascade_registration
+        changeDetails = review.message
+
+        items = review.concepts.all()
+        with transaction.atomic(), reversion.revisions.create_revision():
+            reversion.revisions.set_user(self.request.user)
+            success = []
+            failed = []
+            if regDate is None:
+                regDate = timezone.now().date()
+            for item in items:
+
+                for ra in ras:
+                    if cascade:
+                        register_method = ra.cascaded_register
+                    else:
+                        register_method = ra.register
+
+                    r = register_method(
+                        item,
+                        state,
+                        self.request.user,
+                        changeDetails=changeDetails,
+                        registrationDate=regDate,
+                    )
+                    for f in r['failed']:
+                        failed.append(f)
+                    for s in r['success']:
+                        success.append(s)
+            failed = list(set(failed))
+            success = list(set(success))
+            bad_items = sorted([str(i.id) for i in failed])
+            if failed:
+                message = _(
+                    "%(num_items)s items registered in %(num_ra)s registration authorities. \n"
+                    "%(num_faileds)s items failed, they had the id's: %(bad_ids)s"
+                ) % {
+                    'num_items': len(items),
+                    'num_ra': len(ras),
+                    'num_faileds': len(failed),
+                    'bad_ids': ",".join(bad_items)
+                }
+            else:
+                message = _(
+                    "%(num_items)s items registered in %(num_ra)s registration authorities. \n"
+                ) % {
+                    'num_items': len(items),
+                    'num_ra': len(ras),
+                }
+
+            reversion.revisions.set_comment(message)
+            return message
 
 
 class CheckCascadedStates(ItemSubpageView, DetailView):
@@ -195,8 +256,8 @@ class CheckCascadedStates(ItemSubpageView, DetailView):
             raise Http404
         return super(CheckCascadedStates, self).dispatch(*args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(CheckCascadedStates, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        kwargs = super(CheckCascadedStates, self).get_context_data(*args, **kwargs)
 
         state_matrix = [
             # (item,[(states_ordered_alphabetically_by_ra_as_per_parent_item,state_of_parent_with_same_ra)],[extra statuses] )
@@ -210,7 +271,7 @@ class CheckCascadedStates(ItemSubpageView, DetailView):
                 states.append(s)
 
         for i in item.item.registry_cascade_items:
-            sub_states = [None] * len(ras)
+            sub_states = [(None, None)] * len(ras)
             extras = []
             for s in i.current_statuses():
                 ra = s.registrationAuthority

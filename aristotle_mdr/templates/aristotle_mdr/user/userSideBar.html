@@ -134,7 +134,7 @@
     {% endif %}
     {% if request.user.is_staff %}
     <li class="staff_action {% ifequal activeTab "djangoAdminTools" %}active{% endifequal %}">
-        <a href="{% url 'admin:index' %}">
+        <a href="{% url 'aristotle:django_admin' %}">
         <i class="fa fa-user-md fa-fw"></i> {% trans "Django administration" %}
         </a>
     </li>

@@ -75,10 +75,15 @@ function updateSortRadioDetails(menu) {
 }
 
 $( document ).ready( function() {
+    $('.dropdown-menu-date .date').on('click', function(e) {
+        e.stopPropagation();
+    });
+
     $('.dropdown-menu-form .dropdown-menu').on('click', function(e) {
         e.stopPropagation();
         updateCheckboxBadge(this);
     });
+
     $('.dropdown-menu-form .dropdown-menu').each( function() {
         updateCheckboxBadge(this);
     });
@@ -86,10 +91,13 @@ $( document ).ready( function() {
     $('.dropdown-menu-date input[type=text]').on('click', function(e) {
         e.stopPropagation();
     });
+
+
     $('.dropdown-menu-date .dropdown-menu').on('click', function(e) {
         updateDateRadioDetails(this);
         clearCustomDates(this);
     });
+
     $('.dropdown-menu-date .dropdown-menu').each( function() {
         updateDateRadioDetails(this);
     });

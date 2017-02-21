@@ -21,9 +21,9 @@ class TestExtensionListVisibility(TestCase):
         self.assertEqual(response.status_code, 200)
         ext = apps.get_app_config('extension_test')
         download = apps.get_app_config('text_download_test')
-        self.assertTrue(download.verbose_name in response.content)
+        self.assertContains(response, download.verbose_name)
         self.assertTrue('text_download_test' in response.context['download_extensions'].keys())
-        self.assertTrue(ext.verbose_name in response.content)
+        self.assertContains(response, ext.verbose_name)
         self.assertTrue(ext in response.context['content_extensions'])
 
 
@@ -136,7 +136,7 @@ class QuestionnaireViewPage(LoggedInViewExtensionConceptPages, TestCase):
             {"items_to_add":[q1.pk,q2.pk,q3.pk],}
         )
 
-        self.assertTrue('Select a valid choice' in response.content)
+        self.assertContains(response, 'Select a valid choice')
         self.item1 = Questionnaire.objects.get(pk=self.item1.pk)
         self.assertTrue(self.item1.questions.count() == 0)
 

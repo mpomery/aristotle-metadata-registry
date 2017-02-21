@@ -124,14 +124,6 @@ class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
     actions_on_top = True
     actions_on_bottom = False
 
-    """
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "workgroup":
-            kwargs['queryset'] = request.user.profile.editable_workgroups.all()
-            kwargs['initial'] = request.user.profile.activeWorkgroup
-        return super(ConceptAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
-    """
-
     def get_form(self, request, obj=None, **kwargs):
         # Thanks: http://stackoverflow.com/questions/6321916
         # Thanks: http://stackoverflow.com/questions/2683689
@@ -186,6 +178,11 @@ class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
         if '_save' in request.POST and post_url_continue is None:
             response['location'] = reverse("aristotle:item", args=(obj.id,))
         return response
+
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            obj.submitter = request.user
+        obj.save()
 
 
 # For ValueDomains

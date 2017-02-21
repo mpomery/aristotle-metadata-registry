@@ -10,4 +10,4 @@ def loadSystemData(**kwargs):
     from django.core.management import call_command
     call_command('loaddata', 'system.json')
 
-signals.post_syncdb.connect(loadSystemData, sender=aristotle_mdr.models)
+signals.post_migrate.connect(loadSystemData, sender=aristotle_mdr.models)

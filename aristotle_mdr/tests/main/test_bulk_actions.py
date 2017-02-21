@@ -5,6 +5,8 @@ import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 
+import datetime
+
 from django.test.utils import setup_test_environment
 setup_test_environment()
 
@@ -14,10 +16,10 @@ class BulkActionsTest(utils.LoggedInViewPages):
 
         # There would be too many tests to test every item type against every other
         # But they all have identical logic, so one test should suffice
-        self.item1 = models.ObjectClass.objects.create(name="OC1", workgroup=self.wg1)
-        self.item2 = models.ObjectClass.objects.create(name="OC2", workgroup=self.wg1)
-        self.item3 = models.ObjectClass.objects.create(name="OC3", workgroup=self.wg1)
-        self.item4 = models.Property.objects.create(name="Prop4", workgroup=self.wg2)
+        self.item1 = models.ObjectClass.objects.create(name="OC1", definition="OC1 definition", workgroup=self.wg1)
+        self.item2 = models.ObjectClass.objects.create(name="OC2", definition="OC2 definition", workgroup=self.wg1)
+        self.item3 = models.ObjectClass.objects.create(name="OC3", definition="OC3 definition", workgroup=self.wg1)
+        self.item4 = models.Property.objects.create(name="Prop4", definition="Prop4 definition", workgroup=self.wg2)
 
 
 class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
@@ -36,6 +38,20 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(self.editor.profile.favourites.count(), 2)
 
+
+    def test_bulk_add_favourite_on_permitted_items_by_anonymous(self):
+        self.logout()
+
+        response = self.client.post(
+            reverse('aristotle:bulk_action'),
+            {
+                'bulkaction': 'add_favourites',
+                'items': [self.item1.id, self.item2.id],
+            }
+        )
+        self.assertRedirects(response,reverse('friendly_login')+"?next="+reverse('aristotle:bulk_action'))
+        self.assertEqual(response.status_code, 302)
+
     def test_bulk_add_favourite_on_forbidden_items(self):
         self.login_editor()
 
@@ -50,7 +66,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         )
         self.assertEqual(self.editor.profile.favourites.count(), 1)
         self.assertFalse(self.item4 in self.editor.profile.favourites.all())
-        self.assertTrue("Some items failed, they had the id&#39;s: %s" % self.item4.id in response.content)
+        self.assertContains(response, "Some items failed, they had the id&#39;s: %s" % self.item4.id)
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertEqual(response.redirect_chain[0][1], 302)
 
@@ -89,7 +105,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(self.item1.concept in self.new_workgroup.items.all())
         self.assertTrue(self.item2.concept in self.new_workgroup.items.all())
 
-        self.assertTrue("Forbbiden" in response.content)
+        self.assertEqual(response.status_code, 403)
 
     @override_settings(ARISTOTLE_SETTINGS=dict(settings.ARISTOTLE_SETTINGS, WORKGROUP_CHANGES=['submitter']))
     def test_bulk_change_workgroup_for_editor__for_some_items(self):
@@ -116,13 +132,15 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(self.item2.concept in self.new_workgroup.items.all())
         self.assertTrue(self.item4.concept not in self.new_workgroup.items.all())
 
-        self.assertTrue("Some items failed, they had the id&#39;s: %(bad_ids)s" % {
-            'bad_ids': ",".join(map(str,[self.item4.pk]))
-        } in response.content)
+        self.assertContains(
+            response,
+            "Some items failed, they had the id&#39;s: %(bad_ids)s" % {
+                'bad_ids': ",".join(map(str,[self.item4.pk]))
+            }
+        )
 
         self.logout()
         self.login_superuser()
-
 
         response = self.client.post(
             reverse('aristotle:bulk_action'),
@@ -139,7 +157,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(self.item2.concept in self.wg1.items.all())
         self.assertTrue(self.item4.concept in self.wg1.items.all())
 
-        self.assertTrue("Some items failed, they had the id&#39;s" not in response.content)
+        self.assertNotContains(response, "Some items failed, they had the id&#39;s")
 
     def test_bulk_remove_favourite(self):
         self.login_editor()
@@ -167,7 +185,11 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
 
     def test_bulk_status_change_on_permitted_items(self):
         self.login_registrar()
-        review = models.ReviewRequest.objects.create(requester=self.su,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.su,registration_authority=self.ra,
+            state=self.ra.locked_state,
+            registration_date=datetime.date(2013,4,2)
+        )
         review.concepts.add(self.item1)
         review.concepts.add(self.item2)
 
@@ -175,13 +197,16 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(perms.user_can_change_status(self.registrar, self.item2))
         self.assertFalse(self.item1.is_registered)
         self.assertFalse(self.item2.is_registered)
+        
+        reg_date = datetime.date(2014,10,27)
+        new_state = self.ra.locked_state
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
                 'bulkaction': 'change_state',
-                'state': 1,
+                'state': new_state,
                 'items': [self.item1.id, self.item2.id],
-                'registrationDate': "2014-10-27",
+                'registrationDate': reg_date,
                 'cascadeRegistration': 0,
                 'registrationAuthorities': [self.ra.id],
                 'confirmed': 'confirmed',
@@ -190,9 +215,20 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(self.item1.is_registered)
         self.assertTrue(self.item2.is_registered)
 
+        self.assertTrue(self.item1.current_statuses().first().registrationDate == reg_date)
+        self.assertTrue(self.item2.current_statuses().first().registrationDate == reg_date)
+        self.assertTrue(self.item1.current_statuses().first().state == new_state)
+        self.assertTrue(self.item2.current_statuses().first().state == new_state)
+        self.assertTrue(self.item1.current_statuses().first().registrationAuthority == self.ra)
+        self.assertTrue(self.item2.current_statuses().first().registrationAuthority == self.ra)
+
     def test_bulk_status_change_on_forbidden_items(self):
         self.login_registrar()
-        review = models.ReviewRequest.objects.create(requester=self.su,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.su,registration_authority=self.ra,
+            registration_date=datetime.date(2010,1,1),
+            state=self.ra.locked_state
+        )
         review.concepts.add(self.item1)
         # review.concepts.add(self.item4)
 
@@ -201,13 +237,16 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertFalse(self.item1.is_registered)
         self.assertFalse(self.item2.is_registered)
         self.assertFalse(self.item4.is_registered)
+        
+        reg_date = datetime.date(2014,10,27)
+        new_state = self.ra.locked_state
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
                 'bulkaction': 'change_state',
-                'state': 1,
+                'state': new_state,
                 'items': [self.item1.id, self.item2.id, self.item4.id],
-                'registrationDate': "2014-10-27",
+                'registrationDate': reg_date,
                 'cascadeRegistration': 0,
                 'registrationAuthorities': [self.ra.id],
                 'confirmed': 'confirmed',
@@ -219,12 +258,16 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertFalse(self.item2.is_registered)
         self.assertFalse(self.item4.is_registered)
 
+        self.assertTrue(self.item1.current_statuses().first().registrationDate == reg_date)
+        self.assertTrue(self.item1.current_statuses().first().state == new_state)
+        self.assertTrue(self.item1.current_statuses().first().registrationAuthority == self.ra)
+
         from django.utils.html import escape
         err1 = "Some items failed"
         err2 = "s: %s" % ','.join(sorted([str(self.item2.id), str(self.item4.id)]))
 
-        self.assertTrue(err1 in response.content)
-        self.assertTrue(err2 in response.content)
+        self.assertContains(response, err1)
+        self.assertContains(response, err2)
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertEqual(response.redirect_chain[0][1], 302)
 
@@ -297,6 +340,8 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
                 'state': 1,
                 'items': [self.item1.id, self.item2.id],
                 'registration_authority': self.ra.id,
+                "registration_date": "2010-01-01",
+                "cascade_registration": 0,
                 "message": "review these plz",
                 'confirmed': 'confirmed',
             }
@@ -324,6 +369,9 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
                 'state': 1,
                 'items': [self.item1.id, self.item4.id],
                 'registration_authority': self.ra.id,
+                'registration_date': datetime.date(2016,1,1),
+                "registration_date": "2010-01-01",
+                "cascade_registration": 0,
                 "message": "review these plz",
                 'confirmed': 'confirmed',
             }
@@ -389,7 +437,6 @@ class BulkDownloadTests(BulkActionsTest, TestCase):
     def test_bulk_pdf_download_on_forbidden_items(self):
         self.login_editor()
 
-        self.assertEqual(self.editor.profile.favourites.count(), 0)
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
@@ -403,3 +450,70 @@ class BulkDownloadTests(BulkActionsTest, TestCase):
         )
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertEqual(response.redirect_chain[0][1], 302)
+
+
+    def test_bulk_pdf_download_on_forbidden_items_by_anonymous_user(self):
+        self.logout()
+
+        response = self.client.post(
+            reverse('aristotle:bulk_action'),
+            {
+                'bulkaction': 'bulk_download',
+                'items': [self.item1.id, self.item4.id],
+                "title": "The title",
+                "download_type": self.download_type,
+                'confirmed': 'confirmed',
+            },
+            follow=True
+        )
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertEqual(response.redirect_chain[0][1], 302)
+
+        response = self.client.post(
+            reverse('aristotle:bulk_action'),
+            {
+                'bulkaction': 'bulk_download',
+                'items': [self.item1.id, self.item4.id],
+                "title": "The title",
+                "download_type": self.download_type,
+                'confirmed': 'confirmed',
+            },
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                'aristotle:bulk_download',
+                kwargs={
+                    "download_type": self.download_type,
+                }
+            )+"?title=The%20title"+"&items=%s&items=%s"%(self.item1.id, self.item4.id)
+        )
+
+    def test_content_exists_in_bulk_pdf_download_on_permitted_items(self):
+        self.login_editor()
+
+        self.item5 = models.DataElementConcept.objects.create(name="DEC1", definition="DEC5 definition", objectClass=self.item2, workgroup=self.wg1)
+
+        response = self.client.get(
+            reverse(
+                'aristotle:bulk_download',
+                kwargs={
+                    "download_type": self.download_type,
+                }
+            ),
+            {
+                "items": [self.item1.id, self.item5.id],
+                "title": "The title",
+                "html": True  # Force HTML to debug content
+            }
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.item1.name)
+        self.assertContains(response, self.item2.name)  # Will be in as its a component of DEC5
+        self.assertContains(response, self.item5.name)
+
+        self.assertContains(response, self.item1.definition)
+        self.assertContains(response, self.item2.definition)  # Will be in as its a component of DEC5
+        self.assertContains(response, self.item5.definition)
+

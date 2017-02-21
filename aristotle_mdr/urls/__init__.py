@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth.views import password_reset
 from django.views.generic.base import RedirectView
@@ -28,6 +28,7 @@ if 'aristotle_mdr.contrib.slots' in settings.INSTALLED_APPS:
 
 if 'aristotle_mdr.contrib.identifiers' in settings.INSTALLED_APPS:
     urlpatterns.append(url(r'^', include('aristotle_mdr.contrib.identifiers.urls', app_name="aristotle_mdr_identifiers", namespace="aristotle_identifiers")))
+urlpatterns.append(url(r'^', include('aristotle_mdr.contrib.healthcheck.urls', app_name="aristotle_mdr_hb", namespace="aristotle_hb")))
 
 # This is only for dev work, so we can skip it.
 if settings.DEBUG:  # pragma: no cover

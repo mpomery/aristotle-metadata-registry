@@ -13,6 +13,8 @@ from reversion import revisions as reversion
 setup_test_environment()
 
 from time import sleep
+import datetime
+from django.utils import timezone
 
 
 class TestSearch(utils.LoggedInViewPages,TestCase):
@@ -64,8 +66,8 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         response = self.client.get(reverse('aristotle:search')+"?q=wolverine")
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.context['page'].object_list),1)
-        self.assertTrue("Did you mean" not in response.content)
-        self.assertTrue("wolverine" in response.content)
+        self.assertNotContains(response, "Did you mean")
+        self.assertContains(response, "wolverine")
 
     def test_empty_search(self):
         self.logout()
@@ -130,7 +132,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.logout()
         
         response = self.client.get(reverse('aristotle:search')+"?q=xman")
-        self.assertTrue('Add Favourite' not in response.content)
+        self.assertNotContains(response, 'Add Favourite')
         
         response = self.client.post(reverse('friendly_login'),
                     {'username': 'stryker', 'password': 'mutantsMustDie'})
@@ -138,7 +140,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertEqual(response.status_code,302) # logged in
 
         response = self.client.get(reverse('aristotle:search')+"?q=xman")
-        self.assertTrue('This item is in your favourites list' not in response.content)
+        self.assertNotContains(response, 'This item is in your favourites list')
 
         i = self.xmen_wg.items.first()
         
@@ -146,7 +148,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertTrue(i in self.registrar.profile.favourites.all())
         
         response = self.client.get(reverse('aristotle:search')+"?q=xman")
-        self.assertTrue('This item is in your favourites list' in response.content)
+        self.assertContains(response, 'This item is in your favourites list')
 
     def test_registrar_search_after_adding_new_status_request(self):
         self.logout()
@@ -155,13 +157,21 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         steve_rogers = models.ObjectClass.objects.get(name="captainAmerica")
         self.assertFalse(perms.user_can_view(self.registrar,steve_rogers))
-        review = models.ReviewRequest.objects.create(requester=self.su,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.su,registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
         review.concepts.add(steve_rogers)
 
         with reversion.create_revision():
             steve_rogers.save()
 
-        review = models.ReviewRequest.objects.create(requester=self.su,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.su,registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
         review.concepts.add(steve_rogers)
 
         self.assertTrue(perms.user_can_view(self.registrar,steve_rogers))
@@ -287,15 +297,16 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
                     definition="not really an xman, no matter how much he tries",
                     workgroup=self.xmen_wg)
 
-        review = models.ReviewRequest.objects.create(requester=self.su,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.su,registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
         review.concepts.add(dp)
 
         dp = models.ObjectClass.objects.get(pk=dp.pk) # Un-cache
         self.assertTrue(perms.user_can_view(self.registrar,dp))
         self.assertFalse(dp.is_public())
-
-        from django.utils import timezone
-        import datetime
 
         self.ra.register(dp,models.STATES.incomplete,self.registrar,
             registrationDate=timezone.now()+datetime.timedelta(days=-7)
@@ -318,7 +329,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.logout()
         
         response = self.client.get(reverse('aristotle:search')+"?q=xman")
-        self.assertTrue('Restriction' not in response.content)
+        self.assertNotContains(response, 'Restriction')
 
         response = self.client.post(reverse('friendly_login'),
                     {'username': 'stryker', 'password': 'mutantsMustDie'})
@@ -331,28 +342,29 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
                     definition="not really an xman, no matter how much he tries",
                     workgroup=self.xmen_wg)
 
-        review = models.ReviewRequest.objects.create(requester=self.su,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.su,registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
         review.concepts.add(dp)
 
         dp = models.ObjectClass.objects.get(pk=dp.pk) # Un-cache
         self.assertTrue(perms.user_can_view(self.registrar,dp))
         self.assertFalse(dp.is_public())
 
-        from django.utils import timezone
-        import datetime
-
         self.ra.register(dp,models.STATES.candidate,self.registrar,
             registrationDate=timezone.now()+datetime.timedelta(days=-7)
         )
 
         response = self.client.get(reverse('aristotle:search')+"?q=xman")
-        self.assertTrue('Restriction' in response.content)
+        self.assertContains(response, 'Restriction')
         
 
         response = self.client.get(reverse('aristotle:search')+"?q=xman&res=1")
-        self.assertTrue('Restriction' not in response.content)
+        self.assertNotContains(response, 'Restriction')
 
-        self.assertTrue('Item visibility state is Locked' in response.content)
+        self.assertContains(response, 'Item visibility state is Locked')
 
         self.assertEqual(len(response.context['page'].object_list),1)
         dp_result = response.context['page'].object_list[0]
@@ -508,7 +520,7 @@ class TestSearchDescriptions(TestCase):
         
         if not form.is_valid(): # pragma: no cover
             # If this branch happens, we messed up the test bad.
-            print form.errors
+            print(form.errors)
             self.assertTrue('programmer' is 'good')
 
         description = gen(form)
@@ -522,7 +534,7 @@ class TestSearchDescriptions(TestCase):
         ]}
         form = PSF(filters)
         if not form.is_valid(): # pragma: no cover
-            print form.errors
+            print(form.errors)
             self.assertTrue('programmer' is 'good')
         
         description = gen(form)
@@ -535,7 +547,7 @@ class TestSearchDescriptions(TestCase):
         filters = {'models':['aristotle_mdr.objectclass'],'ra':[str(ra.pk)]}
         form = PSF(filters)
         if not form.is_valid(): # pragma: no cover
-            print form.errors
+            print(form.errors)
             self.assertTrue('programmer' is 'good')
 
         description = gen(form)
@@ -552,7 +564,7 @@ class TestSearchDescriptions(TestCase):
         
         if not form.is_valid(): # pragma: no cover
             # If this branch happens, we messed up the test bad.
-            print form.errors
+            print(form.errors)
             self.assertTrue('programmer' is 'good')
 
         description = gen(form)

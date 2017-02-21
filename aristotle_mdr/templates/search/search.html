@@ -278,10 +278,6 @@
                                 {{ ra.name }}</a>
                             ({{ f.1 }})
                         {% else %}
-                        {# the user wants unregistered content, show that #}
-                            <a href="{{ request.get_full_path }}&amp;state=-99">
-                                {% trans 'Not registered' %}</a>
-                            ({{ f.1 }})
                         {% endif %}
                         {% endwith %}
                     </dd>

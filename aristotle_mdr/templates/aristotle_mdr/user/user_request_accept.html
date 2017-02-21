@@ -13,9 +13,13 @@
         </ol>
 
 
-        <header>By approving this review, this form allows you to change the status of multiple items in your registration authorities.
+        <header>By approving this review, this form will change the status of the listed items in your registration authorities.
         </header>
+        <div>Requested registration status:
+            <em>{{review.get_state_display}}</em> in <a href="{{review.registration_authority.get_absolute_url }}">{{review.registration_authority.name }}</a>
+        </div>
         <div class="well">
+            {{ form.errors }}
             <strong>The original message for this request:</strong>
             <p>{{ review.message }}</p>
             <strong>The items in this request are listed below:</strong>
@@ -26,70 +30,14 @@
                     </li>
                 {% endfor %}
             </ul>
-        </div>
-        <div>
-
-            {{ form.errors }}
-        </div>
+        </div>  
         <div id="visibilty">
-            <span id="potential">
-            {% trans 'Select a new state to see how the visibility of these metadata items will change.' %}
-            </span>
+            
         </div>
         <section>
-        <div id="changeStatusDate">
-            <span>
-                <label for="id_registrationDate">{{ form.registrationDate.label }}</label>:
-                {{ form.registrationDate.errors }}
-            </span>
-            <span class="pull-right">
-                {{ form.registrationDate }}
-            </span>
-        </div>
-        <div id="cascadeRegistration">
-            <span>
-                <label for="id_cascadeRegistration">
-                {{ form.cascadeRegistration.label }}
-                </label>
-                {{ form.cascadeRegistration.errors }}
-            </span>
-            <span class="pull-right">
-                {{ form.cascadeRegistration }}
-            </span>
-        </div>
-        <div id="changeStatus">
-            <div>
-                <span>
-                    {{ form.state.label }}
-                    {{ form.state.errors }}
-                </span>
-                <span>
-                    {{ form.registrationAuthorities.label }}
-                    {{ form.registrationAuthorities.errors }}
-                </span>
-            </div>
-            <div>
-                {{ form.state }}
-                <ul>
-                {% for val,label_text in form.registrationAuthorities.field.choices %}
-                    <li>
-                        <input type="checkbox" id="registrationAuthorities_{{val}}" name="registrationAuthorities" value="{{val}}">
-                        <label for="registrationAuthorities_{{val}}">{{label_text}}</label>
-                        <a href="{% url 'aristotle_mdr:registrationAuthority' iid=val %}" title="Visit the registration authority page to learn more about state meanings for this authority" class="pull-right">
-                            <i class="fa fa-fw fa-university"></i>
-                        </a>
-                    </li>
-                {% endfor %}
-                </ul>
-            </div>
-        </div>
         <div class="status_change_description">
             <label for='id_response'>{{ form.response.label }}:</label> {{ form.response.help_text }} 
             {{ form.response }}
-        </div>
-        <div class="status_change_description">
-            {{ form.changeDetails.label }} (optional):
-            {{ form.changeDetails }}
         </div>
         {% block save %}
         {% endblock %}
@@ -104,24 +52,5 @@
         <input type="submit" class="btn btn-primary" value="Update Status" />
     </div>
 </form>
-<pre>
-    {{status_matrix}}
-</pre>
-<script>
-    current_visibility = "";
-    status_matrix = {{status_matrix|safe}};
-    {# VISIBILITY_STATUS will be replaced in javascript #}
-    same_visibility_text = "{% trans 'After saving, these items will stay at their current status' %}";
-    {# VISIBILITY_STATUS will be replaced in javascript #}  
-    diff_visibility_text = "{% trans 'After saving, these items will become VISIBILITY_STATUS' %}";
-    select_state_to_see = "{% trans 'Select a new state to see how the visibility of these items will change.' %}";
-    visibility_translations = {
-        "hidden":"{% trans 'hidden' %}",
-        "locked":"{% trans 'locked' %}",
-        "public":"{% trans 'public' %}"
-    }
-</script>
-    {% block extra_head_scripts %}
-        <script src="{{ STATIC_URL }}aristotle_mdr/aristotle.status_change.js"></script>
-    {% endblock %}
+
 {% endblock %}

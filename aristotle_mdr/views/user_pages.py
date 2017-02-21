@@ -251,6 +251,11 @@ def my_review_list(request):
     return paginated_list(request, reviews, "aristotle_mdr/user/my_review_list.html", {'reviews': reviews})
 
 
+@login_required
+def django_admin_wrapper(request, page_url):
+    return render(request, "aristotle_mdr/user/admin.html", {'page_url': page_url})
+
+
 class ReviewDetailsView(DetailView):
     pk_url_kwarg = 'review_id'
     template_name = "aristotle_mdr/user/request_review_details.html"
@@ -279,9 +284,9 @@ class CreatedItemsListView(ListView):
             review_requests__isnull=True
         )
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         # Call the base implementation first to get a context
-        context = super(CreatedItemsListView, self).get_context_data(**kwargs)
+        context = super(CreatedItemsListView, self).get_context_data(*args, **kwargs)
         context['sort'] = self.request.GET.get('sort', 'name_asc')
         return context
 

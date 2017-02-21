@@ -32,6 +32,26 @@
             {{form.errors}}
         </div>
         <section>
+        <div id="changeStatusDate">
+            <span>
+                <label for="id_registration_date">{{ form.registration_date.label }}</label>:
+                {{ form.registration_date.errors }}
+            </span>
+            <span class="pull-right">
+                {{ form.registration_date }}
+            </span>
+        </div>
+        <div id="cascadeRegistration">
+            <span>
+                <label for="id_cascadeRegistration">
+                {{ form.cascade_registration.label }}
+                </label>
+                {{ form.cascade_registration.errors }}
+            </span>
+            <span class="pull-right">
+                {{ form.cascade_registration }}
+            </span>
+        </div>
         <div id="changeStatus">
             <div>
                 <span>
@@ -76,7 +96,7 @@
         {% else %}
             <a class="btn btn-default" href="{% url 'aristotle:item' item.id %}">Cancel</a>
         {% endif %}
-        <input type="submit" class="btn btn-primary" value="Update Status" />
+        <input type="submit" class="btn btn-primary" value="{% trans 'Request Review'%}" />
     </div>
 </form>
 {% comment %}

@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.db.models.signals import post_save, m2m_changed, post_delete
 from django.dispatch import receiver, Signal
 from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible  # Python 2
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_lazy as _
 
@@ -17,6 +18,8 @@ from model_utils.managers import InheritanceManager, InheritanceQuerySet
 from model_utils.models import TimeStampedModel
 from model_utils import Choices, FieldTracker
 from aristotle_mdr.contrib.channels.utils import fire
+
+from django.utils.encoding import python_2_unicode_compatible  # Python 2
 
 import reversion  # import revisions
 
@@ -68,6 +71,7 @@ VERY_RECENTLY_SECONDS = 15
 concept_visibility_updated = Signal(providing_args=["concept"])
 
 
+@python_2_unicode_compatible  # Python 2
 class baseAristotleObject(TimeStampedModel):
     name = models.TextField(
         help_text=_("The primary name used for human identification purposes.")
@@ -104,9 +108,6 @@ class baseAristotleObject(TimeStampedModel):
         return d
 
     def __str__(self):
-        return "{name}".format(name=self.name).encode('utf-8')
-
-    def __unicode__(self):
         return "{name}".format(name=self.name)
 
     # Defined so we can access it during templates.
@@ -912,6 +913,7 @@ class ReviewRequestManager(models.Manager):
             return getattr(self.__class__, attr, *args)
 
 
+@python_2_unicode_compatible  # Python 2
 class ReviewRequest(TimeStampedModel):
     objects = ReviewRequestManager()
     concepts = models.ManyToManyField(_concept, related_name="review_requests")
@@ -920,7 +922,7 @@ class ReviewRequest(TimeStampedModel):
         help_text=_("The registration authority the requester wishes to endorse the metadata item")
     )
     requester = models.ForeignKey(User, help_text=_("The user requesting a review"), related_name='requested_reviews')
-    message = models.TextField(blank=True, null=True, help_text=_("An optional message accompanying a request"))
+    message = models.TextField(blank=True, null=True, help_text=_("An optional message accompanying a request, this will accompany the approved registration status"))
     reviewer = models.ForeignKey(User, null=True, help_text=_("The user performing a review"), related_name='reviewed_requests')
     response = models.TextField(blank=True, null=True, help_text=_("An optional message responding to a request"))
     status = models.IntegerField(
@@ -930,11 +932,33 @@ class ReviewRequest(TimeStampedModel):
     )
     state = models.IntegerField(
         choices=STATES,
-        blank=True, null=True,
         help_text=_("The state at which a user wishes a metadata item to be endorsed")
     )
+    registration_date = models.DateField(
+        _('Date registration effective'),
+        help_text=_("date and time you want the metadata to be registered from")
+    )
+    cascade_registration = models.IntegerField(
+        choices=[(0, _('No')), (1, _('Yes'))],
+        default=0,
+        help_text=_("Update the registration of associated items")
+    )
+
+    def get_absolute_url(self):
+        return reverse(
+            "aristotle:userReviewDetails",
+            kwargs={'review_id': self.pk}
+        )
+
+    def __str__(self):
+        return "Review of {count} items as {state} in {ra} registraion authority".format(
+            count=self.concepts.count(),
+            state=self.get_state_display(),
+            ra=self.registration_authority,
+        )
 
 
+@python_2_unicode_compatible  # Python 2
 class Status(TimeStampedModel):
     """
     8.1.2.6 - Registration_State class
@@ -970,7 +994,7 @@ class Status(TimeStampedModel):
     def state_name(self):
         return STATES[self.state]
 
-    def __unicode__(self):
+    def __str__(self):
         return "{obj} is {stat} for {ra} on {date} - {desc}".format(
             obj=self.concept.name,
             stat=self.state_name,
@@ -1062,6 +1086,7 @@ class ConceptualDomain(concept):
     )
 
 
+@python_2_unicode_compatible  # Python 2
 class ValueMeaning(aristotleComponent):
     """
     Value_Meaning is a class each instance of which models a value meaning (3.2.141),
@@ -1087,7 +1112,7 @@ class ValueMeaning(aristotleComponent):
         help_text='Date at which the value meaning ceased to be valid'
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s: %s - %s" % (
             self.conceptual_domain.name,
             self.value,
@@ -1160,6 +1185,7 @@ class ValueDomain(concept):
         return self.supplementaryvalue_set.all()
 
 
+@python_2_unicode_compatible  # Python 2
 class AbstractValue(aristotleComponent):
     """
     Implementation note: Not the best name, but there will be times to
@@ -1202,7 +1228,7 @@ class AbstractValue(aristotleComponent):
         help_text='Date at which the value ceased to be valid'
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s: %s - %s" % (
             self.valueDomain.name,
             self.value,
@@ -1245,7 +1271,7 @@ class DataElementConcept(concept):
     )
     property = models.ForeignKey(  # 11.2.3.1
         Property, blank=True, null=True,
-        help_text=_('references a Property that is part of the specification of the Data_Element_Concept')
+        help_text=_('references a Property that is part of the specification of the Data_Element_Concept'),
     )
     conceptualDomain = models.ForeignKey(  # 11.2.3.2
         ConceptualDomain, blank=True, null=True,
@@ -1316,7 +1342,7 @@ class DataElementDerivation(concept):
     output :model:`aristotle_mdr.DataElement`\s (3.2.33)
     """
 
-    derives = models.ForeignKey(  # 11.5.3.5
+    derives = models.ManyToManyField(  # 11.5.3.5
         DataElement,
         related_name="derived_from",
         blank=True,
@@ -1472,6 +1498,12 @@ def new_post_created(sender, **kwargs):
 
 @receiver(post_save, sender=Status)
 def states_changed(sender, instance, *args, **kwargs):
-    item = instance.concept
-    kwargs['status_id'] = instance.pk
-    fire("concept_changes.status_changed", obj=item, **kwargs)
+    fire("concept_changes.status_changed", obj=instance, **kwargs)
+
+
+@receiver(post_save, sender=ReviewRequest)
+def review_request_changed(sender, instance, *args, **kwargs):
+    if kwargs.get('created'):
+        fire("action_signals.review_request_created", obj=instance, **kwargs)
+    else:
+        fire("action_signals.review_request_updated", obj=instance, **kwargs)

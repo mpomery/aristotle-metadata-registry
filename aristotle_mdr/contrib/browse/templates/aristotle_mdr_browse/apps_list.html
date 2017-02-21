@@ -31,20 +31,22 @@
         </tr>
         <tbody>
     {% for model in app_models.models %}
-        <tr>
-        <td>
-            <a href="{% url 'browse_concepts' model.app_label model.model %}">
-                {{ model.model_class.get_verbose_name }}
-            </a>
-        </td>
-        <td>
-            {{ model.model_class|visible_count:request.user }}
-        </td>
-        <td>{% help_doc model.model_class 'brief' %}</td>
-        </tr>
+      {% if model.model_class|visible_count:request.user %}
+          <tr>
+          <td>
+              <a href="{% url 'browse_concepts' model.app_label model.model %}">
+                  {{ model.model_class.get_verbose_name }}
+              </a>
+          </td>
+          <td>
+              {{ model.model_class|visible_count:request.user }}
+          </td>
+          <td>{% help_doc model.model_class 'brief' %}</td>
+          </tr>
+      {% endif %}
     {% endfor %}
     </tbody>
-    
+
 {% endfor %}
     </table>
 

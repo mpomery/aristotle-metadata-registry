@@ -1,16 +1,7 @@
 from channels import Group
 from aristotle_mdr import models as MDR
 from aristotle_mdr import messages
-
-
-def safe_object(message):
-    __object__ = message['__object__']
-    if __object__.get('object', None):
-        instance = __object__['object']
-    else:
-        model = apps.get_model(__object__['app_label'], __object__['model_name'])
-        instance = model.objects.filter(pk=__object__['pk']).first()
-    return instance
+from aristotle_mdr.contrib.channels.utils import safe_object
 
 
 def concept_saved(message):
@@ -69,13 +60,13 @@ def new_post_created(message, **kwargs):
 
 
 def status_changed(message, **kwargs):
-    instance = safe_object(message)
-    new_status = MDR.Status.objects.get(pk=message['status_id'])
+    new_status = safe_object(message)
+    concept = new_status.concept
 
-    for status in instance.current_statuses().all():
+    for status in concept.current_statuses().all():
         for registrar in status.registrationAuthority.registrars.all():
-            if instance.statuses.filter(registrationAuthority=new_status.registrationAuthority).count() <= 1:
+            if concept.statuses.filter(registrationAuthority=new_status.registrationAuthority).count() <= 1:
                 # 0 or 1 because the transaction may not be complete yet
-                messages.registrar_item_registered(recipient=registrar, obj=instance)
+                messages.registrar_item_registered(recipient=registrar, obj=concept)
             else:
-                messages.registrar_item_changed_status(recipient=registrar, obj=instance)
+                messages.registrar_item_changed_status(recipient=registrar, obj=concept)

@@ -42,9 +42,9 @@ class UserHomePages(utils.LoggedInViewPages, TestCase):
     def test_user_can_view_sandbox(self):
         self.login_viewer()
         self.item1 = models.ObjectClass.objects.create(
-            name="Test Item 1 (visible to tested viewers)",definition=" ",submitter=self.viewer)
+            name="Test Item 1 (visible to tested viewers)",definition="my definition",submitter=self.viewer)
         self.item2 = models.ObjectClass.objects.create(
-            name="Test Item 1 (visible to tested viewers)",definition=" ")
+            name="Test Item 1 (visible to tested viewers)",definition="my definition")
         response = self.client.get(reverse('aristotle:userSandbox',))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.item1.concept in response.context['page'])
@@ -54,22 +54,25 @@ class UserHomePages(utils.LoggedInViewPages, TestCase):
         self.login_viewer()
         self.item1 = models._concept.objects.create(
             name="Test Item 1 (visible to tested viewers in sandbox)",
-            definition=" ",
+            definition="my definition",
             submitter=self.viewer)
         # Should not see item2 because it has a review request
         self.item2 = models._concept.objects.create(
             name="Test Item 2 (not visible in sandbox, review request)",
-            definition=" ", 
+            definition="my definition", 
             submitter=self.viewer)
         review = models.ReviewRequest.objects.create(
             requester=self.su,
-            registration_authority=self.ra)
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
         review.concepts.add(self.item2)
 
         # Should not see item3 because it has a status
         self.item3 = models._concept.objects.create(
             name="Test Item 3 (not visible in sandbox, status)",
-            definition=" ",
+            definition="my definition",
             submitter=self.viewer)
         status = models.Status.objects.create(
             concept=self.item3,
