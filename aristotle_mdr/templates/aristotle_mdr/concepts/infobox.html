@@ -27,6 +27,7 @@
             </dd>
             <!-- dt>Aristotle ID</dt><dd>{{ item.id }}</dd -->
             <dt>Identifiers</dt>
+            <dd>Local ID - {{ item.id }}</dd>
             <dd>UUID - <span title='{{ item.uuid }}'>{{ item.uuid|truncatechars:16 }}</span></dd>
             {% for ident in item.identifiers.all %}
                 <dd><a href="{{ident.namespace.naming_authority.get_absolute_url}}">{{ ident.prefix }}</a>:{{ ident.identifier }}:{{ ident.version }}</dd>
@@ -46,18 +47,11 @@
             {% comment %}
             {# These may yet be removed, I don't like it #}
             <dt>Included in</dt>
-            <dd>
-                {% with total=item.packages.count %}
-                {% if total > 0 %}<a href="{{ request.path }}/packages">{% endif %}
-                {{ total }} {% trans 'Package' context "Aristotle Package" %}{{ total|pluralize }}
-                {% if total > 0 %}</a>{% endif %}
-                {% endwith %}
-            </dd>
             {% block includes %}{% endblock %}
             {% endcomment %}
             
             {% if item.registerable %}
-            {% include "aristotle_mdr/statuses.html" with statuses=item.current_statuses infoBox=True %}
+            {% include "aristotle_mdr/infobox_statuses.html" with statuses=item.current_statuses %}
             {% endif %}
             
             {% if item.publicationrecord and not item.current_statuses %}

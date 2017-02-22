@@ -5,4 +5,4 @@ from aristotle_mdr.contrib.self_publish.tests import *
 from aristotle_mdr.contrib.slots.tests import *
 from aristotle_mdr.contrib.identifiers.tests import *
 from aristotle_mdr.contrib.healthcheck.tests import *
-from aristotle_mdr.contrib.links.tests import *
+from aristotle_mdr.contrib.links.tests.test_links import *
