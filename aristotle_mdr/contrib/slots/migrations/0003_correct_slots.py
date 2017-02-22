@@ -5,6 +5,15 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 
 
+def move_slot_info(apps, schema_editor):
+    Slot = apps.get_model('aristotle_mdr_slots', 'slot')
+
+    for slot in Slot.objects.all():
+        slot.name = slot.type.slot_name
+        slot.new_type = slot.type.datatype
+        slot.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -12,21 +21,44 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='slot',
+            name='name',
+            field=models.CharField(default='Slot name lost during migration', max_length=256, blank=True),
+            preserve_default=False,
+        ),
+
+        migrations.RunPython(move_slot_info, reverse_code=migrations.RunPython.noop),
+
+        migrations.AddField(
+            model_name='slot',
+            name='new_type',
+            field=models.CharField(max_length=256, blank=True),
+        ),
+
         migrations.RemoveField(
             model_name='slotdefinition',
             name='datatype',
         ),
-        migrations.AddField(
-            model_name='slot',
-            name='name',
-            field=models.CharField(default='Slot name lost during migration', max_length=256),
-            preserve_default=False,
-        ),
-        migrations.AlterField(
+
+        migrations.RemoveField(
             model_name='slot',
             name='type',
-            field=models.CharField(max_length=256, blank=True),
         ),
+
+        migrations.RenameField(
+            model_name='slot',
+            old_name='new_type',
+            new_name='type',
+        ),
+
+        migrations.AlterField(
+            model_name='slot',
+            name='name',
+            field=models.CharField(max_length=256),
+            preserve_default=False,
+        ),
+
         migrations.DeleteModel(
             name='SlotDefinition',
         ),
