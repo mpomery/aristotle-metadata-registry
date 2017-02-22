@@ -20,20 +20,20 @@ def setUpModule():
 
 
 class RelationViewPage(LoggedInViewConceptPages, TestCase):
-    url_name='relation'
-    itemType=models.Relation
+    url_name = 'relation'
+    itemType = models.Relation
     defaults = {'arity': 2}
 
 
 class RelationAdminPage(AdminPageForConcept, TestCase):
-    itemType=models.Relation
+    itemType = models.Relation
     create_defaults = {'arity': 2}
-    form_defaults={
+    form_defaults = {
         'arity': 2,
-        'rolerelation_set-TOTAL_FORMS':0,
-        'rolerelation_set-INITIAL_FORMS':0,
-        'rolerelation_set-MAX_NUM_FORMS':1,
-        }
+        'relationrole_set-TOTAL_FORMS':0,
+        'relationrole_set-INITIAL_FORMS':0,
+        'relationrole_set-MAX_NUM_FORMS':1,
+    }
 
 
 class LinkTestBase(utils.LoggedInViewPages):
