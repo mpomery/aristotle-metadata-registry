@@ -414,12 +414,17 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.logout()
 
         with reversion.create_revision():
+            oc = models.ObjectClass.objects.create(
+                name="Pokemon",
+                definition="a Pocket monster"
+            )
             dec = models.DataElementConcept.objects.create(
-                name="Pokemon-CP",
-                definition="a Pokemons combat power"
+                name="Pokemon-CombatPower",
+                definition="a Pokemons combat power",
+                objectClass=oc
             )
             de = models.DataElement.objects.create(
-                name="Pokemon-CP, Go",
+                name="Pokemon-Combat Power, Go",
                 definition="a Pokemons combat power as recorded in the Pokemon-Go scale",
                 dataElementConcept=dec
             )
@@ -430,21 +435,44 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
         
         objs = response.context['page'].object_list
-        self.assertDelayedEqual(len(objs),2)
+        self.assertDelayedEqual(len(objs),3)
         extra_facets = response.context['form'].extra_facet_fields
-        self.assertTrue(len(extra_facets) == 1)
-        self.assertTrue(extra_facets[0][0] == 'data_element_concept')
+
+        self.assertTrue(len(extra_facets) == 2)
+        self.assertTrue('data_element_concept' in [f[0] for f in extra_facets] )
+        self.assertTrue('object_class' in [f[0] for f in extra_facets] )
+        
+        # Confirm spaces are included in the facet
+        self.assertTrue(dec.name in [v[0] for v in dict(extra_facets)['data_element_concept']['values']])
 
         psqs = PermissionSearchQuerySet()
         psqs = psqs.auto_query('pokemon').apply_permission_checks(self.su)
+        self.assertDelayedEqual(len(psqs),3)
 
-        self.assertDelayedEqual(len(psqs),2)
+        response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
+        objs = response.context['page'].object_list
+        self.assertDelayedEqual(len(objs),3)
 
-        response = self.client.get(reverse('aristotle:search')+"?q=pokemon&f=data_element_concept::%s"%dec.pk)
+        response = self.client.get(reverse('aristotle:search')+"?q=pokemon&f=object_class::%s"%oc.name)
+
+        objs = response.context['page'].object_list
+        self.assertDelayedEqual(len(objs),2)
+        self.assertTrue(de.pk in [o.object.pk for o in objs])
+        self.assertTrue(dec.pk in [o.object.pk for o in objs])
+
+        response = self.client.get(reverse('aristotle:search')+"?q=pokemon&f=data_element_concept::%s"%dec.name.replace(' ','+'))
+
+        objs = response.context['page'].object_list
+        self.assertDelayedEqual(len(objs),2)
+        self.assertTrue(de.pk in [o.object.pk for o in objs])
+        self.assertTrue(dec.pk in [o.object.pk for o in objs])
+
+        response = self.client.get(reverse('aristotle:search')+"?q=pokemon&models=aristotle_mdr.dataelement&f=data_element_concept::%s"%dec.name.replace(' ','+'))
 
         objs = response.context['page'].object_list
         self.assertDelayedEqual(len(objs),1)
-        self.assertTrue(objs[0].object.pk,de.pk)
+        self.assertTrue(de.pk in [o.object.pk for o in objs])
+        self.assertTrue(dec.pk not in [o.object.pk for o in objs])
 
     def test_model_search(self):
         self.logout()
