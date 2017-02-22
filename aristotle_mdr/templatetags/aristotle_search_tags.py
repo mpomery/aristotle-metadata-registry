@@ -90,8 +90,12 @@ def get_item_from_facet(_type, _id):
         item = model_type.objects.filter(pk=int(_id)).first()
         if item is None:
             logger.warning(
-                "Warning: Failed to find item type [%s] with id [%s]"
+                "Warning: Failed to find item type [%s] with id [%s]" % (model_type, _id)
             )
+            item = {
+                'name': 'None',
+                'id': _id
+            }
     return item
 
 
