@@ -20,7 +20,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for slot in item.slots.all|order_by:'type__slot_name' %}
+        {% for slot in item.slots.all|order_by:'name' %}
         <tr>
             <td>
                 {{ slot.name }}
@@ -30,7 +30,7 @@
                 {{ slot.value|linebreaks }}
             </td>
             <td>
-                <a href="{% url 'aristotle_slots:similar_slots' slot.type.id %}?value={{slot.value}}">
+                <a href="{% url 'aristotle_slots:similar_slots' slot.name %}?value={{slot.value}}">
                 {% count_similar request.user slot %}
                 </a>
             </td>

@@ -15,6 +15,7 @@
     {% with formset.forms.0 as slot_form %}
       <thead><tr>
             <th>{% trans 'Slot name' %}</th>
+            <th>{% trans 'Type' %}</th>
             <th>{% trans 'Value' %}</th>
             <th>{% trans 'Delete' %}</th>
       </tr></thead>
@@ -44,27 +45,6 @@
         <i class="fa fa-plus-circle"></i> Add a slot</a>
 
 {% endwith %}
-    <header class='editor'>Slots available for this metadata item</header>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>{% trans 'Slot name' %}</th>
-                <th>{% trans 'Details' %}</th>
-                <th>{% trans 'Cardinality' %}</th>
-                <th>{% trans 'Data type' %}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for slot in concept_slots %}
-            <tr>
-                <td>{{slot.slot_name}}</td>
-                <td>{{slot.help_text}}</td>
-                <td>{{slot.get_cardinality_display}}</td>
-                <td><a href="{{ slot.datatype.get_absolute_url }}">{{slot.datatype}}</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 
         <script src="{{ STATIC_URL }}aristotle_mdr/aristotle.moveable.js"></script>
 {% endblock %}
