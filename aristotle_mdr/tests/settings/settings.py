@@ -45,7 +45,7 @@ elif os.environ.get('DB') == 'mssql':
     print("Running %s test-suite with MSSQL" % ci_runner)
     skip_migrations = True  # Sadly, this may not be possible until after migration 0018
     from aristotle_mdr.tests.settings.templates.db.mssql import DATABASES
-else:
+elif os.environ.get('TOXDIR'):
     print("Running %s test-suite with tox SQLite" % ci_runner)
     from aristotle_mdr.tests.settings.tox import DATABASES
 
@@ -65,7 +65,7 @@ elif os.environ.get('SEARCH') == 'elastic':
     else:
         print("Aristotle specific variant")
         from aristotle_mdr.tests.settings.templates.search.elasticsearch import HAYSTACK_CONNECTIONS
-else:
+elif os.environ.get('TOXDIR'):
     print("Running  %s test-suite with whoosh" % ci_runner)
     from aristotle_mdr.tests.settings.tox import HAYSTACK_CONNECTIONS
 
