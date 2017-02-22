@@ -41,7 +41,11 @@ def concepts_with_similar_slots(user, name=None, _type=None, value=None, slot=No
         _type = slot.type
         value = slot.value
 
-    slots = MDR._concept.objects.visible(user).filter(slots__name=name)
+    slots = MDR._concept.objects.visible(user)
+
+    if name:
+        slots = slots.filter(slots__name=name)
+
     if _type:
         slots = slots.filter(slots__type=_type)
 

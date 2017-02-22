@@ -128,7 +128,7 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
 
         response = self.client.get(
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name]),
-            {'sf':['%s:hello'%_type.slot_name,'%s:bye'%_type.slot_name]}
+            {'sf':['%s:hello'%slot_name,'%s:bye'%slot_name]}
             )
         self.assertEqual(response.status_code,200)
         self.assertContains(response, self.item1.name)
@@ -149,7 +149,7 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
     def test_editor_can_view_browse_with_two_slot_filters(self):
         from aristotle_mdr.contrib.slots.models import Slot
         slot_name_1 = "test1"
-        slot_type_2 = "test2"
+        slot_name_2 = "test2"
 
         self.login_editor()
         response = self.client.get(
@@ -161,9 +161,9 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
         self.assertNotContains(response, self.item3.name)
 
         # Make some slots
-        Slot.objects.create(concept=self.item1.concept, name=slot_type_1, value="hello")
-        Slot.objects.create(concept=self.item1.concept, name=slot_type_2, value="other")
-        Slot.objects.create(concept=self.item3.concept, name=slot_type_1, value="hello")
+        Slot.objects.create(concept=self.item1.concept, name=slot_name_1, value="hello")
+        Slot.objects.create(concept=self.item1.concept, name=slot_name_2, value="other")
+        Slot.objects.create(concept=self.item3.concept, name=slot_name_1, value="hello")
 
         self.login_editor()
         response = self.client.get(
