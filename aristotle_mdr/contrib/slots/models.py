@@ -21,51 +21,16 @@ from aristotle_mdr import models as MDR
 
 
 @python_2_unicode_compatible  # Python 2
-class SlotDefinition(TimeStampedModel):
-    CARDINALITY = Choices(
-        (0, 'singleton', _('Singleton (0..1)')),
-        (1, 'repeatable', _('Repeatable (0..n)')),
-    )
-
-    app_label = models.CharField(
-        max_length=256,
-        help_text=_('Add an app for app specific help, required for concept help')
-        )
-    concept_type = models.CharField(max_length=256)
-    slot_name = models.CharField(max_length=256)  # Or some other sane length
-    help_text = models.TextField(max_length=256, null=True, blank=True)  # Or some other sane length
-    datatype = models.ForeignKey(MDR.DataType, null=True, blank=True)  # What! So meta
-    cardinality = models.IntegerField(
-        choices=CARDINALITY,
-        default=CARDINALITY.singleton,
-        help_text=_("Specifies if the slot can be stored multiple times.")
-    )
-
-    def __str__(self):
-        return "{0.slot_name}".format(self)
-
-    def clean(self):
-        if not ContentType.objects.filter(app_label=self.app_label, model=self.concept_type).exists():
-            raise ValidationError(_('The concept type specified below does not exist.'))
-
-    def model_class(self):
-        return ContentType.objects.get(app_label=self.app_label, model=self.concept_type)
-
-
-@python_2_unicode_compatible  # Python 2
 class Slot(TimeStampedModel):
     # on save confirm the concept and model are correct, otherwise reject
     # on save confirm the cardinality
-    type = models.ForeignKey(SlotDefinition)
+    name = models.CharField(max_length=256)  # Or some other sane length
+    type = models.CharField(max_length=256)  # Or some other sane length
     concept = models.ForeignKey(MDR._concept, related_name='slots')
     value = models.TextField()
 
-    def clean(self):
-        if hasattr(self, 'type') and self.type is not None and not self.concept.__class__ != self.type.model_class():
-            raise ValidationError('This slot is not allowed on this model')
-
     def __str__(self):
-        return u"{0} - {1}".format(self.type, self.value)
+        return u"{0} - {1}".format(self.name, self.value)
 
 
 def concepts_with_similar_slots(user, _type=None, value=None, slot=None):

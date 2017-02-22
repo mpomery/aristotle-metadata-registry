@@ -9,10 +9,7 @@
                 {% trans 'Slot name' %}
             </th>
             <th>
-                {% trans 'Details' %}
-            </th>
-            <th>
-                {% trans 'Cardinality' %}
+                {% trans 'Type' %}
             </th>
             <th>
                 {% trans 'Value' %}
@@ -26,10 +23,9 @@
         {% for slot in item.slots.all|order_by:'type__slot_name' %}
         <tr>
             <td>
-                {{ slot.type.slot_name }}
+                {{ slot.name }}
             </td>
-            <td>{{slot.type.help_text}}</td>
-            <td>{{slot.type.get_cardinality_display}}</td>
+            <td>{{slot.type}}</td>
             <td>
                 {{ slot.value|linebreaks }}
             </td>
