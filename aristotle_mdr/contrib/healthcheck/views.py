@@ -8,6 +8,7 @@ from aristotle_mdr.models import _concept
 
 def heartbeat(request):
     service_status = {
+        "aristotle": get_version(),
         "webserver": check_web(),
         "database": check_db(),
         "cache": check_cache(),
@@ -19,6 +20,13 @@ def heartbeat(request):
         status_code = 200
     service_status.update(status_code=status_code)
     return JsonResponse(service_status, status=status_code)
+
+
+def get_version():
+    from aristotle_mdr import __version__
+    return {
+        'version': __version__
+    }
 
 
 def check_web():

@@ -112,7 +112,7 @@ class BrowseConcepts(AppBrowser):
         for slot_name, values in slots.items():
             try:
                 queryset = queryset.filter(
-                    slots__type__slot_name=slot_name,
+                    slots__name=slot_name,
                     slots__value__in=values,
                 )
             except FieldError:
