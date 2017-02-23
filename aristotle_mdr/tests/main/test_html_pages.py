@@ -211,13 +211,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
 
         self.assertEqual(self.item1.slots.count(),0)
 
-        from aristotle_mdr.contrib.slots.models import SlotDefinition, Slot
-        slot_def = SlotDefinition.objects.create(
-            app_label=self.itemType._meta.app_label,
-            concept_type=self.itemType._meta.model_name,
-            slot_name="extra",
-            cardinality=SlotDefinition.CARDINALITY.singleton
-        )
+        from aristotle_mdr.contrib.slots.models import Slot
 
         updated_item = utils.model_to_dict_with_change_time(response.context['item'])
         updated_name = updated_item['name'] + " updated!"
@@ -230,7 +224,8 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         updated_item['slots-MAX_NUM_FORMS'] = 1
 
         updated_item['slots-0-concept'] = self.item1.pk
-        updated_item['slots-0-type'] = slot_def.pk
+        updated_item['slots-0-name'] = 'extra'
+        updated_item['slots-0-type'] = None
         updated_item['slots-0-value'] = 'test slot value'
 
         response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
@@ -242,89 +237,6 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(reverse('aristotle:edit_item',args=[self.item1.id]))
         self.assertContains(response, 'test slot value')
 
-
-    def test_submitter_cannot_save_via_edit_page_with_slots_that_are_duplicates(self):
-        self.login_editor()
-        response = self.client.get(reverse('aristotle:edit_item',args=[self.item1.id]))
-        self.assertEqual(response.status_code,200)
-
-        self.assertEqual(self.item1.slots.count(),0)
-
-        from aristotle_mdr.contrib.slots.models import SlotDefinition, Slot
-        slot_def = SlotDefinition.objects.create(
-            app_label=self.itemType._meta.app_label,
-            concept_type=self.itemType._meta.model_name,
-            slot_name="extra",
-            cardinality=SlotDefinition.CARDINALITY.singleton
-        )
-
-        updated_item = utils.model_to_dict_with_change_time(response.context['item'])
-        updated_name = updated_item['name'] + " updated!"
-        updated_item['name'] = updated_name
-
-        # Add slots management form
-        updated_item['slots-TOTAL_FORMS'] = 2
-        updated_item['slots-INITIAL_FORMS'] = 0
-        updated_item['slots-MIN_NUM_FORMS'] = 0
-        updated_item['slots-MAX_NUM_FORMS'] = 2
-
-        updated_item['slots-0-concept'] = self.item1.pk
-        updated_item['slots-0-type'] = slot_def.pk
-        updated_item['slots-0-value'] = 'test slot value'
-        updated_item['slots-1-concept'] = self.item1.pk
-        updated_item['slots-1-type'] = slot_def.pk
-        updated_item['slots-1-value'] = 'test slot value2'
-
-        response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
-        self.item1 = self.itemType.objects.get(pk=self.item1.pk)
-
-        self.assertEqual(response.status_code,200)
-        self.assertEqual(self.item1.slots.count(),0)
-
-        self.assertContains(response, "The selected slot type &#39;%(slot_name)s&#39; is only allowed to be included once" % {'slot_name': slot_def.slot_name})
-
-    def test_submitter_cannot_save_via_edit_page_with_slots_that_are_for_a_different_metadata_type(self):
-        self.login_editor()
-
-        from aristotle_mdr.contrib.slots.models import SlotDefinition, Slot
-        if self.itemType._meta.model_name == "property":
-            other_type = "objectclass"
-        else:
-            other_type = "property"
-        slot_def = SlotDefinition.objects.create(
-            app_label=self.itemType._meta.app_label,
-            concept_type=other_type,
-            slot_name="extra slot not available",
-            cardinality=SlotDefinition.CARDINALITY.singleton
-        )
-
-        response = self.client.get(reverse('aristotle:edit_item',args=[self.item1.id]))
-        self.assertEqual(response.status_code,200)
-
-        self.assertEqual(self.item1.slots.count(),0)
-        self.assertNotContains(response, slot_def.slot_name)
-
-        updated_item = utils.model_to_dict_with_change_time(response.context['item'])
-        updated_name = updated_item['name'] + " updated!"
-        updated_item['name'] = updated_name
-
-        # Add slots management form
-        updated_item['slots-TOTAL_FORMS'] = 1
-        updated_item['slots-INITIAL_FORMS'] = 0
-        updated_item['slots-MIN_NUM_FORMS'] = 0
-        updated_item['slots-MAX_NUM_FORMS'] = 1
-
-        updated_item['slots-0-concept'] = self.item1.pk
-        updated_item['slots-0-type'] = slot_def.pk
-        updated_item['slots-0-value'] = 'test slot value'
-
-        response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
-        self.item1 = self.itemType.objects.get(pk=self.item1.pk)
-
-        self.assertEqual(response.status_code,200)
-        self.assertEqual(self.item1.slots.count(),0)
-
-        self.assertContains(response, "Select a valid choice. That choice is not one of the available choices")
 
     def test_submitter_cannot_save_via_edit_page_if_other_saves_made(self):
         from datetime import timedelta

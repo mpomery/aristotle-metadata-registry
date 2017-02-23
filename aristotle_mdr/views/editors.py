@@ -142,7 +142,7 @@ class EditItemView(PermissionFormView):
         return self.render_to_response(self.get_context_data(form=form, slots_FormSet=slots_FormSet))
 
     def get_context_data(self, *args, **kwargs):
-        from aristotle_mdr.contrib.slots.models import Slot, SlotDefinition
+        from aristotle_mdr.contrib.slots.models import Slot
         context = super(EditItemView, self).get_context_data(*args, **kwargs)
         if self.slots_active and kwargs.get('slots_FormSet', None):
             context['slots_FormSet'] = kwargs['slots_FormSet']
@@ -161,8 +161,8 @@ class EditItemView(PermissionFormView):
                 )
 
         context['show_slots_tab'] = self.slots_active
+        context['show_links_tab'] = self.links_active
         context['show_id_tab'] = self.identifiers_active
-        context['concept_slots'] = SlotDefinition.objects.filter(app_label=self.model._meta.app_label, concept_type=self.model._meta.model_name)
         return context
 
 
