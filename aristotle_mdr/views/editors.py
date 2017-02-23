@@ -161,7 +161,6 @@ class EditItemView(PermissionFormView):
                 )
 
         context['show_slots_tab'] = self.slots_active
-        context['show_links_tab'] = self.links_active
         context['show_id_tab'] = self.identifiers_active
         return context
 

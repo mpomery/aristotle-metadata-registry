@@ -15,6 +15,7 @@ def setUpModule():
     models.HelpPage.objects.all().delete()
     models.ConceptHelp.objects.all().delete()
 
+
 class TestHelpPagesLoad(TestCase):
     def test_help_pages_load_into_db(self):
         count_hp_1 = models.HelpPage.objects.all().count()
