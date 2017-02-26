@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.test import TestCase, override_settings, modify_settings
 from django.test.utils import setup_test_environment
@@ -194,3 +195,31 @@ class TestLinkPerms(LinkTestBase, TestCase):
         user = self.registrar
         self.assertFalse(perms.user_can_change_link(user,self.link1))
         self.assertFalse(perms.user_can_change_link(user,self.link2))
+
+    def test_who_can_make_links(self):
+        # Anyone who has an active account is an editor, so everyone can make links
+        self.assertTrue(perms.user_can_make_link(self.registrar))
+        self.assertTrue(perms.user_can_make_link(self.viewer))
+        self.assertTrue(perms.user_can_make_link(self.editor))
+        self.assertTrue(perms.user_can_make_link(self.su))
+
+    def test_cannot_save_linkend_with_bad_role(self):
+        self.new_relation = models.Relation.objects.create(
+            name="another_test_relation", definition="Used for testing", arity=2
+        )
+
+        self.new_link = models.Link.objects.create(relation=self.new_relation)
+        self.assertNotEqual(self.new_link.relation, self.relation_role1.relation)
+
+        with self.assertRaises(ValidationError):
+            self.link_end_bad = self.new_link.add_link_end(
+                role = self.relation_role1,
+                concept = self.item1
+            )
+
+
+class TestLinkAssortedPages(LinkTestBase, TestCase):
+    def test_link_json_page(self):
+        self.login_superuser()
+        response = self.client.get(reverse('aristotle_mdr_links:link_json_for_item', args=[self.item1.pk]))
+        self.assertEqual(response.status_code,200)

@@ -2,23 +2,20 @@
 Aristotle MDR 11179 Link and Relationship models
 ================================================
 
-These are based on the Slots definition in ISO/IEC 11179 Part 3 - 7.2.2.4
+These are based on the Link and Relation definitions in ISO/IEC 11179 Part 3 - 9.1.2.4 - 9.1.2.5
 """
 
-from django.apps import apps
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
-from django.conf.global_settings import LANGUAGES
+from django.db.models.signals import pre_save
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
-from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import python_2_unicode_compatible  # Python 2
 
-from model_utils import Choices
 from model_utils.models import TimeStampedModel
 
 from aristotle_mdr import models as MDR
+from aristotle_mdr.signals import pre_save_clean
 
 
 class Relation(MDR.concept):  # 9.1.2.4
@@ -92,3 +89,5 @@ class LinkEnd(TimeStampedModel):  # 9.1.2.7
             raise ValidationError(
                 _('A link ends role relation must be from the relation itself')
             )
+
+pre_save.connect(pre_save_clean, sender=LinkEnd)
