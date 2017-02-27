@@ -69,9 +69,9 @@ elif os.environ.get('TOXDIR'):
     print("Running  %s test-suite with whoosh" % ci_runner)
     from aristotle_mdr.tests.settings.tox import HAYSTACK_CONNECTIONS
 else:
-    print("Running %s test-suite with tmp-file whoosh" % ci_runner)
+    print("Running %s test-suite with whoosh" % ci_runner)
+    print("Aristotle specific variant")
     from aristotle_mdr.tests.settings.templates.search.whoosh import HAYSTACK_CONNECTIONS
-
 
 if skip_migrations:  # pragma: no cover
     print("Skipping migrations")
@@ -151,3 +151,7 @@ __LOGGING__ = {
             },
         }
     }
+
+TEST_RUNNER = 'django_slowtests.testrunner.DiscoverSlowestTestsRunner'
+NUM_SLOW_TESTS = 50
+
