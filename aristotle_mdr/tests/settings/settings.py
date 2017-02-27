@@ -151,7 +151,3 @@ __LOGGING__ = {
             },
         }
     }
-
-TEST_RUNNER = 'django_slowtests.testrunner.DiscoverSlowestTestsRunner'
-NUM_SLOW_TESTS = 50
-
