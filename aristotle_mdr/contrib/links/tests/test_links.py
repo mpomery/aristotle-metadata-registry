@@ -5,7 +5,7 @@ from django.test import TestCase, override_settings, modify_settings
 from django.test.utils import setup_test_environment
 
 from aristotle_mdr.contrib.links import models, perms
-from aristotle_mdr.models import Workgroup, ObjectClass
+from aristotle_mdr.models import Workgroup, ObjectClass, STATES
 from aristotle_mdr.tests import utils
 
 from aristotle_mdr.tests.main.test_admin_pages import AdminPageForConcept
@@ -173,7 +173,73 @@ class TestLinkPages(LinkTestBase, TestCase):
         self.assertTrue(self.item1 in self.link1.concepts())
         self.assertTrue(self.item2 not in self.link1.concepts())
         self.assertTrue(self.item3 in self.link1.concepts())
-        
+
+    def test_add_link_wizard(self):
+        self.wizard_form_name = "add_link_wizard"
+        next_url = "/"
+        self.wizard_url = reverse('aristotle_mdr_links:add_link')+'?next=' + next_url
+
+        r = self.ra.register(
+            item=self.relation,
+            state=STATES.standard,
+            user=self.su
+        )
+        self.item1.linkend_set.all().delete()
+
+        self.assertTrue(self.relation.can_view(self.editor))
+        self.assertEqual(self.item1.linkend_set.count(), 0)
+        response = self.client.get(self.wizard_url)
+        self.assertEqual(response.status_code, 302)  # Redirects to login
+
+        self.login_editor()
+
+        response = self.client.get(self.wizard_url)
+        self.assertEqual(response.status_code, 200)  # OK, lets go!
+        self.assertContains(response, "add_link_wizard-current_step")
+
+        step_0_data = {
+            self.wizard_form_name+'-current_step': '0',
+        }
+
+        response = self.client.post(self.wizard_url, step_0_data)
+        wizard = response.context['wizard']
+        self.assertEqual(wizard['steps'].current, '0')
+        self.assertTrue('relation' in wizard['form'].errors.keys())
+
+        # must submit a relation
+        step_0_data.update({'0-relation': str(self.relation.pk)})
+        # success!
+
+        response = self.client.post(self.wizard_url, step_0_data)
+        wizard = response.context['wizard']
+        self.assertEqual(response.status_code, 200)  # OK, lets go!
+
+        self.assertEqual(wizard['steps'].current, '1')
+        self.assertFalse('relation' in wizard['form'].errors.keys())
+
+        self.assertEqual(response.status_code, 200)
+
+        step_1_data = {}
+        step_1_data.update(step_0_data)
+        step_1_data.update({self.wizard_form_name+'-current_step': '1'})
+        for role in self.relation.relationrole_set.all():
+            step_1_data.update({'1-role_%s'%role.pk: self.item1.pk})
+
+        response = self.client.post(self.wizard_url, step_1_data)
+        wizard = response.context['wizard']
+        self.assertEqual(response.status_code, 200)  # OK, lets go!
+
+        self.assertEqual(len(wizard['form'].errors.keys()), 0)
+        self.assertEqual(wizard['steps'].current, '2')
+
+        step_2_data = {}
+        step_2_data.update(step_1_data)
+        step_2_data.update({self.wizard_form_name+'-current_step': '2'})
+        response = self.client.post(self.wizard_url, step_2_data)
+        self.assertRedirects(response, next_url)
+
+        self.assertEqual(self.item1.linkend_set.count(), self.relation.relationrole_set.count())
+
 
 class TestLinkPerms(LinkTestBase, TestCase):
     def test_superuser_can_edit_links(self):
@@ -223,3 +289,4 @@ class TestLinkAssortedPages(LinkTestBase, TestCase):
         self.login_superuser()
         response = self.client.get(reverse('aristotle_mdr_links:link_json_for_item', args=[self.item1.pk]))
         self.assertEqual(response.status_code,200)
+

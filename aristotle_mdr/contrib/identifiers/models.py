@@ -48,4 +48,3 @@ class ScopedIdentifier(TimeStampedModel):
     @property
     def prefix(self):
         return self.namespace.shorthand_prefix
-
