@@ -164,7 +164,21 @@ ARISTOTLE_SETTINGS = {
         'request_review': 'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
         'bulk_download': 'aristotle_mdr.forms.bulk_actions.BulkDownloadForm',
     },
-    'DASHBOARD_ADDONS': []
+    'DASHBOARD_ADDONS': [],
+    'METADATA_CREATION_WIZARDS': [
+        {
+            'app_label': 'aristotle_mdr',
+            'model': 'DataElement',
+            'class': 'aristotle_mdr.views.wizards.DataElementWizard',
+            'link': 'create/wizard/aristotle_mdr/dataelement',
+        },
+        {
+            'app_label': 'aristotle_mdr',
+            'model': 'DataElementConcept',
+            'class': 'aristotle_mdr.views.wizards.DataElementConceptWizard',
+            'link': 'create/wizard/aristotle_mdr/dataelementconcept',
+        }
+    ]
 }
 ARISTOTLE_DOWNLOADS = [
     # (fileType, menu, font-awesome-icon, module)

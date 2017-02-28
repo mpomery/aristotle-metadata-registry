@@ -13,6 +13,7 @@ from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
+from django.utils.module_loading import import_string
 
 import reversion
 from reversion_compare.views import HistoryCompareDetailView
@@ -168,6 +169,16 @@ def create_list(request):
     aristotle_apps += ["aristotle_mdr"]
     out = {}
 
+    wizards = []
+    for wiz in getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('METADATA_CREATION_WIZARDS', []):
+        w = wiz.copy()
+        _w = {
+            'model': apps.get_app_config(wiz['app_label']).get_model(wiz['model']),
+            'class': import_string(wiz['class']),
+        }
+        w.update(_w)
+        wizards.append(w)
+
     for m in get_concepts_for_apps(aristotle_apps):
         # Only output subclasses of 11179 concept
         app_models = out.get(m.app_label, {'app': None, 'models': []})
@@ -179,7 +190,13 @@ def create_list(request):
         app_models['models'].append((m, m.model_class()))
         out[m.app_label] = app_models
 
-    return render(request, "aristotle_mdr/create/create_list.html", {'models': out})
+    return render(
+        request, "aristotle_mdr/create/create_list.html",
+        {
+            'models': out,
+            'wizards': wizards
+        }
+    )
 
 
 @login_required
