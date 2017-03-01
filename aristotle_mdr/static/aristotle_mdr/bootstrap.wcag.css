@@ -17,3 +17,9 @@ a {
     /* Bootsrap default link color (darkened 16%) */
     color: #0A518E;
 }
+
+input[type=checkbox],
+input[type=radio] {
+    padding-top: 10px;
+    transform: scale(1.25);
+}

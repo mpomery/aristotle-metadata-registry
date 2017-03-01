@@ -56,7 +56,7 @@ script:
 #  - ./manage.py runworker --settings=aristotle_mdr.tests.settings.settings > worker1.log 2>&1 &
   - if [[ "$DB" != "" ]]; then tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters; fi
 # check documentation builds cleanly
-  - if [[ $DOCS == 1 ]]; then tox -e docs --skip-missing-interpreters; fi
+  - if [[ $DOCS == 1 ]]; then tox -e pep8 -e docs --skip-missing-interpreters; fi
   - if [[ $A11Y != "" ]]; then tox -e ally-$A11Y --skip-missing-interpreters; fi
 #  - cat worker1.log
 after_success:

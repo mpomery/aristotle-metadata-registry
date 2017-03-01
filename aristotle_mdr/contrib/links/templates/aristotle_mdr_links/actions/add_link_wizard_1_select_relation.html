@@ -1,0 +1,24 @@
+{% extends 'aristotle_mdr_links/actions/add_link_wizard_0_base.html' %}
+{% load compile_static i18n %}
+
+{% block title %}Add new link - select relation{% endblock %}
+{% block extra_head_scripts %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.wizard.less' %}" />
+{% endblock %}
+
+{% block wizard_content %}
+        <ol class="breadcrumb">
+          <li class="active">Add new link</a></li>
+        </ol>
+        <div class="alert alert-danger">
+            {% blocktrans %}
+            Reusing 
+            {% endblocktrans %}
+        </div>
+        <div>
+            <table>
+            {{ form.as_table }}
+            </table>
+        </div>
+    </div>
+{% endblock %}

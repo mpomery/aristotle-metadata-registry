@@ -18,6 +18,7 @@ from model_utils.managers import InheritanceManager, InheritanceQuerySet
 from model_utils.models import TimeStampedModel
 from model_utils import Choices, FieldTracker
 from aristotle_mdr.contrib.channels.utils import fire
+import uuid
 
 from django.utils.encoding import python_2_unicode_compatible  # Python 2
 
@@ -73,6 +74,10 @@ concept_visibility_updated = Signal(providing_args=["concept"])
 
 @python_2_unicode_compatible  # Python 2
 class baseAristotleObject(TimeStampedModel):
+    uuid = models.UUIDField(
+        help_text=_("Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries"),
+        unique=True, default=uuid.uuid1, editable=False, null=False
+    )
     name = models.TextField(
         help_text=_("The primary name used for human identification purposes.")
     )
@@ -596,6 +601,12 @@ class ConceptQuerySet(InheritanceQuerySet):
             ObjectClass.objects.public().filter(name__contains="Person")
         """
         return self.filter(_is_public=True)
+
+    def __contains__(self, item):
+        if not issubclass(type(item), _concept):
+            return False
+        else:
+            return self.all().filter(pk=item.concept.pk).exists()
 
 
 class ConceptManager(InheritanceManager):

@@ -9,6 +9,13 @@ from aristotle_mdr.contrib.help import models
 setup_test_environment()
 
 
+def setUpModule():
+    # There are race contitions around ordering of help loading
+    # So lets just clear everything out!
+    models.HelpPage.objects.all().delete()
+    models.ConceptHelp.objects.all().delete()
+
+
 class TestHelpPagesLoad(TestCase):
     def test_help_pages_load_into_db(self):
         count_hp_1 = models.HelpPage.objects.all().count()

@@ -42,6 +42,11 @@ def model_to_dict_with_change_time(item, fetch_time=None):
     d['slots-MIN_NUM_FORMS'] = 0
     d['slots-MAX_NUM_FORMS'] = 0
 
+    d['identifiers-TOTAL_FORMS'] = 0
+    d['identifiers-INITIAL_FORMS'] = 0
+    d['identifiers-MIN_NUM_FORMS'] = 0
+    d['identifiers-MAX_NUM_FORMS'] = 1
+
     return d
 
 
@@ -63,11 +68,12 @@ class ManagedObjectVisibility(object):
     def setUp(self):
         self.ra = models.RegistrationAuthority.objects.create(
             name="Test RA",
+            definition="My RA",
             public_state=models.STATES.qualified,
             locked_state=models.STATES.candidate
         )
 
-        self.wg = models.Workgroup.objects.create(name="Test WG")
+        self.wg = models.Workgroup.objects.create(name="Test WG", definition="My WG")
         #RAFIX self.wg.registrationAuthorities.add(self.ra)
 
     def test_object_is_public(self):
@@ -440,9 +446,9 @@ class LoggedInViewPages(object):
     This helps us manage testing across different user types.
     """
     def setUp(self):
-        self.wg1 = models.Workgroup.objects.create(name="Test WG 1")  # Editor is member
-        self.wg2 = models.Workgroup.objects.create(name="Test WG 2")
-        self.ra = models.RegistrationAuthority.objects.create(name="Test RA")
+        self.wg1 = models.Workgroup.objects.create(name="Test WG 1", definition="My WG")  # Editor is member
+        self.wg2 = models.Workgroup.objects.create(name="Test WG 2", definition="My WG")
+        self.ra = models.RegistrationAuthority.objects.create(name="Test RA", definition="My WG")
         #RAFIX self.wg1.registrationAuthorities.add(self.ra)
         self.wg1.save()
 

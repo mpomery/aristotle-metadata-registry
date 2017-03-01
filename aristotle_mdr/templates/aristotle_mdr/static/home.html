@@ -5,6 +5,11 @@
 {% block header %}
    {% include 'aristotle_mdr/header.html' with hide_search=True %}
 {% endblock %}
+
+{% block extra_head_scripts %}
+{% include 'meta/schemaorg/home.html' %}
+{% endblock %}
+
 {% block content %}
 
 <div class="jumbotron">

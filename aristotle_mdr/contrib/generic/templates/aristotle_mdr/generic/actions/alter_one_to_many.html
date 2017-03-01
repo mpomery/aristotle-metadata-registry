@@ -46,6 +46,7 @@
     {% endwith %}
     <tbody id="draggableTable">
     {% for form in formset.forms %}
+    {% if not forloop.last %}
     <p>{{form.errors}}</p>
       <tr class="moveablerow">
           <td title="Drag to reorder"><i class="fa fa-bars grabber"></i>
@@ -67,6 +68,7 @@
             </td>
           {% endfor %}
       </tr>
+    {% endif %}
     {% endfor %}
     </tbody>
     </table>

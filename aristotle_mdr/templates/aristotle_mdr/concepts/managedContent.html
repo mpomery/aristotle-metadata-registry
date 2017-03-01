@@ -65,7 +65,12 @@
         {% endif %}
     </div>
     {% endif %}
-    {% include "aristotle_mdr/slots/slots_display.html" %}
+    {% if 'aristotle_mdr.contrib.slots'|is_installed_app %}
+        {% include "aristotle_mdr/slots/slots_display.html" %}
+    {% endif %}
+    {% if 'aristotle_mdr.contrib.links'|is_installed_app %}
+        {% include "aristotle_mdr/links/links_display.html" %}
+    {% endif %}
     <h2>Related content</h2>
         {% block relationships %}{% endblock %}
         {% for extension in config.CONTENT_EXTENSIONS %}

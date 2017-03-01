@@ -68,7 +68,10 @@ elif os.environ.get('SEARCH') == 'elastic':
 elif os.environ.get('TOXDIR'):
     print("Running  %s test-suite with whoosh" % ci_runner)
     from aristotle_mdr.tests.settings.tox import HAYSTACK_CONNECTIONS
-
+else:
+    print("Running %s test-suite with whoosh" % ci_runner)
+    print("Aristotle specific variant")
+    from aristotle_mdr.tests.settings.templates.search.whoosh import HAYSTACK_CONNECTIONS
 
 if skip_migrations:  # pragma: no cover
     print("Skipping migrations")
@@ -86,6 +89,7 @@ if skip_migrations:  # pragma: no cover
 INSTALLED_APPS = (
     # The good stuff
     'aristotle_mdr.contrib.self_publish',
+    'aristotle_mdr.contrib.links',
     'templatetags',
     'extension_test',
     'text_download_test',
@@ -99,7 +103,7 @@ PASSWORD_HASHERS = (
 )
 
 ARISTOTLE_SETTINGS['SEPARATORS']['DataElementConcept'] = '--'
-ARISTOTLE_SETTINGS['CONTENT_EXTENSIONS'] = ARISTOTLE_SETTINGS['CONTENT_EXTENSIONS'] + ['extension_test']
+ARISTOTLE_SETTINGS['CONTENT_EXTENSIONS'] = ARISTOTLE_SETTINGS['CONTENT_EXTENSIONS'] + ['extension_test', 'aristotle_mdr_links']
 ARISTOTLE_DOWNLOADS = ARISTOTLE_DOWNLOADS + [
     ('txt', 'Text', 'fa-file-pdf-o', 'text_download_test'),
 ]
