@@ -32,7 +32,7 @@ For example::
 
    ./manage.py load_aristotle_help
 
-Will load all help files in the ``fixtures/aristotle_help/`` subdirectory of *all apps in ``INSTALLED_APPS``*.
+Will load all help files in the ``./aristotle_help_files/`` subdirectory of *all apps in ``INSTALLED_APPS``*.
 
 Accessing help in extension and download templates
 --------------------------------------------------

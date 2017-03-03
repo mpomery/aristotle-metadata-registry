@@ -5,13 +5,11 @@ Aristotle MDR 11179 Identification models
 These are based on the Identification metadamodel region in ISO/IEC 11179 Part 3 - 7.2.1
 """
 
-from django.apps import apps
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible  # Python 2
 from django.utils.translation import ugettext_lazy as _
 
 from model_utils.models import TimeStampedModel
-
 from aristotle_mdr import models as MDR
 
 
@@ -21,6 +19,9 @@ class Namespace(TimeStampedModel):
         max_length=512,
         help_text=_('prefix conventionally used as shorthand for a namespace, for greater readability, in text for human consumption.')
     )
+
+    def __str__(self):
+        return u"{0}:{1}".format(self.naming_authority.name, self.shorthand_prefix)
 
 
 @python_2_unicode_compatible  # Python 2
@@ -43,3 +44,7 @@ class ScopedIdentifier(TimeStampedModel):
 
     def __str__(self):
         return u"{0}:{1}:{2}".format(self.namespace.naming_authority.name, self.identifier, self.version)
+
+    @property
+    def prefix(self):
+        return self.namespace.shorthand_prefix

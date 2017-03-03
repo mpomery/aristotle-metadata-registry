@@ -9,5 +9,6 @@ py:obj OneToOneField
 py:obj RichTextUploadingField
 py:obj TextField
 py:obj URLField
+py:obj UUIDField
 py:obj boolean
 py:obj list

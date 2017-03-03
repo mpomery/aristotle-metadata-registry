@@ -224,7 +224,6 @@ class AdminPageForConcept(utils.LoggedInViewPages):
 
     def test_editor_deleting_allowed_item(self):
         self.login_editor()
-        # make some items
 
         before_count = self.wg1.items.count()
         self.assertEqual(self.wg1.items.count(),1)

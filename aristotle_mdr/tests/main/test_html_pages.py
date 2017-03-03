@@ -211,13 +211,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
 
         self.assertEqual(self.item1.slots.count(),0)
 
-        from aristotle_mdr.contrib.slots.models import SlotDefinition, Slot
-        slot_def = SlotDefinition.objects.create(
-            app_label=self.itemType._meta.app_label,
-            concept_type=self.itemType._meta.model_name,
-            slot_name="extra",
-            cardinality=SlotDefinition.CARDINALITY.singleton
-        )
+        from aristotle_mdr.contrib.slots.models import Slot
 
         updated_item = utils.model_to_dict_with_change_time(response.context['item'])
         updated_name = updated_item['name'] + " updated!"
@@ -230,7 +224,8 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         updated_item['slots-MAX_NUM_FORMS'] = 1
 
         updated_item['slots-0-concept'] = self.item1.pk
-        updated_item['slots-0-type'] = slot_def.pk
+        updated_item['slots-0-name'] = 'extra'
+        updated_item['slots-0-type'] = None
         updated_item['slots-0-value'] = 'test slot value'
 
         response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
@@ -242,89 +237,6 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(reverse('aristotle:edit_item',args=[self.item1.id]))
         self.assertContains(response, 'test slot value')
 
-
-    def test_submitter_cannot_save_via_edit_page_with_slots_that_are_duplicates(self):
-        self.login_editor()
-        response = self.client.get(reverse('aristotle:edit_item',args=[self.item1.id]))
-        self.assertEqual(response.status_code,200)
-
-        self.assertEqual(self.item1.slots.count(),0)
-
-        from aristotle_mdr.contrib.slots.models import SlotDefinition, Slot
-        slot_def = SlotDefinition.objects.create(
-            app_label=self.itemType._meta.app_label,
-            concept_type=self.itemType._meta.model_name,
-            slot_name="extra",
-            cardinality=SlotDefinition.CARDINALITY.singleton
-        )
-
-        updated_item = utils.model_to_dict_with_change_time(response.context['item'])
-        updated_name = updated_item['name'] + " updated!"
-        updated_item['name'] = updated_name
-
-        # Add slots management form
-        updated_item['slots-TOTAL_FORMS'] = 2
-        updated_item['slots-INITIAL_FORMS'] = 0
-        updated_item['slots-MIN_NUM_FORMS'] = 0
-        updated_item['slots-MAX_NUM_FORMS'] = 2
-
-        updated_item['slots-0-concept'] = self.item1.pk
-        updated_item['slots-0-type'] = slot_def.pk
-        updated_item['slots-0-value'] = 'test slot value'
-        updated_item['slots-1-concept'] = self.item1.pk
-        updated_item['slots-1-type'] = slot_def.pk
-        updated_item['slots-1-value'] = 'test slot value2'
-
-        response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
-        self.item1 = self.itemType.objects.get(pk=self.item1.pk)
-
-        self.assertEqual(response.status_code,200)
-        self.assertEqual(self.item1.slots.count(),0)
-
-        self.assertContains(response, "The selected slot type &#39;%(slot_name)s&#39; is only allowed to be included once" % {'slot_name': slot_def.slot_name})
-
-    def test_submitter_cannot_save_via_edit_page_with_slots_that_are_for_a_different_metadata_type(self):
-        self.login_editor()
-
-        from aristotle_mdr.contrib.slots.models import SlotDefinition, Slot
-        if self.itemType._meta.model_name == "property":
-            other_type = "objectclass"
-        else:
-            other_type = "property"
-        slot_def = SlotDefinition.objects.create(
-            app_label=self.itemType._meta.app_label,
-            concept_type=other_type,
-            slot_name="extra slot not available",
-            cardinality=SlotDefinition.CARDINALITY.singleton
-        )
-
-        response = self.client.get(reverse('aristotle:edit_item',args=[self.item1.id]))
-        self.assertEqual(response.status_code,200)
-
-        self.assertEqual(self.item1.slots.count(),0)
-        self.assertNotContains(response, slot_def.slot_name)
-
-        updated_item = utils.model_to_dict_with_change_time(response.context['item'])
-        updated_name = updated_item['name'] + " updated!"
-        updated_item['name'] = updated_name
-
-        # Add slots management form
-        updated_item['slots-TOTAL_FORMS'] = 1
-        updated_item['slots-INITIAL_FORMS'] = 0
-        updated_item['slots-MIN_NUM_FORMS'] = 0
-        updated_item['slots-MAX_NUM_FORMS'] = 1
-
-        updated_item['slots-0-concept'] = self.item1.pk
-        updated_item['slots-0-type'] = slot_def.pk
-        updated_item['slots-0-value'] = 'test slot value'
-
-        response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
-        self.item1 = self.itemType.objects.get(pk=self.item1.pk)
-
-        self.assertEqual(response.status_code,200)
-        self.assertEqual(self.item1.slots.count(),0)
-
-        self.assertContains(response, "Select a valid choice. That choice is not one of the available choices")
 
     def test_submitter_cannot_save_via_edit_page_if_other_saves_made(self):
         from datetime import timedelta
@@ -596,7 +508,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
 
     def test_editor_can_remove_supersede_relation(self):
         self.login_editor()
-        self.item2 = self.itemType.objects.create(name="supersede this",workgroup=self.wg1)
+        self.item2 = self.itemType.objects.create(name="supersede this",workgroup=self.wg1, **self.defaults)
         self.item1.superseded_by = self.item2
         self.item1.save()
 
@@ -1047,16 +959,16 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(check_url)
         self.assertEqual(response.status_code,404)
 
-class ObjectClassViewPage(LoggedInViewConceptPages,TestCase):
+class ObjectClassViewPage(LoggedInViewConceptPages, TestCase):
     url_name='objectClass'
     itemType=models.ObjectClass
-class PropertyViewPage(LoggedInViewConceptPages,TestCase):
+class PropertyViewPage(LoggedInViewConceptPages, TestCase):
     url_name='property'
     itemType=models.Property
-class UnitOfMeasureViewPage(LoggedInViewConceptPages,TestCase):
+class UnitOfMeasureViewPage(LoggedInViewConceptPages, TestCase):
     url_name='unitOfMeasure'
     itemType=models.UnitOfMeasure
-class ValueDomainViewPage(LoggedInViewConceptPages,TestCase):
+class ValueDomainViewPage(LoggedInViewConceptPages, TestCase):
     url_name='valueDomain'
     itemType=models.ValueDomain
     def setUp(self):
@@ -1206,10 +1118,10 @@ class ValueDomainViewPage(LoggedInViewConceptPages,TestCase):
         for sv in self.item1.supplementaryvalue_set.all():
             self.assertContains(response,sv.meaning,1)
 
-class ConceptualDomainViewPage(LoggedInViewConceptPages,TestCase):
+class ConceptualDomainViewPage(LoggedInViewConceptPages, TestCase):
     url_name='conceptualDomain'
     itemType=models.ConceptualDomain
-class DataElementConceptViewPage(LoggedInViewConceptPages,TestCase):
+class DataElementConceptViewPage(LoggedInViewConceptPages, TestCase):
     url_name='dataElementConcept'
     itemType=models.DataElementConcept
     run_cascade_tests = True
@@ -1344,7 +1256,7 @@ class DataElementConceptViewPage(LoggedInViewConceptPages,TestCase):
         self.assertContains(response, 'fa-times') # The property has a different status
 
 
-class DataElementViewPage(LoggedInViewConceptPages,TestCase):
+class DataElementViewPage(LoggedInViewConceptPages, TestCase):
     url_name='dataElement'
     itemType=models.DataElement
 
@@ -1364,7 +1276,7 @@ class DataElementViewPage(LoggedInViewConceptPages,TestCase):
         response = self.client.get(check_url)
         self.assertEqual(response.status_code,200)
 
-class DataElementDerivationViewPage(LoggedInViewConceptPages,TestCase):
+class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
     url_name='dataelementderivation'
     itemType=models.DataElementDerivation
 
@@ -1452,7 +1364,7 @@ class LoggedInViewUnmanagedPages(utils.LoggedInViewPages):
         response = self.client.get(self.get_page(self.item1))
         self.assertEqual(response.status_code,200)
 
-class MeasureViewPage(LoggedInViewUnmanagedPages,TestCase):
+class MeasureViewPage(LoggedInViewUnmanagedPages, TestCase):
     url_name='measure'
     itemType=models.Measure
 
@@ -1461,7 +1373,7 @@ class MeasureViewPage(LoggedInViewUnmanagedPages,TestCase):
 
         self.item2 = models.UnitOfMeasure.objects.create(name="OC1",workgroup=self.wg1,measure=self.item1,**self.defaults)
 
-class RegistrationAuthorityViewPage(LoggedInViewUnmanagedPages,TestCase):
+class RegistrationAuthorityViewPage(LoggedInViewUnmanagedPages, TestCase):
     url_name='registrationAuthority'
     itemType=models.RegistrationAuthority
 
@@ -1485,7 +1397,7 @@ class RegistrationAuthorityViewPage(LoggedInViewUnmanagedPages,TestCase):
         response = self.client.get(reverse('aristotle:all_registration_authorities'))
         self.assertEqual(response.status_code,200)
 
-class OrganizationViewPage(LoggedInViewUnmanagedPages,TestCase):
+class OrganizationViewPage(LoggedInViewUnmanagedPages, TestCase):
     url_name='organization'
     itemType=models.Organization
 

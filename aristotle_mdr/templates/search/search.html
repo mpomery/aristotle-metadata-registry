@@ -252,6 +252,8 @@
     {% if query or form.filter_search %}
         {% if page.object_list %}
         <div class="col-md-3 facets">
+                <form method="get" class="row"> {# open main_search_form #}
+                <input type="hidden" name="q" value="{{form.q.value}}">
             <header>Refine your results</header>
             <dl class="panel-body">
                 {% if form.facets.fields.facet_model_ct %}
@@ -315,34 +317,44 @@
 
                 {% for field,details in form.extra_facet_fields %}
                     {% if details.values|length > 1 %}
-                    <dt>{{details.details.title}}</dt>
-                    {% if details.details.applied %}
-                    <dd>
-                    Active facets
-                    <ul class='active-facets'>
-                        {% for af in details.details.applied %}
-                        <li>
-                            <a href='?{% unfacet request field af|urlencode %}'>
-                                <span class='badge'><i class="fa fa-times"></i></span>
-                                {% facet_display details.details af %}
-                            </a>
-                        </li>
+                        <dt>{{details.details.title}}</dt>
+                        <dd>
+                            {% if details.details.allow_search %}
+                            <label>
+                            <input name="f___{{field}}">
+                            </label>
+                            {% endif %}
+    
+                        </dd>
+                        {% if details.details.applied %}
+                        <dd>
+                        Active facets
+                        <ul class='active-facets'>
+                            {% for af in details.details.applied %}
+                            <li>
+                                <a href='?{% unfacet request field af|urlencode %}'>
+                                    {% facet_display details.details af %}
+                                    <span class='badge pull-right'><i class="fa fa-times"></i></span>
+                                    
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        </dd>
+                        {% endif %}
+                        {% for f,count in details.values %}
+                        {% if f %}
+                        <dd>
+                            <a href="{{ request.get_full_path }}&amp;f={{field}}::{{ f|urlencode }}">
+                                {% facet_display details.details f %}</a>
+                            <span>({{ count }})</span>
+                        </dd>
+                        {% endif %}
                         {% endfor %}
-                    </ul>
-                    </dd>
-                    {% endif %}
-                    {% for f,count in details.values %}
-                    {% if f %}
-                    <dd>
-                        <a href="{{ request.get_full_path }}&amp;f={{field}}::{{ f|urlencode }}">
-                            {% facet_display details.details f %}</a>
-                        ({{ count }})
-                    </dd>
-                    {% endif %}
-                    {% endfor %}
                     {% endif %}
                 {% endfor %}
             </dl>
+            </form>
         </div>
         <div class="col-md-9">
 

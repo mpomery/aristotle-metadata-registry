@@ -1,4 +1,5 @@
-from django.db.models.signals import post_save, post_delete, pre_delete, m2m_changed
+from django.dispatch import receiver
+from django.db.models.signals import m2m_changed, post_save, post_delete, pre_delete, pre_save
 # from reversion.signals import post_revision_commit
 import haystack.signals as signals  # .RealtimeSignalProcessor as RealtimeSignalProcessor
 # Don't import aristotle_mdr.models directly, only pull in whats required,
@@ -7,6 +8,11 @@ import haystack.signals as signals  # .RealtimeSignalProcessor as RealtimeSignal
 # class AristotleSignalProcessor(signals.BaseSignalProcessor):
 # Replace below with this when doing a dataload (shuts off Haystack)
 #    pass
+
+
+# @receiver(pre_save)
+def pre_save_clean(sender, instance, *args, **kwargs):
+    instance.full_clean()
 
 
 class AristotleSignalProcessor(signals.BaseSignalProcessor):

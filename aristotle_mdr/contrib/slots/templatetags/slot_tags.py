@@ -16,5 +16,5 @@ def count_similar(user, slot):
 
 
 @register.filter
-def slots_by_type(concept, _type):
-    return concept.slots.filter(type=_type)
+def slots_by_type(concept, name):
+    return concept.slots.filter(name=name)
