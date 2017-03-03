@@ -56,6 +56,21 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
             models.ObjectClass.objects.create(name=t,workgroup=self.avengers_wg)
             for t in avengers.split()]
 
+    def test_search_factory_fails_with_bad_queryset(self):
+        from haystack.query import SearchQuerySet
+        from haystack.views import search_view_factory
+        from django.core.exceptions import ImproperlyConfigured
+        from aristotle_mdr.views.views import PermissionSearchView
+        from aristotle_mdr.forms.search import PermissionSearchForm
+        
+        with self.assertRaises(ImproperlyConfigured):
+            search_view_factory(
+                view_class=PermissionSearchView,
+                template='search/search.html',
+                searchqueryset=SearchQuerySet(),
+                form_class=PermissionSearchForm
+            )
+
     def test_empty_search_loads(self):
         self.logout()
         response = self.client.get(reverse('aristotle:search'))
@@ -571,4 +586,3 @@ class TestSearchDescriptions(TestCase):
         self.assertTrue('Item type is Object Classes' in description)
         self.assertTrue('and' in description)
         self.assertTrue('Item visibility state is Public' in description)
-
