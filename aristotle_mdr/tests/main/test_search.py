@@ -64,12 +64,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         from aristotle_mdr.forms.search import PermissionSearchForm
         
         with self.assertRaises(ImproperlyConfigured):
-            search_view_factory(
-                view_class=PermissionSearchView,
-                template='search/search.html',
-                searchqueryset=SearchQuerySet(),
-                form_class=PermissionSearchForm
-            )
+            response = self.client.get(reverse('fail_search')+"?q=wolverine")
 
     def test_empty_search_loads(self):
         self.logout()
