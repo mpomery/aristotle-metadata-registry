@@ -15,7 +15,9 @@ and future releases of Aristotle-MDR may break code that uses these methods.
 from __future__ import absolute_import
 # import autocomplete_light
 
+from django.conf import settings
 from django.contrib import admin
+from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_lazy as _
 
 # from aristotle_mdr import autocomplete_light_registry as reg
@@ -86,7 +88,13 @@ def register_concept_search_index(concept_class, *args, **kwargs):
 
 
 def create(cls):
-    class SubclassedConceptIndex(conceptIndex, indexes.Indexable):
+
+    if hasattr(settings, 'HAYSTACK_BASE_INDEX_CLASS'):
+        base_index_class = import_string(settings.HAYSTACK_BASE_INDEX_CLASS)
+    else:
+        base_index_class = conceptIndex
+
+    class SubclassedConceptIndex(base_index_class, indexes.Indexable):
         def get_model(self):
             return cls
     return SubclassedConceptIndex

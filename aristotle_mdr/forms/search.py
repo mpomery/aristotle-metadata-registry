@@ -1,5 +1,6 @@
 import datetime
 from django import forms
+from django.core.exceptions import ImproperlyConfigured
 from django.apps import apps
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -326,9 +327,13 @@ class PermissionSearchForm(TokenSearchForm):
         widget=BootstrapDropdownSelectMultiple
     )
     # F for facet!
+    # searchqueryset = PermissionSearchQuerySet
 
     def __init__(self, *args, **kwargs):
-        kwargs['searchqueryset'] = PermissionSearchQuerySet()
+        if 'searchqueryset' not in kwargs.keys() or kwargs['searchqueryset'] is None:
+            kwargs['searchqueryset'] = PermissionSearchQuerySet()
+        if not issubclass(type(kwargs['searchqueryset']), PermissionSearchQuerySet):
+            raise ImproperlyConfigured("Aristotle Search Queryset connection must be a subclass of PermissionSearchQuerySet")
         super(PermissionSearchForm, self).__init__(*args, **kwargs)
 
         from haystack.forms import SearchForm, FacetedSearchForm, model_choices
@@ -513,7 +518,7 @@ class PermissionSearchForm(TokenSearchForm):
                         # Haystack can *over correct* so we'll do a quick search with the
                         # suggested spelling to compare words against
                         try:
-                            PermissionSearchQuerySet().auto_query(test_query)[0]
+                            self.searchqueryset.auto_query(test_query)[0]
                             suggested_query.append(suggestion)
                             has_suggestions = True
                             optimal_query = test_query
