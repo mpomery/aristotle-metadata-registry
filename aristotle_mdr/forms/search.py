@@ -16,6 +16,7 @@ from bootstrap3_datetime.widgets import DateTimePicker
 
 import aristotle_mdr.models as MDR
 from aristotle_mdr.widgets import BootstrapDropdownSelectMultiple, BootstrapDropdownIntelligentDate, BootstrapDropdownSelect
+from aristotle_mdr.utils import fetch_aristotle_settings
 
 
 QUICK_DATES = Choices(
@@ -187,7 +188,7 @@ class TokenSearchForm(FacetedSearchForm):
                 elif opt == "type":
                     # we'll allow these through and assume they meant content type
                     from django.conf import settings
-                    aristotle_apps = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS', [])
+                    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
                     aristotle_apps += ["aristotle_mdr"]
 
                     from django.contrib.contenttypes.models import ContentType

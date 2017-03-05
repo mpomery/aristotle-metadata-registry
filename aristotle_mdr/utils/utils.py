@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
 from django.forms import model_to_dict
 from django.template.defaultfilters import slugify
-from django.utils.text import get_text_list
 from django.utils.encoding import force_text
+from django.utils.module_loading import import_string
+from django.utils.text import get_text_list
 from django.utils.translation import ugettext as _
 
 
@@ -188,3 +190,9 @@ def cache_per_item_user(ttl=None, prefix=None, cache_post=False):
             return response
         return apply_cache
     return decorator
+
+
+def fetch_aristotle_settings():
+    if hasattr(settings, 'ARISTOTLE_SETTINGS_LOADER'):
+        return import_string(getattr(settings, 'ARISTOTLE_SETTINGS_LOADER'))()
+    return getattr(settings, 'ARISTOTLE_SETTINGS', {})

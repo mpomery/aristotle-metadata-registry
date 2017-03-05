@@ -19,6 +19,7 @@ from aristotle_mdr.utils import cache_per_item_user, concept_to_dict, construct_
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import exceptions as registry_exceptions
 from aristotle_mdr import models as MDR
+from aristotle_mdr.utils import fetch_aristotle_settings
 
 
 class BulkAction(FormView):
@@ -115,7 +116,7 @@ class BulkAction(FormView):
 
 def get_bulk_actions():
     import re
-    config = getattr(settings, 'ARISTOTLE_SETTINGS', {})
+    config = fetch_aristotle_settings()
     if not hasattr(get_bulk_actions, 'actions') or not get_bulk_actions.actions:
         actions = {}
         for action_name, form in config.get('BULK_ACTIONS', {}).items():

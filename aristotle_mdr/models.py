@@ -35,6 +35,7 @@ from aristotle_mdr.utils import (
     url_slugify_organization
 )
 from aristotle_mdr import comparators
+from aristotle_mdr.utils import fetch_aristotle_settings
 
 from model_utils.fields import AutoLastModifiedField
 
@@ -555,7 +556,7 @@ class ConceptQuerySet(InheritanceQuerySet):
                 q |= Q(
                     Q(statuses__registrationAuthority__registrars__profile__user=user)
                 )
-        extra_q = settings.ARISTOTLE_SETTINGS.get('EXTRA_CONCEPT_QUERYSETS', {}).get('visible', None)
+        extra_q = fetch_aristotle_settings().get('EXTRA_CONCEPT_QUERYSETS', {}).get('visible', None)
         if extra_q:
             for func in extra_q:
                 q |= import_string(func)(user)
@@ -776,7 +777,7 @@ class _concept(baseAristotleObject):
 
         q = Q()
         extra = False
-        extra_q = settings.ARISTOTLE_SETTINGS.get('EXTRA_CONCEPT_QUERYSETS', {}).get('public', None)
+        extra_q = fetch_aristotle_settings().get('EXTRA_CONCEPT_QUERYSETS', {}).get('public', None)
         if extra_q:
             for func in extra_q:
                 q |= import_string(func)()

@@ -5,6 +5,7 @@ from django.test.utils import setup_test_environment
 
 from django.core.management import call_command
 from aristotle_mdr.contrib.help import models
+from aristotle_mdr.utils import fetch_aristotle_settings
 
 setup_test_environment()
 
@@ -64,7 +65,7 @@ class TestHelpPagesLoad(TestCase):
         response = self.client.get(reverse('aristotle_help:help_concepts'))
         self.assertEqual(response.status_code, 200)
 
-        for app_label in getattr(settings, 'ARISTOTLE_SETTINGS')['CONTENT_EXTENSIONS']:
+        for app_label in fetch_aristotle_settings()['CONTENT_EXTENSIONS']:
             response = self.client.get(reverse('aristotle_help:concept_app_help', args=[app_label]))
             self.assertEqual(response.status_code, 200)
 

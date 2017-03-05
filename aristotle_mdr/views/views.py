@@ -25,7 +25,7 @@ from aristotle_mdr import perms
 from aristotle_mdr.utils import cache_per_item_user, url_slugify_concept
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
-from aristotle_mdr.utils import get_concepts_for_apps
+from aristotle_mdr.utils import get_concepts_for_apps, fetch_aristotle_settings
 from aristotle_mdr.views.utils import generate_visibility_matrix
 
 from haystack.views import FacetedSearchView
@@ -164,7 +164,7 @@ def create_list(request):
     if not perms.user_is_editor(request.user):
         raise PermissionDenied
 
-    aristotle_apps = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS', [])
+    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
     aristotle_apps += ["aristotle_mdr"]
     out = {}
 
@@ -337,7 +337,7 @@ def deprecate(request, iid):
 
 def extensions(request):
     content=[]
-    aristotle_apps = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS', [])
+    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
 
     if aristotle_apps:
         for app_label in aristotle_apps:
