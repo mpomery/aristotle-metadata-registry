@@ -1,13 +1,13 @@
 {% extends "aristotle_mdr/user/userHome.html" %}
 
-{% load staticfiles %}
+{% load static from staticfiles %}
 {% load compile_static %}
 
 {% block title %}All Discussions{% endblock %}
 
 {% block extra_head_scripts %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.dashboard.less' %}" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle_discussions.less' %}" />
+    <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.dashboard.less'|compile %}" />
+    <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle_discussions.less'|compile %}" />
 {% endblock %}
 
 {% block sidebar %}

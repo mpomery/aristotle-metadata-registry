@@ -1,9 +1,10 @@
 {% extends 'aristotle_mdr/base.html' %}
 {% load compile_static i18n util_tags %}
+{% load static from staticfiles %}
 
 {% block title %}Edit link - {% endblock %}
 {% block extra_head_scripts %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.wizard.less' %}" />
+    <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.wizard.less'|compile %}" />
 {% endblock %}
 
 {% block content %}

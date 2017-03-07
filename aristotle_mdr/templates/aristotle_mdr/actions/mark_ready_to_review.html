@@ -1,10 +1,11 @@
 {% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
 {% load compile_static i18n %}
+{% load static from staticfiles %}
 
 {% block title %}Editing {{ item.name }}{% endblock %}
 {% block content %}
 {% block extra_head_scripts %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.wizard.less' %}" />
+    <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.wizard.less'|compile %}" />
     {{ form.media }}
 {% endblock %}
 

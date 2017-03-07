@@ -2,14 +2,14 @@
 {% load i18n %}
 {% load humanize %}
 {% load bootstrap3 %}
-{% load staticfiles %}
+{% load static from staticfiles %}
 {% load aristotle_tags aristotle_search_tags %}
 {% load compile_static %}
 
 {% block extra_head_scripts %}
     <script src="{% static 'aristotle_mdr/aristotle.search.js' %}" type="text/javascript"></script>
     <!--[if !IE]> -->
-    <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle_search.less' %}" />
+    <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle_search.less'|compile %}" />
     <![endif]-->
     <!--[if lt IE 9]>
     <![endif]-->
