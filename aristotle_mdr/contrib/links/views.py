@@ -130,11 +130,11 @@ class AddLinkWizard(SessionWizardView):
         return kwargs
 
     def get_role_concepts(self):
-        role_concepts = []            
+        role_concepts = []
         for role, concepts in zip(self.get_roles(), self.get_cleaned_data_for_step('1').values()):
             if role.multiplicity == 1:
                 concepts = [concepts]
-            role_concepts.append((role,concepts))
+            role_concepts.append((role, concepts))
         print(role_concepts)
         return role_concepts
 
