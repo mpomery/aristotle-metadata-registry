@@ -12,7 +12,7 @@
     <div>
         {% blocktrans %}
         You are about to add concepts to the roles for relation
-            <a href=''>{{ relation.name }}</a> for this link.
+            <a href='{{ relation.get_absolute_url }}'>{{ relation.name }}</a> for this link.
         {% endblocktrans %}
         <div class='well'>
         {{ relation.definition|safe }}
