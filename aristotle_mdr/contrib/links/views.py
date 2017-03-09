@@ -129,10 +129,25 @@ class AddLinkWizard(SessionWizardView):
 
         return kwargs
 
+    def get_role_concepts(self):
+        role_concepts = []            
+        for role, concepts in zip(self.get_roles(), self.get_cleaned_data_for_step('1').values()):
+            if role.multiplicity == 1:
+                concepts = [concepts]
+            role_concepts.append((role,concepts))
+        print(role_concepts)
+        return role_concepts
+
     def get_context_data(self, *args, **kwargs):
         context = super(AddLinkWizard, self).get_context_data(*args, **kwargs)
         if int(self.steps.current) == 1:
             context.update({'roles': self.get_roles()})
+        if int(self.steps.current) == 2:
+
+            context.update({
+                'relation': self.get_cleaned_data_for_step('0')['relation'],
+                'role_concepts': self.get_role_concepts()
+            })
         return context
 
     @transaction.atomic
@@ -141,9 +156,9 @@ class AddLinkWizard(SessionWizardView):
         role_concepts = self.get_cleaned_data_for_step('1')
 
         link = link_models.Link.objects.create(relation=self.relation)
-        for role, concepts in zip(self.get_roles(), role_concepts.values()):
-            if role.multiplicity == 1:
-                concepts = [concepts]
+        for role, concepts in self.get_role_concepts():
+            # if role.multiplicity == 1:
+            #     concepts = [concepts]
             for concept in concepts:
                 link_models.LinkEnd.objects.create(link=link, role=role, concept=concept)
 
