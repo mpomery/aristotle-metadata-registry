@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('aristotle_mdr', '0017_add_organisations'),
+        (b'aristotle_mdr', '0017_add_organisations'),
     ]
 
     operations = [
