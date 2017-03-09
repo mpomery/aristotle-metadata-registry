@@ -29,10 +29,10 @@
                     <td>{{role.name}}</td>
                     <td>
                         <ul>
-                        {% for c in concepts %}
+                        {% for concept in concepts %}
                         <li>
-                            <a href="{{c.get_absolute_url}}">
-                            {{c.name}}
+                            <a href="{{concept.get_absolute_url}}">
+                            {{concept.name}}
                             </a>
                         </li>
                         {% endfor %}
