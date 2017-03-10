@@ -210,6 +210,10 @@ class MultiStepAristotleWizard(PermissionWizard):
     This should not be extended for creating other type of Aristotle/11179 concepts - make a fresh wizard.
     """
 
+    @property
+    def display(self):
+        return self.__doc__
+
     def get_object_class(self):
         if hasattr(self, '_object_class'):
             return self._object_class
@@ -330,6 +334,12 @@ class MultiStepAristotleWizard(PermissionWizard):
 
 
 class DataElementConceptWizard(MultiStepAristotleWizard):
+    __doc__ = _(
+        "This wizard steps a user through creating a Data Element Concept, "
+        "as well as helping reuse or create the Object Class and Property to "
+        "accurately describe the new Data Element Concept."
+    )
+
     model = MDR.DataElementConcept
     templates = {
         "component_search": "aristotle_mdr/create/dec_1_initial_search.html",
@@ -505,6 +515,12 @@ def has_valid_data_elements_from_components(wizard):
 
 
 class DataElementWizard(MultiStepAristotleWizard):
+    __doc__ = _(
+        "This wizard steps a user through creating a Data Element, "
+        "as well as helping reuse or create the Value Domain and Data Element Concept - "
+        "as well as the Object Class and Property that complete describe the new Data Element."
+    )
+
     model = MDR.DataElement
     templates = {
         "component_search": "aristotle_mdr/create/de_1_initial_search.html",

@@ -6,19 +6,24 @@
     <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.wizard.less'|compile %}" />
 {% endblock %}
 
+{% block title %}{% endblock %}
+
 {% block content %}
     <form method="post" action="">{% csrf_token %}
     <div class="modal-body">
-        <h1>{% block title %}{% endblock %}</h1>
         {{wizard.management_form}}
             {% if form.errors %}
                 {{form.errors}}
             {% endif %}
+        <ol class="breadcrumb">
+          <li class="active">Add new link</a></li>
+        </ol>
+        <h1>{% block form_title %}{% endblock %}</h1>
         {% block wizard_content %}
         {% endblock %}
         <div class="modal-footer">
             <a class="btn btn-default" href="">Cancel</a>
-            <input type="submit" class="btn btn-primary" value="Next" />
+            <input type="submit" class="btn btn-primary" value="{% block form_save_text %}Next{% endblock %}" />
         </div>
     </div>
     </form>
