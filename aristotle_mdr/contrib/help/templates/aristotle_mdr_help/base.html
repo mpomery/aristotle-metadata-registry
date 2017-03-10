@@ -1,8 +1,9 @@
 {% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
 {% load i18n static compile_static %}
+{% load static from staticfiles %}
 
 {% block extra_head_scripts %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.help.less' %}" />
+    <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.help.less'|compile %}" />
 {% endblock %}
 
 {% block content %}

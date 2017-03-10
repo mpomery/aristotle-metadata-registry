@@ -17,6 +17,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from aristotle_mdr.contrib.help.models import ConceptHelp
+from aristotle_mdr.utils import fetch_aristotle_settings
 
 from formtools.wizard.views import SessionWizardView
 from reversion import revisions as reversion
@@ -314,7 +315,7 @@ class MultiStepAristotleWizard(PermissionWizard):
                 # remove the tailing period as we are going to try to make a sentence
                 pr_desc = pr_desc[:-1]
 
-            SEPARATORS = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('SEPARATORS', {})
+            SEPARATORS = fetch_aristotle_settings().get('SEPARATORS', {})
             initial.update({
                 'name': u"{oc}{separator}{pr}".format(
                     oc=oc_name,
@@ -776,7 +777,7 @@ class DataElementWizard(MultiStepAristotleWizard):
                 # remove the trailing period as we are going to try to make a sentence
                 dec_desc = dec_desc[:-1]
 
-            SEPARATORS = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('SEPARATORS', {})
+            SEPARATORS = fetch_aristotle_settings().get('SEPARATORS', {})
 
             initial.update({
                 'name': u"{dec}{separator}{vd}".format(dec=dec_name, separator=SEPARATORS["DataElement"], vd=vd_name),

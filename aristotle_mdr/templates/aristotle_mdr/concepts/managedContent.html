@@ -1,13 +1,14 @@
 {% extends 'aristotle_mdr/base.html' %}
 {% load humanize i18n %}
-{% load static compile_static %}
+{% load compile_static %}
+{% load static from staticfiles %}
 {% load aristotle_tags %}
 
 {% block extra_head_scripts %}
     {% if item|can_edit:request.user %}
         <link rel="stylesheet" type="text/css" href="{% static 'aristotle_mdr/aristotle.autocomplete.css' %}" />
     {% endif %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.visuals.less' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'aristotle_mdr/aristotle.visuals.less'|compile %}" />
 {% endblock %}
 
 {% block title %}

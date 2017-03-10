@@ -1,14 +1,14 @@
 {% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
 {% load compile_static i18n %}
+{% load static from staticfiles %}
 
 {% block title %}Editing {{ item.name }}{% endblock %}
 {% block extra_head_scripts %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.wizard.less' %}" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle_search.less' %}" />
+    <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.wizard.less'|compile %}" />
+    <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle_search.less'|compile %}" />
     {% if request.is_ajax %}
         {{ form.media }}
     {% endif %}
-    {% include 'autocomplete_light/static.html' %}
 {% endblock %}
 
 {% block content %}

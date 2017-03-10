@@ -2,6 +2,7 @@ from django.contrib.auth.backends import ModelBackend
 from django.conf import settings
 
 from aristotle_mdr import perms
+from aristotle_mdr.utils import fetch_aristotle_settings
 
 
 class AristotleBackend(ModelBackend):
@@ -13,7 +14,7 @@ class AristotleBackend(ModelBackend):
         """
         if not user_obj.is_active:
             return False
-        extensions = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS', [])
+        extensions = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
         if app_label in extensions + ["aristotle_mdr"]:
             return perms.user_is_editor(user_obj)
         return super(AristotleBackend, self).has_module_perms(user_obj, app_label)
@@ -26,7 +27,7 @@ class AristotleBackend(ModelBackend):
             return True
 
         app_label, perm_name = perm.split('.', 1)
-        extensions = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS', [])
+        extensions = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
 
         if app_label == "aristotle_mdr" and hasattr(perms, perm_name):
             return getattr(perms, perm_name)(user_obj, obj)

@@ -18,6 +18,8 @@ from haystack import indexes
 import reversion
 
 from aristotle_mdr.register import register_concept
+from aristotle_mdr.utils import fetch_aristotle_settings
+
 reversion.revisions.register(MDR.Status)
 reversion.revisions.register(MDR._concept, follow=['statuses', 'workgroup', 'slots'])
 reversion.revisions.register(MDR.Workgroup)
@@ -134,7 +136,7 @@ class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
                 kwargs['request'] = request
                 kwargs['name_suggest_fields'] = self.name_suggest_fields
                 if self.name_suggest_fields:
-                    SEPARATORS = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('SEPARATORS', {})
+                    SEPARATORS = fetch_aristotle_settings().get('SEPARATORS', {})
                     kwargs['separator'] = SEPARATORS[self.model.__name__]
                 return conceptForm(*args, **kwargs)
 

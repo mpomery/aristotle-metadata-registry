@@ -1,9 +1,9 @@
 {% load compile_static i18n %}
+{% load static from staticfiles %}
 
 {% block content %}
     {% block extra_head_scripts %}
-        <script src="{{ STATIC_URL }}aristotle_mdr/jqueryui/jquery-ui.min.js"></script>
-        {# <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle_search.less' %}" /> #}
+        <script src="{% static 'aristotle_mdr/jqueryui/jquery-ui.min.js' %}"></script>
     {% endblock %}
 
 
@@ -67,5 +67,5 @@
         </tbody>
     </table>
 
-        <script src="{{ STATIC_URL }}aristotle_mdr/aristotle.moveable.js"></script>
+        <script src="{% static 'aristotle_mdr/aristotle.moveable.js' %}"></script>
 {% endblock %}

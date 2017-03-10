@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, TemplateView
-from aristotle_mdr.utils import get_concepts_for_apps
+from aristotle_mdr.utils import get_concepts_for_apps, fetch_aristotle_settings
 from collections import OrderedDict
 
 
@@ -17,7 +17,7 @@ class BrowseApps(TemplateView):
     def get_context_data(self, *args, **kwargs):
         context = super(BrowseApps, self).get_context_data(*args, **kwargs)
 
-        aristotle_apps = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS', [])
+        aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
         aristotle_apps += ["aristotle_mdr"]
         out = {}
 

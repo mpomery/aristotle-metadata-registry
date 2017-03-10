@@ -1,10 +1,12 @@
 {% extends 'aristotle_mdr/base.html' %}
 {% load aristotle_tags i18n %}
-{% load static compile_static %}
+{% load compile_static %}
+{% load static from staticfiles %}
+
 {% block title %}Version history of {{ object.item.name }}{% endblock %}
 
 {% block extra_head_scripts %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.compare.less' %}" />
+    <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.compare.less'|compile %}" />
 {% endblock %}
 
 {% block content %}{% with item=object.item %}
