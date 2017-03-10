@@ -98,7 +98,7 @@ class EditItemView(PermissionFormView):
                         if not has_change_comments:
                             change_comments += construct_change_message(request, form, [slot_formset])
                     else:
-                        return self.form_invalid(form, slot_formset)
+                        return self.form_invalid(form, slots_FormSet=slot_formset)
 
                 if self.identifiers_active:
                     id_formset = self.get_identifier_formset()(request.POST, request.FILES, item.concept)
@@ -110,7 +110,7 @@ class EditItemView(PermissionFormView):
                         if not has_change_comments:
                             change_comments += construct_change_message(request, form, [id_formset])
                     else:
-                        return self.form_invalid(form)
+                        return self.form_invalid(form, identifier_FormSet=id_formset)
 
                 reversion.revisions.set_user(request.user)
                 reversion.revisions.set_comment(change_comments)
@@ -134,7 +134,7 @@ class EditItemView(PermissionFormView):
             extra=1,
             )
 
-    def form_invalid(self, form, slots_FormSet=None):
+    def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None):
         """
         If the form is invalid, re-render the context data with the
         data-filled form and errors.
@@ -142,7 +142,7 @@ class EditItemView(PermissionFormView):
         return self.render_to_response(self.get_context_data(form=form, slots_FormSet=slots_FormSet))
 
     def get_context_data(self, *args, **kwargs):
-        from aristotle_mdr.contrib.slots.models import Slot, SlotDefinition
+        from aristotle_mdr.contrib.slots.models import Slot
         context = super(EditItemView, self).get_context_data(*args, **kwargs)
         if self.slots_active and kwargs.get('slots_FormSet', None):
             context['slots_FormSet'] = kwargs['slots_FormSet']
@@ -162,7 +162,6 @@ class EditItemView(PermissionFormView):
 
         context['show_slots_tab'] = self.slots_active
         context['show_id_tab'] = self.identifiers_active
-        context['concept_slots'] = SlotDefinition.objects.filter(app_label=self.model._meta.app_label, concept_type=self.model._meta.model_name)
         return context
 
 
