@@ -1,5 +1,7 @@
 import datetime
 from django import forms
+from django.core.exceptions import ImproperlyConfigured
+from django.apps import apps
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -14,6 +16,7 @@ from bootstrap3_datetime.widgets import DateTimePicker
 
 import aristotle_mdr.models as MDR
 from aristotle_mdr.widgets import BootstrapDropdownSelectMultiple, BootstrapDropdownIntelligentDate, BootstrapDropdownSelect
+from aristotle_mdr.utils import fetch_aristotle_settings
 
 
 QUICK_DATES = Choices(
@@ -185,7 +188,7 @@ class TokenSearchForm(FacetedSearchForm):
                 elif opt == "type":
                     # we'll allow these through and assume they meant content type
                     from django.conf import settings
-                    aristotle_apps = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS', [])
+                    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
                     aristotle_apps += ["aristotle_mdr"]
 
                     from django.contrib.contenttypes.models import ContentType
@@ -239,8 +242,8 @@ class TokenSearchForm(FacetedSearchForm):
 
 datePickerOptions = {
     "format": "YYYY-MM-DD",
-    "pickTime": False,
-    "pickDate": True,
+    # "pickTime": False,
+    # "pickDate": True,
     "defaultDate": "",
     "useCurrent": False,
 }
@@ -308,7 +311,7 @@ class PermissionSearchForm(TokenSearchForm):
     state = forms.MultipleChoiceField(
         required=False,
         label=_("Registration status"),
-        choices=MDR.STATES,
+        choices=MDR.STATES + [(-99, _('Unregistered'))],  # Allow unregistered as a selection
         widget=BootstrapDropdownSelectMultiple
     )
     public_only = forms.BooleanField(
@@ -325,10 +328,15 @@ class PermissionSearchForm(TokenSearchForm):
         widget=BootstrapDropdownSelectMultiple
     )
     # F for facet!
+    # searchqueryset = PermissionSearchQuerySet
 
     def __init__(self, *args, **kwargs):
-        kwargs['searchqueryset'] = PermissionSearchQuerySet()
+        if 'searchqueryset' not in kwargs.keys() or kwargs['searchqueryset'] is None:
+            kwargs['searchqueryset'] = PermissionSearchQuerySet()
+        if not issubclass(type(kwargs['searchqueryset']), PermissionSearchQuerySet):
+            raise ImproperlyConfigured("Aristotle Search Queryset connection must be a subclass of PermissionSearchQuerySet")
         super(PermissionSearchForm, self).__init__(*args, **kwargs)
+
         from haystack.forms import SearchForm, FacetedSearchForm, model_choices
 
         self.fields['ra'].choices = [(ra.id, ra.name) for ra in MDR.RegistrationAuthority.objects.all()]
@@ -340,7 +348,7 @@ class PermissionSearchForm(TokenSearchForm):
 
         if self.is_valid() and self.cleaned_data['models']:
             for model in self.cleaned_data['models']:
-                search_models.append(models.get_model(*model.split('.')))
+                search_models.append(apps.get_model(*model.split('.')))
 
         return search_models
 
@@ -369,8 +377,8 @@ class PermissionSearchForm(TokenSearchForm):
             self.filter_search = True
             self.attempted_filter_search = True
 
-        states = self.cleaned_data['state']
-        ras = self.cleaned_data['ra']
+        states = self.cleaned_data.get('state', None)
+        ras = self.cleaned_data.get('ra', None)
         restriction = self.cleaned_data['res']
         sqs = sqs.apply_registration_status_filters(states, ras)
 
@@ -385,11 +393,15 @@ class PermissionSearchForm(TokenSearchForm):
         )
 
         extra_facets_details = {}
-        for _facet in self.request.GET.getlist('f', []):
+        facets_opts = self.request.GET.getlist('f', [])
+
+        for _facet in facets_opts:
             _facet, value = _facet.split("::", 1)
-            sqs = sqs.filter(**{_facet: value})
+            # Force exact as otherwise we don't match when there are spaces.
+            # Insensitive to improve matching
+            sqs = sqs.filter(**{"%s__iexact" % _facet: value})
             facets_details = extra_facets_details.get(_facet, {'applied': []})
-            facets_details['applied'] = facets_details['applied'] + [value]
+            facets_details['applied'] = list(set(facets_details['applied'] + [value]))
             extra_facets_details[_facet] = facets_details
 
         self.has_spelling_suggestions = False
@@ -436,21 +448,23 @@ class PermissionSearchForm(TokenSearchForm):
                     sqs = sqs.facet(facet)
 
         extra_facets = []
-        extra_facets_details = {}
+
         from aristotle_mdr.search_indexes import registered_indexes
+        from haystack.fields import FacetField
         for model_index in registered_indexes:
             for name, field in model_index.fields.items():
                 if field.faceted:
-                    if name not in (filters_to_facets.values() + logged_in_facets.values()):
+                    if name not in (list(filters_to_facets.values()) + list(logged_in_facets.values())):
                         extra_facets.append(name)
 
                         x = extra_facets_details.get(name, {})
                         x.update(**{
                             'title': getattr(field, 'title', name),
                             'display': getattr(field, 'display', None),
+                            'allow_search': getattr(field, 'allow_search', False),
                         })
                         extra_facets_details[name]= x
-                        # Don't do this: sqs = sqs.facet(facet, sort='count')
+                        # Don't do this: sqs = sqs.facet(facet, sort='count')  # Why Sam, why?
                         sqs = sqs.facet(name)
 
         self.facets = sqs.facet_counts()
@@ -461,6 +475,20 @@ class PermissionSearchForm(TokenSearchForm):
                 for k, v in self.facets['fields'].items()
                 if k in extra_facets
             ]
+
+            self.extra_facet_fields = [
+                (k, {
+                    'values': [
+                        f for f in
+                        sorted(v, key=lambda x: -x[1])
+                        if f[0] not in extra_facets_details.get(k, {}).get('applied', [])
+                        ][:10],
+                    'details': extra_facets_details[k]
+                })
+                for k, v in self.facets['fields'].items()
+                if k in extra_facets
+            ]
+
             for facet, counts in self.facets['fields'].items():
                 # Return the 5 top results for each facet in order of number of results.
                 self.facets['fields'][facet] = sorted(counts, key=lambda x: -x[1])[:10]
@@ -471,7 +499,11 @@ class PermissionSearchForm(TokenSearchForm):
         if self.query_text:
             original_query = self.cleaned_data.get('q', "")
 
-            from urllib import quote_plus
+            try:  # Python 2
+                from urllib import quote_plus
+            except:  # Python 3
+                from urllib.parse import quote_plus
+
             suggestions = []
             has_suggestions = False
             suggested_query = []
@@ -487,7 +519,7 @@ class PermissionSearchForm(TokenSearchForm):
                         # Haystack can *over correct* so we'll do a quick search with the
                         # suggested spelling to compare words against
                         try:
-                            PermissionSearchQuerySet().auto_query(test_query)[0]
+                            self.searchqueryset.auto_query(test_query)[0]
                             suggested_query.append(suggestion)
                             has_suggestions = True
                             optimal_query = test_query

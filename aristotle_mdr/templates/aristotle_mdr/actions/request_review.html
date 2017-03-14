@@ -1,6 +1,7 @@
 {% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
 {% load compile_static i18n humanize %}
 {% load aristotle_tags %}
+{% load static from staticfiles %}
 
 {% block title %}Request review for {{ item.name }}{% endblock %}
 {% block content %}
@@ -32,6 +33,26 @@
             {{form.errors}}
         </div>
         <section>
+        <div id="changeStatusDate">
+            <span>
+                <label for="id_registration_date">{{ form.registration_date.label }}</label>:
+                {{ form.registration_date.errors }}
+            </span>
+            <span class="pull-right">
+                {{ form.registration_date }}
+            </span>
+        </div>
+        <div id="cascadeRegistration">
+            <span>
+                <label for="id_cascadeRegistration">
+                {{ form.cascade_registration.label }}
+                </label>
+                {{ form.cascade_registration.errors }}
+            </span>
+            <span class="pull-right">
+                {{ form.cascade_registration }}
+            </span>
+        </div>
         <div id="changeStatus">
             <div>
                 <span>
@@ -76,7 +97,7 @@
         {% else %}
             <a class="btn btn-default" href="{% url 'aristotle:item' item.id %}">Cancel</a>
         {% endif %}
-        <input type="submit" class="btn btn-primary" value="Update Status" />
+        <input type="submit" class="btn btn-primary" value="{% trans 'Request Review'%}" />
     </div>
 </form>
 {% comment %}
@@ -99,7 +120,7 @@
 </script>
     {% block extra_head_scripts %}
         {{ form.media }}
-        <script src="{{ STATIC_URL }}aristotle_mdr/aristotle.status_change.js"></script>
+        <script src="{% static 'aristotle_mdr/aristotle.status_change.js' %}"></script>
     {% endblock %}
 {% endcomment %}
 {% endblock %}

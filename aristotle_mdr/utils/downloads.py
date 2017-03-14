@@ -1,3 +1,5 @@
+from importlib import import_module
+
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured
@@ -13,10 +15,7 @@ def get_download_module(module_name):
         # bad module_name
         raise registry_exceptions.BadDownloadModuleName("Download name isn't a valid Python module name.")
     try:
-        downloader = None
-        # dangerous - we are really trusting the settings creators here.
-        exec("import %s.downloader as downloader" % module_name)
-        return downloader
+        return import_module("%s.downloader" % module_name)
     except:
         debug = getattr(settings, 'DEBUG')
         if debug:

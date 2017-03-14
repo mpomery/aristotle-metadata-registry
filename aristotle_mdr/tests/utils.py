@@ -1,9 +1,12 @@
+from django import VERSION as django_version
+import datetime
+import random
+import string
+
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-
-import datetime
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
@@ -39,7 +42,24 @@ def model_to_dict_with_change_time(item, fetch_time=None):
     d['slots-MIN_NUM_FORMS'] = 0
     d['slots-MAX_NUM_FORMS'] = 0
 
+    d['identifiers-TOTAL_FORMS'] = 0
+    d['identifiers-INITIAL_FORMS'] = 0
+    d['identifiers-MIN_NUM_FORMS'] = 0
+    d['identifiers-MAX_NUM_FORMS'] = 1
+
     return d
+
+
+def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+
+def get_json_from_response(response):
+    if django_version > (1, 9):
+        return response.json()
+    else:
+        import json
+        return json.loads(response.content.decode('utf-8'))
 
 
 # Since all managed objects have the same rules, these can be used to cover everything
@@ -48,11 +68,12 @@ class ManagedObjectVisibility(object):
     def setUp(self):
         self.ra = models.RegistrationAuthority.objects.create(
             name="Test RA",
+            definition="My RA",
             public_state=models.STATES.qualified,
             locked_state=models.STATES.candidate
         )
 
-        self.wg = models.Workgroup.objects.create(name="Test WG")
+        self.wg = models.Workgroup.objects.create(name="Test WG", definition="My WG")
         #RAFIX self.wg.registrationAuthorities.add(self.ra)
 
     def test_object_is_public(self):
@@ -92,7 +113,7 @@ class ManagedObjectVisibility(object):
             concept=self.item,
             registrationAuthority=self.ra,
             registrationDate=datetime.date(2005, 1, 1),
-            until_date=datetime.date(2005, 06, 29),
+            until_date=datetime.date(2005, 6, 29),
             state=self.ra.public_state,
             changeDetails="s2",
         )
@@ -202,7 +223,7 @@ class ManagedObjectVisibility(object):
         self.assertEqual(self.item.check_is_locked(when=d), True)
         self.assertEqual(list(self.item.current_statuses(when=d)), [s6])
 
-        d = date(2008, 07, 30)
+        d = date(2008, 7, 30)
         self.assertEqual(self.item.check_is_public(when=d), True)
         self.assertEqual(self.item.check_is_locked(when=d), True)
         self.assertEqual(list(self.item.current_statuses(when=d)), [s6])
@@ -425,9 +446,9 @@ class LoggedInViewPages(object):
     This helps us manage testing across different user types.
     """
     def setUp(self):
-        self.wg1 = models.Workgroup.objects.create(name="Test WG 1")  # Editor is member
-        self.wg2 = models.Workgroup.objects.create(name="Test WG 2")
-        self.ra = models.RegistrationAuthority.objects.create(name="Test RA")
+        self.wg1 = models.Workgroup.objects.create(name="Test WG 1", definition="My WG")  # Editor is member
+        self.wg2 = models.Workgroup.objects.create(name="Test WG 2", definition="My WG")
+        self.ra = models.RegistrationAuthority.objects.create(name="Test RA", definition="My WG")
         #RAFIX self.wg1.registrationAuthorities.add(self.ra)
         self.wg1.save()
 
@@ -463,7 +484,7 @@ class LoggedInViewPages(object):
         return url_slugify_concept(item)
 
     def logout(self):
-        self.client.post(reverse('django.contrib.auth.views.logout'), {})
+        self.client.post(reverse('logout'), {})
 
     def login_superuser(self):
         self.logout()
@@ -539,10 +560,6 @@ class LoggedInViewPages(object):
                 # Needs no coverage as the test should pass to be successful
                 debug_response(response, msg="%s" % e)  # from django-tools
                 raise
-
-    def assertRedirects(self, *args, **kwargs):
-        self.assertResponseStatusCodeEqual(args[0], 302)
-        super(LoggedInViewPages, self).assertRedirects(*args, **kwargs)
 
     def assertResponseStatusCodeEqual(self, response, code):
             try:

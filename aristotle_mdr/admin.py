@@ -18,6 +18,8 @@ from haystack import indexes
 import reversion
 
 from aristotle_mdr.register import register_concept
+from aristotle_mdr.utils import fetch_aristotle_settings
+
 reversion.revisions.register(MDR.Status)
 reversion.revisions.register(MDR._concept, follow=['statuses', 'workgroup', 'slots'])
 reversion.revisions.register(MDR.Workgroup)
@@ -124,14 +126,6 @@ class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
     actions_on_top = True
     actions_on_bottom = False
 
-    """
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "workgroup":
-            kwargs['queryset'] = request.user.profile.editable_workgroups.all()
-            kwargs['initial'] = request.user.profile.activeWorkgroup
-        return super(ConceptAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
-    """
-
     def get_form(self, request, obj=None, **kwargs):
         # Thanks: http://stackoverflow.com/questions/6321916
         # Thanks: http://stackoverflow.com/questions/2683689
@@ -142,7 +136,7 @@ class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
                 kwargs['request'] = request
                 kwargs['name_suggest_fields'] = self.name_suggest_fields
                 if self.name_suggest_fields:
-                    SEPARATORS = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('SEPARATORS', {})
+                    SEPARATORS = fetch_aristotle_settings().get('SEPARATORS', {})
                     kwargs['separator'] = SEPARATORS[self.model.__name__]
                 return conceptForm(*args, **kwargs)
 
@@ -186,6 +180,11 @@ class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
         if '_save' in request.POST and post_url_continue is None:
             response['location'] = reverse("aristotle:item", args=(obj.id,))
         return response
+
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            obj.submitter = request.user
+        obj.save()
 
 
 # For ValueDomains
@@ -312,22 +311,15 @@ register_concept(
 )
 
 
-# class aristotle_mdr_DataElementConceptSearchIndex(conceptIndex, indexes.Indexable):
-#     data_element_concept = indexes.IntegerField(model_attr="id", faceted=True, null=True)
-#     data_element_concept.title = 'Data element concept'
-#     data_element_concept.display = lambda i: MDR.DataElementConcept.objects.filter(pk=i).values_list('name', flat=True)[0]
-
-#     def get_model(self):
-#         return MDR.DataElementConcept
-
-
-class aristotle_mdr_DataElementSearchIndex(conceptIndex, indexes.Indexable):
-    data_element_concept = indexes.IntegerField(model_attr="dataElementConcept_id", faceted=True, null=True)
+class aristotle_mdr_DataElementConceptSearchIndex(conceptIndex, indexes.Indexable):
+    data_element_concept = indexes.MultiValueField(model_attr="name", faceted=True, null=True)
     data_element_concept.title = 'Data element concept'
-    data_element_concept.display = lambda i: MDR.DataElementConcept.objects.filter(pk=i).values_list('name', flat=True)[0]
+    object_class = indexes.MultiValueField(model_attr="objectClass__name", faceted=True, null=True)
+    object_class.title = 'Object class'
 
     def get_model(self):
-        return MDR.DataElement
+        return MDR.DataElementConcept
+
 
 register_concept(
     MDR.DataElementConcept,
@@ -336,8 +328,18 @@ register_concept(
     reversion={
         'follow': ['objectClass', 'property'],
     },
-    # custom_search_index=aristotle_mdr_DataElementConceptSearchIndex
+    custom_search_index=aristotle_mdr_DataElementConceptSearchIndex
 )
+
+
+class aristotle_mdr_DataElementSearchIndex(conceptIndex, indexes.Indexable):
+    data_element_concept = indexes.MultiValueField(model_attr="dataElementConcept__name", faceted=True, null=True)
+    data_element_concept.title = 'Data element concept'
+    object_class = indexes.MultiValueField(model_attr="dataElementConcept__objectClass__name", faceted=True, null=True)
+    object_class.title = 'Object class'
+
+    def get_model(self):
+        return MDR.DataElement
 
 
 register_concept(
@@ -350,9 +352,31 @@ register_concept(
     custom_search_index=aristotle_mdr_DataElementSearchIndex
 )
 
+
+class aristotle_mdr_DataElementDerivationSearchIndex(conceptIndex, indexes.Indexable):
+    data_element_concept = indexes.MultiValueField(faceted=True, null=True)
+    data_element_concept.title = 'Data element concept'
+    object_class = indexes.MultiValueField(faceted=True, null=True)
+    object_class.title = 'Object class'
+
+    def get_model(self):
+        return MDR.DataElementDerivation
+
+    def prepare_data_element_concept(self, obj):
+        return list(MDR.DataElementConcept.objects.filter(
+            Q(dataelement__derived_from=obj) | Q(dataelement__input_to_derivation=obj)
+        ).values_list('name', flat=True))
+
+    def prepare_object_class(self, obj):
+        return list(MDR.ObjectClass.objects.filter(
+            Q(dataelementconcept__dataelement__derived_from=obj) | Q(dataelementconcept__dataelement__input_to_derivation=obj)
+        ).values_list('name', flat=True))
+
+
 register_concept(
     MDR.DataElementDerivation,
-    extra_fieldsets=[('Derivation', {'fields': ['derivation_rule', 'derives', 'inputs']})]
+    extra_fieldsets=[('Derivation', {'fields': ['derivation_rule', 'derives', 'inputs']})],
+    custom_search_index=aristotle_mdr_DataElementDerivationSearchIndex
 )
 
 register_concept(MDR.ConceptualDomain)

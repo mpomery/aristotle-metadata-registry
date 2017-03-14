@@ -1,8 +1,8 @@
 {% extends "aristotle_mdr/base.html" %}
-{% load staticfiles compile_static %}
+{% load compile_static %}
+{% load static from staticfiles %}
 
 {% block extra_head_scripts %}
 {{ form.media }}
-<link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.bulk_action.less' %}" />
-{% include 'autocomplete_light/static.html' %}
+<link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.bulk_action.less'|compile %}" />
 {% endblock %}

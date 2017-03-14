@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
 from django.forms import model_to_dict
 from django.template.defaultfilters import slugify
-from django.utils.text import get_text_list
 from django.utils.encoding import force_text
+from django.utils.module_loading import import_string
+from django.utils.text import get_text_list
 from django.utils.translation import ugettext as _
 
 
@@ -56,30 +58,42 @@ def get_download_template_path_for_item(item, download_type, subpath=''):
 
 def url_slugify_concept(item):
     item = item.item
+    slug = slugify(item.name)[:50]
+    if not slug:
+        slug = "--"
     return reverse(
         "aristotle:item",
-        kwargs={'iid': item.pk, 'model_slug': item._meta.model_name, 'name_slug': slugify(item.name)[:50]}
+        kwargs={'iid': item.pk, 'model_slug': item._meta.model_name, 'name_slug': slug}
     )
 
 
 def url_slugify_workgroup(workgroup):
+    slug = slugify(workgroup.name)[:50]
+    if not slug:
+        slug = "--"
     return reverse(
         "aristotle:workgroup",
-        kwargs={'iid': workgroup.pk, 'name_slug': slugify(workgroup.name)[:50]}
+        kwargs={'iid': workgroup.pk, 'name_slug': slug}
     )
 
 
 def url_slugify_registration_authoritity(ra):
+    slug = slugify(ra.name)[:50]
+    if not slug:
+        slug = "--"
     return reverse(
         "aristotle:registrationAuthority",
-        kwargs={'iid': ra.pk, 'name_slug': slugify(ra.name)[:50]}
+        kwargs={'iid': ra.pk, 'name_slug': slug}
     )
 
 
 def url_slugify_organization(org):
+    slug = slugify(org.name)[:50]
+    if not slug:
+        slug = "--"
     return reverse(
         "aristotle:organization",
-        kwargs={'iid': org.pk, 'name_slug': slugify(org.name)[:50]}
+        kwargs={'iid': org.pk, 'name_slug': slug}
     )
 
 
@@ -116,7 +130,7 @@ def construct_change_message(request, form, formsets):
 def get_concepts_for_apps(app_labels):
     from django.contrib.contenttypes.models import ContentType
     from aristotle_mdr import models as MDR
-    models = ContentType.objects.filter(app_label__in=app_labels).all()
+    models = ContentType.objects.filter(app_label__in=app_labels).all().order_by('model')
     concepts = [
         m
         for m in models
@@ -176,3 +190,9 @@ def cache_per_item_user(ttl=None, prefix=None, cache_post=False):
             return response
         return apply_cache
     return decorator
+
+
+def fetch_aristotle_settings():
+    if hasattr(settings, 'ARISTOTLE_SETTINGS_LOADER'):
+        return import_string(getattr(settings, 'ARISTOTLE_SETTINGS_LOADER'))()
+    return getattr(settings, 'ARISTOTLE_SETTINGS', {})

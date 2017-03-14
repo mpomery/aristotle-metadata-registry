@@ -6,17 +6,18 @@ from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, TemplateView
-from aristotle_mdr.utils import get_concepts_for_apps
+from aristotle_mdr.utils import get_concepts_for_apps, fetch_aristotle_settings
+from collections import OrderedDict
 
 
 class BrowseApps(TemplateView):
     template_name = "aristotle_mdr_browse/apps_list.html"
     ordering = 'app_label'
 
-    def get_context_data(self, **kwargs):
-        context = super(BrowseApps, self).get_context_data(**kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super(BrowseApps, self).get_context_data(*args, **kwargs)
 
-        aristotle_apps = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS', [])
+        aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
         aristotle_apps += ["aristotle_mdr"]
         out = {}
 
@@ -32,14 +33,15 @@ class BrowseApps(TemplateView):
 
             app_models['models'].append(m)
             out[m.app_label] = app_models
-        context['apps'] = out
+
+        context['apps'] = OrderedDict(sorted(out.items(), key=lambda app: app[1]['app']))
         return context
 
 
 class AppBrowser(ListView):
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         # Call the base implementation first to get a context
-        context = super(AppBrowser, self).get_context_data(**kwargs)
+        context = super(AppBrowser, self).get_context_data(*args, **kwargs)
         context['app_label'] = self.kwargs['app']
         context['app'] = apps.get_app_config(self.kwargs['app'])
         return context
@@ -52,9 +54,7 @@ class BrowseModels(AppBrowser):
 
     def get_queryset(self):
         app = self.kwargs['app']
-        models = ContentType.objects.filter(app_label=app)
-        models = get_concepts_for_apps([app])
-        return models
+        return get_concepts_for_apps([app])
 
 
 class BrowseConcepts(AppBrowser):
@@ -112,7 +112,7 @@ class BrowseConcepts(AppBrowser):
         for slot_name, values in slots.items():
             try:
                 queryset = queryset.filter(
-                    slots__type__slot_name=slot_name,
+                    slots__name=slot_name,
                     slots__value__in=values,
                 )
             except FieldError:
@@ -120,9 +120,9 @@ class BrowseConcepts(AppBrowser):
 
         return queryset.visible(self.request.user)
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         # Call the base implementation first to get a context
-        context = super(BrowseConcepts, self).get_context_data(**kwargs)
+        context = super(BrowseConcepts, self).get_context_data(*args, **kwargs)
         context['model'] = self.model
         context['model_name'] = self.model._meta.model_name
         context['sort'] = self.order

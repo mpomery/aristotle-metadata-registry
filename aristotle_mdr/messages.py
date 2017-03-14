@@ -44,3 +44,15 @@ def new_comment_created(comment):
 def new_post_created(post, recipient):
     op_name = post.author.get_full_name() or post.author
     notify.send(post.author, recipient=recipient, verb="made a new post", target=post, action_object=post.workgroup)
+
+
+def review_request_created(review_request, requester, registrar):
+    notify.send(requester, recipient=registrar, verb="requested concept review", target=review_request)
+
+
+def review_request_updated(review_request, requester, reviewer):
+    if reviewer:
+        notify.send(reviewer, recipient=requester, verb="concept was reviewed", target=review_request)
+    else:
+        # Maybe it was auto reviewed, or updated manually?
+        notify.send(review_request, recipient=requester, verb="concept was reviewed", target=review_request)

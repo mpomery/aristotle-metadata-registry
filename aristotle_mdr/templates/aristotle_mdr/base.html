@@ -1,4 +1,6 @@
-{% load staticfiles i18n bootstrap3 compile_static aristotle_tags %}
+{% load i18n bootstrap3 compile_static aristotle_tags %}
+{% load static from staticfiles %}
+
 <!doctype html>
 <html lang="en">
    <head>
@@ -17,7 +19,9 @@
 	  <link rel="sitemap" type="application/xml" title="Sitemap" href="{% url 'aristotle:sitemap_xml' %}" />
       <link rel="icon" type="image/png" href="{% static 'aristotle_mdr/images/favicon.png' %}"/>
       <title>{% block title %}{% endblock %} - {{ config.SITE_NAME }}</title>
+
     {% include 'aristotle_mdr/scripts.html' %}
+
     {% block extra_head_scripts %}
         {% comment %}
             Only for scripts that need to be inserted for other special templates
@@ -43,7 +47,6 @@
         </div>
         {% endif %}
    <div id='content' class="container">
-
         {% block content %}
         {% endblock %}
     </div>

@@ -6,7 +6,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template import RequestContext, TemplateDoesNotExist
+from django.template import TemplateDoesNotExist
 from django.template.defaultfilters import slugify
 from django.template.loader import select_template
 from django.utils.translation import ugettext_lazy as _
@@ -19,6 +19,7 @@ from aristotle_mdr.utils import cache_per_item_user, concept_to_dict, construct_
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import exceptions as registry_exceptions
 from aristotle_mdr import models as MDR
+from aristotle_mdr.utils import fetch_aristotle_settings
 
 
 class BulkAction(FormView):
@@ -115,7 +116,7 @@ class BulkAction(FormView):
 
 def get_bulk_actions():
     import re
-    config = getattr(settings, 'ARISTOTLE_SETTINGS', {})
+    config = fetch_aristotle_settings()
     if not hasattr(get_bulk_actions, 'actions') or not get_bulk_actions.actions:
         actions = {}
         for action_name, form in config.get('BULK_ACTIONS', {}).items():
@@ -123,11 +124,12 @@ def get_bulk_actions():
                 # Invalid download_type
                 raise registry_exceptions.BadBulkActionModuleName("Bulk action isn't a valid Python module name.")
 
-            module, form = form.rsplit('.', 1)
-            exec('from %s import %s as f' % (module, form))
-
+            from django.utils.module_loading import import_string
+            # module, form = form.rsplit('.', 1)
+            # f = exec('from %s import %s as f' % (module, form))
+            f = import_string(form)
             # We need to make this a dictionary, not a class as otherwise
-            # the template engire tries to instantiate it.
+            # the template engine tries to instantiate it.
             frm = {'form': f}
             for prop in ['classes', 'can_use', 'text']:
                 frm[prop] = getattr(f, prop, None)

@@ -143,7 +143,7 @@ class ConceptForm(WorkgroupVerificationMixin, UserAwareModelForm):
     def object_specific_fields(self):
         # returns every field that isn't in a concept
         obj_field_names = [
-            field.name for field in self._meta.model._meta.fields
+            field.name for field in self._meta.model._meta.get_fields()
             if field not in MDR.concept._meta.fields
             ]
         fields = []
@@ -175,6 +175,14 @@ def subclassed_modelform(set_model):
 def subclassed_edit_modelform(set_model):
     class MyForm(ConceptForm, CheckIfModifiedMixin):
         change_comments = forms.CharField(widget=forms.Textarea, required=False)
+
+        def _media(self):
+            js = ('aristotle_mdr/aristotle.moveable.js', )
+            media = forms.Media(js=js)
+            for field in self.fields.values():
+                media = media + field.widget.media
+            return media
+        media = property(_media)
 
         class Meta(ConceptForm.Meta):
             model = set_model

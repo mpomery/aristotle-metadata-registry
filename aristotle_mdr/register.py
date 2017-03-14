@@ -15,7 +15,9 @@ and future releases of Aristotle-MDR may break code that uses these methods.
 from __future__ import absolute_import
 # import autocomplete_light
 
+from django.conf import settings
 from django.contrib import admin
+from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_lazy as _
 
 # from aristotle_mdr import autocomplete_light_registry as reg
@@ -86,7 +88,13 @@ def register_concept_search_index(concept_class, *args, **kwargs):
 
 
 def create(cls):
-    class SubclassedConceptIndex(conceptIndex, indexes.Indexable):
+
+    if hasattr(settings, 'HAYSTACK_BASE_INDEX_CLASS'):
+        base_index_class = import_string(settings.HAYSTACK_BASE_INDEX_CLASS)
+    else:
+        base_index_class = conceptIndex
+
+    class SubclassedConceptIndex(base_index_class, indexes.Indexable):
         def get_model(self):
             return cls
     return SubclassedConceptIndex
@@ -115,9 +123,16 @@ def register_concept_admin(concept_class, *args, **kwargs):
     from django.db.models.fields.related import ManyToManyField, ManyToOneRel
     if not extra_fieldsets and auto_fieldsets:
         # returns every field that isn't in a concept
-        field_names = concept._meta.get_all_field_names() + ['supersedes']
-        m2ms = [m[0] for m in concept_class._meta.get_m2m_with_model()]
-        m2m_rel = [y.related_model for y in concept_class._meta.get_all_related_objects()]
+        field_names = [f.name for f in concept._meta.get_fields()] + ['supersedes']
+        m2ms = [
+            f for f in concept_class._meta.get_fields()
+            if f.many_to_many and not f.auto_created
+        ]
+        m2m_rel = [
+            f.related_model
+            for f in concept_class._meta.get_fields()
+            if (f.one_to_many or f.one_to_one) and f.auto_created and not f.concrete
+        ]
         auto_fieldset = []
         auto_inlines = []
         for f in concept_class._meta.get_fields():

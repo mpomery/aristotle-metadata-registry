@@ -50,4 +50,13 @@ class UserAutocompleteSelect(ModelSelect2):
 
 
 class UserAutocompleteSelectMultiple(ModelSelect2Multiple):
-    url = 'aristotle-autocomplete:user'
+    def __init__(self, *args, **kwargs):
+        kwargs.update(
+            url=reverse_lazy('aristotle-autocomplete:user'),
+            # attrs={'data-html': 'true'}
+        )
+        super(UserAutocompleteSelectMultiple, self).__init__(*args, **kwargs)
+
+    def render_options(self, *args, **kwargs):
+        """This prevents users from showing in a static HTML list"""
+        return ""

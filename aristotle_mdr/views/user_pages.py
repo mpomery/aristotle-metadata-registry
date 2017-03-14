@@ -16,6 +16,7 @@ from django.views.generic import DetailView, ListView
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.views.utils import paginated_list, paginated_workgroup_list
+from aristotle_mdr.utils import fetch_aristotle_settings
 
 
 def friendly_redirect_login(request):
@@ -77,7 +78,7 @@ def admin_tools(request):
     if not request.user.is_superuser:
         raise PermissionDenied
 
-    aristotle_apps = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS', [])
+    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
     aristotle_apps += ["aristotle_mdr"]
 
     from django.contrib.contenttypes.models import ContentType
@@ -112,7 +113,7 @@ def admin_stats(request):
     if not request.user.is_superuser:
         raise PermissionDenied
 
-    aristotle_apps = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS', [])
+    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
     aristotle_apps += ["aristotle_mdr"]
 
     from django.contrib.contenttypes.models import ContentType
@@ -251,6 +252,11 @@ def my_review_list(request):
     return paginated_list(request, reviews, "aristotle_mdr/user/my_review_list.html", {'reviews': reviews})
 
 
+@login_required
+def django_admin_wrapper(request, page_url):
+    return render(request, "aristotle_mdr/user/admin.html", {'page_url': page_url})
+
+
 class ReviewDetailsView(DetailView):
     pk_url_kwarg = 'review_id'
     template_name = "aristotle_mdr/user/request_review_details.html"
@@ -279,9 +285,9 @@ class CreatedItemsListView(ListView):
             review_requests__isnull=True
         )
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         # Call the base implementation first to get a context
-        context = super(CreatedItemsListView, self).get_context_data(**kwargs)
+        context = super(CreatedItemsListView, self).get_context_data(*args, **kwargs)
         context['sort'] = self.request.GET.get('sort', 'name_asc')
         return context
 

@@ -1,6 +1,7 @@
 {% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
 {% load compile_static i18n humanize %}
 {% load aristotle_tags %}
+{% load static from staticfiles %}
 
 {% block title %}Review details{{ item.name }}{% endblock %}
 {% block content %}
@@ -61,6 +62,6 @@
 </form>
 
     {% block extra_head_scripts %}
-        <link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.actions.less' %}" />
+        <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.actions.less'|compile %}" />
     {% endblock %}
 {% endblock %}

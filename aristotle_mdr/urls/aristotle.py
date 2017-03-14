@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
@@ -9,16 +9,16 @@ import aristotle_mdr.forms as forms
 import aristotle_mdr.models as models
 from aristotle_mdr.contrib.generic.views import (
     GenericAlterOneToManyView,
+    GenericAlterManyToManyView,
     generic_foreign_key_factory_view
 )
 from django.utils.translation import ugettext_lazy as _
 
 
-urlpatterns = patterns(
-    'aristotle_mdr.views',
-
+urlpatterns=[
     url(r'^/?$', TemplateView.as_view(template_name='aristotle_mdr/static/home.html'), name="home"),
-    url(r'^manifest.json$', TemplateView.as_view(template_name='aristotle_mdr/manifest.json', content_type='application/json')),
+    url(r'^manifest.json$', TemplateView.as_view(template_name='meta/manifest.json', content_type='application/json')),
+    url(r'^robots.txt$', TemplateView.as_view(template_name='meta/robots.txt', content_type='text/plain')),
     url(r'^sitemap.xml$', views.sitemaps.main, name='sitemap_xml'),
     url(r'^sitemaps/sitemap_(?P<page>[0-9]+).xml$', views.sitemaps.page_range, name='sitemap_range_xml'),
 
@@ -46,6 +46,18 @@ urlpatterns = patterns(
             form_add_another_text=_('Add a code'),
             form_title=_('Change Supplementary Values')
         ), name='supplementary_values_edit'),
+    url(r'^item/(?P<iid>\d+)/dataelementderivation/change_inputs/?$',
+        GenericAlterManyToManyView.as_view(
+            model_base=models.DataElementDerivation,
+            model_to_add=models.DataElement,
+            model_base_field='inputs'
+        ), name='dataelementderivation_change_inputs'),
+    url(r'^item/(?P<iid>\d+)/dataelementderivation/change_derives/?$',
+        GenericAlterManyToManyView.as_view(
+            model_base=models.DataElementDerivation,
+            model_to_add=models.DataElement,
+            model_base_field='derives'
+        ), name='dataelementderivation_change_derives'),
 
     url(r'^item/(?P<iid>\d+)?/alter_relationship/(?P<fk_field>[A-Za-z\-_]+)/?$',
         generic_foreign_key_factory_view,
@@ -58,7 +70,7 @@ urlpatterns = patterns(
     url(r'^workgroup/(?P<iid>\d+)/leave/?$', views.workgroups.leave, name='workgroup_leave'),
     url(r'^workgroup/addMembers/(?P<iid>\d+)$', views.workgroups.add_members, name='addWorkgroupMembers'),
     url(r'^workgroup/(?P<iid>\d+)/archive/?$', views.workgroups.archive, name='archive_workgroup'),
-    url(r'^remove/WorkgroupRole/(?P<iid>\d+)/(?P<role>[A-Za-z\-]+)/(?P<userid>\d+)/?$', views.workgroups.remove_role, name='removeWorkgroupRole'),
+    url(r'^action/remove/WorkgroupRole/(?P<iid>\d+)/(?P<role>[A-Za-z\-]+)/(?P<userid>\d+)/?$', views.workgroups.remove_role, name='removeWorkgroupRole'),
 
     url(r'^discussions/?$', views.discussions.all, name='discussions'),
     url(r'^discussions/new/?$', views.discussions.new, name='discussionsNew'),
@@ -85,8 +97,8 @@ urlpatterns = patterns(
 
     # url(r'^create/?$', views.item, name='item'),
     url(r'^create/?$', views.create_list, name='create_list'),
-    url(r'^create/(aristotle_mdr/)?dataelementconcept$', views.wizards.DataElementConceptWizard.as_view(), name='createDataElementConcept'),
-    url(r'^create/(aristotle_mdr/)?dataelement$', views.wizards.DataElementWizard.as_view(), name='createDataElement'),
+    url(r'^create/wizard/aristotle_mdr/dataelementconcept$', views.wizards.DataElementConceptWizard.as_view(), name='createDataElementConcept'),
+    url(r'^create/wizard/aristotle_mdr/dataelement$', views.wizards.DataElementWizard.as_view(), name='createDataElement'),
     url(r'^create/(?P<app_label>.+)/(?P<model_name>.+)/?$', views.wizards.create_item, name='createItem'),
     url(r'^create/(?P<model_name>.+)/?$', views.wizards.create_item, name='createItem'),
 
@@ -98,7 +110,7 @@ urlpatterns = patterns(
     url(r'^action/bulkaction/?$', views.bulk_actions.BulkAction.as_view(), name='bulk_action'),
     url(r'^action/compare/?$', views.comparator.compare_concepts, name='compare_concepts'),
 
-    url(r'^changestatus/(?P<iid>\d+)$', views.changeStatus, name='changeStatus'),
+    url(r'^action/changestatus/(?P<iid>\d+)$', views.changeStatus, name='changeStatus'),
     # url(r'^remove/WorkgroupUser/(?P<iid>\d+)/(?P<userid>\d+)$', views.removeWorkgroupUser, name='removeWorkgroupUser'),
 
     url(r'^account/?$', RedirectView.as_view(url='account/home/', permanent=True)),
@@ -115,6 +127,8 @@ urlpatterns = patterns(
     url(r'^account/workgroups/?$', views.user_pages.workgroups, name='userWorkgroups'),
     url(r'^account/workgroups/archives/?$', views.user_pages.workgroup_archives, name='user_workgroups_archives'),
     url(r'^account/notifications(?:/folder/(?P<folder>all))?/?$', views.user_pages.inbox, name='userInbox'),
+
+    url(r'^account/django/(.*)?$', views.user_pages.django_admin_wrapper, name='django_admin'),
 
 
     url(r'^action/review/(?P<iid>\d+)?$', views.actions.SubmitForReviewView.as_view(), name='request_review'),
@@ -147,4 +161,4 @@ urlpatterns = patterns(
             ),
         name='search'
     ),
-)
+]

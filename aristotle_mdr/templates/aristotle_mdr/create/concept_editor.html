@@ -5,6 +5,8 @@
     {{ form.errors.as_ul }}
     {{slots_FormSet.errors.as_ul}}
     {{slots_FormSet.non_form_errors.as_ul}}
+    {{identifier_FormSet.errors.as_ul}}
+    {{identifier_FormSet.non_form_errors.as_ul}}
     </div>
 {% endif %}
 
@@ -19,12 +21,17 @@
         </li>
         {% if form.object_specific_fields %}
         <li role="presentation">
-            <a href="#tab_objSpecific" aria-controls="messages" role="tab" data-toggle="tab">{# { model_name|title } #} {% trans 'Components' context 'For making an item' %}</a>
+            <a href="#tab_components" aria-controls="messages" role="tab" data-toggle="tab">{# { model_name|title } #} {% trans 'Components' context 'For making an item' %}</a>
         </li>
         {% endif %}
         {% if show_slots_tab %}
         <li role="presentation">
             <a href="#tab_slots" aria-controls="messages" role="tab" data-toggle="tab">{% trans 'Slots' context 'When saving changes to an item' %}</a>
+        </li>
+        {% endif %}
+        {% if show_id_tab %}
+        <li role="presentation">
+            <a href="#tab_identifiers" aria-controls="messages" role="tab" data-toggle="tab">{% trans 'Identifiers' context 'When saving changes to an item' %}</a>
         </li>
         {% endif %}
         {% if form.change_comments %}
@@ -119,7 +126,7 @@
             {% endfor %}
         </div>
         {% if form.object_specific_fields %}
-        <div role="tabpanel" class="tab-pane" id="tab_objSpecific">
+        <div role="tabpanel" class="tab-pane" id="tab_components">
         {% for field in form.object_specific_fields %}
             {% if forloop.first %}
             <div class="alert alert-info">
@@ -156,6 +163,17 @@
             {% include 'aristotle_mdr/slots/slots_editor_tab.html' %}
         </div>
         {% endif %}
+        {% if show_id_tab %}
+        <div role="tabpanel" class="tab-pane" id="tab_identifiers">
+            <div class="alert alert-info">
+                <p>Links can be used to annotate metadata with additional key-value pairs.
+                Below are the slots that have been configured to be used with
+                your registry for this particular metadata type.
+                </p>
+            </div>
+            {% include 'aristotle_mdr/identifiers/identifiers_editor_tab.html' %}
+        </div>
+        {% endif %}
 
         {% if form.change_comments %}
         <div role="tabpanel" class="tab-pane" id="tab_changeComments">
@@ -187,7 +205,7 @@
         {% endif %}
         <div role="tabpanel" class="tab-pane" id="tab_tips">
 
-            <h4>How to use this creation wizard</h4>
+            <header class='editor'>How to use this creation wizard</header>
             <p>
                 This wizard is designed to help you create well-defined,
                 reusable metadata.
@@ -221,7 +239,7 @@
             </p>
             
             {% if help %}
-                <h4>Help on {{ model_name_plural }}</h4>
+                <header>Help on {{ model_name_plural }}</header>
                 <strong>For more information on {{model_name_plural}}, read the
                 <a href="{% url 'aristotle_help:concept_help' app_label model %}">
                 help page.</strong>

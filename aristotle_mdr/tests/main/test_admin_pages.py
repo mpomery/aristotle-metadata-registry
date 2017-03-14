@@ -5,6 +5,8 @@ from django.forms import model_to_dict
 from django.test import TestCase
 from django.test.utils import setup_test_environment
 
+import datetime
+
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
@@ -153,7 +155,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
             self.create_items()
 
     def create_items(self):
-        self.item1 = self.itemType.objects.create(name="admin_page_test_oc",definition=" ",workgroup=self.wg1,**self.create_defaults)
+        self.item1 = self.itemType.objects.create(name="admin_page_test_oc",definition="my definition",workgroup=self.wg1,**self.create_defaults)
 
     def test_registration_authority_inline_not_in_editor_admin_page(self):
         self.login_editor()
@@ -222,7 +224,6 @@ class AdminPageForConcept(utils.LoggedInViewPages):
 
     def test_editor_deleting_allowed_item(self):
         self.login_editor()
-        # make some items
 
         before_count = self.wg1.items.count()
         self.assertEqual(self.wg1.items.count(),1)
@@ -239,7 +240,11 @@ class AdminPageForConcept(utils.LoggedInViewPages):
         self.assertEqual(self.wg1.items.count(),1)
         before_count = self.wg1.items.count()
 
-        review = models.ReviewRequest.objects.create(requester=self.su,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.su,registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
         review.concepts.add(self.item1)
         old_count = self.item1.statuses.count()
         self.ra.register(self.item1,models.STATES.standard,self.registrar)
@@ -311,8 +316,8 @@ class AdminPageForConcept(utils.LoggedInViewPages):
 
 # deprecated
     def test_supersedes_saves(self):
-        self.item2 = self.itemType.objects.create(name="admin_page_test_oc_2",definition=" ",workgroup=self.wg1,**self.create_defaults)
-        self.item3 = self.itemType.objects.create(name="admin_page_test_oc_2",definition=" ",workgroup=self.wg1,**self.create_defaults)
+        self.item2 = self.itemType.objects.create(name="admin_page_test_oc_2",definition="my definition",workgroup=self.wg1,**self.create_defaults)
+        self.item3 = self.itemType.objects.create(name="admin_page_test_oc_2",definition="my definition",workgroup=self.wg1,**self.create_defaults)
 
         self.login_editor()
         response = self.client.get(reverse("admin:%s_%s_change"%(self.itemType._meta.app_label,self.itemType._meta.model_name),args=[self.item1.pk]))
@@ -340,7 +345,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
         self.assertTrue(self.item3 in self.item1.supersedes.all().select_subclasses())
 
     def test_superseded_by_saves(self):
-        self.item2 = self.itemType.objects.create(name="admin_page_test_oc_2",definition=" ",workgroup=self.wg1,**self.create_defaults)
+        self.item2 = self.itemType.objects.create(name="admin_page_test_oc_2",definition="my definition",workgroup=self.wg1,**self.create_defaults)
 
         self.login_editor()
         response = self.client.get(reverse("admin:%s_%s_change"%(self.itemType._meta.app_label,self.itemType._meta.model_name),args=[self.item1.pk]))
@@ -404,7 +409,11 @@ class AdminPageForConcept(utils.LoggedInViewPages):
             self.item1.save()
 
         old_count = self.item1.statuses.count()
-        review = models.ReviewRequest.objects.create(requester=self.su,registration_authority=self.ra)
+        review = models.ReviewRequest.objects.create(
+            requester=self.su,registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
         review.concepts.add(self.item1)
         with reversion.create_revision():
             self.item1.name = "change 2"
@@ -432,8 +441,8 @@ class AdminPageForConcept(utils.LoggedInViewPages):
             }
         )
         self.assertResponseStatusCodeEqual(response,200)
-        self.assertTrue("change 2" in response.content)
-        self.assertTrue('statuses' in response.content)
+        self.assertContains(response, "change 2")
+        self.assertContains(response, 'statuses')
         
         self.item1 = self.itemType.objects.get(pk=self.item1.pk) #decache
         self.assertTrue(self.item1.name == "change 2")
@@ -442,6 +451,50 @@ class AdminPageForConcept(utils.LoggedInViewPages):
                 response,
                 '%s is %s'%(self.item1.name,s.get_state_display())
             )
+
+    def test_editor_make_item_has_submitter(self):
+        # Fixes #595
+        self.login_editor()
+        # make an item
+        response = self.client.get(reverse("admin:%s_%s_add"%(self.itemType._meta.app_label,self.itemType._meta.model_name)))
+        
+        short_name = utils.id_generator()
+        data = {
+            'name':"admin_page_test_oc_has_submitter",
+            'definition':"test", "workgroup":self.wg1.id,
+            'short_name': short_name,
+            'statuses-TOTAL_FORMS': 0, 'statuses-INITIAL_FORMS': 0 # no substatuses
+        }
+        data.update(self.form_defaults)
+
+        response = self.client.post(
+            reverse("admin:%s_%s_add"%(self.itemType._meta.app_label,self.itemType._meta.model_name)),
+            data
+        )
+        new_item = self.itemType.objects.get(short_name=short_name)
+        self.assertEqual(new_item.name,"admin_page_test_oc_has_submitter")
+        self.assertEqual(new_item.submitter,self.editor)
+
+        self.login_superuser()
+        updated_item = dict((k,v) for (k,v) in model_to_dict(self.item1).items() if v is not None)
+        updated_item['name'] = 'admin_page_test_oc_has_submitter_that_hasnt_changed'
+
+        updated_item.update({
+            'statuses-TOTAL_FORMS': 0, 'statuses-INITIAL_FORMS': 0, # no statuses
+        })
+        updated_item.update(self.form_defaults)
+
+        response = self.client.post(
+            reverse(
+                "admin:%s_%s_change"%(self.itemType._meta.app_label,self.itemType._meta.model_name),
+                args=[new_item.pk]
+            ),
+            updated_item
+        )
+
+        new_item = self.itemType.objects.get(pk=new_item.pk)  # decache
+        self.assertEqual(new_item.name,"admin_page_test_oc_has_submitter_that_hasnt_changed")
+        self.assertEqual(new_item.submitter,self.editor)
 
 
 class ObjectClassAdminPage(AdminPageForConcept,TestCase):
@@ -473,12 +526,10 @@ class DataElementDerivationAdminPage(AdminPageForConcept,TestCase):
         from reversion import revisions as reversion
         with reversion.create_revision():
             self.ded_wg = models.Workgroup.objects.create(name="Derived WG")
-            self.derived_de = models.DataElement.objects.create(name='derivedDE',definition="",workgroup=self.ded_wg)
-        x=self.ra.register(self.derived_de,models.STATES.standard,self.su)
-        self.create_defaults = {'derives':self.derived_de}
-        self.form_defaults = {'derives':self.derived_de.id}
+            self.derived_de = models.DataElement.objects.create(name='derivedDE',definition="my definition",workgroup=self.ded_wg)
+
+        self.ra.register(self.derived_de, models.STATES.standard, self.su)
         
-        self.derived_de = models.DataElement.objects.get(pk=self.derived_de.pk)
         self.assertTrue(self.derived_de.is_public())
         self.create_items()
 
@@ -516,7 +567,7 @@ class OrganizationAdminPage(utils.LoggedInViewPages, TestCase):
         )
         msg = "Are you sure you want to promote the selected organizations to Registration Authorities"
 
-        self.assertTrue(msg in response.content)
+        self.assertContains(response, msg)
         self.assertTrue(ra_count == models.RegistrationAuthority.objects.count())
         self.assertTrue(org_count == models.Organization.objects.count())
 
@@ -535,4 +586,4 @@ class OrganizationAdminPage(utils.LoggedInViewPages, TestCase):
         self.assertTrue(org_count == models.Organization.objects.count())
 
         msg = "Successfully promoted 1 organization."
-        self.assertTrue(msg in response.content)
+        self.assertContains(response, msg)

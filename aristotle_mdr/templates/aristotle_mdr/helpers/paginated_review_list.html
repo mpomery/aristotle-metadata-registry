@@ -43,7 +43,14 @@ Showing {{ page.paginator.count }} results.
         <td>{{ item.get_status_display }}
         </td>
         <td>
-            <a href="{% url 'aristotle:userReviewDetails' item.id %}" data-toggle="modal" data-target="#review_box">{{ item.message }}</a></td>
+            <a href="{% url 'aristotle:userReviewDetails' item.id %}" data-toggle="modal" data-target="#review_box">
+                {% if item.message %}
+                    {{ item.message }}
+                {% else %}
+                    {% trans "No message given" %}
+                {% endif %}
+            </a>
+        </td>
         <td>{% if item.response %}
             {{ item.response }}
             {% endif %}
@@ -87,5 +94,4 @@ Showing {{ page.paginator.count }} results.
 </table>
 
 {% include "aristotle_mdr/helpers/paginator.html" with page=page %}
-{% bootstrap_modal "review_box" size='md' %}
 

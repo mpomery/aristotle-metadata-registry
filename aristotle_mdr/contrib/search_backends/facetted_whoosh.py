@@ -1,6 +1,7 @@
 # From https://github.com/aptivate/intranet-search/blob/master/whoosh_backend.py
 # This is an improved Whoosh backend that speeds up Whoosh spell checking dramatically!
 # It also provides facetting
+# 2016-11-27 - Module inherited to add Python 3 functionality
 
 from collections import defaultdict
 from haystack.backends import whoosh_backend as original_backend
@@ -347,7 +348,7 @@ class FixedWhooshSearchBackend(CustomWhooshBackend):
             for facet_fieldname, extra_options in facets.items():
                 facet_results = raw_page.results.groups(facet_fieldname)
                 facet_term_counts = []
-                for term, term_results in facet_results.iteritems():
+                for term, term_results in facet_results.items():
                     facet_term_counts.append((term, len(term_results)))
                 facets_out['fields'][facet_fieldname] = facet_term_counts
             results['facets'] = facets_out

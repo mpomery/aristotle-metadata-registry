@@ -21,14 +21,13 @@
             {% if page %}
                 <strong><a href="?help=help">Get help on using your favourites list</a></strong>
                 {% include "aristotle_mdr/helpers/bulk_action_paginated_list.html" with page=page allow_select_all=True %}
-                {{ page}}
             {% else %}
-                <h3>You currently have no favourited items.</h3>
+                <strong>You currently have no favourited items.</strong>
             {% endif %}
         {% endif %}
-        {% if user.profile.favourites.count = 0 or help %}
+        {% if user.profile.favourites.count == 0 or help %}
             <hr>
-             <h3 id="using">Using your favourites list.</h3>
+             <h2 id="using">Using your favourites list.</h2>
             <p>
                 You can favourite many items within the registry, when you are logged
                 in items you can follow will have an open bookmark symbol next to them -

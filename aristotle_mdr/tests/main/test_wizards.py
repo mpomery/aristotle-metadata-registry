@@ -109,8 +109,8 @@ class ConceptWizardPage(utils.LoggedInViewPages):
         self.assertEqual(response.status_code,200)
 
     def do_test_for_issue333(self,response):
-        self.assertTrue(self.extra_wg.name in response.content)
-        self.assertTrue(response.content.count(self.extra_wg.name) == 1)
+        self.assertContains(response, self.extra_wg.name)
+        self.assertTrue(response.content.decode('utf-8').count(self.extra_wg.name) == 1)
 
     def test_editor_can_make_object(self):
         self.login_editor()
@@ -190,8 +190,8 @@ class DataElementConceptWizardPage(ConceptWizardPage,TestCase):
         self.login_editor()
         from reversion.revisions import create_revision
         with create_revision():
-            ani = models.ObjectClass.objects.create(name="animagus",definition="",workgroup=self.wg1)
-            at  = models.Property.objects.create(name="animal type",definition="",workgroup=self.wg1)
+            ani = models.ObjectClass.objects.create(name="animagus",definition="my definition",workgroup=self.wg1)
+            at  = models.Property.objects.create(name="animal type",definition="my definition",workgroup=self.wg1)
 
         step_1_data = {
             self.wizard_form_name+'-current_step': 'component_search',
@@ -405,13 +405,13 @@ class DataElementWizardPage(ConceptWizardPage,TestCase):
 
         from reversion.revisions import create_revision
         with create_revision():
-            ani   = models.ObjectClass.objects.create(name="animagus",definition="",workgroup=self.wg1)
-            at    = models.Property.objects.create(name="animal type",definition="",workgroup=self.wg1)
+            ani   = models.ObjectClass.objects.create(name="animagus",definition="my definition",workgroup=self.wg1)
+            at    = models.Property.objects.create(name="animal type",definition="my definition",workgroup=self.wg1)
             momat = models.ValueDomain.objects.create(name="MoM animal type classification",
                     definition="Ministry of Magic standard classification of animagus animal types",workgroup=self.wg1)
             ani_dec = models.DataElementConcept.objects.create(
                 name="animagus--animal type",
-                definition="",
+                definition="my definition",
                 workgroup=self.wg1,
                 objectClass=ani,
                 property=at
@@ -475,8 +475,8 @@ class DataElementWizardPage(ConceptWizardPage,TestCase):
         self.login_editor()
         from reversion.revisions import create_revision
         with create_revision():
-            ani   = models.ObjectClass.objects.create(name="animagus",definition="",workgroup=self.wg1)
-            at    = models.Property.objects.create(name="animal type",definition="",workgroup=self.wg1)
+            ani   = models.ObjectClass.objects.create(name="animagus",definition="my definition",workgroup=self.wg1)
+            at    = models.Property.objects.create(name="animal type",definition="my definition",workgroup=self.wg1)
             momat = models.ValueDomain.objects.create(name="MoM animal type classification",
                     definition="Ministry of Magic standard classification of animagus animal types",workgroup=self.wg1)
 

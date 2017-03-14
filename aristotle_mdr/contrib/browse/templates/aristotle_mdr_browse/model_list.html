@@ -19,17 +19,19 @@
         </thead>
         <tbody>
       {% for obj in object_list %}
-        <tr>
-            <td>
-                <a href="{% url 'browse_concepts' app.label obj.model %}">{{ obj.model_class.get_verbose_name_plural }}</a>
-            </td>
-            <td>
-                {{ obj.model_class|visible_count:request.user }}
-            </td>
-            <td>
-                {% help_doc obj.model_class %}
-            </td>
-        </tr>
+        {% if obj.model_class|visible_count:request.user %}
+          <tr>
+              <td>
+                  <a href="{% url 'browse_concepts' app.label obj.model %}">{{ obj.model_class.get_verbose_name_plural }}</a>
+              </td>
+              <td>
+                  {{ obj.model_class|visible_count:request.user }}
+              </td>
+              <td>
+                  {% help_doc obj.model_class %}
+              </td>
+          </tr>
+        {% endif %}
       {% endfor %}
       </tbody>
     </table>

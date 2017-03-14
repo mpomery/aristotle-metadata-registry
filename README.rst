@@ -4,7 +4,7 @@ Aristotle Metadata Registry (Aristotle-MDR)
 
 |aristotle-logo|
 
-|build-status| |docs| |coveralls| |demoserver| |codeclimate|
+|tci-build-status| |docs| |coveralls| |demoserver| |codeclimate| |av-build-status|
 
 Introduction and mission statement
 ----------------------------------
@@ -96,7 +96,7 @@ or reviewing the `documentation <http://aristotle-metadata-registry.readthedocs.
 
 About the badges (plus some extras):
 ++++++++++++++++++++++++++++++++++++
-* |build-status| - Travis-CI, showing the details of the continuous testing suite
+* |tci-build-status| - Travis-CI, showing the details of the continuous testing suite
 * |docs| - Read the docs, with details on installing, configuring and extending Aristotle-MDR
 * |coveralls| - Coveralls, showing in-depth code coverage
 * |codecov| - Codecov.io, showing even greater in-depth code coverage with branch coverage
@@ -105,10 +105,15 @@ About the badges (plus some extras):
 * |waffleio| - Waffle.io bugs ready to be actioned.
 * |codeclimate| - Code Climate - additional code metrics
 
-.. |build-status| image:: https://travis-ci.org/aristotle-mdr/aristotle-metadata-registry.svg?branch=master
-    :alt: build status
+.. |tci-build-status| image:: https://travis-ci.org/aristotle-mdr/aristotle-metadata-registry.svg?branch=master
+    :alt: Travis-CI build status
     :scale: 100%
     :target: https://travis-ci.org/aristotle-mdr/aristotle-metadata-registry
+
+.. |av-build-status| image:: https://ci.appveyor.com/api/projects/status/1swylnist5i9ogb2/branch/master?svg=true
+    :alt: Appveyor build status
+    :scale: 100%
+    :target: https://ci.appveyor.com/project/LegoStormtroopr/aristotle-metadata-registry-361e5/branch/develop
 
 .. |docs| image:: https://readthedocs.org/projects/aristotle-metadata-registry/badge/?version=latest
     :alt: Documentation Status

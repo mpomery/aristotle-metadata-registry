@@ -25,7 +25,12 @@
                     data-toggle="modal" data-target="#infobox_modal"
                 >{{ item.get_verbose_name }}</a>
             </dd>
-            <dt>Aristotle ID</dt><dd>{{ item.id }}</dd>
+            <!-- dt>Aristotle ID</dt><dd>{{ item.id }}</dd -->
+            <dt>Identifiers</dt>
+            <dd>UUID - <span title='{{ item.uuid }}'>{{ item.uuid }}</span></dd>
+            {% for ident in item.identifiers.all %}
+                <dd><a href="{{ident.namespace.naming_authority.get_absolute_url}}">{{ ident.prefix }}</a>:{{ ident.identifier }}:{{ ident.version }}</dd>
+            {% endfor %}
             {% if item.short_name %}
             <dt class="visible-xs">{% trans 'Short name'%}</dt><dd class="visible-xs">{{ item.short_name }}</dd>
             {% endif %}
@@ -41,31 +46,29 @@
             {% comment %}
             {# These may yet be removed, I don't like it #}
             <dt>Included in</dt>
-            <dd>
-                {% with total=item.packages.count %}
-                {% if total > 0 %}<a href="{{ request.path }}/packages">{% endif %}
-                {{ total }} {% trans 'Package' context "Aristotle Package" %}{{ total|pluralize }}
-                {% if total > 0 %}</a>{% endif %}
-                {% endwith %}
-            </dd>
             {% block includes %}{% endblock %}
             {% endcomment %}
-            {% include "aristotle_mdr/statuses.html" with statuses=item.current_statuses infoBox=True %}
-
+            
+            {% if item.registerable %}
+            {% include "aristotle_mdr/infobox_statuses.html" with statuses=item.current_statuses %}
+            {% endif %}
+            
             {% if item.publicationrecord and not item.current_statuses %}
                 {% include "aristotle_self_publish/concepts/publication_details.html" with item=item %}
             {% endif %}
 
             <dt>{% trans 'Last updated'%}</dt>
             <dd>
-                {% if request.user.is_superuser or request.user.is_staff and item.workgroup in request.user.workgroups %}
-                    <time title="{{ item.modified|date:'o-m-d H:i e' }}" datetime="{{ item.modified|date:'c' }}">
-                        <a href="{% historyLink item %}">{{item.modified|naturaltime}}</a>
-                    </time>
-                {% elif item.workgroup in request.user.workgroups %}
-                    <time title="{{ item.modified|date:'o-m-d H:i e' }}" datetime="{{ item.modified|date:'c' }}">
-                        <a href="{% url 'aristotle:item_history' iid=item.id %}">{{item.modified|naturaltime}}</a>
-                    </time>
+                {% if request.user.is_authenticated %}
+                    {% if request.user.is_superuser or request.user.is_staff and item.workgroup in request.user.workgroups %}
+                        <time title="{{ item.modified|date:'o-m-d H:i e' }}" datetime="{{ item.modified|date:'c' }}">
+                            <a href="{% historyLink item %}">{{item.modified|naturaltime}}</a>
+                        </time>
+                    {% elif item.workgroup in request.user.workgroups or item.submitter == request.user %}
+                        <time title="{{ item.modified|date:'o-m-d H:i e' }}" datetime="{{ item.modified|date:'c' }}">
+                            <a href="{% url 'aristotle:item_history' iid=item.id %}">{{item.modified|naturaltime}}</a>
+                        </time>
+                    {% endif %}
                 {% else %}
                     <time title="{{ item.modified|date:'o-m-d H:i e' }}" datetime="{{ item.modified|date:'c' }}">
                         {{item.modified|naturaltime}}

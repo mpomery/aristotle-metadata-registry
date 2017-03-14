@@ -1,3 +1,4 @@
+from django import VERSION as django_version
 from django.apps import apps
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -9,10 +10,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import slugify
-from django.template.loader import select_template
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
+from django.utils.module_loading import import_string
 
 import reversion
 from reversion_compare.views import HistoryCompareDetailView
@@ -25,7 +26,7 @@ from aristotle_mdr import perms
 from aristotle_mdr.utils import cache_per_item_user, url_slugify_concept
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
-from aristotle_mdr.utils import get_concepts_for_apps
+from aristotle_mdr.utils import get_concepts_for_apps, fetch_aristotle_settings
 from aristotle_mdr.views.utils import generate_visibility_matrix
 
 from haystack.views import FacetedSearchView
@@ -89,17 +90,14 @@ def concept(*args, **kwargs):
 
 def measure(request, iid, model_slug, name_slug):
     item = get_object_or_404(MDR.Measure, pk=iid).item
-    template = select_template([item.template])
-    context = RequestContext(
-        request,
+    return render(
+        request, [item.template],
         {
             'item': item,
             # 'view': request.GET.get('view', '').lower(),
             # 'last_edit': last_edit
         }
     )
-
-    return HttpResponse(template.render(context))
 
     # return render_if_user_can_view(MDR.Measure, *args, **kwargs)
 
@@ -124,9 +122,8 @@ def render_if_condition_met(request, condition, objtype, iid, model_slug=None, n
     last_edit = Version.objects.get_for_object(item).first()
 
     default_template = "%s/concepts/%s.html" % (item.__class__._meta.app_label, item.__class__._meta.model_name)
-    template = select_template([default_template, item.template])
-    context = RequestContext(
-        request,
+    return render(
+        request, [default_template, item.template],
         {
             'item': item,
             # 'view': request.GET.get('view', '').lower(),
@@ -134,8 +131,6 @@ def render_if_condition_met(request, condition, objtype, iid, model_slug=None, n
             'last_edit': last_edit
         }
     )
-
-    return HttpResponse(template.render(context))
 
 
 def registrationHistory(request, iid):
@@ -170,9 +165,19 @@ def create_list(request):
     if not perms.user_is_editor(request.user):
         raise PermissionDenied
 
-    aristotle_apps = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS', [])
+    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
     aristotle_apps += ["aristotle_mdr"]
     out = {}
+
+    wizards = []
+    for wiz in getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('METADATA_CREATION_WIZARDS', []):
+        w = wiz.copy()
+        _w = {
+            'model': apps.get_app_config(wiz['app_label']).get_model(wiz['model']),
+            'class': import_string(wiz['class']),
+        }
+        w.update(_w)
+        wizards.append(w)
 
     for m in get_concepts_for_apps(aristotle_apps):
         # Only output subclasses of 11179 concept
@@ -185,7 +190,13 @@ def create_list(request):
         app_models['models'].append((m, m.model_class()))
         out[m.app_label] = app_models
 
-    return render(request, "aristotle_mdr/create/create_list.html", {'models': out})
+    return render(
+        request, "aristotle_mdr/create/create_list.html",
+        {
+            'models': out,
+            'wizards': wizards
+        }
+    )
 
 
 @login_required
@@ -331,7 +342,10 @@ def deprecate(request, iid):
                         item.supersedes.remove(i)
                 for i in form.cleaned_data['olderItems']:
                     if user_can_edit(request.user, i):  # Would check item.supersedes but its a set
-                        item.supersedes.add(i)
+                        kwargs = {}
+                        if django_version > (1, 9):
+                            kwargs = {'bulk': False}
+                        item.supersedes.add(i, **kwargs)
             return HttpResponseRedirect(url_slugify_concept(item))
     else:
         form = MDRForms.DeprecateForm(user=request.user, item=item, qs=qs)
@@ -340,7 +354,7 @@ def deprecate(request, iid):
 
 def extensions(request):
     content=[]
-    aristotle_apps = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS', [])
+    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
 
     if aristotle_apps:
         for app_label in aristotle_apps:
@@ -381,4 +395,14 @@ class PermissionSearchView(FacetedSearchView):
     def build_form(self):
         form = super(self.__class__, self).build_form()
         form.request = self.request
+        form.request.GET = self.clean_facets(self.request)
         return form
+
+    def clean_facets(self, request):
+        get = request.GET.copy()
+        for k, val in get.items():
+            if k.startswith('f__'):
+                get.pop(k)
+                k = k[4:]
+                get.update({'f': '%s::%s' % (k, val)})
+        return get

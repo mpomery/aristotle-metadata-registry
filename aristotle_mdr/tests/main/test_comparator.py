@@ -86,7 +86,7 @@ class ComparatorTester(utils.LoggedInViewPages):
 
         self.assertTrue('item_a' not in form.errors.keys())
         self.assertTrue('item_b' not in form.errors.keys())
-        self.assertTrue('>different </ins' in response.content)  # check that we have made a diff
+        self.assertContains(response, '>different </ins')  # check that we have made a diff
 
         same = response.context['same']
         self.assertTrue('definition' in same.keys())  # check that we have made a diff

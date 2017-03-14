@@ -1,9 +1,10 @@
 {% extends "aristotle_mdr/base.html" %}
-{% load aristotle_tags staticfiles compile_static %}
+{% load aristotle_tags compile_static %}
+{% load static from staticfiles %}
 
 {% block title %}My Dashboard{% endblock %}
 {% block extra_head_scripts %}
-<link rel="stylesheet" href="{{ STATIC_URL }}{% compile 'aristotle_mdr/aristotle.dashboard.less' %}" />
+    <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.dashboard.less'|compile %}" />
 {% endblock %}
 
 {% block content %}

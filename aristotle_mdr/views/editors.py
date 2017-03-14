@@ -8,7 +8,7 @@ from django.forms import ValidationError, ModelForm
 from django.forms.models import modelformset_factory, inlineformset_factory
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template import RequestContext, TemplateDoesNotExist
+from django.template import TemplateDoesNotExist
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView
@@ -51,8 +51,8 @@ class PermissionFormView(FormView):
         })
         return kwargs
 
-    def get_context_data(self, form, **kwargs):
-        context = super(PermissionFormView, self).get_context_data(form=form, **kwargs)
+    def get_context_data(self, *args, **kwargs):
+        context = super(PermissionFormView, self).get_context_data(*args, **kwargs)
         context.update({'model': self.model._meta.model_name,
                         'app_label': self.model._meta.app_label,
                         'item': self.item})
@@ -61,6 +61,11 @@ class PermissionFormView(FormView):
 
 class EditItemView(PermissionFormView):
     template_name = "aristotle_mdr/actions/advanced_editor.html"
+
+    def __init__(self, *args, **kwargs):
+        super(EditItemView, self).__init__(*args, **kwargs)
+        self.slots_active = 'aristotle_mdr.contrib.slots' in settings.INSTALLED_APPS
+        self.identifiers_active = 'aristotle_mdr.contrib.identifiers' in settings.INSTALLED_APPS
 
     def get_form_class(self):
         return MDRForms.wizards.subclassed_edit_modelform(self.model)
@@ -79,48 +84,84 @@ class EditItemView(PermissionFormView):
         if form.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
                 item = form.save(commit=False)
-                slot_formset = self.get_slots_formset()(request.POST, request.FILES, item.concept)
 
-                if slot_formset.is_valid():
+                has_change_comments = form.data.get('change_comments', False)
+                change_comments = form.data.get('change_comments', "")
+                if self.slots_active:
+                    slot_formset = self.get_slots_formset()(request.POST, request.FILES, item.concept)
+                    if slot_formset.is_valid():
 
-                    # Save the slots
-                    slot_formset.save()
+                        # Save the slots
+                        slot_formset.save()
 
-                    # Save the change comments
-                    reversion.revisions.set_user(request.user)
-                    change_comments = form.data.get('change_comments', None)
-                    if not change_comments:
-                        change_comments = construct_change_message(request, form, [slot_formset])
-                    reversion.revisions.set_comment(change_comments)
+                        # Save the change comments
+                        if not has_change_comments:
+                            change_comments += construct_change_message(request, form, [slot_formset])
+                    else:
+                        return self.form_invalid(form, slots_FormSet=slot_formset)
 
-                    item.save()
-                    return HttpResponseRedirect(url_slugify_concept(self.item))
+                if self.identifiers_active:
+                    id_formset = self.get_identifier_formset()(request.POST, request.FILES, item.concept)
+                    if id_formset.is_valid():
 
-        return self.form_invalid(form, slot_formset)
+                        # Save the slots
+                        id_formset.save()
+
+                        if not has_change_comments:
+                            change_comments += construct_change_message(request, form, [id_formset])
+                    else:
+                        return self.form_invalid(form, identifier_FormSet=id_formset)
+
+                reversion.revisions.set_user(request.user)
+                reversion.revisions.set_comment(change_comments)
+                form.save_m2m()
+                item.save()
+                return HttpResponseRedirect(url_slugify_concept(self.item))
+
+        return self.form_invalid(form)
 
     def get_slots_formset(self):
         from aristotle_mdr.contrib.slots.forms import slot_inlineformset_factory
         return slot_inlineformset_factory(model=self.model)
 
-    def form_invalid(self, form, slots_FormSet=None):
+    def get_identifier_formset(self):
+        from aristotle_mdr.contrib.identifiers.models import ScopedIdentifier
+        from django.forms.models import inlineformset_factory
+        return inlineformset_factory(
+            MDR._concept, ScopedIdentifier,
+            can_delete=True,
+            fields=('concept', 'namespace', 'identifier', 'version'),
+            extra=1,
+            )
+
+    def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None):
         """
         If the form is invalid, re-render the context data with the
         data-filled form and errors.
         """
         return self.render_to_response(self.get_context_data(form=form, slots_FormSet=slots_FormSet))
 
-    def get_context_data(self, form, **kwargs):
-        from aristotle_mdr.contrib.slots.models import Slot, SlotDefinition
-        context = super(EditItemView, self).get_context_data(form=form, **kwargs)
-        if kwargs.get('slots_FormSet', None):
+    def get_context_data(self, *args, **kwargs):
+        from aristotle_mdr.contrib.slots.models import Slot
+        context = super(EditItemView, self).get_context_data(*args, **kwargs)
+        if self.slots_active and kwargs.get('slots_FormSet', None):
             context['slots_FormSet'] = kwargs['slots_FormSet']
         else:
             context['slots_FormSet'] = self.get_slots_formset()(
                 queryset=Slot.objects.filter(concept=self.item.id),
                 instance=self.item.concept
                 )
-        context['show_slots_tab'] = True
-        context['concept_slots'] = SlotDefinition.objects.filter(app_label=self.model._meta.app_label, concept_type=self.model._meta.model_name)
+        from aristotle_mdr.contrib.identifiers.models import ScopedIdentifier
+        if self.identifiers_active and kwargs.get('identifier_FormSet', None):
+            context['identifier_FormSet'] = kwargs['identifier_FormSet']
+        else:
+            context['identifier_FormSet'] = self.get_identifier_formset()(
+                queryset=ScopedIdentifier.objects.filter(concept=self.item.id),
+                instance=self.item.concept
+                )
+
+        context['show_slots_tab'] = self.slots_active
+        context['show_id_tab'] = self.identifiers_active
         return context
 
 

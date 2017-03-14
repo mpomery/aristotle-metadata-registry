@@ -7,8 +7,11 @@ SECRET_KEY = os.getenv('aristotlemdr__SECRET_KEY', "OVERRIDE_THIS_IN_PRODUCTION"
 STATIC_ROOT = os.getenv('aristotlemdr__STATIC_ROOT', os.path.join(BASE_DIR, "static"))
 MEDIA_ROOT = os.getenv('aristotlemdr__MEDIA_ROOT', os.path.join(BASE_DIR, "media"))
 
-TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
+TEMPLATES_DIRS = [os.path.join(BASE_DIR, 'templates')]
 FIXTURES_DIRS = [os.path.join(BASE_DIR, 'fixtures')]
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 # This provides for quick easy set up, but should be changed to a production
@@ -26,9 +29,23 @@ CACHES = {
     }
 }
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': TEMPLATES_DIRS,
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.request',
+                'django.template.context_processors.static',
+                'aristotle_mdr.context_processors.settings',
+                'django.contrib.messages.context_processors.messages',
+            ],
+            'debug': DEBUG
+        },
+    },
+]
 
 MEDIA_URL = '/media/'
 CKEDITOR_UPLOAD_PATH = 'uploads/'
@@ -37,6 +54,9 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 # Required for admindocs, see: https://code.djangoproject.com/ticket/21386
 SITE_ID=None
 
+# This gets called because of the DataElementConcept.property attribute.
+# Not sure how to resolve this one yet.
+SILENCED_SYSTEM_CHECKS = ['models.E006']
 
 ALLOWED_HOSTS = []
 
@@ -97,14 +117,6 @@ MIDDLEWARE_CLASSES = (
 )
 
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.request',
-    'django.core.context_processors.static',
-    'aristotle_mdr.context_processors.settings',
-    'django.contrib.messages.context_processors.messages',
-)
-
 ROOT_URLCONF = 'aristotle_mdr.urls'
 LOGIN_REDIRECT_URL = '/account/home'
 LOGIN_URL = '/login'
@@ -152,7 +164,21 @@ ARISTOTLE_SETTINGS = {
         'request_review': 'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
         'bulk_download': 'aristotle_mdr.forms.bulk_actions.BulkDownloadForm',
     },
-    'DASHBOARD_ADDONS': []
+    'DASHBOARD_ADDONS': [],
+    'METADATA_CREATION_WIZARDS': [
+        {
+            'app_label': 'aristotle_mdr',
+            'model': 'DataElement',
+            'class': 'aristotle_mdr.views.wizards.DataElementWizard',
+            'link': 'create/wizard/aristotle_mdr/dataelement',
+        },
+        {
+            'app_label': 'aristotle_mdr',
+            'model': 'DataElementConcept',
+            'class': 'aristotle_mdr.views.wizards.DataElementConceptWizard',
+            'link': 'create/wizard/aristotle_mdr/dataelementconcept',
+        }
+    ]
 }
 ARISTOTLE_DOWNLOADS = [
     # (fileType, menu, font-awesome-icon, module)

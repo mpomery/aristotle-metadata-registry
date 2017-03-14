@@ -5,10 +5,15 @@
 {% block header %}
    {% include 'aristotle_mdr/header.html' with hide_search=True %}
 {% endblock %}
+
+{% block extra_head_scripts %}
+{% include 'meta/schemaorg/home.html' %}
+{% endblock %}
+
 {% block content %}
 
 <div class="jumbotron">
-<p>{{ config.SITE_INTRO }}</p>
+<h1>{{ config.SITE_INTRO }}</h1>
 <form id="homeSearch" action="{% url 'aristotle:search' %}" method="get" >
         <input type="text" class="form-control" id="searchText" name="q" accesskey="q"></input>
         <div class="text-center" style="margin-top:5px;">

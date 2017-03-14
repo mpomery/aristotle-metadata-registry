@@ -1,6 +1,7 @@
 {% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
 {% load compile_static i18n %}
 {% load aristotle_tags %}
+{% load static from staticfiles %}
 
 {% block title %}Change state for {{ item.name }}{% endblock %}
 {% block content %}
@@ -107,6 +108,6 @@
     }
 </script>
     {% block extra_head_scripts %}
-        <script src="{{ STATIC_URL }}aristotle_mdr/aristotle.status_change.js"></script>
+        <script src="{% static 'aristotle_mdr/aristotle.status_change.js' %}"></script>
     {% endblock %}
 {% endblock %}

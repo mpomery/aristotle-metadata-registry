@@ -17,6 +17,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from aristotle_mdr.contrib.help.models import ConceptHelp
+from aristotle_mdr.utils import fetch_aristotle_settings
 
 from formtools.wizard.views import SessionWizardView
 from reversion import revisions as reversion
@@ -209,6 +210,10 @@ class MultiStepAristotleWizard(PermissionWizard):
     This should not be extended for creating other type of Aristotle/11179 concepts - make a fresh wizard.
     """
 
+    @property
+    def display(self):
+        return self.__doc__
+
     def get_object_class(self):
         if hasattr(self, '_object_class'):
             return self._object_class
@@ -314,7 +319,7 @@ class MultiStepAristotleWizard(PermissionWizard):
                 # remove the tailing period as we are going to try to make a sentence
                 pr_desc = pr_desc[:-1]
 
-            SEPARATORS = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('SEPARATORS', {})
+            SEPARATORS = fetch_aristotle_settings().get('SEPARATORS', {})
             initial.update({
                 'name': u"{oc}{separator}{pr}".format(
                     oc=oc_name,
@@ -329,6 +334,12 @@ class MultiStepAristotleWizard(PermissionWizard):
 
 
 class DataElementConceptWizard(MultiStepAristotleWizard):
+    __doc__ = _(
+        "This wizard steps a user through creating a Data Element Concept, "
+        "as well as helping reuse or create the Object Class and Property to "
+        "accurately describe the new Data Element Concept."
+    )
+
     model = MDR.DataElementConcept
     templates = {
         "component_search": "aristotle_mdr/create/dec_1_initial_search.html",
@@ -406,6 +417,14 @@ class DataElementConceptWizard(MultiStepAristotleWizard):
             'completed': {'percent_complete': 100, 'step_title': _('Complete and Save')},
             }.get(self.steps.current, {}))
 
+        if self.steps.current == 'component_results':
+            ocp = self.get_cleaned_data_for_step('component_search')
+            context.update({
+                'oc_name': ocp.get('oc_name', ""),
+                'oc_definition': ocp.get('oc_desc', ""),
+                'pr_name': ocp.get('pr_name', ""),
+                'pr_definition': ocp.get('pr_desc', ""),
+            })
         if self.steps.current == 'make_oc':
             context.update({
                 'model_name': MDR.ObjectClass._meta.verbose_name,
@@ -496,6 +515,12 @@ def has_valid_data_elements_from_components(wizard):
 
 
 class DataElementWizard(MultiStepAristotleWizard):
+    __doc__ = _(
+        "This wizard steps a user through creating a Data Element, "
+        "as well as helping reuse or create the Value Domain and Data Element Concept - "
+        "as well as the Object Class and Property that complete describe the new Data Element."
+    )
+
     model = MDR.DataElement
     templates = {
         "component_search": "aristotle_mdr/create/de_1_initial_search.html",
@@ -681,6 +706,16 @@ class DataElementWizard(MultiStepAristotleWizard):
             },
             }.get(self.steps.current, {}))
 
+        if self.steps.current == 'component_results':
+            ocp = self.get_cleaned_data_for_step('component_search')
+            context.update({
+                'oc_name': ocp.get('oc_name', ""),
+                'oc_definition': ocp.get('oc_desc', ""),
+                'pr_name': ocp.get('pr_name', ""),
+                'pr_definition': ocp.get('pr_desc', ""),
+                'vd_name': ocp.get('vd_name', ""),
+                'vd_definition': ocp.get('vd_desc', "")
+            })
         if self.steps.current == 'make_vd':
             context.update({
                 'model_name': MDR.ValueDomain._meta.verbose_name,
@@ -758,7 +793,7 @@ class DataElementWizard(MultiStepAristotleWizard):
                 # remove the trailing period as we are going to try to make a sentence
                 dec_desc = dec_desc[:-1]
 
-            SEPARATORS = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('SEPARATORS', {})
+            SEPARATORS = fetch_aristotle_settings().get('SEPARATORS', {})
 
             initial.update({
                 'name': u"{dec}{separator}{vd}".format(dec=dec_name, separator=SEPARATORS["DataElement"], vd=vd_name),

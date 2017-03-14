@@ -42,13 +42,12 @@ setup(
         'pyyaml',
         'lesscpy',
 
-        'django-model-utils==2.3.1',
-        'django-notifications-hq>=1.0', #At least 0.8 for live notifications.
+        'django-model-utils>=2.3.1',
+        'django-notifications-hq>=1.0',
         'docutils',
 
         #Search requirements
         'django-haystack==2.5.0',
-        'Whoosh',
 
         #Rich text editors
         'django-ckeditor>=5.0.0',
@@ -62,13 +61,12 @@ setup(
         'django-static-precompiler',
         'django-autocomplete-light>=3.0.0',
         'django-bootstrap3',
-        'django-bootstrap3-datetimepicker',
+        'django-bootstrap3-datetimepicker-2',
 
-        # This was migrated out of django1.7, needed for django1.8
         'django-formtools',
 
-        'html5lib==1.0b8',
-        'xhtml2pdf',
+        'html5lib==1.0b10',
+        'xhtml2pdf>=0.2b1',
         #'django-tastypie'
 
         # required for help, but thats required

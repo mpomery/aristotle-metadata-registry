@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from aristotle_mdr.utils import fetch_aristotle_settings
 
 VIEW_CACHE_SECONDS=60
 EDIT_CACHE_SECONDS=60
@@ -145,7 +146,7 @@ def user_in_workgroup(user, wg):
 
 def user_can_move_any_workgroup(user):
     """Checks if a user can move an item from any of their workgroups"""
-    workgroup_change_access = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('WORKGROUP_CHANGES', [])
+    workgroup_change_access = fetch_aristotle_settings().get('WORKGROUP_CHANGES', [])
 
     if user.is_superuser:
         return True
@@ -160,7 +161,7 @@ def user_can_move_any_workgroup(user):
 
 
 def user_can_add_or_remove_workgroup(user, workgroup):
-    workgroup_change_access = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('WORKGROUP_CHANGES', [])
+    workgroup_change_access = fetch_aristotle_settings().get('WORKGROUP_CHANGES', [])
 
     if user.is_superuser:
         return True
@@ -184,3 +185,7 @@ def user_can_move_to_workgroup(user, workgroup):
 def user_can_move_between_workgroups(user, workgroup_a, workgroup_b):
     """checks if a user can move an item from A to B"""
     return user_can_remove_from_workgroup(user, workgroup_a) and user_can_move_to_workgroup(user, workgroup_b)
+
+
+def user_can_query_user_list(user):
+    return user.is_superuser or user.profile.is_workgroup_manager() or user.profile.is_registrar
