@@ -100,15 +100,15 @@ msgstr ""
 
 #: aristotle_mdr/contrib/help/models.py:27
 msgid "A short title for the help page"
-msgstr ""
+msgstr "Kort titel för hjälpsidan"
 
 #: aristotle_mdr/contrib/help/models.py:31
 msgid "A long help definition for an object or topic"
-msgstr ""
+msgstr "Lång hjälptext för objekt eller ämne"
 
 #: aristotle_mdr/contrib/help/models.py:57
 msgid "A short description of the concept"
-msgstr ""
+msgstr "Kort beskrivning av konceptet"
 
 #: aristotle_mdr/contrib/help/models.py:61
 msgid ""
@@ -126,12 +126,12 @@ msgstr ""
 
 #: aristotle_mdr/contrib/help/models.py:73
 msgid "Instructions for creating good content of this type"
-msgstr ""
+msgstr "Instruktioner för att skapa bra innehåll av den här typen"
 
 #: aristotle_mdr/contrib/help/models.py:102
 #, python-format
 msgid "Help for concept type %s"
-msgstr ""
+msgstr "Hjälp för koncepttypen %s"
 
 #: aristotle_mdr/contrib/help/templates/aristotle_mdr_help/all_help.html:28
 #: aristotle_mdr/contrib/help/templates/aristotle_mdr_help/base.html:25
@@ -147,11 +147,11 @@ msgstr "Sök"
 #, fuzzy
 #| msgid "Search"
 msgid "Search help"
-msgstr "Sök"
+msgstr "Sökhjälp"
 
 #: aristotle_mdr/contrib/help/templates/aristotle_mdr_help/concept_help.html:20
 msgid "Click to view the official source"
-msgstr ""
+msgstr "Klicka för att visa den officiella källan"
 
 #: aristotle_mdr/forms/admin.py:23 aristotle_mdr/forms/admin.py:24
 #: aristotle_mdr/forms/admin.py:25 aristotle_mdr/forms/admin.py:26
@@ -164,7 +164,7 @@ msgstr ""
 
 #: aristotle_mdr/forms/bulk_actions.py:115
 msgid "Add bookmark"
-msgstr ""
+msgstr "Lägg till bokmärke"
 
 #: aristotle_mdr/forms/bulk_actions.py:123
 #, python-format
@@ -175,7 +175,7 @@ msgstr ""
 
 #: aristotle_mdr/forms/bulk_actions.py:133
 msgid "Remove bookmark"
-msgstr ""
+msgstr "Ta bort bokmärke"
 
 #: aristotle_mdr/forms/bulk_actions.py:138
 #, python-format
@@ -185,7 +185,7 @@ msgstr ""
 #: aristotle_mdr/forms/bulk_actions.py:144
 #, fuzzy
 msgid "Change state"
-msgstr "Byt lösenord"
+msgstr "Byt läge"
 
 #: aristotle_mdr/forms/bulk_actions.py:179
 #, python-format
@@ -196,11 +196,11 @@ msgstr ""
 
 #: aristotle_mdr/forms/creation_wizards.py:42
 msgid "You do not have permission to move an item between workgroups."
-msgstr ""
+msgstr "Du har inte rättigheter att flytta entiteter mellan arbetsgrupper."
 
 #: aristotle_mdr/forms/creation_wizards.py:43
 msgid "You do not have permission to remove an item from this workgroup."
-msgstr ""
+msgstr "Du har inte rättigheter att ta bort entiteter från arbetsgruppen."
 
 #: aristotle_mdr/forms/creation_wizards.py:44
 msgid "You do not have permission to move an item to that workgroup."
@@ -275,7 +275,7 @@ msgstr ""
 #: aristotle_mdr/forms/workgroups.py:12
 #, fuzzy
 msgid "Workgroup roles"
-msgstr "arbetsgrupper"
+msgstr "arbetsgruppsroller"
 
 #: aristotle_mdr/forms/workgroups.py:17
 msgid "Select users"
@@ -323,7 +323,7 @@ msgstr "Pensionerad"
 
 #: aristotle_mdr/models.py:54
 msgid "The primary name used for human identification purposes."
-msgstr ""
+msgstr "Primärt namn som används för mänsklig identifikation"
 
 #: aristotle_mdr/models.py:57
 #, fuzzy
@@ -434,11 +434,11 @@ msgstr ""
 
 #: aristotle_mdr/templates/admin/aristotle_admin_base.html:88
 msgid "Return to the main site"
-msgstr ""
+msgstr "Återvänd till huvudsidan"
 
 #: aristotle_mdr/templates/admin/aristotle_admin_base.html:105
 msgid "Browse live documentation"
-msgstr ""
+msgstr "Blädda i dokumentationen"
 
 #: aristotle_mdr/templates/admin/aristotle_admin_base.html:105
 #, fuzzy
@@ -576,20 +576,20 @@ msgstr ""
 
 #: aristotle_mdr/templates/aristotle_mdr/actions/changeStatus.html:120
 msgid "hidden"
-msgstr ""
+msgstr "dold"
 
 #: aristotle_mdr/templates/aristotle_mdr/actions/changeStatus.html:121
 msgid "locked"
-msgstr ""
+msgstr "låst"
 
 #: aristotle_mdr/templates/aristotle_mdr/actions/changeStatus.html:122
 msgid "public"
-msgstr ""
+msgstr "publik"
 
 #: aristotle_mdr/templates/aristotle_mdr/actions/compare/compare_items.html:61
 #: aristotle_mdr/templates/reversion-compare/compare_partial.html:34
 msgid "There are no differences."
-msgstr ""
+msgstr "Det finns inga skillnader"
 
 #: aristotle_mdr/templates/aristotle_mdr/actions/compare/compare_items.html:69
 msgid "Fields below are identical for both items."
@@ -642,7 +642,7 @@ msgstr "Ingen kommentar för versionen"
 
 #: aristotle_mdr/templates/aristotle_mdr/actions/concept_history_compare.html:20
 msgid "Compare"
-msgstr ""
+msgstr "Jämföra"
 
 #: aristotle_mdr/templates/aristotle_mdr/actions/mark_ready_to_review.html:41
 msgid "Remove ready to review flag"
@@ -899,11 +899,11 @@ msgstr "Administrationsgränssnitt"
 #: aristotle_mdr/templates/aristotle_mdr/header.html:105
 #, fuzzy
 msgid "Create new"
-msgstr "Skapa"
+msgstr "Skapa ny"
 
 #: aristotle_mdr/templates/aristotle_mdr/create/create_list.html:25
 msgid "Help"
-msgstr ""
+msgstr "Hjälp"
 
 #: aristotle_mdr/templates/aristotle_mdr/create/create_list.html:26
 #, fuzzy
@@ -932,7 +932,7 @@ msgstr "arbetsgrupper"
 
 #: aristotle_mdr/templates/aristotle_mdr/header.html:75
 msgid "Recent actions"
-msgstr ""
+msgstr "Senaste händelser"
 
 #: aristotle_mdr/templates/aristotle_mdr/header.html:85
 #: aristotle_mdr/templates/aristotle_mdr/user/userSideBar.html:88
@@ -971,7 +971,7 @@ msgstr ""
 #: aristotle_mdr/templates/aristotle_mdr/helpers/paginated_list.html:14
 #: aristotle_mdr/templates/aristotle_mdr/helpers/paginated_review_list.html:14
 msgid "Concept"
-msgstr ""
+msgstr "Koncept"
 
 #: aristotle_mdr/templates/aristotle_mdr/helpers/paginated_list.html:32
 #: aristotle_mdr/templates/aristotle_mdr/helpers/paginated_review_list.html:33
@@ -998,7 +998,7 @@ msgstr ""
 
 #: aristotle_mdr/templates/aristotle_mdr/helpers/paginated_workgroup_list.html:37
 msgid "Number of members"
-msgstr ""
+msgstr "Antal medlemmar"
 
 #: aristotle_mdr/templates/aristotle_mdr/helpers/paginated_workgroup_list.html:47
 #, fuzzy
@@ -1045,7 +1045,7 @@ msgstr ""
 
 #: aristotle_mdr/templates/aristotle_mdr/user/userInbox.html:59
 msgid "in"
-msgstr ""
+msgstr "i"
 
 #: aristotle_mdr/templates/aristotle_mdr/user/userSideBar.html:24
 msgid "All messages"
@@ -1094,7 +1094,7 @@ msgstr "Avbryt ändringar"
 
 #: aristotle_mdr/templates/registration/password_change_done.html:7
 msgid "Your password was changed."
-msgstr ""
+msgstr "Ditt lösenord har ändrats"
 
 #: aristotle_mdr/templates/registration/password_change_form.html:3
 #: aristotle_mdr/templates/registration/password_change_form.html:6
@@ -1132,13 +1132,13 @@ msgstr ""
 #: aristotle_mdr/templates/reversion-compare/action_list_partial.html:14
 #: aristotle_mdr/templates/reversion-compare/action_list_partial.html:16
 msgid "compare"
-msgstr ""
+msgstr "jämför"
 
 #: aristotle_mdr/templates/reversion-compare/action_list_partial.html:20
 #, fuzzy
 #| msgid "Date"
 msgid "Date/time"
-msgstr "Datum"
+msgstr "Datum/tid"
 
 #: aristotle_mdr/templates/reversion-compare/action_list_partial.html:40
 #: aristotle_mdr/templates/reversion-compare/action_list_partial.html:42
@@ -1147,17 +1147,17 @@ msgstr ""
 
 #: aristotle_mdr/templates/reversion-compare/compare_links_partial.html:2
 msgid "previous"
-msgstr ""
+msgstr "föregående"
 
 #: aristotle_mdr/templates/reversion-compare/compare_links_partial.html:3
 msgid "next"
-msgstr ""
+msgstr "nästa"
 
 #: aristotle_mdr/templates/reversion-compare/compare_partial.html:5
 #, fuzzy
 #| msgid "Comment"
 msgid "Edit comment:"
-msgstr "Kommentar"
+msgstr "Redigera kommentar:"
 
 #: aristotle_mdr/templates/reversion-compare/compare_partial.html:17
 msgid "Note:"
@@ -1235,17 +1235,17 @@ msgstr "Det här objektet är just nu publikt"
 #: aristotle_mdr/templatetags/aristotle_search_tags.py:63
 #, python-format
 msgid "%s is"
-msgstr ""
+msgstr "%s är"
 
 #: aristotle_mdr/templatetags/aristotle_search_tags.py:58
 #, python-format
 msgid " or %s"
-msgstr ""
+msgstr " eller %s"
 
 #: aristotle_mdr/templatetags/aristotle_search_tags.py:68
 #, fuzzy, python-format
 msgid " and %s"
-msgstr "Byt lösenord"
+msgstr " och %s"
 
 #: aristotle_mdr/templatetags/aristotle_tags.py:358
 #: aristotle_mdr/templatetags/aristotle_tags.py:360
@@ -1265,7 +1265,7 @@ msgstr " (kopia)"
 #: aristotle_mdr/utils/utils.py:76
 #, fuzzy, python-format
 msgid "Changed %s."
-msgstr "Byt lösenord"
+msgstr "Byt %s"
 
 #: aristotle_mdr/utils/utils.py:76 aristotle_mdr/utils/utils.py:88
 msgid "and"
@@ -1304,12 +1304,12 @@ msgstr ""
 #: aristotle_mdr/views/views.py:317
 #, python-format
 msgid "%s added to favourites."
-msgstr ""
+msgstr "%s lades till i favoriter."
 
 #: aristotle_mdr/views/views.py:319
 #, python-format
 msgid "%s removed from favourites."
-msgstr ""
+msgstr "%s togs bort från favoriter."
 
 #: aristotle_mdr/views/views.py:320
 msgid " Review your favourites from the user menu."
@@ -1323,7 +1323,7 @@ msgstr "Sök efter komponenter"
 
 #: aristotle_mdr/views/wizards.py:134
 msgid "Select or create"
-msgstr ""
+msgstr "Välj eller skapa"
 
 #: aristotle_mdr/views/wizards.py:287 aristotle_mdr/views/wizards.py:290
 msgid "No object class name found"
