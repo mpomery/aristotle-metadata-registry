@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='_concept',
             name='uuid',
-            field=models.SlugField(default=uuid.uuid4, editable=False, unique=True, null=False,
+            field=models.SlugField(default=uuid.uuid1, editable=False, unique=True, null=False,
                 help_text='Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries'
             ),
         ),
@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='measure',
             name='uuid',
-            field=models.SlugField(default=uuid.uuid4, editable=False, unique=True, null=False,
+            field=models.SlugField(default=uuid.uuid1, editable=False, unique=True, null=False,
                 help_text='Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries'
             ),
         ),
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='organization',
             name='uuid',
-            field=models.SlugField(default=uuid.uuid4, editable=False, unique=True, null=False,
+            field=models.SlugField(default=uuid.uuid1, editable=False, unique=True, null=False,
                 help_text='Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries'
             ),
         ),
@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='workgroup',
             name='uuid',
-            field=models.SlugField(default=uuid.uuid4, editable=False, unique=True, null=False,
+            field=models.SlugField(default=uuid.uuid1, editable=False, unique=True, null=False,
                 help_text='Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries'
             ),
         ),
