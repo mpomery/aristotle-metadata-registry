@@ -11,6 +11,8 @@ from aristotle_mdr.perms import user_can_move_between_workgroups, user_can_move_
 from aristotle_mdr.contrib.autocomplete import widgets
 
 from dal import autocomplete
+from bootstrap3_datetime.widgets import DateTimePicker
+from aristotle_mdr.widgets import BootstrapDateTimePicker
 
 
 class UserAwareForm(forms.Form):
@@ -123,6 +125,8 @@ class ConceptForm(WorkgroupVerificationMixin, UserAwareModelForm):
                     self.fields[f].queryset = self.fields[f].queryset.all().visible(self.user)
                     self.fields[f].widget = field_widget(model=self.fields[f].queryset.model)
                     self.fields[f].widget.choices = self.fields[f].choices
+            if type(self.fields[f]) == forms.fields.DateField:
+                self.fields[f].widget = BootstrapDateTimePicker(options={"format": "YYYY-MM-DD",})
 
         if not self.user.is_superuser:
             self.fields['workgroup'].queryset = self.user.profile.editable_workgroups
