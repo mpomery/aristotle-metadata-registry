@@ -48,8 +48,6 @@ Showing {{ page.paginator.count }} results.
         <td>
             {% if item.is_registered %}
                 <i class="fa fa-university fa-fw" title="Registered"></i>
-            {% elif item.readyToReview %}
-                <i class="fa fa-flag fa-fw" title="Ready to review"></i>
             {% else %}
                 <i class="fa fa-flag-o fa-fw" title="In progress"></i>
             {% endif %}
