@@ -15,7 +15,7 @@ def concept_to_dict(obj):
     ``ManyToManyFields``, but removes certain concept fields.
     """
 
-    excluded_fields='_concept_ptr readyToReview version workgroup pk id supersedes superseded_by _is_public _is_locked'.split()
+    excluded_fields='_concept_ptr version workgroup pk id supersedes superseded_by _is_public _is_locked'.split()
     concept_dict = model_to_dict(
         obj,
         fields=[field.name for field in obj._meta.fields if field.name not in excluded_fields],
