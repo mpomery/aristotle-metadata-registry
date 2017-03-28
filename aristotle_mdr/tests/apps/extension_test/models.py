@@ -37,6 +37,16 @@ class Questionnaire(aristotle_mdr.models.concept):
         aristotle_mdr.models.ObjectClass,
         through='TargetRespondentClass'
     )
+    start_date = models.DateField(
+        blank=True,
+        null=True,
+        help_text='Date the questionnaire was run from'
+    )
+    end_date = models.DateField(
+        blank=True,
+        null=True,
+        help_text='Date the questionnaire was run until'
+    )
 
     # Start of get_download_items
     def get_download_items(self):
