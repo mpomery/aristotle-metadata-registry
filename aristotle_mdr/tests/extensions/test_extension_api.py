@@ -83,7 +83,9 @@ class QuestionnaireAdmin(AdminPageForConcept, TestCase):
 
         auto_fields = response.context['adminform'].model_admin.fieldsets[-1]
         self.assertEqual(auto_fields[0], u'Extra fields for Questionnaire')
-        self.assertEqual(auto_fields[1]['fields'], ['questions'])
+        self.assertTrue('start_date' in auto_fields[1]['fields'])
+        self.assertTrue('end_date' in auto_fields[1]['fields'])
+        self.assertTrue('questions' in auto_fields[1]['fields'])
 
 
 class QuestionnaireViewPage(LoggedInViewExtensionConceptPages, TestCase):
