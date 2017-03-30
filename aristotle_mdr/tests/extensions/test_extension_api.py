@@ -52,7 +52,7 @@ class QuestionViewPage(LoggedInViewExtensionConceptPages, TestCase):
         self.logout()
         response = self.client.get(self.get_help_page())
         self.assertEqual(response.status_code, 200)
-
+        
 
 # ---- Questionnaire tests
 
@@ -83,7 +83,9 @@ class QuestionnaireAdmin(AdminPageForConcept, TestCase):
 
         auto_fields = response.context['adminform'].model_admin.fieldsets[-1]
         self.assertEqual(auto_fields[0], u'Extra fields for Questionnaire')
-        self.assertEqual(auto_fields[1]['fields'], ['questions'])
+        self.assertTrue('start_date' in auto_fields[1]['fields'])
+        self.assertTrue('end_date' in auto_fields[1]['fields'])
+        self.assertTrue('questions' in auto_fields[1]['fields'])
 
 
 class QuestionnaireViewPage(LoggedInViewExtensionConceptPages, TestCase):
@@ -152,4 +154,10 @@ class QuestionnaireViewPage(LoggedInViewExtensionConceptPages, TestCase):
         self.assertTrue(q2 in self.item1.questions.all())
         self.assertTrue(q3 not in self.item1.questions.all())
 
+    def test_datefield_in_editor(self):
+        self.login_editor()
+        response = self.client.get(reverse('aristotle:edit_item', args=[self.item1.id]))
+        self.assertEqual(response.status_code, 200)
+        form = response.context['form']
+        self.assertContains(response, 'glyphicon-calendar')  # While we use bootstrap-datewidget, this should be there.
 
