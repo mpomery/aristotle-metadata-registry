@@ -4,6 +4,8 @@ from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
+from bootstrap3_datetime.widgets import DateTimePicker
+
 
 class NameSuggestInput(TextInput):
     def __init__(self, *args, **kwargs):
@@ -35,6 +37,17 @@ class RegistrationAuthoritySelect(forms.Select):
             return mark_safe(rendered + hidden_input_with_value)
         else:
             return super(RegistrationAuthoritySelect, self).render(name, value, **kwargs)
+
+
+class BootstrapDateTimePicker(DateTimePicker):
+    class Media:
+        css = {
+            'all': ('bootstrap3_datetime/bootstrap-datetimepicker.min.css',)
+        }
+        js = (
+            'bootstrap3_datetime/moment.min.js',
+            'bootstrap3_datetime/bootstrap-datetimepicker.min.js'
+        )
 
 
 class BootstrapChoiceInput(ChoiceInput):

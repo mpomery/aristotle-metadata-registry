@@ -1,7 +1,7 @@
 --index-url https://pypi.python.org/simple/
 
 django-model-utils==2.5.1
-django-haystack==2.5.0
+django-haystack>=2.6.0,<2.7.0
 django-haystack-channels==0.0.1b
 
 xhtml2pdf>=0.2b

@@ -15,7 +15,10 @@ from haystack.query import EmptySearchQuerySet, SearchQuerySet, SQ
 from bootstrap3_datetime.widgets import DateTimePicker
 
 import aristotle_mdr.models as MDR
-from aristotle_mdr.widgets import BootstrapDropdownSelectMultiple, BootstrapDropdownIntelligentDate, BootstrapDropdownSelect
+from aristotle_mdr.widgets import (
+    BootstrapDropdownSelectMultiple, BootstrapDropdownIntelligentDate,
+    BootstrapDropdownSelect, BootstrapDateTimePicker
+)
 from aristotle_mdr.utils import fetch_aristotle_settings
 
 
@@ -129,7 +132,7 @@ class PermissionSearchQuerySet(SearchQuerySet):
             sqs = sqs.filter(q)
             return sqs
 
-        q = SQ(submitter_id=user.pk)  # users can see items they create
+        q |= SQ(submitter_id=user.pk)  # users can see items they create
         if user.is_superuser:
             q = SQ()  # Super-users can see everything
         else:
@@ -266,12 +269,12 @@ class PermissionSearchForm(TokenSearchForm):
     mds = forms.DateField(
         required=False,
         label="Modified after date",
-        widget=DateTimePicker(options=datePickerOptions)
+        widget=BootstrapDateTimePicker(options=datePickerOptions)
     )
     mde = forms.DateField(
         required=False,
         label="Modified before date",
-        widget=DateTimePicker(options=datePickerOptions)
+        widget=BootstrapDateTimePicker(options=datePickerOptions)
     )
     cq=forms.ChoiceField(
         required=False,
@@ -282,12 +285,12 @@ class PermissionSearchForm(TokenSearchForm):
     cds = forms.DateField(
         required=False,
         label="Created after date",
-        widget=DateTimePicker(options=datePickerOptions)
+        widget=BootstrapDateTimePicker(options=datePickerOptions)
     )
     cde = forms.DateField(
         required=False,
         label="Created before date",
-        widget=DateTimePicker(options=datePickerOptions)
+        widget=BootstrapDateTimePicker(options=datePickerOptions)
     )
 
     # Use short singular names

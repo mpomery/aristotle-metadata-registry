@@ -651,7 +651,6 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         import reversion
         #from reversion import revisions as reversion
         with reversion.revisions.create_revision():
-            self.item1.readyToReview = True
             self.item1.save()
         original_name = self.item1.name
 
