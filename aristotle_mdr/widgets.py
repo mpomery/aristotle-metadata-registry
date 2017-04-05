@@ -1,5 +1,12 @@
 from django import forms
-from django.forms.widgets import TextInput, CheckboxSelectMultiple, ChoiceFieldRenderer, ChoiceInput, CheckboxChoiceInput, RadioSelect
+#from django.forms.widgets import TextInput, CheckboxSelectMultiple, ChoiceFieldRenderer, ChoiceInput, CheckboxChoiceInput, RadioSelect
+from django.forms.widgets import (
+    TextInput, CheckboxSelectMultiple, Input,
+    #ChoiceFieldRenderer, 
+    #ChoiceInput,
+    #CheckboxChoiceInput,
+    RadioSelect
+)
 from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -50,7 +57,7 @@ class BootstrapDateTimePicker(DateTimePicker):
         )
 
 
-class BootstrapChoiceInput(ChoiceInput):
+class BootstrapChoiceInput(Input): #(ChoiceInput):
     input_type = 'radio'
 
     def render(self, name=None, value=None, attrs=None, choices=()):
@@ -68,53 +75,53 @@ class BootstrapChoiceInput(ChoiceInput):
         return super(BootstrapChoiceInput, self).tag()
 
 
-class BootstrapCheckInput(BootstrapChoiceInput, CheckboxChoiceInput):
+class BootstrapCheckInput(BootstrapChoiceInput, Input): #CheckboxChoiceInput):
     input_type = 'checkbox'
 
 
-class BootstrapChoiceFieldRenderer(ChoiceFieldRenderer):
-    wrap = True
-    choice_input_class = BootstrapChoiceInput
+# class BootstrapChoiceFieldRenderer(ChoiceFieldRenderer):
+#     wrap = True
+#     choice_input_class = BootstrapChoiceInput
 
-    def render(self):
-        """
-        Outputs a <ul> for this set of choice fields.
-        If an id was given to the field, it is applied to the <ul> (each
-        item in the list will get an id of `$id_$i`).
-        """
-        id_ = self.attrs.get('id', None)
-        output=[]
-        for widget in self:
-            output.append(format_html(u'<li role="presentation">{0}</li>', force_text(widget)))
-        if self.wrap:
-            start_tag = format_html(u'<ul id="{0}" class="dropdown-menu" role="menu">', id_) if id_ else '<ul class="dropdown-menu" role="menu">'
-            output = [start_tag] + output
-            output.append(u'</ul>')
-        return mark_safe('\n'.join(output))
-
-
-class BootstrapCheckboxFieldRenderer(BootstrapChoiceFieldRenderer):
-    choice_input_class = BootstrapCheckInput
+#     def render(self):
+#         """
+#         Outputs a <ul> for this set of choice fields.
+#         If an id was given to the field, it is applied to the <ul> (each
+#         item in the list will get an id of `$id_$i`).
+#         """
+#         id_ = self.attrs.get('id', None)
+#         output=[]
+#         for widget in self:
+#             output.append(format_html(u'<li role="presentation">{0}</li>', force_text(widget)))
+#         if self.wrap:
+#             start_tag = format_html(u'<ul id="{0}" class="dropdown-menu" role="menu">', id_) if id_ else '<ul class="dropdown-menu" role="menu">'
+#             output = [start_tag] + output
+#             output.append(u'</ul>')
+#         return mark_safe('\n'.join(output))
 
 
-class BootstrapRadioFieldRenderer(BootstrapChoiceFieldRenderer):
-    choice_input_class = BootstrapChoiceInput
+# class BootstrapCheckboxFieldRenderer(BootstrapChoiceFieldRenderer):
+#     choice_input_class = BootstrapCheckInput
 
 
-class BootstrapIntelligentDateRenderer(BootstrapChoiceFieldRenderer):
-    choice_input_class = BootstrapChoiceInput
-    wrap = False
+# class BootstrapRadioFieldRenderer(BootstrapChoiceFieldRenderer):
+#     choice_input_class = BootstrapChoiceInput
 
 
-class BootstrapDropdownSelect(RadioSelect):
-    renderer = BootstrapRadioFieldRenderer
-    allow_multiple_selected = False
+# class BootstrapIntelligentDateRenderer(BootstrapChoiceFieldRenderer):
+#     choice_input_class = BootstrapChoiceInput
+#     wrap = False
 
 
-class BootstrapDropdownIntelligentDate(BootstrapDropdownSelect):
-    renderer = BootstrapIntelligentDateRenderer
+# class BootstrapDropdownSelect(RadioSelect):
+#     renderer = BootstrapRadioFieldRenderer
+#     allow_multiple_selected = False
 
 
-class BootstrapDropdownSelectMultiple(CheckboxSelectMultiple):
-    renderer = BootstrapCheckboxFieldRenderer
-    allow_multiple_selected = True
+# class BootstrapDropdownIntelligentDate(BootstrapDropdownSelect):
+#     renderer = BootstrapIntelligentDateRenderer
+
+
+# class BootstrapDropdownSelectMultiple(CheckboxSelectMultiple):
+#     renderer = BootstrapCheckboxFieldRenderer
+#     allow_multiple_selected = True

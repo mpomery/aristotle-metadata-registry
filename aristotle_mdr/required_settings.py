@@ -54,9 +54,12 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 # Required for admindocs, see: https://code.djangoproject.com/ticket/21386
 SITE_ID=None
 
-# This gets called because of the DataElementConcept.property attribute.
-# Not sure how to resolve this one yet.
-SILENCED_SYSTEM_CHECKS = ['models.E006']
+
+# Not sure how to resolve these yet.
+SILENCED_SYSTEM_CHECKS = [
+    'models.E006', # This gets called because of the DataElementConcept.property attribute.
+    'models.E023', # This gets called because we named a model with an underscore
+]
 
 ALLOWED_HOSTS = []
 

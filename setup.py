@@ -63,7 +63,7 @@ setup(
         'django-bootstrap3',
         'django-bootstrap3-datetimepicker-2',
 
-        'django-formtools',
+        'django-formtools>=2.0',
 
         'html5lib==1.0b10',
         'xhtml2pdf>=0.2b1',
