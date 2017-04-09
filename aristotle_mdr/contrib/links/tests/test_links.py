@@ -11,8 +11,14 @@ from aristotle_mdr.tests import utils
 from aristotle_mdr.tests.main.test_admin_pages import AdminPageForConcept
 from aristotle_mdr.tests.main.test_html_pages import LoggedInViewConceptPages
 
-
-setup_test_environment()
+try:
+    setup_test_environment()
+except RuntimeError as err:
+    if "setup_test_environment() was already called" in err.msg:
+        # The environment is setup, its all good.
+        pass
+    else:
+        raise
 
 
 def setUpModule():

@@ -8,7 +8,14 @@ from aristotle_mdr.models import ObjectClass, Workgroup
 from aristotle_mdr.tests import utils
 from aristotle_mdr.tests.main.test_bulk_actions import BulkActionsTest
 
-setup_test_environment()
+try:
+    setup_test_environment()
+except RuntimeError as err:
+    if "setup_test_environment() was already called" in err.msg:
+        # The environment is setup, its all good.
+        pass
+    else:
+        raise
 
 
 class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):

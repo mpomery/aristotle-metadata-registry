@@ -13,7 +13,15 @@ from aristotle_mdr.contrib.self_publish import models as pub
 from aristotle_mdr.forms.search import PermissionSearchQuerySet
 from aristotle_mdr.models import ObjectClass, Workgroup
 from aristotle_mdr.tests import utils
-setup_test_environment()
+
+try:
+    setup_test_environment()
+except RuntimeError as err:
+    if "setup_test_environment() was already called" in err.msg:
+        # The environment is setup, its all good.
+        pass
+    else:
+        raise
 
 
 @override_settings(

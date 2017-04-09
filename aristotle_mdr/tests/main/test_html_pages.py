@@ -11,10 +11,18 @@ from aristotle_mdr.forms.creation_wizards import (
     WorkgroupVerificationMixin,
     CheckIfModifiedMixin
 )
-
-setup_test_environment()
 from aristotle_mdr.tests import utils
 import datetime
+
+try:
+    setup_test_environment()
+except RuntimeError as err:
+    if "setup_test_environment() was already called" in err.msg:
+        # The environment is setup, its all good.
+        pass
+    else:
+        raise
+
 
 class AnonymousUserViewingThePages(TestCase):
     def test_homepage(self):

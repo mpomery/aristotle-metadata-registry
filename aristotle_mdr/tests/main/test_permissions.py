@@ -10,7 +10,15 @@ import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 from aristotle_mdr.tests import utils
 
-setup_test_environment()
+try:
+    setup_test_environment()
+except RuntimeError as err:
+    if "setup_test_environment() was already called" in err.msg:
+        # The environment is setup, its all good.
+        pass
+    else:
+        raise
+
 
 class SuperuserPermissions(TestCase):
     # All of the below are called with None as a Superuser, by definition *must* be able to edit, view and managed everything. Since a is_superuser chcek is cheap is should be called first, so calling with None checks that there is no other database calls going on.

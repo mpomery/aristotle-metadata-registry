@@ -17,7 +17,14 @@ except:
     from django.template.exceptions import TemplateSyntaxError  # Django1.9 only
 
 # Execute in a test environment.
-setup_test_environment()
+try:
+    setup_test_environment()
+except RuntimeError as err:
+    if "setup_test_environment() was already called" in err.msg:
+        # The environment is setup, its all good.
+        pass
+    else:
+        raise
 
 preamble = "{% load aristotle_tags %}"
 

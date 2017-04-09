@@ -10,7 +10,14 @@ from django.test.utils import override_settings
 
 from django.test.utils import setup_test_environment
 from reversion import revisions as reversion
-setup_test_environment()
+try:
+    setup_test_environment()
+except RuntimeError as err:
+    if "setup_test_environment() was already called" in err.msg:
+        # The environment is setup, its all good.
+        pass
+    else:
+        raise
 
 from time import sleep
 import datetime

@@ -17,6 +17,14 @@ env:
   - A11Y='metadata_item'
   - A11Y='metadata_action'
   - A11Y='static'
+
+  - DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic
+  - DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic
+  - DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh
+  - DJANGO_VERSION='1.11'  DB=postgres  SEARCH=whoosh
+  - DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=whoosh
+  - DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic
+
   - DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
   - DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
   - DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh
@@ -24,14 +32,10 @@ env:
   - DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=whoosh
   - DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=elastic
 
-  - DJANGO_VERSION='1.10' DB=sqlite    SEARCH=elastic
-  - DJANGO_VERSION='1.10' DB=sqlite    SEARCH=whoosh
-
   # Possible failures:
-  - DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-  - DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
+  - DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
+  - DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
 
-  - DJANGO_VERSION='1.11' DB=sqlite    SEARCH=whoosh
 
 before_install:
   - pip install codecov
@@ -84,9 +88,9 @@ matrix:
     - python: "2.7"
       env: DOCS=1
     - python: "2.7"
-      env: DJANGO_VERSION='1.10' DB=sqlite    SEARCH=elastic
+      env: DJANGO_VERSION='1.8' DB=sqlite    SEARCH=elastic
     - python: "2.7"
-      env: DJANGO_VERSION='1.10' DB=sqlite    SEARCH=whoosh
+      env: DJANGO_VERSION='1.8' DB=sqlite    SEARCH=whoosh
   # Possible failures:
     - python: "2.7"
       env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
@@ -96,6 +100,5 @@ matrix:
       env: DJANGO_VERSION='1.11' DB=sqlite    SEARCH=whoosh
 
   allow_failures:
-    - env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-    - env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-    - env: DJANGO_VERSION='1.11' DB=sqlite    SEARCH=whoosh
+    - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
+    - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack

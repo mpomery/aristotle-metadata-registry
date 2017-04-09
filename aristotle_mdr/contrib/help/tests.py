@@ -7,7 +7,14 @@ from django.core.management import call_command
 from aristotle_mdr.contrib.help import models
 from aristotle_mdr.utils import fetch_aristotle_settings
 
-setup_test_environment()
+try:
+    setup_test_environment()
+except RuntimeError as err:
+    if "setup_test_environment() was already called" in err.msg:
+        # The environment is setup, its all good.
+        pass
+    else:
+        raise
 
 
 def setUpModule():
