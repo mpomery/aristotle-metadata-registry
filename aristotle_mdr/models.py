@@ -1096,7 +1096,9 @@ class ConceptualDomain(concept):
                    'range for a set of all value meanings for a Conceptual '
                    'Domain')
     )
-
+    serialize_weak_entities = [
+        ('value_meaning', 'valuemeaning_set'),
+    ]
 
 @python_2_unicode_compatible  # Python 2
 class ValueMeaning(aristotleComponent):
@@ -1147,6 +1149,10 @@ class ValueDomain(concept):
     # no reason to model them separately.
 
     template = "aristotle_mdr/concepts/valueDomain.html"
+    serialize_weak_entities = [
+        ('permissible_values', 'permissiblevalue_set'),
+        ('supplementary_values', 'supplementaryvalue_set'),
+    ]
 
     data_type = models.ForeignKey(  # 11.3.2.5.2.1
         DataType,
