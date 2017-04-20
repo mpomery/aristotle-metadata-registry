@@ -1,7 +1,7 @@
 Changelog
 
-- Future ??
-    -  Added `serialize_weak_entities` to ValueDomain and ConceptualDomain allow for codes to be transmitted
+- 1.5.2
+    -  Added `serialize_weak_entities` to ValueDomain and ConceptualDomain allow for codes to be transmitted via API
     -  Fix slots in PDFs #635
 
 - 1.5.1
