@@ -1100,6 +1100,7 @@ class ConceptualDomain(concept):
         ('value_meaning', 'valuemeaning_set'),
     ]
 
+
 @python_2_unicode_compatible  # Python 2
 class ValueMeaning(aristotleComponent):
     """
