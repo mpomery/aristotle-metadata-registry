@@ -1,9 +1,9 @@
 Changelog
 
 - 1.5.2
-    - Autocompletes check against identifiers if installed, #516
-    -  Added `serialize_weak_entities` to ValueDomain and ConceptualDomain allow for codes to be transmitted via API
-    -  Fix slots in PDFs #635
+    - Autocompletes now restrict via UUID 
+    - Added `serialize_weak_entities` to ValueDomain and ConceptualDomain allow for codes to be transmitted via API
+    - Fix slots in PDFs #635
 
 - 1.5.1
     - Fixed UUID4 transcription error in migrations #625
