@@ -69,6 +69,8 @@ class GenericConceptAutocomplete(GenericAutocomplete):
         if self.q:
             q = Q(name__icontains=self.q)
             q |= Q(uuid__iexact=self.q)
+            if 'aristotle_mdr.contrib.identifiers' in settings.INSTALLED_APPS:
+               q |= Q(identifiers__identifier__iexact=self.q)
             try:
                 int(self.q)
                 q |= Q(pk=self.q)
