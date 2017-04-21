@@ -45,7 +45,7 @@
             </li>
         {% if user.is_active %}
             <li class="dropdown">
-                <a href="{% url 'aristotle:userHome' %}" accesskey="u" class="dropdown-toggle" role="menu" data-toggle="dropdown" title="{% trans 'Open user menu' %}">
+                <a id="header_menu_button_user" href="{% url 'aristotle:userHome' %}" accesskey="u" class="dropdown-toggle" role="menu" data-toggle="dropdown" title="{% trans 'Open user menu' %}">
                     {% if user.is_superuser %}
                         <i class="fa fa-user-md fa-lg"></i>
                     {% else %}
@@ -101,7 +101,7 @@
                 </ul>
             </li>
             <li class="dropdown">
-                <a href="{% url 'aristotle:create_list' %}"
+                <a id="header_menu_button_create" href="{% url 'aristotle:create_list' %}"
                     accesskey="o" class="dropdown-toggle" data-toggle="dropdown" title="{% trans 'Create new' %}...">
                     <i class="fa fa-plus"></i>
                     <span class="visible-xs-inline">{% trans 'Create new' %} ... </span>
@@ -137,7 +137,7 @@
                 </ul>
             </li>
             <li class="dropdown">
-                <a href="{% url 'notifications:all' %}"
+                <a id="header_menu_button_notifications" href="{% url 'notifications:all' %}"
                     class="dropdown-toggle" data-toggle="dropdown" title="{% trans 'Show recent notifications' %}">
                     {% if user.notifications.unread %}
                     <span class="notify" title="{% trans 'New notifications' %}"></span>
@@ -151,14 +151,14 @@
                 {% live_notify_list classes="dropdown-menu" %}
             </li>
             <li>
-                <a href="{% url 'logout' %}?next={{request.path}}" title="{% trans 'Log out'%}">
+                <a id="header_menu_button_logout" href="{% url 'logout' %}?next={{request.path}}" title="{% trans 'Log out'%}">
                     <i class="fa fa-sign-out fa-fw"></i>
                     <span class="visible-xs-inline">{% trans 'Log out' %}</span>
                 </a>
             </li>
         {% else %}
             <li>
-            <a href="{% url 'friendly_login' %}?next={{request.path}}">
+            <a id="header_menu_button_login" href="{% url 'friendly_login' %}?next={{request.path}}">
                 <i class="fa fa-sign-in fa-lg"></i>  {% trans 'Log in'%}
             </a>
             </li>
