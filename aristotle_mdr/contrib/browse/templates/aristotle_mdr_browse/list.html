@@ -2,7 +2,7 @@
 {% load i18n aristotle_tags aristotle_help %}
 
 {% block breadcumbs %}
-    <li><a href="{% url 'browse_apps'  %}">Concept browser</a></li>
+    <li><a href="{% url 'browse_apps'  %}">Metadata browser</a></li>
     <li><a href="{% url 'browse_models' app.label %}">{{app.verbose_name}}</a></li>
     <li class="active">{{ model.get_verbose_name_plural }}</li>
 {% endblock %}
