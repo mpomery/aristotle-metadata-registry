@@ -8,5 +8,5 @@ urlpatterns = [
     url(r'^concepts/?', views.AllConceptHelpView.as_view(), name='help_concepts'),
 
     url(r'^page/(?P<slug>.+)?', views.HelpView.as_view(), name='help_page'),
-    url(r'^/?', views.AllHelpView.as_view(), name='help_base'),
+    url(r'^$', views.AllHelpView.as_view(), name='help_base'),
 ]

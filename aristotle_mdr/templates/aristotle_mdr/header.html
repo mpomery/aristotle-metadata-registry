@@ -41,6 +41,9 @@
 
         <ul class="nav navbar-nav navbar-right">
             <li >
+                <a href="{% url 'browse_apps' %}">{% trans 'Browse'%}</a>
+            </li>
+            <li >
                 <a accesskey="h" href="{% url 'aristotle_help:help_base' %}">{% trans 'Help'%}</a>
             </li>
         {% if user.is_active %}
