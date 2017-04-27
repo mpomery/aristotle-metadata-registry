@@ -16,7 +16,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 urlpatterns=[
-    url(r'^/?$', TemplateView.as_view(template_name='aristotle_mdr/static/home.html'), name="home"),
+    url(r'^$', TemplateView.as_view(template_name='aristotle_mdr/static/home.html'), name="home"),
     url(r'^manifest.json$', TemplateView.as_view(template_name='meta/manifest.json', content_type='application/json')),
     url(r'^robots.txt$', TemplateView.as_view(template_name='meta/robots.txt', content_type='text/plain')),
     url(r'^sitemap.xml$', views.sitemaps.main, name='sitemap_xml'),
