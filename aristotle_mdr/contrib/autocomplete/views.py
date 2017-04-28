@@ -2,6 +2,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 
+from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.template.loader import get_template
@@ -68,6 +69,9 @@ class GenericConceptAutocomplete(GenericAutocomplete):
 
         if self.q:
             q = Q(name__icontains=self.q)
+            q |= Q(uuid__iexact=self.q)
+            if 'aristotle_mdr.contrib.identifiers' in settings.INSTALLED_APPS:
+                q |= Q(identifiers__identifier__iexact=self.q)
             try:
                 int(self.q)
                 q |= Q(pk=self.q)

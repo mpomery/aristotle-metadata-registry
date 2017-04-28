@@ -61,6 +61,7 @@ def download(request, download_type, item):
                 'tableOfContents': len(subItems) > 0,
                 'view': request.GET.get('view', '').lower(),
                 'pagesize': request.GET.get('pagesize', page_size),
+                'request': request,
             }
         )
 
