@@ -513,6 +513,11 @@ class ValueDomainAdminPage(AdminPageForConcept,TestCase):
         }
 class ConceptualDomainAdminPage(AdminPageForConcept,TestCase):
     itemType=models.ConceptualDomain
+    form_defaults={
+        'valuemeaning_set-TOTAL_FORMS':0,
+        'valuemeaning_set-INITIAL_FORMS':0,
+        'valuemeaning_set-MAX_NUM_FORMS':1,
+    }
 class DataElementConceptAdminPage(AdminPageForConcept,TestCase):
     itemType=models.DataElementConcept
 class DataElementAdminPage(AdminPageForConcept,TestCase):
