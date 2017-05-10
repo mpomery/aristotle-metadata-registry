@@ -167,9 +167,9 @@ def generate_visibility_matrix(user):
     for ra in user.profile.registrarAuthorities:
         ra_matrix = {'name': ra.name, 'states': {}}
         for s, _ in STATES:
-            if s > ra.public_state:
+            if s >= ra.public_state:
                 ra_matrix['states'][s] = "public"
-            elif s > ra.locked_state:
+            elif s >= ra.locked_state:
                 ra_matrix['states'][s] = "locked"
             else:
                 ra_matrix['states'][s] = "hidden"
