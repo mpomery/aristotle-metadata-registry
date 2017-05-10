@@ -1110,9 +1110,13 @@ class ValueMeaning(aristotleComponent):
     class Meta:
         ordering = ['order']
 
-    meaning = models.CharField(  # 3.2.141
+    name = models.CharField(  # 3.2.141
         max_length=255,
         help_text=_('The semantic content of a possible value (3.2.141)')
+    )
+    definition = models.TextField(
+        null=True, blank=True,
+        help_text=_('The semantic definition of a possible value')
     )
     conceptual_domain = models.ForeignKey(ConceptualDomain)
     order = models.PositiveSmallIntegerField("Position")
@@ -1130,8 +1134,8 @@ class ValueMeaning(aristotleComponent):
     def __str__(self):
         return "%s: %s - %s" % (
             self.conceptual_domain.name,
-            self.value,
-            self.meaning
+            self.name,
+            self.definition
         )
 
     @property
