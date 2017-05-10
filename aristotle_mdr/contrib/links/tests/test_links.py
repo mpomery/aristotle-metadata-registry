@@ -271,7 +271,7 @@ class TestLinkPerms(LinkTestBase, TestCase):
 
     def test_cannot_save_linkend_with_bad_role(self):
         self.new_relation = models.Relation.objects.create(
-            name="another_test_relation", definition="Used for testing", arity=2
+            name="another_test_relation", definition="Used for testing",
         )
 
         self.new_link = models.Link.objects.create(relation=self.new_relation)

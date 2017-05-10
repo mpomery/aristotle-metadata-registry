@@ -23,7 +23,8 @@ class Relation(MDR.concept):  # 9.1.2.4
     """
     arity = models.PositiveIntegerField(  # 9.1.2.4.3.1
         help_text=_('number of elements in the relation'),
-        validators=[MinValueValidator(2)]
+        validators=[MinValueValidator(2)],
+        null=True
     )
 
 
