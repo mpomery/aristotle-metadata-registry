@@ -206,7 +206,7 @@ class SupplementaryValueInline(CodeValueInline):
 # For ConceptualDomains
 class ValueMeaningInline(admin.TabularInline):
     model = MDR.ValueMeaning
-    fields = ("order", "name","definition","start_date","end_date")
+    fields = ("order", "name", "definition", "start_date", "end_date")
     sortable_field_name = "order"
     extra = 1
 
@@ -391,8 +391,8 @@ register_concept(
     MDR.ConceptualDomain,
     extra_inlines=[ValueMeaningInline],
     reversion={
-        'follow': ['valuemeaning_set',],
-        'follow_classes': [MDR.ValueMeaning,]
+        'follow': ['valuemeaning_set', ],
+        'follow_classes': [MDR.ValueMeaning, ]
     }
 )
 

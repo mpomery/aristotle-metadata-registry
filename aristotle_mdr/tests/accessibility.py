@@ -42,8 +42,9 @@ class TestWebPageAccessibilityBase(utils.LoggedInViewPages):
         self.oc = models.ObjectClass.objects.create(name="Test OC 1")
         self.pr = models.Property.objects.create(name="Test Property 1")
         self.dec = models.DataElementConcept.objects.create(name="Test DEC 1", objectClass=self.oc, property=self.pr)
-        self.vd = models.ValueDomain.objects.create(name="Test DE 1")
-        self.de = models.DataElement.objects.create(name="Test VD 1", dataElementConcept=self.dec, valueDomain=self.vd)
+        self.vd = models.ValueDomain.objects.create(name="Test VD 1")
+        self.cd = models.ConceptualDomain.objects.create(name="Test CD 1")
+        self.de = models.DataElement.objects.create(name="Test DE 1", dataElementConcept=self.dec, valueDomain=self.vd)
 
         call_command('collectstatic', interactive=False, verbosity=0)
         
@@ -117,7 +118,8 @@ class TestMetadataItemPageAccessibility(TestWebPageAccessibilityBase, TestCase):
                 self.pr,
                 self.dec,
                 self.vd,
-                self.de
+                self.de,
+                self.cd,
             ]
         ]
         self.pages_tester(pages)
@@ -131,7 +133,8 @@ class TestMetadataActionPageAccessibility(TestWebPageAccessibilityBase, TestCase
                 self.pr,
                 self.dec,
                 self.vd,
-                self.de
+                self.de,
+                self.cd,
         ]
         
         pages = [
