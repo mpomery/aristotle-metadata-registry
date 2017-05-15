@@ -15,7 +15,7 @@
     {% csrf_token %}
 
     {% block warning %}
-    You are about to delete something, confirm below, or click cancel to return to the item.
+    {{ warning_text|linebreaksbr }}
     {% endblock %}
 
     <div class="modal-footer">

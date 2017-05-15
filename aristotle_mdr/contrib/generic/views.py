@@ -67,6 +67,7 @@ class GenericWithItemURLView(View):
     def get_success_url(self):
         return self.item.get_absolute_url()
 
+
 class GenericWithItemURLFormView(GenericWithItemURLView, FormView):
     pass
 
@@ -333,12 +334,17 @@ class ConfirmDeleteView(GenericWithItemURLView, TemplateView):
     confirm_template = "aristotle_mdr/generic/actions/confirm_delete.html"
     template_name = "aristotle_mdr/generic/actions/confirm_delete.html"
     form_delete_button_text = _("Delete")
+    warning_text = _("You are about to delete something, confirm below, or click cancel to return to the item.")
 
     def get_context_data(self, *args, **kwargs):
         context = super(ConfirmDeleteView, self).get_context_data(*args, **kwargs)
         context['form_title'] = self.form_title or _('Add child item')
         context['form_delete_button_text'] = self.form_delete_button_text
+        context['warning_text'] = self.get_warning_text()
         return context
+
+    def get_warning_text(self):
+        return self.warning_text
 
     def perform_deletion(self):
         raise NotImplementedError("This must be overridden in a subclass")
