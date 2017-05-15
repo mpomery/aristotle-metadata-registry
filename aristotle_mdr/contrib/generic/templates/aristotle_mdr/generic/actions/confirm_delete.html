@@ -1,0 +1,36 @@
+{% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
+{% load compile_static i18n %}
+{% load static from staticfiles %}
+
+{% block title %}{{ form_title }} for {{ item.name }}{% endblock %}
+{% block content %}
+
+<form method="post" action="{{ submit_url }}" >
+    <div class="modal-body">
+        <ol class="breadcrumb">
+          <li><a href="{% url 'aristotle:item' item.id %}">{{ item.name }}</a></li>
+          <li class="active">{{ form_title }}</li>
+        </ol>
+
+    {% csrf_token %}
+
+    {% block warning %}
+    {{ warning_text|linebreaksbr }}
+    {% endblock %}
+
+    <div class="modal-footer">
+        {% if request.is_ajax %}
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+                <i class="fa fa-times"></i>Cancel</button>
+        {% else %}
+            <a class="btn btn-default" href="{% url 'aristotle:item' item.id %}">
+                <i class="fa fa-times"></i>
+                Cancel</a>
+        {% endif %}
+        <button type="submit" class="btn btn-danger" value="Save" accesskey='s'>
+            <i class="fa fa-trash"></i> {{ form_delete_button_text }}
+        </button>
+    </div>
+    </div>
+</form>
+{% endblock %}
