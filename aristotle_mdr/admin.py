@@ -203,6 +203,14 @@ class SupplementaryValueInline(CodeValueInline):
     model = MDR.SupplementaryValue
 
 
+# For ConceptualDomains
+class ValueMeaningInline(admin.TabularInline):
+    model = MDR.ValueMeaning
+    fields = ("order", "name", "definition", "start_date", "end_date")
+    sortable_field_name = "order"
+    extra = 1
+
+
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ['name', 'definition', 'created', 'modified']
     list_filter = ['created', 'modified']
@@ -379,7 +387,15 @@ register_concept(
     custom_search_index=aristotle_mdr_DataElementDerivationSearchIndex
 )
 
-register_concept(MDR.ConceptualDomain)
+register_concept(
+    MDR.ConceptualDomain,
+    extra_inlines=[ValueMeaningInline],
+    reversion={
+        'follow': ['valuemeaning_set', ],
+        'follow_classes': [MDR.ValueMeaning, ]
+    }
+)
+
 register_concept(MDR.DataType)
 
 register_concept(

@@ -46,6 +46,16 @@ urlpatterns=[
             form_add_another_text=_('Add a code'),
             form_title=_('Change Supplementary Values')
         ), name='supplementary_values_edit'),
+    url(r'^conceptualdomain/(?P<iid>\d+)?/edit/values/?$',
+        GenericAlterOneToManyView.as_view(
+            model_base=models.ConceptualDomain,
+            model_to_add=models.ValueMeaning,
+            model_base_field='valuemeaning_set',
+            model_to_add_field='conceptual_domain',
+            ordering_field='order',
+            form_add_another_text=_('Add a value meaning'),
+            form_title=_('Change Value Meanings')
+        ), name='value_meanings_edit'),
     url(r'^item/(?P<iid>\d+)/dataelementderivation/change_inputs/?$',
         GenericAlterManyToManyView.as_view(
             model_base=models.DataElementDerivation,
