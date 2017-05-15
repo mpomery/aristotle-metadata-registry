@@ -9,6 +9,7 @@ Changelog
     - Improved search index for Value Domains
     - Allow arity of relationships to be blank #652
     - Fix display bug that incorecctly stated how visibility of items would change #648  
+    - Fix bug that listed unregistered metadata in downloads #659
 
 - 1.5.2
     - Autocompletes now restrict via UUID 
