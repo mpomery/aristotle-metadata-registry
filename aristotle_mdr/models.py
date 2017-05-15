@@ -1154,6 +1154,7 @@ class ValueDomain(concept):
     # no reason to model them separately.
 
     template = "aristotle_mdr/concepts/valueDomain.html"
+    comparator = comparators.ValueDomainComparator
     serialize_weak_entities = [
         ('permissible_values', 'permissiblevalue_set'),
         ('supplementary_values', 'supplementaryvalue_set'),
