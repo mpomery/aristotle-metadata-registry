@@ -1,6 +1,7 @@
 Changelog
 
 - 1.5.3
+    - Added generic delete confirmation view
     - Conceptual Domains improvements:
         - Added value meaning editor, and admin inline editor
         - Improved layout and display of Conceptual Domains
