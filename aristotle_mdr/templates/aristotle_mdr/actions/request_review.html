@@ -24,7 +24,7 @@
         {% endif %}
         {% endwith %}
         <div id="visibilty">
-            This item is currently {{visibility}}.
+            This item is currently {{item|visibility_text}}.
             <span id="potential">
             {% trans 'Select a new state to see how the visibility of this item will change.' %}
             </span>
@@ -65,9 +65,7 @@
                 </span>
             </div>
             <div>
-                <div>
                 {{ form.state }}
-                </div>
                 <ul>
                 {% for val,label_text in form.registration_authority.field.choices %}
                 {% if val %}
@@ -100,17 +98,13 @@
         <input type="submit" class="btn btn-primary" value="{% trans 'Request Review'%}" />
     </div>
 </form>
-{% comment %}
-<pre>
-    {{status_matrix}}
-</pre>
 <script>
     status_matrix = {{status_matrix|safe}};
-    current_visibility = "{{visibility}}";
+    current_visibility = "{{item|visibility_text}}";
     {# VISIBILITY_STATUS will be replaced in javascript #}
-    same_visibility_text = "{% trans 'After saving, this item will stay VISIBILITY_STATUS' %}";
+    same_visibility_text = "{% trans 'If this review is accepted, this item will stay VISIBILITY_STATUS' %}";
     {# VISIBILITY_STATUS will be replaced in javascript #}
-    diff_visibility_text = "{% trans 'After saving, this item will become VISIBILITY_STATUS' %}";
+    diff_visibility_text = "{% trans 'If this review is accepted, this item will become VISIBILITY_STATUS' %}";
     select_state_to_see = "{% trans 'Select a new state to see how the visibility of this item will change.' %}";
     visibility_translations = {
         "hidden":"{% trans 'hidden' %}",
@@ -122,5 +116,4 @@
         {{ form.media }}
         <script src="{% static 'aristotle_mdr/aristotle.status_change.js' %}"></script>
     {% endblock %}
-{% endcomment %}
 {% endblock %}

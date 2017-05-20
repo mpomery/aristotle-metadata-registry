@@ -1,5 +1,11 @@
 Changelog
 
+- 1.5.4
+    - Fixes for review requests:
+        - Fixed hints on visibiity changes, #664
+        - Minor CSS improvements
+        - Matched wording around cascade registration to match status changes
+
 - 1.5.3
     - Added generic delete confirmation view
     - Conceptual Domains improvements:

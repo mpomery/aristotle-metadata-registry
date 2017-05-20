@@ -224,13 +224,13 @@ body footer.footer {
     }
 }
 
-#changeStatusDate {
+#changeStatusDate, #cascadeRegistration {
     margin-top:10px;
     display:table;
     &>span {
         display:table-cell;
         vertical-align:middle;
-        width:50%;
+        padding-right:15px;
     }
     label {
         font-weight:bold;
@@ -257,14 +257,14 @@ body footer.footer {
 #changeStatus {
     margin-top:10px;
     display:table;
+    &>div>ul:first-child, &>div>span:first-child {
+            border-right:1px solid @colors_border;
+    }
     &>div {
         display:table-row;
-        &>*:first-child{
-            border-right:1px solid @colors_border;
-        }
         &>* {
             display:table-cell;
-            padding:5px;
+            padding:15px;
             width:50%;
             li {
                 list-style:none;
