@@ -5,6 +5,7 @@ Changelog
         - Fixed hints on visibiity changes, #664
         - Minor CSS improvements
         - Matched wording around cascade registration to match status changes
+        - Fixed bug where review request popover windows wouldn't work, #633
 
 - 1.5.3
     - Added generic delete confirmation view
