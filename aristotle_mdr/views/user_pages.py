@@ -266,6 +266,12 @@ class ReviewDetailsView(DetailView):
     def dispatch(self, *args, **kwargs):
         return super(ReviewDetailsView, self).dispatch(*args, **kwargs)
 
+    def get_context_data(self, *args, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(ReviewDetailsView, self).get_context_data(*args, **kwargs)
+        context['next'] = self.request.GET.get('next', reverse('aristotle:userReadyForReview'))
+        return context
+
     def get_queryset(self):
         return MDR.ReviewRequest.objects.visible(self.request.user)
 
