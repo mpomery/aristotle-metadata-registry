@@ -9,6 +9,7 @@ from django.template import TemplateDoesNotExist
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, DetailView
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
 import datetime
