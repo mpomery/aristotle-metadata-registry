@@ -292,7 +292,6 @@ class CreatedItemsListView(ListView):
             ) & Q(
                 Q(review_requests__isnull=True) | Q(review_requests__status=MDR.REVIEW_STATES.cancelled)
             )
-            
         )
 
     def get_context_data(self, *args, **kwargs):
