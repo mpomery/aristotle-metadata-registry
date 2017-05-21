@@ -7,6 +7,7 @@ Changelog
         - Matched wording around cascade registration to match status changes
         - Fixed bug where review request popover windows wouldn't work, #663
         - Fixed bug where bulk review requests would fail, #662
+        - Correct how sandbox shows cancelled reviews, #660
 
 - 1.5.3
     - Added generic delete confirmation view
