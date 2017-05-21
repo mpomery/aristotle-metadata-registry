@@ -286,9 +286,13 @@ class CreatedItemsListView(ListView):
 
     def get_queryset(self, *args, **kwargs):
         return MDR._concept.objects.filter(
-            submitter=self.request.user,
-            statuses__isnull=True,
-            review_requests__isnull=True
+            Q(
+                submitter=self.request.user,
+                statuses__isnull=True
+            ) & Q(
+                Q(review_requests__isnull=True) | Q(review_requests__status=MDR.REVIEW_STATES.cancelled)
+            )
+            
         )
 
     def get_context_data(self, *args, **kwargs):
