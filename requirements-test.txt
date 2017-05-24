@@ -1,3 +1,3 @@
 coverage
-django_tools
+django-tools==0.32.13
 mock
