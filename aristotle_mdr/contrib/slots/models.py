@@ -18,7 +18,7 @@ from model_utils import Choices
 from model_utils.models import TimeStampedModel
 
 from aristotle_mdr import models as MDR
-
+from aristotle_mdr.fields import ConceptForeignKey
 
 @python_2_unicode_compatible  # Python 2
 class Slot(TimeStampedModel):
@@ -26,7 +26,7 @@ class Slot(TimeStampedModel):
     # on save confirm the cardinality
     name = models.CharField(max_length=256)  # Or some other sane length
     type = models.CharField(max_length=256, blank=True)  # Or some other sane length
-    concept = models.ForeignKey(MDR._concept, related_name='slots')
+    concept = ConceptForeignKey(MDR._concept, related_name='slots')
     value = models.TextField()
 
     def __str__(self):
