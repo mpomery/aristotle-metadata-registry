@@ -20,6 +20,7 @@ from model_utils.models import TimeStampedModel
 from aristotle_mdr import models as MDR
 from aristotle_mdr.fields import ConceptForeignKey
 
+
 @python_2_unicode_compatible  # Python 2
 class Slot(TimeStampedModel):
     # on save confirm the concept and model are correct, otherwise reject

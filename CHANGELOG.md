@@ -8,7 +8,8 @@ Changelog
         - Fixed bug where review request popover windows wouldn't work, #663
         - Fixed bug where bulk review requests would fail, #662
         - Correct how sandbox shows cancelled reviews, #660
-    - Add new URL for accessing items via their UUID 
+    - Add new URL for accessing items via their UUID
+    - Change relation fields for concepts to support more intelligent GraphQL querying
 
 - 1.5.3
     - Added generic delete confirmation view

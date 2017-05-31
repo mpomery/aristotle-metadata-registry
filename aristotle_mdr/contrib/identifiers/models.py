@@ -13,6 +13,7 @@ from model_utils.models import TimeStampedModel
 from aristotle_mdr import models as MDR
 from aristotle_mdr.fields import ConceptForeignKey
 
+
 class Namespace(TimeStampedModel):
     naming_authority = models.ForeignKey(MDR.Organization)  # 7.2.2.3.2.1
     shorthand_prefix = models.CharField(  # 7.2.2.3.2.5

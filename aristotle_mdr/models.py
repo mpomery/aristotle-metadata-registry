@@ -1318,6 +1318,7 @@ class DataElementConcept(concept):
             (Property, Property.objects.filter(dataelementconcept=self)),
         ]
 
+
 # Yes this name looks bad - blame 11179:3:2013 for renaming "administered item"
 # to "concept".
 class DataElement(concept):
