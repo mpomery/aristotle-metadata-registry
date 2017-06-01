@@ -85,7 +85,7 @@ class GenericConceptAutocomplete(GenericAutocomplete):
         return [
             {
                 'id': self.get_result_value(result),
-                'uuid': self.get_result_value(result),
+                'uuid': str(result.uuid),
                 'title': self.get_result_title(result),
                 'text': self.get_result_text(result),
             } for result in context['object_list']
