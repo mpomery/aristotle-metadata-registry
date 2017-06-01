@@ -644,6 +644,8 @@ class _concept(baseAristotleObject):
     """
     objects = ConceptManager()
     template = "aristotle_mdr/concepts/managedContent.html"
+    list_details_template = "aristotle_mdr/helpers/concept_list_details.html"
+    
     workgroup = models.ForeignKey(Workgroup, related_name="items", null=True, blank=True)
     submitter = models.ForeignKey(
         User, related_name="created_items",
@@ -1068,6 +1070,7 @@ class UnitOfMeasure(concept):
         verbose_name_plural = "Units Of Measure"
 
     template = "aristotle_mdr/concepts/unitOfMeasure.html"
+    list_details_template = "aristotle_mdr/concepts/list_details/unit_of_measure.html"
     measure = models.ForeignKey(Measure, blank=True, null=True)
     symbol = models.CharField(max_length=20, blank=True)
 
@@ -1155,6 +1158,7 @@ class ValueDomain(concept):
     # no reason to model them separately.
 
     template = "aristotle_mdr/concepts/valueDomain.html"
+    list_details_template = "aristotle_mdr/concepts/list_details/value_domain.html"
     comparator = comparators.ValueDomainComparator
     serialize_weak_entities = [
         ('permissible_values', 'permissiblevalue_set'),
@@ -1326,6 +1330,8 @@ class DataElement(concept):
     Unit of data that is considered in context to be indivisible (3.2.28)"""
 
     template = "aristotle_mdr/concepts/dataElement.html"
+    list_details_template = "aristotle_mdr/concepts/list_details/data_element.html"
+
     dataElementConcept = ConceptForeignKey(  # 11.5.3.2
         DataElementConcept,
         verbose_name="Data Element Concept",
