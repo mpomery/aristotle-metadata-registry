@@ -75,6 +75,8 @@ setup(
         'channels',
         'django-haystack-channels',
         'asgi-redis',
+        
+        'six', # Setuptools > 36 doesn't install this by default
 
     ],
 

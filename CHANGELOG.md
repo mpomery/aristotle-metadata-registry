@@ -10,6 +10,7 @@ Changelog
         - Correct how sandbox shows cancelled reviews, #660
     - Add new URL for accessing items via their UUID
     - Change relation fields for concepts to support more intelligent GraphQL querying
+    - UI improvements to lists of items
 
 - 1.5.3
     - Added generic delete confirmation view
