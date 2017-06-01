@@ -38,6 +38,7 @@ setup(
     ],
     install_requires = [
         "Django>=1.8,<1.9",
+        'six', # Setuptools > 36 doesn't install this by default
         'pytz',
         'pyyaml',
         'lesscpy',
@@ -75,8 +76,6 @@ setup(
         'channels',
         'django-haystack-channels',
         'asgi-redis',
-        
-        'six', # Setuptools > 36 doesn't install this by default
 
     ],
 
