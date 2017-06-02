@@ -645,7 +645,7 @@ class _concept(baseAristotleObject):
     objects = ConceptManager()
     template = "aristotle_mdr/concepts/managedContent.html"
     list_details_template = "aristotle_mdr/helpers/concept_list_details.html"
-   
+
     workgroup = models.ForeignKey(Workgroup, related_name="items", null=True, blank=True)
     submitter = models.ForeignKey(
         User, related_name="created_items",
