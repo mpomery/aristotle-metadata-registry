@@ -5,7 +5,7 @@ Concept model relations
 These are direct reimplementations of Django model relations,
 at the moment they onyl exist to make permissions-based filtering easier for
 the GraphQL codebase. However, in future these may add additional functionality
-such as automatically applying certain permissions to ensure users only 
+such as automatically applying certain permissions to ensure users only
 retrieve the right objects.
 
 When building models that link to any subclass of ``_concept``, use these in place
