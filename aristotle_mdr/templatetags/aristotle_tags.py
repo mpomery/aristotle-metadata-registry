@@ -104,7 +104,10 @@ def can_view(item, user):
         {{ item }}
       {% endif %}
     """
-    return perms.user_can_view(user, item)
+    try:
+        return perms.user_can_view(user, item)
+    except:  # pragma: no cover -- passing a bad item or user is the template authors fault
+        return None
 
 
 @register.filter

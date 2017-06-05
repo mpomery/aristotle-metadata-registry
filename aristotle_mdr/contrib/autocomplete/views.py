@@ -80,6 +80,17 @@ class GenericConceptAutocomplete(GenericAutocomplete):
             qs = qs.filter(q)
         return qs
 
+    def get_results(self, context):
+        """Return data for the 'results' key of the response."""
+        return [
+            {
+                'id': self.get_result_value(result),
+                'uuid': str(result.uuid),
+                'title': self.get_result_title(result),
+                'text': self.get_result_text(result),
+            } for result in context['object_list']
+        ]
+
 
 class UserAutocomplete(autocomplete.Select2QuerySetView):
     model = User

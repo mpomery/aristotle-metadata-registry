@@ -266,6 +266,12 @@ class ReviewDetailsView(DetailView):
     def dispatch(self, *args, **kwargs):
         return super(ReviewDetailsView, self).dispatch(*args, **kwargs)
 
+    def get_context_data(self, *args, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(ReviewDetailsView, self).get_context_data(*args, **kwargs)
+        context['next'] = self.request.GET.get('next', reverse('aristotle:userReadyForReview'))
+        return context
+
     def get_queryset(self):
         return MDR.ReviewRequest.objects.visible(self.request.user)
 
@@ -280,9 +286,12 @@ class CreatedItemsListView(ListView):
 
     def get_queryset(self, *args, **kwargs):
         return MDR._concept.objects.filter(
-            submitter=self.request.user,
-            statuses__isnull=True,
-            review_requests__isnull=True
+            Q(
+                submitter=self.request.user,
+                statuses__isnull=True
+            ) & Q(
+                Q(review_requests__isnull=True) | Q(review_requests__status=MDR.REVIEW_STATES.cancelled)
+            )
         )
 
     def get_context_data(self, *args, **kwargs):

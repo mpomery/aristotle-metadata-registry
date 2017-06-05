@@ -100,7 +100,7 @@ class BulkAction(FormView):
                     return HttpResponseRedirect(url)
             else:
                 # we need a confirmation, render the next form
-                form = action_form(request.POST, user=request.user, request=request, items=items)
+                form = action_form(form=None, initial=dict(request.POST), user=request.user, request=request, items=items)
             return render(
                 request,
                 action_form.confirm_page,

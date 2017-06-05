@@ -9,6 +9,7 @@ of by inheritance within the Python language and the Django web framework.
 
    new_metadata_type.rst
    reusing_actions.rst
+   linking_between.rst
    registering_new_content_types.rst
    out_of_the_box_features.rst
    using_concept_manager.rst

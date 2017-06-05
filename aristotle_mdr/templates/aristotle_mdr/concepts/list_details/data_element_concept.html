@@ -1,0 +1,21 @@
+{% load aristotle_tags %}
+<div class="definition">
+    {{ item.definition|striptags|safe|truncatewords:50 }}
+</div>
+<hr>
+    {% if item.item.objectClass|can_view:request.user %}
+    <div>
+        <small>Object Class:</small>
+        <span>
+        {{item.item.objectClass}}
+        </span>
+    </div>
+    {% endif %}
+    {% if item.item.property|can_view:request.user %}
+    <div>
+        <small>Property:</small>
+        <span>
+        {{item.item.property}}
+        </span>
+    </div>
+    {% endif %}
