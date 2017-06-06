@@ -9,9 +9,11 @@ from django.template import TemplateDoesNotExist
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, DetailView
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
 import datetime
+import json
 
 import reversion
 
@@ -21,6 +23,7 @@ from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import exceptions as registry_exceptions
 from aristotle_mdr import models as MDR
 from aristotle_mdr.forms import actions
+from aristotle_mdr.views.utils import generate_visibility_matrix
 
 
 class ItemSubpageView(object):
@@ -49,6 +52,7 @@ class SubmitForReviewView(ItemSubpageFormView):
     def get_context_data(self, *args, **kwargs):
         kwargs = super(SubmitForReviewView, self).get_context_data(*args, **kwargs)
         kwargs['reviews'] = self.get_item().review_requests.filter(status=MDR.REVIEW_STATES.submitted).all()
+        kwargs['status_matrix'] = json.dumps(generate_visibility_matrix(self.request.user))
         return kwargs
 
     def get_form_kwargs(self):
@@ -161,9 +165,7 @@ class ReviewAcceptView(ReviewActionMixin, FormView):
     template_name = "aristotle_mdr/user/user_request_accept.html"
 
     def get_context_data(self, *args, **kwargs):
-        from aristotle_mdr.views.utils import generate_visibility_matrix
         kwargs = super(ReviewAcceptView, self).get_context_data(*args, **kwargs)
-        import json
         kwargs['status_matrix'] = json.dumps(generate_visibility_matrix(self.request.user))
         return kwargs
 

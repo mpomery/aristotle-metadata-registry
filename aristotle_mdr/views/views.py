@@ -84,6 +84,11 @@ def render_if_user_can_edit(item_type, request, *args, **kwargs):
     )
 
 
+def concept_by_uuid(request, uuid):
+    item = get_object_or_404(MDR._concept, uuid=uuid)
+    return redirect(url_slugify_concept(item))
+
+
 def concept(*args, **kwargs):
     return render_if_user_can_view(MDR._concept, *args, **kwargs)
 

@@ -1,5 +1,5 @@
 {% extends "aristotle_mdr/user/userHome.html" %}
-
+{% load aristotle_tags %}
 
 {% block collapse-link %}
     <i class="fa fa-institution fa-fw"></i> Registrar tools </a>
@@ -23,4 +23,6 @@
 {% else %}
     <strong>You currently have reviews outstanding.</strong>
 {% endif %}
+
+{% bootstrap_modal "review_box" %}
 {% endblock %}

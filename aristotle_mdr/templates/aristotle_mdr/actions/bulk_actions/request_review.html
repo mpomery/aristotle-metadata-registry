@@ -22,14 +22,31 @@
         <div>
             {{form.errors}}
         </div>
-        <div id="visibilty">
-            This item is currently {{visibility}}.
-        </div>
         <div>
             {{ form.items.label }}
             {{ form.items }}
         </div>
         <section>
+        <div id="changeStatusDate">
+            <span>
+                <label for="id_registration_date">{{ form.registration_date.label }}</label>:
+                {{ form.registration_date.errors }}
+            </span>
+            <span class="pull-right">
+                {{ form.registration_date }}
+            </span>
+        </div>
+        <div id="cascadeRegistration">
+            <span>
+                <label for="id_cascadeRegistration">
+                {{ form.cascade_registration.label }}
+                </label>
+                {{ form.cascade_registration.errors }}
+            </span>
+            <span class="pull-right">
+                {{ form.cascade_registration }}
+            </span>
+        </div>
         <div id="changeStatus">
             <div>
                 <span>
@@ -42,9 +59,7 @@
                 </span>
             </div>
             <div>
-                <div>
                 {{ form.state }}
-                </div>
                 <ul>
                 {% for val,label_text in form.registration_authority.field.choices %}
                 {% if val %}

@@ -28,6 +28,7 @@ Showing {{ page.paginator.count }} results.
             {% trans 'Name' %}
         </th>
         <th>{% trans 'Details' %}</th>
+        <th>{% trans 'Statuses' %}</th>
         <th>
         {% if sort == "mod_asc" %}
         <a href="?{% paginator_get request page.number pop='sort' %}&sort=mod_desc"><i class="fa fa-sort-asc"></i></a>
@@ -67,10 +68,23 @@ Showing {{ page.paginator.count }} results.
             {% endif %}
         </td>
         <td>
-        {% include "aristotle_mdr/helpers/itemLink.html" with item=item %}</td>
+        {% include "aristotle_mdr/helpers/itemLink.html" with item=item %}
+        <div class="small" style="white-space: nowrap;">
+        {{ item.item.get_verbose_name }}
+        </div>
+        </td>
         <td>
-        {% include "aristotle_mdr/helpers/inlineDetails.html" with item=item %}
-</td>
+        {% include item.item.list_details_template with item=item %}
+        </td>
+        <td>
+            <ul>
+            {% for s in item.current_statuses %}
+                <li>{{ s.registrationAuthority }}: {{ s.state_name }}</li>
+            {% empty %}
+            <li><em>Unregistered</em></li>
+            {% endfor %}</small>
+            </ul>
+        </td>
         <td>{{ item.modified }}</td>
     </tr>
     {% endfor %}

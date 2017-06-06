@@ -103,7 +103,7 @@ class ChangeStatusForm(UserAwareForm):
     cascadeRegistration = forms.ChoiceField(
         initial=False,
         choices=[(0, _('No')), (1, _('Yes'))],
-        label=_("Do you want to update the registration of associated items?")
+        label=_("Do you want to request a status change for associated items?")
     )
     changeDetails = forms.CharField(
         max_length=512,

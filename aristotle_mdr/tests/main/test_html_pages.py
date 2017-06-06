@@ -110,6 +110,11 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(reverse('aristotle:item',args=[self.item1.id])+"/this-isnt-even-a-proper-stub")
         self.assertRedirects(response,url_slugify_concept(self.item1))
 
+    def test_uuids_redirect_correctly(self):
+        self.login_viewer()
+        response = self.client.get(reverse('aristotle:item_uuid',args=[self.item1.id]))
+        self.assertRedirects(response,url_slugify_concept(self.item1))
+
     def test_anon_cannot_view_edit_page(self):
         self.logout()
         response = self.client.get(reverse('aristotle:edit_item',args=[self.item1.id]))
@@ -957,6 +962,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
 
         response = self.client.get(check_url)
         self.assertEqual(response.status_code,404)
+
 
 class ObjectClassViewPage(LoggedInViewConceptPages, TestCase):
     url_name='objectClass'

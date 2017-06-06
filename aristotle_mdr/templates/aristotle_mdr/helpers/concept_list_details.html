@@ -1,0 +1,8 @@
+<div class="definition">
+    {{ item.definition|striptags|safe|truncatewords:50 }}
+</div>
+<div class="small">
+    {{ item.references|striptags|safe|truncatewords:50 }}
+
+    {{ item.comments|striptags|safe|truncatewords:50 }}
+</div>

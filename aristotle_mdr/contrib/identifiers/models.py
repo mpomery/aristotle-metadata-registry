@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from model_utils.models import TimeStampedModel
 from aristotle_mdr import models as MDR
+from aristotle_mdr.fields import ConceptForeignKey
 
 
 class Namespace(TimeStampedModel):
@@ -27,7 +28,7 @@ class Namespace(TimeStampedModel):
 @python_2_unicode_compatible  # Python 2
 class ScopedIdentifier(TimeStampedModel):
     namespace = models.ForeignKey(Namespace)
-    concept = models.ForeignKey(MDR._concept, related_name='identifiers')
+    concept = ConceptForeignKey(MDR._concept, related_name='identifiers')
     identifier = models.CharField(  # 7.2.2.2.2.1
         max_length=512,
         help_text=_('String used to unambiguously denote an Item within the scope of a specified Namespace.')

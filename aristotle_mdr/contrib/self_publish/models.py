@@ -10,6 +10,7 @@ from model_utils import Choices
 from model_utils.models import TimeStampedModel
 
 from aristotle_mdr import models as MDR
+from aristotle_mdr.fields import ConceptOneToOneField
 
 
 class PublicationRecord(TimeStampedModel):
@@ -24,7 +25,7 @@ class PublicationRecord(TimeStampedModel):
         help_text=_('Specify who can see this item.')
     )
     user = models.ForeignKey(User)
-    concept = models.OneToOneField(MDR._concept, related_name='publicationrecord')
+    concept = ConceptOneToOneField(MDR._concept, related_name='publicationrecord')
     publication_date = models.DateField(
         default=now,
         help_text=_("Enter a date in the future to specify the date is published from.")
