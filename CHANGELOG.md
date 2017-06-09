@@ -1,5 +1,9 @@
 Changelog
 
+- 1.5.5
+    - Added Many to Many fields to generic.views.GenericAlterOneToManyView
+    - Added Date Widget to Date time fields
+
 - 1.5.4
     - Fixes for review requests:
         - Fixed hints on visibiity changes, #664

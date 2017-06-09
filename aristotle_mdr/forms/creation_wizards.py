@@ -127,6 +127,8 @@ class ConceptForm(WorkgroupVerificationMixin, UserAwareModelForm):
                     self.fields[f].widget.choices = self.fields[f].choices
             if type(self.fields[f]) == forms.fields.DateField:
                 self.fields[f].widget = BootstrapDateTimePicker(options={"format": "YYYY-MM-DD"})
+            if type(self.fields[f]) == forms.fields.DateTimeField:
+                self.fields[f].widget = BootstrapDateTimePicker(options={"format": "YYYY-MM-DD"})
 
         if not self.user.is_superuser:
             self.fields['workgroup'].queryset = self.user.profile.editable_workgroups
