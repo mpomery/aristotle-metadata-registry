@@ -282,6 +282,14 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
                         model=foreign_model
                     )
                 })
+        for f in self.model_to_add._meta.many_to_many:
+            foreign_model = self.model_to_add._meta.get_field(f.name).related_model
+            if foreign_model and issubclass(foreign_model, _concept):
+                _widgets.update({
+                    f.name: widgets.ConceptAutocompleteSelectMultiple(
+                        model=foreign_model
+                    )
+                })
 
         from aristotle_mdr.contrib.generic.forms import HiddenOrderModelFormSet
         return modelformset_factory(
@@ -321,6 +329,7 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
                         value.save()
                 for obj in formset.deleted_objects:
                     obj.delete()
+                formset.save_m2m()
                 # formset.save(commit=True)
                 reversion.revisions.set_user(request.user)
                 reversion.revisions.set_comment(construct_change_message(request, None, [formset]))
