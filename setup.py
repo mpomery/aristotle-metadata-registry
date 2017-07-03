@@ -37,7 +37,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
     install_requires = [
-        "Django>=1.8,<1.9",
+        "Django>=1.11.1,<1.12",
         'six', # Setuptools > 36 doesn't install this by default
         'pytz',
         'pyyaml',
