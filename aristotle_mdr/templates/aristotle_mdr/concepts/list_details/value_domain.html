@@ -1,0 +1,29 @@
+{% load aristotle_tags %}
+<div class="definition">
+    {{ item.definition|striptags|safe|truncatewords:50 }}
+</div>
+{% if item.item.description %}
+<div class="description">
+    {{ item.description|striptags|safe|truncatewords:50 }}
+</div>
+{% endif %}
+<hr>
+    {% if item.item.data_type|can_view:request.user  %}
+    <div>
+        <small>Data type:</small>
+        <span>
+        {{item.item.data_type}}
+        </span>
+    </div>
+    {% endif %}
+    {% if item.item.unit_of_measure|can_view:request.user %}
+    <div>
+        <small>Unit of Measure:</small>
+        <span>
+        {{item.item.unit_of_measure}}
+        {% if item.item.unit_of_measure.measure|can_view:request.user %}
+        ({{ item.item.unit_of_measure.measure }})
+        {% endif %}
+        </span>
+    </div>
+    {% endif %}

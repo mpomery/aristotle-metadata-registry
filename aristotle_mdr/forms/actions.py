@@ -17,6 +17,13 @@ class RequestReviewForm(UserAwareModelForm):
         widget=DateTimePicker(options={"format": "YYYY-MM-DD"}),
         initial=timezone.now()
     )
+    state = forms.ChoiceField(choices=MDR.STATES, widget=forms.RadioSelect)
+    cascadeRegistration = forms.ChoiceField(
+        initial=False,
+        required=False,
+        choices=[(0, _('No')), (1, _('Yes'))],
+        label=_("Do you want to update the registration of associated items?")
+    )
 
     class Meta:
         model = MDR.ReviewRequest

@@ -43,7 +43,32 @@ class LoggedInConceptAutocompletes(utils.LoggedInViewPages, TestCase):
         )
         data = utils.get_json_from_response(response)
         self.assertEqual(len(data['results']), 1)
-        self.assertEqual(data['results'][0]['id'], item2.id)
+        self.assertEqual(str(data['results'][0]['id']), str(item2.id))
+
+    def test_concept_identifier_autocompletes(self):
+        self.logout()
+
+        item1 = models.ObjectClass.objects.create(name="Test Item 1 (visible to tested viewers)",definition="my definition",workgroup=self.wg1,**self.defaults)
+        org = models.Organization.objects.create(name='My org', definition="None")
+        from aristotle_mdr.contrib.identifiers.models import ScopedIdentifier, Namespace
+        ns = Namespace.objects.create(naming_authority=org, shorthand_prefix='my_org')
+        ScopedIdentifier.objects.create(namespace=ns,concept=item1,identifier="my_ident")
+
+        self.login_superuser()
+        response = self.client.get(
+            reverse("aristotle-autocomplete:concept") + "?q=my_id" # test partial fails
+        )
+        data = utils.get_json_from_response(response)
+        self.assertEqual(len(data['results']), 0)
+
+        response = self.client.get(
+            reverse("aristotle-autocomplete:concept") + "?q=my_ident"
+        )
+        data = utils.get_json_from_response(response)
+        self.assertEqual(len(data['results']), 1)
+        self.assertEqual(str(data['results'][0]['id']), str(item1.id))
+
+
 
 class LoggedInUserAutocompletes(utils.LoggedInViewPages, TestCase):
     def setUp(self, *args, **kwargs):

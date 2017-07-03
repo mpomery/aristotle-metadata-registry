@@ -52,7 +52,10 @@ def download(request, download_type, item):
     from django.conf import settings
     page_size = getattr(settings, 'PDF_PAGE_SIZE', "A4")
     if download_type == "pdf":
-        subItems = item.get_download_items()
+        subItems = [
+            (obj_type, qs.visible(request.user).order_by('name').distinct())
+            for obj_type, qs in item.get_download_items()
+        ]
         return render_to_pdf(
             template,
             {
@@ -61,6 +64,7 @@ def download(request, download_type, item):
                 'tableOfContents': len(subItems) > 0,
                 'view': request.GET.get('view', '').lower(),
                 'pagesize': request.GET.get('pagesize', page_size),
+                'request': request,
             }
         )
 

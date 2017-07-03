@@ -58,6 +58,7 @@ def compare_concepts(request, obj_type=None):
         if revs[0] is not None and revs[1] is not None:
             comparator_a_to_b = item_a.comparator()
             comparator_b_to_a = item_b.comparator()
+            print(comparator_a_to_b, comparator_b_to_a)
             version1 = revs[0]
             version2 = revs[1]
 
@@ -87,7 +88,7 @@ def compare_concepts(request, obj_type=None):
                     comparison.pop(f.name, None)
                     same.pop(f.name, None)
 
-            hidden_fields = ['workgroup', 'created', 'modified', 'id', 'submitter', 'statuses']
+            hidden_fields = ['workgroup', 'created', 'modified', 'id', 'submitter', 'statuses', 'uuid']
             for h in hidden_fields:
                 comparison.pop(h, None)
                 same.pop(h, None)

@@ -16,7 +16,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 urlpatterns=[
-    url(r'^/?$', TemplateView.as_view(template_name='aristotle_mdr/static/home.html'), name="home"),
+    url(r'^$', TemplateView.as_view(template_name='aristotle_mdr/static/home.html'), name="home"),
     url(r'^manifest.json$', TemplateView.as_view(template_name='meta/manifest.json', content_type='application/json')),
     url(r'^robots.txt$', TemplateView.as_view(template_name='meta/robots.txt', content_type='text/plain')),
     url(r'^sitemap.xml$', views.sitemaps.main, name='sitemap_xml'),
@@ -46,6 +46,16 @@ urlpatterns=[
             form_add_another_text=_('Add a code'),
             form_title=_('Change Supplementary Values')
         ), name='supplementary_values_edit'),
+    url(r'^conceptualdomain/(?P<iid>\d+)?/edit/values/?$',
+        GenericAlterOneToManyView.as_view(
+            model_base=models.ConceptualDomain,
+            model_to_add=models.ValueMeaning,
+            model_base_field='valuemeaning_set',
+            model_to_add_field='conceptual_domain',
+            ordering_field='order',
+            form_add_another_text=_('Add a value meaning'),
+            form_title=_('Change Value Meanings')
+        ), name='value_meanings_edit'),
     url(r'^item/(?P<iid>\d+)/dataelementderivation/change_inputs/?$',
         GenericAlterManyToManyView.as_view(
             model_base=models.DataElementDerivation,
@@ -92,6 +102,7 @@ urlpatterns=[
 
     url(r'^item/(?P<iid>\d+)(?:\/(?P<model_slug>\w+)\/(?P<name_slug>.+))?/?$', views.concept, name='item'),
     url(r'^item/(?P<iid>\d+)(?:\/.*)?$', views.concept, name='item'),  # Catch every other 'item' URL and throw it for a redirect
+    url(r'^item/(?P<uuid>[\w-]+)/?(.*)?$', views.concept_by_uuid, name='item_uuid'),
 
     url(r'^unmanaged/measure/(?P<iid>\d+)(?:\/(?P<model_slug>\w+)\/(?P<name_slug>.+))?/?$', views.measure, name='measure'),
 

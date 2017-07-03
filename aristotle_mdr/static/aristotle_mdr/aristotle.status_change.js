@@ -19,9 +19,9 @@ $("#changeStatus input").change(function() {
         var new_visibility = "hidden";
         selected_ras.each(function( index ) {
             var ra = $(this).val();
-            /*console.log(
+            console.log(
                 status_matrix[ra].states[state]
-            );*/
+            );
             var potential_vis = status_matrix[ra].states[state];
             if (potential_vis == "public") {
                 new_visibility = potential_vis;

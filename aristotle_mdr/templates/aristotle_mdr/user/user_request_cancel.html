@@ -5,7 +5,7 @@
 {% block title %}Reject review for {{ item.name }}{% endblock %}
 {% block content %}
 {{ form.media }}
-<form method="post" action="{% url 'aristotle:userReviewReject' review.id %}">{% csrf_token %}
+<form method="post" action="{% url 'aristotle:userReviewCancel' review.id %}">{% csrf_token %}
     <div class="modal-body">
         <ol class="breadcrumb">
           <li><a href="{% url 'aristotle:userMyReviewRequests' %}">Review list</a></li>
@@ -35,7 +35,7 @@
         {% if request.is_ajax %}
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         {% else %}
-            <a class="btn btn-default" href="{% url 'aristotle:userReadyForReview' %}">Cancel</a>
+            <a class="btn btn-default" href="{% url 'aristotle:userMyReviewRequests' %}">Cancel</a>
         {% endif %}
         <input type="submit" class="btn btn-warning" value="Cancel review" />
     </div>

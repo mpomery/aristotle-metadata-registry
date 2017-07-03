@@ -11,6 +11,7 @@ Showing {{ page.paginator.count }} results.
     <tr>
         <th title="{% trans 'Number of items' %}">#</th>
         <th>{% trans 'Status' %}</th>
+        <th>{% trans 'Items' %}</th>
         <th>{% trans 'Message' %}</th>
         <th>{% trans 'Close reason' %}</th>
         <th>
@@ -42,8 +43,12 @@ Showing {{ page.paginator.count }} results.
         <td>{{ item.concepts.count }}</td>
         <td>{{ item.get_status_display }}
         </td>
+        <td><ul>{% for i in item.concepts.all %}
+        <li>{{ i.name }}</li>
+        {% endfor %}</ul>
+        </td>
         <td>
-            <a href="{% url 'aristotle:userReviewDetails' item.id %}" data-toggle="modal" data-target="#review_box">
+            <a href="{% url 'aristotle:userReviewDetails' item.id %}?next={{ request.path }}" data-toggle="modal" data-target="#review_box">
                 {% if item.message %}
                     {{ item.message }}
                 {% else %}
@@ -94,4 +99,3 @@ Showing {{ page.paginator.count }} results.
 </table>
 
 {% include "aristotle_mdr/helpers/paginator.html" with page=page %}
-

@@ -16,6 +16,7 @@ from model_utils.models import TimeStampedModel
 
 from aristotle_mdr import models as MDR
 from aristotle_mdr.signals import pre_save_clean
+from aristotle_mdr.fields import ConceptForeignKey
 
 
 class Relation(MDR.concept):  # 9.1.2.4
@@ -23,7 +24,8 @@ class Relation(MDR.concept):  # 9.1.2.4
     """
     arity = models.PositiveIntegerField(  # 9.1.2.4.3.1
         help_text=_('number of elements in the relation'),
-        validators=[MinValueValidator(2)]
+        validators=[MinValueValidator(2)],
+        null=True
     )
 
 
@@ -52,7 +54,7 @@ class RelationRole(MDR.aristotleComponent):  # 9.1.2.5
             'order of the relation role among other relation roles in the relation.'
         )
     )
-    relation = models.ForeignKey(Relation)
+    relation = ConceptForeignKey(Relation)
 
     @property
     def parentItem(self):
@@ -70,7 +72,7 @@ class Link(TimeStampedModel):
     Link is a subclass of Assertion (9.1.2.3), and as such is included in one or more
     Concept_Systems (9.1.2.2) through the assertion_inclusion (9.1.3.5) association.
     """
-    relation = models.ForeignKey(Relation)
+    relation = ConceptForeignKey(Relation)
 
     def concepts(self):
         return MDR._concept.objects.filter(linkend__link=self).all().distinct()
@@ -82,12 +84,12 @@ class Link(TimeStampedModel):
 class LinkEnd(TimeStampedModel):  # 9.1.2.7
     link = models.ForeignKey(Link)
     role = models.ForeignKey(RelationRole)
-    concept = models.ForeignKey(MDR._concept)
+    concept = ConceptForeignKey(MDR._concept)
 
     def clean(self):
         if self.role.relation != self.link.relation:
             raise ValidationError(
-                _('A link ends role relation must be from the relation itself')
+                _('A link ends role relation must be from the set of roles on the links relation')
             )
 
 pre_save.connect(pre_save_clean, sender=LinkEnd)

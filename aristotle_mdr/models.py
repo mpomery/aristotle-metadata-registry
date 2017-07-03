@@ -38,6 +38,7 @@ from aristotle_mdr import comparators
 from aristotle_mdr.utils import fetch_aristotle_settings
 
 from model_utils.fields import AutoLastModifiedField
+from .fields import ConceptForeignKey, ConceptManyToManyField
 
 import logging
 logger = logging.getLogger(__name__)
@@ -643,6 +644,8 @@ class _concept(baseAristotleObject):
     """
     objects = ConceptManager()
     template = "aristotle_mdr/concepts/managedContent.html"
+    list_details_template = "aristotle_mdr/helpers/concept_list_details.html"
+
     workgroup = models.ForeignKey(Workgroup, related_name="items", null=True, blank=True)
     submitter = models.ForeignKey(
         User, related_name="created_items",
@@ -668,7 +671,7 @@ class _concept(baseAristotleObject):
     submitting_organisation = models.CharField(max_length=256, blank=True)
     responsible_organisation = models.CharField(max_length=256, blank=True)
 
-    superseded_by = models.ForeignKey(
+    superseded_by = ConceptForeignKey(
         'self',
         related_name='supersedes',
         blank=True,
@@ -977,7 +980,7 @@ class Status(TimeStampedModel):
     A Registration_State is a collection of information about the Registration (8.1.5.1) of an Administered Item (8.1.2.2).
     The attributes of the Registration_State class are summarized here and specified more formally in 8.1.2.6.2.
     """
-    concept = models.ForeignKey(_concept, related_name="statuses")
+    concept = ConceptForeignKey(_concept, related_name="statuses")
     registrationAuthority = models.ForeignKey(RegistrationAuthority)
     changeDetails = models.TextField(blank=True, null=True)
     state = models.IntegerField(
@@ -1067,6 +1070,7 @@ class UnitOfMeasure(concept):
         verbose_name_plural = "Units Of Measure"
 
     template = "aristotle_mdr/concepts/unitOfMeasure.html"
+    list_details_template = "aristotle_mdr/concepts/list_details/unit_of_measure.html"
     measure = models.ForeignKey(Measure, blank=True, null=True)
     symbol = models.CharField(max_length=20, blank=True)
 
@@ -1096,6 +1100,9 @@ class ConceptualDomain(concept):
                    'range for a set of all value meanings for a Conceptual '
                    'Domain')
     )
+    serialize_weak_entities = [
+        ('value_meaning', 'valuemeaning_set'),
+    ]
 
 
 @python_2_unicode_compatible  # Python 2
@@ -1107,11 +1114,15 @@ class ValueMeaning(aristotleComponent):
     class Meta:
         ordering = ['order']
 
-    meaning = models.CharField(  # 3.2.141
+    name = models.CharField(  # 3.2.141
         max_length=255,
         help_text=_('The semantic content of a possible value (3.2.141)')
     )
-    conceptual_domain = models.ForeignKey(ConceptualDomain)
+    definition = models.TextField(
+        null=True, blank=True,
+        help_text=_('The semantic definition of a possible value')
+    )
+    conceptual_domain = ConceptForeignKey(ConceptualDomain)
     order = models.PositiveSmallIntegerField("Position")
     start_date = models.DateField(
         blank=True,
@@ -1127,8 +1138,8 @@ class ValueMeaning(aristotleComponent):
     def __str__(self):
         return "%s: %s - %s" % (
             self.conceptual_domain.name,
-            self.value,
-            self.meaning
+            self.name,
+            self.definition
         )
 
     @property
@@ -1147,8 +1158,14 @@ class ValueDomain(concept):
     # no reason to model them separately.
 
     template = "aristotle_mdr/concepts/valueDomain.html"
+    list_details_template = "aristotle_mdr/concepts/list_details/value_domain.html"
+    comparator = comparators.ValueDomainComparator
+    serialize_weak_entities = [
+        ('permissible_values', 'permissiblevalue_set'),
+        ('supplementary_values', 'supplementaryvalue_set'),
+    ]
 
-    data_type = models.ForeignKey(  # 11.3.2.5.2.1
+    data_type = ConceptForeignKey(  # 11.3.2.5.2.1
         DataType,
         blank=True,
         null=True,
@@ -1165,13 +1182,13 @@ class ValueDomain(concept):
         null=True,
         help_text=_('maximum number of characters available to represent the Data Element value')
         )
-    unit_of_measure = models.ForeignKey(  # 11.3.2.5.2.3
+    unit_of_measure = ConceptForeignKey(  # 11.3.2.5.2.3
         UnitOfMeasure,
         blank=True,
         null=True,
         help_text=_('Unit of Measure used in a Value Domain')
     )
-    conceptual_domain = models.ForeignKey(
+    conceptual_domain = ConceptForeignKey(
         ConceptualDomain,
         blank=True,
         null=True,
@@ -1223,7 +1240,7 @@ class AbstractValue(aristotleComponent):
     )
     # Below will generate exactly the same related name as django, but reversion-compare
     # needs an explicit related_name for some actions.
-    valueDomain = models.ForeignKey(
+    valueDomain = ConceptForeignKey(
         ValueDomain,
         related_name="%(class)s_set",
         help_text=_("Enumerated Value Domain that this value meaning relates to")
@@ -1277,15 +1294,15 @@ class DataElementConcept(concept):
     # Redefine in this context as we need 'property' for the 11179 terminology.
     property_ = property
     template = "aristotle_mdr/concepts/dataElementConcept.html"
-    objectClass = models.ForeignKey(  # 11.2.3.3
+    objectClass = ConceptForeignKey(  # 11.2.3.3
         ObjectClass, blank=True, null=True,
         help_text=_('references an Object_Class that is part of the specification of the Data_Element_Concept')
     )
-    property = models.ForeignKey(  # 11.2.3.1
+    property = ConceptForeignKey(  # 11.2.3.1
         Property, blank=True, null=True,
         help_text=_('references a Property that is part of the specification of the Data_Element_Concept'),
     )
-    conceptualDomain = models.ForeignKey(  # 11.2.3.2
+    conceptualDomain = ConceptForeignKey(  # 11.2.3.2
         ConceptualDomain, blank=True, null=True,
         help_text=_('references a Conceptual_Domain that is part of the specification of the Data_Element_Concept')
     )
@@ -1313,14 +1330,16 @@ class DataElement(concept):
     Unit of data that is considered in context to be indivisible (3.2.28)"""
 
     template = "aristotle_mdr/concepts/dataElement.html"
-    dataElementConcept = models.ForeignKey(  # 11.5.3.2
+    list_details_template = "aristotle_mdr/concepts/list_details/data_element.html"
+
+    dataElementConcept = ConceptForeignKey(  # 11.5.3.2
         DataElementConcept,
         verbose_name="Data Element Concept",
         blank=True,
         null=True,
         help_text=_("binds with a Value_Domain that describes a set of possible values that may be recorded in an instance of the Data_Element")
     )
-    valueDomain = models.ForeignKey(  # 11.5.3.1
+    valueDomain = ConceptForeignKey(  # 11.5.3.1
         ValueDomain,
         verbose_name="Value Domain",
         blank=True,
@@ -1354,14 +1373,14 @@ class DataElementDerivation(concept):
     output :model:`aristotle_mdr.DataElement`\s (3.2.33)
     """
 
-    derives = models.ManyToManyField(  # 11.5.3.5
+    derives = ConceptManyToManyField(  # 11.5.3.5
         DataElement,
         related_name="derived_from",
         blank=True,
         null=True,
         help_text=_("binds with one or more output Data_Elements that are the result of the application of the Data_Element_Derivation.")
     )
-    inputs = models.ManyToManyField(  # 11.5.3.4
+    inputs = ConceptManyToManyField(  # 11.5.3.4
         DataElement,
         related_name="input_to_derivation",
         blank=True,

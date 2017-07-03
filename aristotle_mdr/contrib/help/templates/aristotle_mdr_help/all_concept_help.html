@@ -29,6 +29,7 @@
         </thead>
         <tbody>
       {% for obj in object_list %}
+        {% if obj.get_model %}
         <tr>
             <th>
                 <a href="{% url 'aristotle_help:concept_help' obj.app_label obj.concept_type %}">
@@ -42,6 +43,7 @@
                 {% help_doc obj.get_model %}
             </td>
         </tr>
+        {% endif %}
       {% endfor %}
       </tbody>
     </table>

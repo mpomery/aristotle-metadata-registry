@@ -2,6 +2,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 
+from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.template.loader import get_template
@@ -68,6 +69,9 @@ class GenericConceptAutocomplete(GenericAutocomplete):
 
         if self.q:
             q = Q(name__icontains=self.q)
+            q |= Q(uuid__iexact=self.q)
+            if 'aristotle_mdr.contrib.identifiers' in settings.INSTALLED_APPS:
+                q |= Q(identifiers__identifier__iexact=self.q)
             try:
                 int(self.q)
                 q |= Q(pk=self.q)
@@ -75,6 +79,17 @@ class GenericConceptAutocomplete(GenericAutocomplete):
                 pass
             qs = qs.filter(q)
         return qs
+
+    def get_results(self, context):
+        """Return data for the 'results' key of the response."""
+        return [
+            {
+                'id': self.get_result_value(result),
+                'uuid': str(result.uuid),
+                'title': self.get_result_title(result),
+                'text': self.get_result_text(result),
+            } for result in context['object_list']
+        ]
 
 
 class UserAutocomplete(autocomplete.Select2QuerySetView):

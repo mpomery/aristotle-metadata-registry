@@ -9,7 +9,7 @@ from django.forms.models import modelformset_factory
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import FormView, ListView, TemplateView
+from django.views.generic import FormView, ListView, TemplateView, View
 
 from aristotle_mdr.contrib.autocomplete import widgets
 from aristotle_mdr.utils import get_concepts_for_apps
@@ -38,13 +38,14 @@ def generic_foreign_key_factory_view(request, **kwargs):
     )(request, **kwargs)
 
 
-class GenericWithItemURLFormView(FormView):
+class GenericWithItemURLView(View):
     user_checks = []
     permission_checks = [user_can_view]
     model_base = _concept
+    item_kwarg = "iid"
 
     def dispatch(self, request, *args, **kwargs):
-        self.item = get_object_or_404(self.model_base, pk=self.kwargs['iid'])
+        self.item = get_object_or_404(self.model_base, pk=self.kwargs[self.item_kwarg])
 
         if not (
             self.item and
@@ -55,16 +56,20 @@ class GenericWithItemURLFormView(FormView):
                 return redirect(reverse('friendly_login') + '?next=%s' % request.path)
             else:
                 raise PermissionDenied
-        return super(GenericWithItemURLFormView, self).dispatch(request, *args, **kwargs)
+        return super(GenericWithItemURLView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
-        context = super(GenericWithItemURLFormView, self).get_context_data(*args, **kwargs)
+        context = super(GenericWithItemURLView, self).get_context_data(*args, **kwargs)
         context['item'] = self.item
         context['submit_url'] = self.request.get_full_path()
         return context
 
     def get_success_url(self):
         return self.item.get_absolute_url()
+
+
+class GenericWithItemURLFormView(GenericWithItemURLView, FormView):
+    pass
 
 
 class GenericAlterManyToSomethingFormView(GenericWithItemURLFormView):
@@ -277,6 +282,14 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
                         model=foreign_model
                     )
                 })
+        for f in self.model_to_add._meta.many_to_many:
+            foreign_model = self.model_to_add._meta.get_field(f.name).related_model
+            if foreign_model and issubclass(foreign_model, _concept):
+                _widgets.update({
+                    f.name: widgets.ConceptAutocompleteSelectMultiple(
+                        model=foreign_model
+                    )
+                })
 
         from aristotle_mdr.contrib.generic.forms import HiddenOrderModelFormSet
         return modelformset_factory(
@@ -316,6 +329,7 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
                         value.save()
                 for obj in formset.deleted_objects:
                     obj.delete()
+                formset.save_m2m()
                 # formset.save(commit=True)
                 reversion.revisions.set_user(request.user)
                 reversion.revisions.set_comment(construct_change_message(request, None, [formset]))
@@ -323,3 +337,27 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.form_invalid(form)
+
+
+class ConfirmDeleteView(GenericWithItemURLView, TemplateView):
+    confirm_template = "aristotle_mdr/generic/actions/confirm_delete.html"
+    template_name = "aristotle_mdr/generic/actions/confirm_delete.html"
+    form_delete_button_text = _("Delete")
+    warning_text = _("You are about to delete something, confirm below, or click cancel to return to the item.")
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ConfirmDeleteView, self).get_context_data(*args, **kwargs)
+        context['form_title'] = self.form_title or _('Add child item')
+        context['form_delete_button_text'] = self.form_delete_button_text
+        context['warning_text'] = self.get_warning_text()
+        return context
+
+    def get_warning_text(self):
+        return self.warning_text
+
+    def perform_deletion(self):
+        raise NotImplementedError("This must be overridden in a subclass")
+
+    def post(self, *args, **kwargs):
+        self.perform_deletion()
+        return HttpResponseRedirect(self.get_success_url())

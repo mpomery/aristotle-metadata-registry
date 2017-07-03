@@ -7,7 +7,7 @@
     {% include "aristotle_mdr/helpers/extra_actions.html" %}
     {% if user.is_active or item|can_edit:request.user %}
     <div class="btn-group">
-      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+      <button id="metadata_action_menu_action" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
         <i class="fa fa-fw fa-pencil-square-o"></i> {% trans 'Actions'%} <span class="caret"></span>
       </button>
       <ul class="dropdown-menu dropdown-menu-right" role="menu">
@@ -43,7 +43,7 @@
     </div>
     {% endif %}
     <div class="btn-group">
-        <button accesskey="d" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+        <button id="metadata_action_menu_download" accesskey="d" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
         <i class="fa fa-download"></i> {% trans 'Download'%} <span class="caret"></span>
         </button>
         {% downloadMenu item %}
