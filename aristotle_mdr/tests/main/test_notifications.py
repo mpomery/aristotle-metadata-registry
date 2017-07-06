@@ -2,7 +2,6 @@ from django import VERSION as django_version
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase, override_settings
-from django.test.utils import setup_test_environment
 from django.utils import timezone
 from django.contrib.auth.models import User
 
@@ -14,14 +13,10 @@ from aristotle_mdr.forms.creation_wizards import WorkgroupVerificationMixin,Chec
 from aristotle_mdr.tests import utils
 import datetime
 
-try:
-    setup_test_environment()
-except RuntimeError as err:
-    if "setup_test_environment() was already called" in err.msg:
-        # The environment is setup, its all good.
-        pass
-    else:
-        raise
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+
+setup_aristotle_test_environment()
 
 
 class TestNotifications(utils.LoggedInViewPages, TestCase):
