@@ -9,6 +9,7 @@ from aristotle_mdr.utils import setup_aristotle_test_environment
 
 setup_aristotle_test_environment()
 
+
 class TestGenericPagesLoad(utils.LoggedInViewPages, TestCase):
 
     def test_anon_cant_use_generic(self):

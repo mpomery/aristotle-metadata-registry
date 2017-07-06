@@ -57,8 +57,8 @@ SITE_ID=None
 
 # Not sure how to resolve these yet.
 SILENCED_SYSTEM_CHECKS = [
-    'models.E006', # This gets called because of the DataElementConcept.property attribute.
-    'models.E023', # This gets called because we named a model with an underscore
+    'models.E006',  # This gets called because of the DataElementConcept.property attribute.
+    'models.E023',  # This gets called because we named a model with an underscore
 ]
 
 ALLOWED_HOSTS = []

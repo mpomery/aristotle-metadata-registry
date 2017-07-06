@@ -208,4 +208,3 @@ def setup_aristotle_test_environment():
             pass
         else:
             raise
-

@@ -1,12 +1,13 @@
 from django import forms
-#from django.forms.widgets import TextInput, CheckboxSelectMultiple, ChoiceFieldRenderer, ChoiceInput, CheckboxChoiceInput, RadioSelect
+# from django.forms.widgets import TextInput, CheckboxSelectMultiple, ChoiceFieldRenderer, ChoiceInput, CheckboxChoiceInput, RadioSelect
 from django.forms.widgets import (
     TextInput, CheckboxSelectMultiple, Input,
-    #ChoiceFieldRenderer, 
-    #ChoiceInput,
-    #CheckboxChoiceInput,
+    # ChoiceFieldRenderer,
+    # ChoiceInput,
+    # CheckboxChoiceInput,
     RadioSelect
 )
+
 from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -57,7 +58,7 @@ class BootstrapDateTimePicker(DateTimePicker):
         )
 
 
-class BootstrapChoiceInput(Input): #(ChoiceInput):
+class BootstrapChoiceInput(Input):  # (ChoiceInput):
     input_type = 'radio'
 
     def render(self, name=None, value=None, attrs=None, choices=()):
@@ -75,7 +76,7 @@ class BootstrapChoiceInput(Input): #(ChoiceInput):
         return super(BootstrapChoiceInput, self).tag()
 
 
-class BootstrapCheckInput(BootstrapChoiceInput, Input): #CheckboxChoiceInput):
+class BootstrapCheckInput(BootstrapChoiceInput, Input):  # CheckboxChoiceInput):
     input_type = 'checkbox'
 
 
