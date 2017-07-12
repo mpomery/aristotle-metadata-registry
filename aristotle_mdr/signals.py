@@ -54,7 +54,7 @@ class AristotleSignalProcessor(signals.BaseSignalProcessor):
             self.handle_save(obj.__class__, obj, **kwargs)
 
         # Components should have parents, but lets be kind.
-        if issubclass(sender, aristotleComponent) and hassattr(instance, "parentItem"):
+        if issubclass(sender, aristotleComponent) and hasattr(instance, "parentItem"):
             obj = instance.parentItem.item
             self.handle_save(obj.__class__, obj, **kwargs)
 
