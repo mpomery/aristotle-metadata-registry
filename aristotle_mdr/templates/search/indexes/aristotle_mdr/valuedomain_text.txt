@@ -3,6 +3,7 @@
 {{ object.description }}
 
 {% for val in object.permissiblevalue_set.all %}
+    {{ val.value }}
     {{ val.meaning }}
     {% if val.value_meaning %}
         {{ val.value_meaning.name }}
@@ -11,6 +12,7 @@
 {% endfor %}
 
 {% for val in object.supplementaryvalue_set.all %}
+    {{ val.value }}
     {{ val.meaning }}
     {% if val.value_meaning %}
         {{ val.value_meaning.name }}

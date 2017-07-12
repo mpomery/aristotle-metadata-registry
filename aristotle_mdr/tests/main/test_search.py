@@ -593,15 +593,18 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertEqual(len(psqs),0)
         psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
         self.assertEqual(len(psqs),0)
+        psqs = PSQS.auto_query('FLT').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),0)
 
         with reversion.create_revision():
             vd = models.ValueDomain.objects.create(
                     name="Mutation",
                     definition="Coded list of mutations",
                 )
-            for i, power in enumerate(['flight', 'healing', 'invisiblilty']):
+            for i, data in enumerate([("FLT", 'flight'), ("HEAL", 'healing'), ("INVIS", 'invisiblilty')]):
+                code, power = data
                 models.PermissibleValue.objects.create(
-                    value=i, meaning=power, order=i,
+                    value=code, meaning=power, order=i,
                     valueDomain=vd
                 )
             vd.save() #just to be sure
@@ -610,6 +613,9 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertEqual(len(psqs),1)
         self.assertEqual(psqs[0].object.pk, vd.pk)
         psqs = PSQS.auto_query('flight').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),1)
+        self.assertEqual(psqs[0].object.pk, vd.pk)
+        psqs = PSQS.auto_query('FLT').apply_permission_checks(self.su)
         self.assertEqual(len(psqs),1)
         self.assertEqual(psqs[0].object.pk, vd.pk)
 
