@@ -48,9 +48,14 @@ class AristotleSignalProcessor(signals.BaseSignalProcessor):
     #             self.handle_save(instance.__class__, instance)
 
     def handle_concept_save(self, sender, instance, **kwargs):
-        from aristotle_mdr.models import _concept
+        from aristotle_mdr.models import _concept, aristotleComponent
         if isinstance(instance, _concept) and type(instance) is not _concept:
             obj = instance.item
+            self.handle_save(obj.__class__, obj, **kwargs)
+
+        # Components should have parents, but lets be kind.
+        if issubclass(sender, aristotleComponent) and hassattr(instance, "parentItem"):
+            obj = instance.parentItem.item
             self.handle_save(obj.__class__, obj, **kwargs)
 
     def handle_concept_delete(self, sender, instance, **kwargs):

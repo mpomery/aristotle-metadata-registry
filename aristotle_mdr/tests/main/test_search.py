@@ -576,7 +576,6 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
                     name=power, definition=power, order=i,
                     conceptual_domain=cd
                 )
-            cd.save() #just to be sure
 
         psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
         self.assertEqual(len(psqs),1)
@@ -607,7 +606,6 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
                     value=code, meaning=power, order=i,
                     valueDomain=vd
                 )
-            vd.save() #just to be sure
 
         psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
         self.assertEqual(len(psqs),1)

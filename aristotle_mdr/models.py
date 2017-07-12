@@ -1266,7 +1266,7 @@ class AbstractValue(aristotleComponent):
 
     @property
     def parentItem(self):
-        return self.value_domain
+        return self.valueDomain
 
 
 class PermissibleValue(AbstractValue):
