@@ -1,17 +1,19 @@
 {% include "search/indexes/aristotle_mdr/managedobject_text.txt" %}
 
-{{ item.description }}
+{{ object.description }}
 
-{% for perm in item.permissiblevalue_set.all %}
-    {{ perm.meaning }}
-    {% if perm.value_meaning %}
-        {{ perm.value_meaning.name }}
+{% for val in object.permissiblevalue_set.all %}
+    {{ val.meaning }}
+    {% if val.value_meaning %}
+        {{ val.value_meaning.name }}
+        {{ val.value_meaning.definition }}
     {% endif %}
 {% endfor %}
 
-{% for perm in item.supplementaryvalue_set.all %}
-    {{ perm.meaning }}
-    {% if perm.value_meaning %}
-        {{ perm.value_meaning.name }}
+{% for val in object.supplementaryvalue_set.all %}
+    {{ val.meaning }}
+    {% if val.value_meaning %}
+        {{ val.value_meaning.name }}
+        {{ val.value_meaning.definition }}
     {% endif %}
 {% endfor %}

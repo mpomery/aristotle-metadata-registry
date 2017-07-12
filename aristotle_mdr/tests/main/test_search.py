@@ -557,6 +557,62 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertDelayedEqual(len(objs),1)
         self.assertTrue(objs[0].object.pk,de.pk)
 
+    def test_values_in_conceptual_domain_search(self):
+        # For bug #676
+        from aristotle_mdr.forms.search import PermissionSearchQuerySet
+        PSQS = PermissionSearchQuerySet()
+        psqs = PSQS.auto_query('flight').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),0)
+        psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),0)
+
+        with reversion.create_revision():
+            cd = models.ConceptualDomain.objects.create(
+                    name="Mutation",
+                    definition="List of mutations",
+                )
+            for i, power in enumerate(['flight', 'healing', 'invisiblilty']):
+                models.ValueMeaning.objects.create(
+                    name=power, definition=power, order=i,
+                    conceptual_domain=cd
+                )
+            cd.save() #just to be sure
+
+        psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),1)
+        self.assertEqual(psqs[0].object.pk, cd.pk)
+        psqs = PSQS.auto_query('flight').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),1)
+        self.assertEqual(psqs[0].object.pk, cd.pk)
+
+    def test_values_in_value_domain_search(self):
+        # For bug #676
+        from aristotle_mdr.forms.search import PermissionSearchQuerySet
+        PSQS = PermissionSearchQuerySet()
+        psqs = PSQS.auto_query('flight').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),0)
+        psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),0)
+
+        with reversion.create_revision():
+            vd = models.ValueDomain.objects.create(
+                    name="Mutation",
+                    definition="Coded list of mutations",
+                )
+            for i, power in enumerate(['flight', 'healing', 'invisiblilty']):
+                models.PermissibleValue.objects.create(
+                    value=i, meaning=power, order=i,
+                    valueDomain=vd
+                )
+            vd.save() #just to be sure
+
+        psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),1)
+        self.assertEqual(psqs[0].object.pk, vd.pk)
+        psqs = PSQS.auto_query('flight').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),1)
+        self.assertEqual(psqs[0].object.pk, vd.pk)
+
 
 class TestTokenSearch(TestCase):
     def tearDown(self):
