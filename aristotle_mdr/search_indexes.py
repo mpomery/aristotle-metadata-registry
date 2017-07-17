@@ -3,7 +3,7 @@ import haystack.indexes as indexes
 
 import aristotle_mdr.models as models
 from django.db.models import Q
-from django.template import TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, loader
 from django.utils import timezone
 
 import logging
