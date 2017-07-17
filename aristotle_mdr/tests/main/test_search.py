@@ -566,16 +566,15 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
         self.assertEqual(len(psqs),0)
 
-        with reversion.create_revision():
-            cd = models.ConceptualDomain.objects.create(
-                    name="Mutation",
-                    definition="List of mutations",
-                )
-            for i, power in enumerate(['flight', 'healing', 'invisiblilty']):
-                models.ValueMeaning.objects.create(
-                    name=power, definition=power, order=i,
-                    conceptual_domain=cd
-                )
+        cd = models.ConceptualDomain.objects.create(
+                name="Mutation",
+                definition="List of mutations",
+            )
+        for i, power in enumerate(['flight', 'healing', 'invisiblilty']):
+            models.ValueMeaning.objects.create(
+                name=power, definition=power, order=i,
+                conceptual_domain=cd
+            )
 
         psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
         self.assertEqual(len(psqs),1)
@@ -595,17 +594,17 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         psqs = PSQS.auto_query('FLT').apply_permission_checks(self.su)
         self.assertEqual(len(psqs),0)
 
-        with reversion.create_revision():
-            vd = models.ValueDomain.objects.create(
-                    name="Mutation",
-                    definition="Coded list of mutations",
-                )
-            for i, data in enumerate([("FLT", 'flight'), ("HEAL", 'healing'), ("INVIS", 'invisiblilty')]):
-                code, power = data
-                models.PermissibleValue.objects.create(
-                    value=code, meaning=power, order=i,
-                    valueDomain=vd
-                )
+        # with reversion.create_revision():
+        vd = models.ValueDomain.objects.create(
+                name="Mutation",
+                definition="Coded list of mutations",
+            )
+        for i, data in enumerate([("FLT", 'flight'), ("HEAL", 'healing'), ("INVIS", 'invisiblilty')]):
+            code, power = data
+            models.PermissibleValue.objects.create(
+                value=code, meaning=power, order=i,
+                valueDomain=vd
+            )
 
         psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
         self.assertEqual(len(psqs),1)

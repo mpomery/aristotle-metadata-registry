@@ -1,0 +1,6 @@
+{% include "search/indexes/aristotle_mdr/managedobject_text.txt" %}
+
+{{ object.derivation_rule }}
+{% for d in object.derives.all %}
+    {% include "search/indexes/aristotle_mdr/dataelementconcept_text.txt" with object=d only %}
+{% endfor %}
