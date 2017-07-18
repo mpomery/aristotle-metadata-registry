@@ -1,5 +1,9 @@
 Changelog
 
+- 1.5.6
+    - Fixed search indexes for Value Domains and Conceptual Domains #676
+    - Fixed search page html bug #673
+
 - 1.5.5
     - Added Many to Many fields to generic.views.GenericAlterOneToManyView
     - Added Date Widget to Date time fields
