@@ -1,7 +1,7 @@
 # Lets run on the new infrastructure
 sudo: false
 
-# We're having issues on the default Trust setup, lets wait for now
+# We're having issues on the default Trusty setup, lets wait for now
 dist: precise
 
 language: python
