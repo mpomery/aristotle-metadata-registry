@@ -1,5 +1,8 @@
 Changelog
 
+- 1.5.7
+    - Pinned bootstrap-timepicker-datepicker version
+
 - 1.5.6
     - Fixed search indexes for Value Domains and Conceptual Domains #676
     - Fixed search page html bug #673
