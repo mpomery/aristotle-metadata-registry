@@ -5,9 +5,6 @@ sudo: false
 dist: precise
 
 language: python
-python:
-  - "3.5"
-  - "2.7"
 
 install:
   - pip install tox codecov coveralls
@@ -57,21 +54,39 @@ jobs:
 
     - stage: testing
       env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
+      python:
+        - "3.5"
+        - "2.7"
       <<: *main_test_script
     - stage: testing
       env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
+      python:
+        - "3.5"
+        - "2.7"
       <<: *main_test_script
     - stage: testing
       env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh
+      python:
+        - "3.5"
+        - "2.7"
       <<: *main_test_script
     - stage: testing
       env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=whoosh
+      python:
+        - "3.5"
+        - "2.7"
       <<: *main_test_script
     - stage: testing
       env: DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=whoosh
+      python:
+        - "3.5"
+        - "2.7"
       <<: *main_test_script
     - stage: testing
       env: DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=elastic
+      python:
+        - "3.5"
+        - "2.7"
       <<: *main_test_script
     - stage: testing
       env: DJANGO_VERSION='1.10' DB=sqlite    SEARCH=elastic
