@@ -21,7 +21,8 @@ from aristotle_mdr.required_settings import *
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 FIXTURES_DIRS = [os.path.join(BASE_DIR, 'fixtures')]
-STATIC_ROOT =os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+ALLOWED_HOSTS = ["*"]
 
 # If you are using the Aristotle Glossary, uncomment the command below to enable
 # the glossary insertion button in the rich text editor
@@ -36,8 +37,6 @@ SECRET_KEY = 'Change-this-key-as-soon-as-you-can'
 DEBUG = True
 
 TEMPLATE_DEBUG = True
-
-ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -99,7 +98,7 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 ARISTOTLE_SETTINGS.update({
-    'SITE_NAME': 'Aristotle-MDR Demo Server', # 'The main title for the site.'
+    'SITE_NAME': 'Example Metadata Registry', # 'The main title for the site.'
     'SITE_BRAND': '/static/aristotle_mdr/images/aristotle_small.png', # URL for the Site-wide logo
     'SITE_INTRO': 'Use Default Site Name to search for metadata...', # 'Intro text use on the home page as a prompt for users.'
     'SITE_DESCRIPTION': 'About this site', # 'The main title for the site.'
@@ -118,4 +117,3 @@ ARISTOTLE_DOWNLOADS = ARISTOTLE_DOWNLOADS + [
     ]
 
 #
-GRAPPELLI_ADMIN_TITLE = "Comet admin interface"
