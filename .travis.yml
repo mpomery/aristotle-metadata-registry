@@ -47,10 +47,6 @@ jobs:
       script: tox -e docs --skip-missing-interpreters
 
 env:
-  - DOCS=1
-  - A11Y='metadata_item'
-  - A11Y='metadata_action'
-  - A11Y='static'
   - DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
   - DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
   - DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh
@@ -66,14 +62,6 @@ env:
   - DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
 
   - DJANGO_VERSION='1.11' DB=sqlite    SEARCH=whoosh
-
-# command to run tests
-script:
-# Start a few workers
-#  - ./manage.py runworker --settings=aristotle_mdr.tests.settings.settings > worker1.log 2>&1 &
-  - if [[ "$DB" != "" ]]; then tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters; fi
-# check documentation builds cleanly
-#  - cat worker1.log
 
 jobs:
   allow_failures:
