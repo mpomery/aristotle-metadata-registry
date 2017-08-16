@@ -45,6 +45,8 @@ addons:
     repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
   mariadb: '10.1'
 
+script: true
+
 jobs:
   allow_failures:
     - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
@@ -57,7 +59,7 @@ jobs:
     - stage: documentation
       script: tox -e docs --skip-missing-interpreters
 
-    - stage: test
+    - stage: testing
       script: tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
 
     - stage: accessibility
