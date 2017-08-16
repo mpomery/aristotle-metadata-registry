@@ -13,7 +13,7 @@ jobs:
       script: tox -e pep8 --skip-missing-interpreters
 
     - stage: documentation
-    install:
+      install:
       - pip install tox
       script: tox -e docs --skip-missing-interpreters
 
