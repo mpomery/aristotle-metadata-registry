@@ -12,7 +12,6 @@ services:
   - mariadb
 
 env:
-  - DOCS=1
   - A11Y='metadata_item'
   - A11Y='metadata_action'
   - A11Y='static'
@@ -30,8 +29,7 @@ env:
 
 
 before_install:
-  - pip install codecov
-  - pip install coveralls
+  - pip install codecov coveralls
 
 install:
   - pip install tox
@@ -50,15 +48,7 @@ before_script:
 script:
 # Start a few workers
 #  - ./manage.py runworker --settings=aristotle_mdr.tests.settings.settings > worker1.log 2>&1 &
-  - if [[ "$DB" != "" ]]; then tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters; fi
-# check documentation builds cleanly
-  - if [[ $DOCS == 1 ]]; then tox -e pep8 -e docs --skip-missing-interpreters; fi
-  - if [[ $A11Y != "" ]]; then tox -e ally-$A11Y --skip-missing-interpreters; fi
-#  - cat worker1.log
-after_success:
-  - coveralls
-  - codecov
-
+  
 addons:
   apt:
     sources:
@@ -73,3 +63,18 @@ matrix:
   allow_failures:
     - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
     - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
+
+jobs:
+  include:
+    - stage: stylecheck
+      script: tox -e pep8 --skip-missing-interpreters
+    - stage: documentation
+      script: tox -e docs --skip-missing-interpreters
+    - stage: accessibility
+      script: tox -e ally-$A11Y --skip-missing-interpreters
+    - stage: testing
+      script: tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
+
+after_success:
+  - coveralls
+  - codecov
