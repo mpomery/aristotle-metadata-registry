@@ -45,7 +45,7 @@ before_script:
   - if [[ $DB == postgres ]]; then psql -c 'create database aristotle_test_db;' -U postgres; fi
 
 # command to run tests
-script:
+# script:
 # Start a few workers
 #  - ./manage.py runworker --settings=aristotle_mdr.tests.settings.settings > worker1.log 2>&1 &
   
@@ -72,7 +72,7 @@ jobs:
       script: tox -e docs --skip-missing-interpreters
     - stage: accessibility
       script: tox -e ally-$A11Y --skip-missing-interpreters
-    - stage: testing
+    - stage: test
       script: tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
 
 after_success:
