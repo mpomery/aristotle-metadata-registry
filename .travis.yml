@@ -5,76 +5,71 @@ language: python
 python:
   - "3.5"
 
-services:
-  - postgresql
-  - redis-server
-  - elasticsearch
-  - mariadb
-
-env:
-  - A11Y='metadata_item'
-  - A11Y='metadata_action'
-  - A11Y='static'
-
-  - DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic
-  - DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic
-  - DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh
-  - DJANGO_VERSION='1.11'  DB=postgres  SEARCH=whoosh
-  - DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=whoosh
-  - DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic
-
-  # Possible failures:
-  - DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-  - DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-
-
-before_install:
-  - pip install codecov coveralls
-
-install:
-  - pip install tox
-
-before_script:
-# Make a MariaDB database
-# Fix wierdness with MariaDB on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0  
-  - if [[ $DB == mariadb ]]; then mysql -e 'create database aristotle_test_db;' -u root ; fi
-  - if [[ $DB == mariadb ]]; then mysql -e 'SET GLOBAL wait_timeout = 36000;' ; fi
-  - if [[ $DB == mariadb ]]; then mysql -e 'SET GLOBAL max_allowed_packet = 134209536;' ; fi
-  - if [[ $SEARCH == elasticsearch ]]; then sleep 10; fi
-# Make a posgres database
-  - if [[ $DB == postgres ]]; then psql -c 'create database aristotle_test_db;' -U postgres; fi
-
-# command to run tests
-# script:
-# Start a few workers
-#  - ./manage.py runworker --settings=aristotle_mdr.tests.settings.settings > worker1.log 2>&1 &
-  
-addons:
-  apt:
-    sources:
-      - elasticsearch-2.x
-    packages:
-      - elasticsearch
-  code_climate:
-    repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
-  mariadb: '10.1'
-
-matrix:
-  allow_failures:
-    - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-    - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-
 jobs:
   include:
     - stage: stylecheck
+      install:
+        - pip install tox
       script: tox -e pep8 --skip-missing-interpreters
-    - stage: documentation
-      script: tox -e docs --skip-missing-interpreters
-    - stage: accessibility
-      script: tox -e ally-$A11Y --skip-missing-interpreters
-    - stage: test
-      script: tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
 
-after_success:
-  - coveralls
-  - codecov
+    - stage: documentation
+    install:
+      - pip install tox
+      script: tox -e docs --skip-missing-interpreters
+
+    - stage: accessibility
+      install:
+        - pip install tox
+      env:
+        - A11Y='metadata_item'
+        - A11Y='metadata_action'
+        - A11Y='static'
+      script: tox -e ally-$A11Y --skip-missing-interpreters
+
+    - stage: test
+      env:
+        - DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic
+        - DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic
+        - DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh
+        - DJANGO_VERSION='1.11'  DB=postgres  SEARCH=whoosh
+        - DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=whoosh
+        - DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic
+      
+        # Possible failures:
+        - DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
+        - DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
+      matrix:
+        allow_failures:
+          - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
+          - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
+      install:
+        - pip install tox codecov coveralls
+      
+      before_script:
+      # Make a MariaDB database
+      # Fix wierdness with MariaDB on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0  
+        - if [[ $DB == mariadb ]]; then mysql -e 'create database aristotle_test_db;' -u root ; fi
+        - if [[ $DB == mariadb ]]; then mysql -e 'SET GLOBAL wait_timeout = 36000;' ; fi
+        - if [[ $DB == mariadb ]]; then mysql -e 'SET GLOBAL max_allowed_packet = 134209536;' ; fi
+        - if [[ $SEARCH == elasticsearch ]]; then sleep 10; fi
+      # Make a posgres database
+        - if [[ $DB == postgres ]]; then psql -c 'create database aristotle_test_db;' -U postgres; fi
+      script: tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
+      services:
+        - postgresql
+        - redis-server
+        - elasticsearch
+        - mariadb
+      addons:
+        apt:
+          sources:
+            - elasticsearch-2.x
+          packages:
+            - elasticsearch
+        code_climate:
+          repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
+        mariadb: '10.1'
+      
+      after_success:
+        - coveralls
+        - codecov
