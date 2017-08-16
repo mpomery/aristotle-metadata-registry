@@ -5,6 +5,9 @@ sudo: false
 dist: precise
 
 language: python
+python:
+  - "3.5"
+  - "2.7"
 
 install:
   - pip install tox codecov coveralls
@@ -36,32 +39,6 @@ defaults:
       code_climate:
         repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
       mariadb: '10.1'
-
-jobs:
-
-  include:
-    - stage: stylecheck
-      script: tox -e pep8 --skip-missing-interpreters
-
-    - stage: documentation
-      script: tox -e docs --skip-missing-interpreters
-
-env:
-  - DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
-  - DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
-  - DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh
-  - DJANGO_VERSION='1.8'  DB=postgres  SEARCH=whoosh
-  - DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=whoosh
-  - DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=elastic
-
-  - DJANGO_VERSION='1.10' DB=sqlite    SEARCH=elastic
-  - DJANGO_VERSION='1.10' DB=sqlite    SEARCH=whoosh
-
-  # Possible failures:
-  - DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-  - DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-
-  - DJANGO_VERSION='1.11' DB=sqlite    SEARCH=whoosh
 
 jobs:
   allow_failures:
@@ -98,29 +75,24 @@ jobs:
       <<: *main_test_script
     - stage: testing
       env: DJANGO_VERSION='1.10' DB=sqlite    SEARCH=elastic
-      python:
-        - "3.5"
+      python: "3.5"
       <<: *main_test_script
     - stage: testing
       env: DJANGO_VERSION='1.10' DB=sqlite    SEARCH=whoosh
-      python:
-        - "3.5"
+      python: "3.5"
       <<: *main_test_script
   # Possible failures:
     - stage: testing
       env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-      python:
-        - "3.5"
+      python: "3.5"
       <<: *main_test_script
     - stage: testing
       env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-      python:
-        - "3.5"
+      python: "3.5"
       <<: *main_test_script
     - stage: testing
       env: DJANGO_VERSION='1.11' DB=sqlite    SEARCH=whoosh
-      python:
-        - "3.5"
+      python: "3.5"
 
     - stage: deploy
       script: true
