@@ -275,12 +275,12 @@ class PermissionSearchForm(TokenSearchForm):
     mds = forms.DateField(
         required=False,
         label="Modified after date",
-        widget=BootstrapDateTimePicker()#options=datePickerOptions)
+        widget=BootstrapDateTimePicker()  # options=datePickerOptions)
     )
     mde = forms.DateField(
         required=False,
         label="Modified before date",
-        widget=BootstrapDateTimePicker()#options=datePickerOptions)
+        widget=BootstrapDateTimePicker()  # options=datePickerOptions)
     )
     cq=forms.ChoiceField(
         required=False,
@@ -291,12 +291,12 @@ class PermissionSearchForm(TokenSearchForm):
     cds = forms.DateField(
         required=False,
         label="Created after date",
-        widget=BootstrapDateTimePicker()#options=datePickerOptions)
+        widget=BootstrapDateTimePicker()  # options=datePickerOptions)
     )
     cde = forms.DateField(
         required=False,
         label="Created before date",
-        widget=BootstrapDateTimePicker()#options=datePickerOptions)
+        widget=BootstrapDateTimePicker()  # options=datePickerOptions)
     )
 
     # Use short singular names

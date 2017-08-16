@@ -5,26 +5,21 @@ language: python
 python:
   - "3.5"
 
+install:
+  - pip install tox codecov coveralls
+
 jobs:
   include:
     - stage: stylecheck
-      install:
-        - pip install tox
       script: tox -e pep8 --skip-missing-interpreters
 
     - stage: documentation
-      install:
-      - pip install tox
       script: tox -e docs --skip-missing-interpreters
 
     - stage: accessibility
-      install:
-        - pip install tox
-      env:
-        - A11Y='metadata_item'
-        - A11Y='metadata_action'
-        - A11Y='static'
-      script: tox -e ally-$A11Y --skip-missing-interpreters
+      script: tox -e ally-metadata_item --skip-missing-interpreters
+      script: tox -e ally-metadata_action --skip-missing-interpreters
+      script: tox -e ally-static --skip-missing-interpreters
 
     - stage: test
       env:
@@ -42,8 +37,6 @@ jobs:
         allow_failures:
           - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
           - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-      install:
-        - pip install tox codecov coveralls
       
       before_script:
       # Make a MariaDB database
