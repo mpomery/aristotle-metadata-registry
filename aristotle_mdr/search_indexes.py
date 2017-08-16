@@ -3,7 +3,7 @@ import haystack.indexes as indexes
 
 import aristotle_mdr.models as models
 from django.db.models import Q
-from django.template import TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, loader
 from django.utils import timezone
 
 import logging
@@ -29,11 +29,9 @@ class ConceptFallbackCharField(indexes.CharField):
         try:
             return super(ConceptFallbackCharField, self).prepare_template(obj)
         except TemplateDoesNotExist:
-
             logger.debug("No search template found for %s, using untyped fallback." % obj)
-
-            self.template_name = "search/indexes/aristotle_mdr/untyped_concept_text.txt"
-            return super(ConceptFallbackCharField, self).prepare_template(obj)
+            t = loader.select_template(["search/indexes/aristotle_mdr/untyped_concept_text.txt"])
+            return t.render({'object': obj})
 
 
 class baseObjectIndex(indexes.SearchIndex):

@@ -1,6 +1,7 @@
 #Uncomment lines as required
 
-aristotle-metadata-registry>=1.2
+aristotle-metadata-registry>=1.5
+Whoosh
 
 #!aristotle_dse! -e git+git://github.com/aristotle-mdr/aristotle-dataset-extensions#egg=aristotle-dse
 #!aristotle_glossary! -e git+git://github.com/aristotle-mdr/aristotle-glossary#egg=aristotle_glossary

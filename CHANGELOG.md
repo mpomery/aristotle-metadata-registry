@@ -1,5 +1,14 @@
 Changelog
 
+- 1.5.7
+    - Pinned bootstrap-timepicker-datepicker version
+
+- 1.5.6
+    - Fixed search indexes for Value Domains and Conceptual Domains #676
+    - Fixed search page html bug #673
+    - Added improved search indexes for Units of Measure & Data Element Derivations
+    - Fixed bug around search indexes not populaitng properly if a search index template didn't exist
+
 - 1.5.5
     - Added Many to Many fields to generic.views.GenericAlterOneToManyView
     - Added Date Widget to Date time fields

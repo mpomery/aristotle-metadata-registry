@@ -4,7 +4,7 @@ Aristotle Metadata Registry (Aristotle-MDR)
 
 |aristotle-logo|
 
-|tci-build-status| |docs| |coveralls| |demoserver| |codeclimate| |av-build-status|
+|tci-build-status| |docs| |coveralls| |demoserver| |codeclimate| |av-build-status| |wcagzoo|
 
 Introduction and mission statement
 ----------------------------------
@@ -35,14 +35,14 @@ Quick start
 
     pip install aristotle-metadata-registry
 
-#. Add "aristotle_mdr" to your INSTALLED_APPS setting like this::
+#. Aristotle has a large number of requirements, to support search, API, downloads and such, so review `example_mdr/settings.py` to ensure you have all of the right settings applied.
 
+    For installed apps this can be applied like so::
+
+    FROM aristotle_mdr.required_settings import INSTALLED_APPS as ARISTOTLE_APPS
     INSTALLED_APPS = (
         ...
-        'haystack',
-        'aristotle_mdr',
-        ...
-    )
+    ) + ARISTOTLE_APPS
 
    To ensure that search indexing works properly ``haystack`` **must** be installed before `aristotle_mdr`.
    If you want to take advantage of Aristotle's access-key shortcut improvements for the admin interface,
@@ -56,10 +56,6 @@ Quick start
     url(r'^/', include('aristotle_mdr.urls')),
 
 #. Run ``python manage.py migrate`` to create the Aristotle-MDR Database.
-
-#. Install `lessc` for your system (e.g. ``apt-get install node-less``) or
-   configure django-static-precompiler to use your LESS pre-processor of choice.
-   (This step is not required if you are running from PythonAnywhere)
 
 #. (Optional) Compile the multilingual resource files for improved performance, like so::
 
@@ -76,10 +72,10 @@ For a complete example of how to successfully include Aristotle, see the `tests/
 Screenshots for users
 ---------------------
 
-`More screenshots available in the Aristotle-MDR Wiki <https://github.com/aristotle-mdr/aristotle-metadata-registry/wiki/Screenshots>`_.
+`More screenshots available in the Aristotle Metadata Registry User Help Documentation <http://help.aristotlemetadata.com/>`_.
 
 A data element shown on desktop and mobile
-|newitemsample|
+|homescreenshot|
 
 An item being edited without changing screens
 |itemeditsample|
@@ -94,6 +90,28 @@ Review the wiki, open issues and existing documentation to get started.
 **If you are looking to contribute**, `a good place to start is checking out the open issues labeled "help wanted" <https://github.com/aristotle-mdr/aristotle-metadata-registry/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22>`_
 or reviewing the `documentation <http://aristotle-metadata-registry.readthedocs.org/en/latest/>`_ and `wiki  <https://github.com/aristotle-mdr/aristotle-metadata-registry/wiki>`_ and identifying (and even adding) content that isn't there.
 
+Using docker
+++++++++++++
+
+To test Aristotle, there is an included `Dockerfile`. This will:
+
+* Use the `/aristotle_mdr/example_mdr/` django settings file
+* Install Aristotle-MDR and all requirements
+* Create an SQLite Database and Whoosh search index inside the Container
+* Collect the necessary static files
+* Load some sample metadata
+* Run a server using the django `runserver` management command.
+
+To start this, from the repository directory run::
+
+    docker build . -t aristotle
+    docker run -t --name amdr -p 8000:8000 aristotle
+
+Then browse to `localhost:8000` to see the "Example Metadata Registry".
+
+The included `Dockerfile` is for development purposes, and is not suitable for production deployments.
+
+
 About the badges (plus some extras):
 ++++++++++++++++++++++++++++++++++++
 * |tci-build-status| - Travis-CI, showing the details of the continuous testing suite
@@ -104,6 +122,7 @@ About the badges (plus some extras):
 * |gitter| - Gitter, a git-powered chat room for developers
 * |waffleio| - Waffle.io bugs ready to be actioned.
 * |codeclimate| - Code Climate - additional code metrics
+* |wcagzoo| - Web Content Accessibility Guidelines AA Compliant
 
 .. |tci-build-status| image:: https://travis-ci.org/aristotle-mdr/aristotle-metadata-registry.svg?branch=master
     :alt: Travis-CI build status
@@ -131,9 +150,9 @@ About the badges (plus some extras):
     :target: https://codecov.io/github/aristotle-mdr/aristotle-metadata-registry?branch=master
 
 .. |demoserver| image:: https://img.shields.io/badge/Open_Metadata_Registry-online-blue.svg
-    :alt: visit the live demonstration server on PythonAnywhere
+    :alt: visit the open access metadata registry
     :scale: 98%
-    :target: http://registry.aristotlemetadata.com
+    :target: https://registry.aristotlemetadata.com
 
 .. |gitter| image:: https://badges.gitter.im/Join%20Chat.svg
     :alt: visit the gitter chat room for this project
@@ -148,12 +167,20 @@ About the badges (plus some extras):
    :target: https://codeclimate.com/github/aristotle-mdr/aristotle-metadata-registry
    :alt: Code Climate
 
-.. |newitemsample| image:: https://cloud.githubusercontent.com/assets/2173174/7829993/4de09a2a-048b-11e5-8b25-c1935da42a2d.png
+.. |wcagzoo| image:: https://img.shields.io/badge/WCAG_Zoo-AA-green.svg
+   :target: https://github.com/data61/wcag-zoo/wiki/Compliance-Statement
+   :alt: This repository is WCAG-Zoo compliant
+
+.. |homescreenshot| image:: https://user-images.githubusercontent.com/2173174/28704337-3a65dbca-73ad-11e7-9d01-fce46591118a.png
+    :alt:  Main screen of the Aristotle registry
+    :scale: 100%
+
+.. |newitemsample| image:: https://user-images.githubusercontent.com/2173174/28704337-3a65dbca-73ad-11e7-9d01-fce46591118a.png
     :alt:  Data Element on desktop and mobile
     :scale: 100%
 
-.. |itemeditsample| image:: http://i.imgur.com/dAEboRg.png
-    :alt: Edit screen for a Data Element
+.. |itemeditsample| image:: https://user-images.githubusercontent.com/2173174/28704593-be870022-73ae-11e7-8ff8-5c328fe28281.png
+    :alt: Edit screen for a metadata object
     :scale: 100%
 
 .. |aristotle-logo| image:: https://raw.githubusercontent.com/aristotle-mdr/aristotle-metadata-registry/develop/aristotle_mdr/static/aristotle_mdr/images/aristotle.png

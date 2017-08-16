@@ -87,7 +87,6 @@ jobs:
     - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
 
 
-
 after_success:
   - coveralls
   - codecov
