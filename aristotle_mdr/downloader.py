@@ -30,7 +30,7 @@ def render_to_pdf(template_src, context_dict, debug_as_html=False):
         template_src,
         'aristotle_mdr/downloads/pdf/managedContent.html'
     ])
-    context = Context(context_dict)
+    context = context_dict
     html = template.render(context)
 
     if debug_as_html:
