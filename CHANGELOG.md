@@ -1,5 +1,8 @@
 Changelog
 
+- 1.5.8
+    - Improved disabling of metadata extensions in code
+
 - 1.5.7
     - Pinned bootstrap-timepicker-datepicker version
 
