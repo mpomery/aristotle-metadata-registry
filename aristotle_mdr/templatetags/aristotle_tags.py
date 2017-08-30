@@ -22,6 +22,7 @@ from django.utils.html import mark_safe
 
 from aristotle_mdr import perms
 import aristotle_mdr.models as MDR
+from aristotle_mdr.utils import fetch_metadata_apps
 
 register = template.Library()
 
@@ -160,7 +161,7 @@ def public_standards(regAuth, itemType="aristotle_mdr._concept"):
         standard_states = [MDR.STATES.standard, MDR.STATES.preferred]
         return [
             (i, i.statuses.filter(registrationAuthority=regAuth, state__in=standard_states).first())
-            for i in ContentType.objects.get(app_label=app_label, model=model_name).model_class().objects.filter(statuses__registrationAuthority=regAuth, statuses__state__in=standard_states).public()
+            for i in ContentType.objects.filter(app_label__in=fetch_metadata_apps()).get(app_label=app_label, model=model_name).model_class().objects.filter(statuses__registrationAuthority=regAuth, statuses__state__in=standard_states).public()
         ]
     except:
         return []

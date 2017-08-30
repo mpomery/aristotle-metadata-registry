@@ -4,10 +4,11 @@ from __future__ import absolute_import
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.db import models, transaction
 from django.db.models import Q
-from django.db.models.signals import post_save, m2m_changed, post_delete
+from django.db.models.signals import post_save, m2m_changed, post_delete, pre_save
 from django.dispatch import receiver, Signal
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible  # Python 2
@@ -29,13 +30,14 @@ from ckeditor_uploader.fields import RichTextUploadingField as RichTextField
 from aristotle_mdr import perms
 from aristotle_mdr import messages
 from aristotle_mdr.utils import (
+    fetch_aristotle_settings,
+    fetch_metadata_apps,
     url_slugify_concept,
     url_slugify_workgroup,
     url_slugify_registration_authoritity,
-    url_slugify_organization
+    url_slugify_organization,
 )
 from aristotle_mdr import comparators
-from aristotle_mdr.utils import fetch_aristotle_settings
 
 from model_utils.fields import AutoLastModifiedField
 from .fields import ConceptForeignKey, ConceptManyToManyField
@@ -1491,6 +1493,7 @@ post_save.connect(create_user_profile, sender=User)
 def concept_saved(sender, instance, **kwargs):
     if not issubclass(sender, _concept):
         return
+
     if not instance.non_cached_fields_changed:
         # If the only thing that has changed is a cached public/locked status
         # then don't notify.
@@ -1500,6 +1503,19 @@ def concept_saved(sender, instance, **kwargs):
         return
     kwargs['changed_fields'] = instance.changed_fields
     fire("concept_changes.concept_saved", obj=instance, **kwargs)
+
+
+@receiver(pre_save)
+def check_concept_app_label(sender, instance, **kwargs):
+    if not issubclass(sender, _concept):
+        return
+    if instance._meta.app_label not in fetch_metadata_apps():
+        raise ImproperlyConfigured(
+            "Trying to save item <{instance_name}> when app_label <{app_label}> is not enabled".format(
+                app_label=instance._meta.app_label,
+                instance_name=instance.name
+            )
+        )
 
 
 @receiver(post_save, sender=DiscussionComment)

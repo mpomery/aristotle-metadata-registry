@@ -16,7 +16,7 @@ from django.views.generic import DetailView, ListView
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.views.utils import paginated_list, paginated_workgroup_list
-from aristotle_mdr.utils import fetch_aristotle_settings
+from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
 
 
 def friendly_redirect_login(request):
@@ -78,8 +78,7 @@ def admin_tools(request):
     if not request.user.is_superuser:
         raise PermissionDenied
 
-    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
-    aristotle_apps += ["aristotle_mdr"]
+    aristotle_apps = fetch_metadata_apps()
 
     from django.contrib.contenttypes.models import ContentType
     models = ContentType.objects.filter(app_label__in=aristotle_apps).all()
@@ -113,8 +112,7 @@ def admin_stats(request):
     if not request.user.is_superuser:
         raise PermissionDenied
 
-    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
-    aristotle_apps += ["aristotle_mdr"]
+    aristotle_apps = fetch_metadata_apps()
 
     from django.contrib.contenttypes.models import ContentType
     models = ContentType.objects.filter(app_label__in=aristotle_apps).all()

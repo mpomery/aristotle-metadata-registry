@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.template import TemplateDoesNotExist
 from aristotle_mdr.tests.main.test_html_pages import LoggedInViewConceptPages
 from aristotle_mdr.tests.main.test_admin_pages import AdminPageForConcept
+from django.test.utils import override_settings
 
 from extension_test.models import Question, Questionnaire
 
@@ -160,4 +161,3 @@ class QuestionnaireViewPage(LoggedInViewExtensionConceptPages, TestCase):
         self.assertEqual(response.status_code, 200)
         form = response.context['form']
         self.assertContains(response, 'glyphicon-calendar')  # While we use bootstrap-datewidget, this should be there.
-

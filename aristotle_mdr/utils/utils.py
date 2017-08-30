@@ -196,3 +196,12 @@ def fetch_aristotle_settings():
     if hasattr(settings, 'ARISTOTLE_SETTINGS_LOADER'):
         return import_string(getattr(settings, 'ARISTOTLE_SETTINGS_LOADER'))()
     return getattr(settings, 'ARISTOTLE_SETTINGS', {})
+
+
+def fetch_metadata_apps():
+    """
+    Returns a list of all apps that provide metadata types
+    """
+    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
+    aristotle_apps += ["aristotle_mdr"]
+    return list(set(aristotle_apps))

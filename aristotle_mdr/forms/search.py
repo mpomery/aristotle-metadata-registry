@@ -19,7 +19,7 @@ from aristotle_mdr.widgets import (
     BootstrapDropdownSelectMultiple, BootstrapDropdownIntelligentDate,
     BootstrapDropdownSelect, BootstrapDateTimePicker
 )
-from aristotle_mdr.utils import fetch_aristotle_settings
+from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
 
 
 QUICK_DATES = Choices(
@@ -191,12 +191,10 @@ class TokenSearchForm(FacetedSearchForm):
                 elif opt == "type":
                     # we'll allow these through and assume they meant content type
                     from django.conf import settings
-                    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
-                    aristotle_apps += ["aristotle_mdr"]
 
                     from django.contrib.contenttypes.models import ContentType
                     arg = arg.lower().replace('_', '').replace('-', '')
-                    mods = ContentType.objects.filter(app_label__in=aristotle_apps).all()
+                    mods = ContentType.objects.filter(app_label__in=fetch_metadata_apps()).all()
                     for i in mods:
                         if hasattr(i.model_class(), 'get_verbose_name'):
                             model_short_code = "".join(
@@ -237,6 +235,9 @@ class TokenSearchForm(FacetedSearchForm):
 
         if self.load_all:
             sqs = sqs.load_all()
+
+        # Only show models that are in apps that are enabled
+        sqs = sqs.filter(django_ct_app_label__in=fetch_metadata_apps())
 
         return sqs
 
@@ -343,7 +344,10 @@ class PermissionSearchForm(TokenSearchForm):
         from haystack.forms import SearchForm, FacetedSearchForm, model_choices
 
         self.fields['ra'].choices = [(ra.id, ra.name) for ra in MDR.RegistrationAuthority.objects.all()]
-        self.fields['models'].choices = model_choices()
+        self.fields['models'].choices = [
+            m for m in model_choices()
+            if m[0].split('.', 1)[0] in fetch_metadata_apps()
+        ]
 
     def get_models(self):
         """Return an alphabetical list of model classes in the index."""
