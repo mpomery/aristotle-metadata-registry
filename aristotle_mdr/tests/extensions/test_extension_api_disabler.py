@@ -26,6 +26,9 @@ class ConfigDisableCheckTests(utils.LoggedInViewPages, TestCase):
             definition="Some unique string"
         )
 
+    def tearDown(self):
+        call_command('clear_index', interactive=False, verbosity=0)
+
     def setup_help(self):
         call_command('load_aristotle_help')
         from aristotle_mdr.contrib.help.models import HelpPage
@@ -152,10 +155,11 @@ class ConfigDisableCheckTests(utils.LoggedInViewPages, TestCase):
             name="Different Question",
             definition="Some different unique string"
         )
+        pre_save.connect(check_concept_app_label)
+
         sqs = SearchQuerySet().auto_query("Different Question unique")
         self.assertTrue(unindexed_item.pk not in [s.object.pk for s in sqs])
 
-        pre_save.connect(check_concept_app_label)
     
     # -------------------------------------------
 

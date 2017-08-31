@@ -1,7 +1,8 @@
 Changelog
 
 - 1.5.8
-    - Improved disabling of metadata extensions in code
+    - Removed incorrect instructions on login page
+    - Improved disabling of metadata extensions in code/configuration
 
 - 1.5.7
     - Pinned bootstrap-timepicker-datepicker version
