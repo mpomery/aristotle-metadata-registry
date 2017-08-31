@@ -205,4 +205,4 @@ def fetch_metadata_apps():
     aristotle_apps = list(fetch_aristotle_settings().get('CONTENT_EXTENSIONS', []))
     aristotle_apps += ["aristotle_mdr"]
     aristotle_apps = list(set(aristotle_apps))
-    return aristotle_apps 
+    return aristotle_apps
