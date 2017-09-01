@@ -15,7 +15,6 @@ item_register = {
 }
 
 
-
 def download(request, download_type, item):
     """Built in download method"""
     template = get_download_template_path_for_item(item, download_type)
