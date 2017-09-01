@@ -18,6 +18,7 @@ from aristotle_mdr.utils import cache_per_item_user
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.views import get_if_user_can_view
+from aristotle_mdr.utils import fetch_aristotle_settings
 from aristotle_mdr.utils.downloads import get_download_module
 
 import logging
@@ -38,7 +39,7 @@ def download(request, download_type, iid=None):
     This is passed into ``download`` which resolves the item id (``iid``), and
     determines if a user has permission to view the requested item with that id. If
     a user is allowed to download this file, ``download`` iterates through each
-    download type defined in ``ARISTOTLE_DOWNLOADS``.
+    download type defined in ``ARISTOTLE_SETTINGS.DOWNLOADERS``.
 
     A download option tuple takes the following form form::
 
@@ -50,10 +51,10 @@ def download(request, download_type, iid=None):
     ``module_name`` is the name of the python module that provides a downloader
     for this file type.
 
-    For example, included with Aristotle-MDR is a PDF downloader which has the
+    For example, the Aristotle-PDF with Aristotle-MDR is a PDF downloader which has the
     download definition tuple::
 
-            ('pdf','PDF','fa-file-pdf-o','aristotle_mdr'),
+            ('pdf','PDF','fa-file-pdf-o','aristotle_pdr'),
 
     Where a ``file_type`` multiple is defined multiple times, **the last matching
     instance in the tuple is used**.
@@ -75,7 +76,7 @@ def download(request, download_type, iid=None):
         else:
             raise PermissionDenied
 
-    downloadOpts = getattr(settings, 'ARISTOTLE_DOWNLOADS', "")
+    downloadOpts = fetch_aristotle_settings().get('DOWNLOADERS', [])
     module_name = ""
     for d in downloadOpts:
         dt = d[0]
@@ -120,7 +121,7 @@ def bulk_download(request, download_type, items=None):
         item = get_if_user_can_view(item.__class__, request.user, iid)
         items.append(item)
 
-    downloadOpts = getattr(settings, 'ARISTOTLE_DOWNLOADS', "")
+    downloadOpts = fetch_aristotle_settings().get('DOWNLOADERS', [])
     module_name = ""
     for d in downloadOpts:
         dt = d[0]

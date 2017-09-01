@@ -61,9 +61,10 @@ The following are required within a dictionary in the settings for the configure
 ``WORKGROUP_CHANGES``
     An array that specified which classes of user can move items between workgroups.
     Possible options include ``'admin'``, ``'manager'`` or ``'submitter'``.
+``DOWNLOADERS``: An array of download options - explained below
 
-``ARISTOTLE_DOWNLOADS``
------------------------
+``ARISTOTLE_SETTINGS.DOWNLOADERS``
+**********************************
 This is a **list of tuples** that define the different download options that will
 be made available to users. This tuple defines in order:
 
@@ -101,7 +102,7 @@ For more information on creating additional download extensions consult the guid
 Sample settings
 ---------------
 
-Below is the ``ARISTOTLE_SETTINGS`` and ``ARISTOTLE_DOWNLOADS`` used on the hosted
+Below is the ``ARISTOTLE_SETTINGS`` used on the hosted
 Aristotle example::
 
     ARISTOTLE_SETTINGS = {
@@ -116,8 +117,7 @@ Aristotle example::
        # Separators for auto-generating the names of constructed items.
         'SEPARATORS': { 'DataElement':',',
                     'DataElementConcept':'–'},
-      }
-
-    ARISTOTLE_DOWNLOADS = [
-        ('pdf','PDF','fa-file-pdf-o','aristotle_mdr'),
+        'DOWNLOADERS': [
+            ('pdf','PDF','fa-file-pdf-o','aristotle_pdf'),
         ]
+      }

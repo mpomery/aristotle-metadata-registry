@@ -1,8 +1,13 @@
 Changelog
 
-- 1.5.8
+- 1.6.0
     - Removed incorrect instructions on login page
     - Improved disabling of metadata extensions in code/configuration
+    - **Database migration:** Added concrete base class to unmanaged objects
+    - **Breaking change:** Download options have been moved into the ``ARISTOTLE_SETTINGS``
+        under the ``DOWNLOADERS`` key
+    - **Breaking change:** The PDF download library is no longer included by default,
+        and must be installed from github - https://github.com/aristotle-mdr/aristotle-pdf-downloads
 
 - 1.5.7
     - Pinned bootstrap-timepicker-datepicker version

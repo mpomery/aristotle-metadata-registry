@@ -20,6 +20,7 @@ from aristotle_mdr.perms import (
 )
 from aristotle_mdr.forms.creation_wizards import UserAwareForm
 from aristotle_mdr.contrib.autocomplete import widgets
+from aristotle_mdr.utils import fetch_aristotle_settings
 
 
 class ForbiddenAllowedModelMultipleChoiceField(forms.ModelMultipleChoiceField):
@@ -423,7 +424,10 @@ class BulkDownloadForm(DownloadActionForm):
         # widget=forms.Textarea
     )
     download_type = forms.ChoiceField(
-        choices=[(setting[0], setting[1]) for setting in getattr(settings, 'ARISTOTLE_DOWNLOADS', [])],
+        choices=[
+            (setting[0], setting[1])
+            for setting in fetch_aristotle_settings().get('DOWNLOADERS', [])
+        ],
         widget=forms.RadioSelect
     )
 

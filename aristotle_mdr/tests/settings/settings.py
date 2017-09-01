@@ -106,11 +106,10 @@ ARISTOTLE_SETTINGS = ARISTOTLE_SETTINGS.copy()
 
 ARISTOTLE_SETTINGS['SEPARATORS']['DataElementConcept'] = '--'
 ARISTOTLE_SETTINGS['CONTENT_EXTENSIONS'] = ARISTOTLE_SETTINGS['CONTENT_EXTENSIONS'] + ['extension_test', 'aristotle_mdr_links']
-ARISTOTLE_DOWNLOADS = ARISTOTLE_DOWNLOADS + [
+ARISTOTLE_SETTINGS['DOWNLOADERS'] = ARISTOTLE_SETTINGS['DOWNLOADERS'] + [
     ('txt', 'Text', 'fa-file-pdf-o', 'text_download_test'),
 ]
 ARISTOTLE_SETTINGS['BULK_ACTIONS'].update({
-    'quick_pdf_download':'aristotle_mdr.forms.bulk_actions.QuickPDFDownloadForm',
     'delete': 'bulk_actions_test.actions.StaffDeleteActionForm',
     'incomplete': 'bulk_actions_test.actions.IncompleteActionForm',
     'add_slots': 'aristotle_mdr.contrib.slots.forms.BulkAssignSlotsForm',

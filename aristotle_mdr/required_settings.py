@@ -178,13 +178,13 @@ ARISTOTLE_SETTINGS = {
             'class': 'aristotle_mdr.views.wizards.DataElementConceptWizard',
             'link': 'create/wizard/aristotle_mdr/dataelementconcept',
         }
+    ],
+    "DOWNLOADERS": [
+        # (fileType, menu, font-awesome-icon, module)
+        ('pdf', 'PDF', 'fa-file-pdf-o', 'aristotle_mdr', 'Downloads for various content types in the PDF format'),
+        ('csv-vd', 'CSV list of values', 'fa-file-excel-o', 'aristotle_mdr', 'CSV downloads for value domain codelists'),
     ]
 }
-ARISTOTLE_DOWNLOADS = [
-    # (fileType, menu, font-awesome-icon, module)
-    ('pdf', 'PDF', 'fa-file-pdf-o', 'aristotle_mdr', 'Downloads for various content types in the PDF format'),
-    ('csv-vd', 'CSV list of values', 'fa-file-excel-o', 'aristotle_mdr', 'CSV downloads for value domain codelists'),
-]
 
 CKEDITOR_CONFIGS = {
     'default': {

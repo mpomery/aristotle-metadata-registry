@@ -22,7 +22,7 @@ from django.utils.html import mark_safe
 
 from aristotle_mdr import perms
 import aristotle_mdr.models as MDR
-from aristotle_mdr.utils import fetch_metadata_apps
+from aristotle_mdr.utils import fetch_metadata_apps, fetch_aristotle_settings
 
 register = template.Library()
 
@@ -301,7 +301,7 @@ def downloadMenu(item):
     """
     from django.template.loader import get_template
     from django.template import Context
-    downloadOpts = getattr(settings, 'ARISTOTLE_DOWNLOADS', "")
+    downloadOpts = fetch_aristotle_settings().get('DOWNLOADERS', [])
     from aristotle_mdr.utils import get_download_template_path_for_item
     from aristotle_mdr.utils.downloads import get_download_module
 

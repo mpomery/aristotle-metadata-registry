@@ -66,10 +66,6 @@ setup(
 
         'django-formtools',
 
-        'html5lib==1.0b10',
-        'xhtml2pdf>=0.2b1',
-        #'django-tastypie'
-
         # required for help, but thats required
         'django-autoslug',
         # for more 'real-time' notifications

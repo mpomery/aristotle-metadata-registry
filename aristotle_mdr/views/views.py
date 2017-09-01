@@ -371,7 +371,7 @@ def extensions(request):
             content.append(app)
 
     content = list(set(content))
-    aristotle_downloads = getattr(settings, 'ARISTOTLE_DOWNLOADS', [])
+    aristotle_downloads = fetch_aristotle_settings().get('DOWNLOADERS', [])
     downloads=dict()
     if aristotle_downloads:
         for download in aristotle_downloads:
