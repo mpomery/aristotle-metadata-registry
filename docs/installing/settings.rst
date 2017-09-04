@@ -61,7 +61,8 @@ The following are required within a dictionary in the settings for the configure
 ``WORKGROUP_CHANGES``
     An array that specified which classes of user can move items between workgroups.
     Possible options include ``'admin'``, ``'manager'`` or ``'submitter'``.
-``DOWNLOADERS``: An array of download options - explained below
+``DOWNLOADERS``
+    n array of download options - explained below
 
 ``ARISTOTLE_SETTINGS.DOWNLOADERS``
 **********************************

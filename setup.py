@@ -51,7 +51,8 @@ setup(
         'django-haystack>=2.6.0,<2.7.0',
 
         #Rich text editors
-        'django-ckeditor>=5.0.0',
+        'django-ckeditor>=5.3.0',
+        'pillow',
 
         # Revision control
         "django-reversion>=2.0,<2.1",
