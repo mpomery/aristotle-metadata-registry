@@ -24,10 +24,10 @@ class Migration(migrations.Migration):
             ],
         ),
 
-        migrations.RunPython(create_uuid_objects('_concept')),
-        migrations.RunPython(create_uuid_objects('measure')),
-        migrations.RunPython(create_uuid_objects('organization')),
-        migrations.RunPython(create_uuid_objects('workgroup')),
+        migrations.RunPython(create_uuid_objects('aristotle_mdr','_concept')),
+        migrations.RunPython(create_uuid_objects('aristotle_mdr','measure')),
+        migrations.RunPython(create_uuid_objects('aristotle_mdr','organization')),
+        migrations.RunPython(create_uuid_objects('aristotle_mdr','workgroup')),
 
         migrations.AlterField(
             model_name='_concept',

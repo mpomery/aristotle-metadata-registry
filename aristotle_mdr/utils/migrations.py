@@ -4,9 +4,10 @@ At some point, we will squash the entire migration path for <1.4 and remove this
 running this code.
 """
 from django.db import migrations, models
-import ckeditor_uploader.fields
-
+# from django.apps import apps
 from django.db.migrations.operations.base import Operation
+
+import ckeditor_uploader.fields
 
 
 class classproperty(object):
@@ -18,11 +19,22 @@ class classproperty(object):
         return self.fget(owner_cls)
 
 
-def create_uuid_objects(obj_type):
-    from aristotle_mdr.models import UUID
-    for instance in obj_type.objects.all():
-        UUID.objects.create_uuid(instance)
+def create_uuid_objects(app_label, model_name):
+    def foo(apps, schema_editor):
+        from aristotle_mdr.models import UUID, baseAristotleObject
+        from django.contrib.contenttypes.models import ContentType
 
+        object_type = apps.get_model(app_label, model_name)
+        if not issubclass(object_type, baseAristotleObject):
+            return
+
+        for instance in object_type.objects.all().select_subclasses():
+            UUID.objects.create(
+                uuid=instance.uuid,
+                app_label=instance._meta.app_label,
+                model_name=instance._meta.model_name,
+            )
+    return foo
 
 class MoveConceptFields(Operation):
 
