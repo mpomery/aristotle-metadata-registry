@@ -19,7 +19,6 @@ def download(request, download_type, item):
     """Built in download method"""
     template = get_download_template_path_for_item(item, download_type)
     from django.conf import settings
-    page_size = getattr(settings, 'PDF_PAGE_SIZE', "A4")
 
     if download_type == "csv-vd":
         response = HttpResponse(content_type='text/csv')

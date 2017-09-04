@@ -1,7 +1,19 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.module_loading import import_string
+from aristotle_mdr.utils import fetch_aristotle_settings
 
 from model_utils.managers import InheritanceManager, InheritanceQuerySet
+
+
+class UUIDManager(models.Manager):
+    def create_uuid(self, instance):
+        if instance.uuid is not None:
+            return
+        instance.uuid = self.create(
+            app_label=instance._meta.app_label,
+            model_name=instance._meta.model_name,
+        )
 
 
 class MetadataItemQuerySet(InheritanceQuerySet):
@@ -30,6 +42,7 @@ class ConceptQuerySet(MetadataItemQuerySet):
             ObjectClass.objects.filter(name__contains="Person").visible()
             ObjectClass.objects.visible().filter(name__contains="Person")
         """
+        from aristotle_mdr.models import REVIEW_STATES
         if user.is_superuser:
             return self.all()
         if user.is_anonymous():
@@ -100,6 +113,8 @@ class ConceptQuerySet(MetadataItemQuerySet):
         return self.filter(_is_public=True)
 
     def __contains__(self, item):
+        from aristotle_mdr.models import _concept
+
         if not issubclass(type(item), _concept):
             return False
         else:

@@ -18,6 +18,12 @@ class classproperty(object):
         return self.fget(owner_cls)
 
 
+def create_uuid_objects(obj_type):
+    from aristotle_mdr.models import UUID
+    for instance in obj_type.objects.all():
+        UUID.objects.create_uuid(instance)
+
+
 class MoveConceptFields(Operation):
 
     reversible = False

@@ -3,7 +3,7 @@ Changelog
 - 1.6.0
     - Removed incorrect instructions on login page
     - Improved disabling of metadata extensions in code/configuration
-    - **Database migration:** Added concrete base class to unmanaged objects
+    - **Database migration:** Added concrete UUID model for more flexible lookups
     - **Breaking change:** Download options have been moved into the ``ARISTOTLE_SETTINGS``
         under the ``DOWNLOADERS`` key
     - **Breaking change:** The PDF download library is no longer included by default,
