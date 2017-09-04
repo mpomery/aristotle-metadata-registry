@@ -36,6 +36,7 @@ def create_uuid_objects(app_label, model_name):
             )
     return foo
 
+
 class MoveConceptFields(Operation):
 
     reversible = False

@@ -3,11 +3,12 @@ from django.core.checks import Error, register, Warning
 # Deprecated Errors:
 # * Nil
 
+
 @register()
 def example_check(app_configs, **kwargs):
     errors = []
     from django.conf import settings
-    
+
     if hasattr(settings, "ARISTOTLE_DOWNLOADS"):
         errors.append(
             Warning(
