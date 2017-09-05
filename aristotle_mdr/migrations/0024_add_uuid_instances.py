@@ -6,23 +6,33 @@ from django.db import migrations, models
 import django.db.models.deletion
 import uuid
 
-from aristotle_mdr.utils.migrations import create_uuid_objects
+from aristotle_mdr.utils.migrations import create_uuid_objects, classproperty
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('aristotle_mdr', '0022_switch_to_concept_relations'),
-    ]
+    @classproperty
+    def dependencies(cls):
+        deps = [
+            ('aristotle_mdr', '0023_uuid_model'),
+            ('aristotle_mdr_links', '0005_switch_to_concept_relations'),
+            ('aristotle_mdr_slots', '0004_switch_to_concept_relations'),
+        ]
+        from django.conf import settings
+
+        if "aristotle_multisite" in settings.INSTALLED_APPS:
+            deps.append(
+                ('aristotle_multisite', '0001_initial'),
+            )
+
+        return deps
 
     operations = [
-        migrations.CreateModel(
-            name='UUID',
-            fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid1, editable=False, help_text='Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries', primary_key=True, serialize=False, unique=True)),
-                ('app_label', models.CharField(editable=False, max_length=256)),
-                ('model_name', models.CharField(editable=False, max_length=256)),
-            ],
-        ),
+        migrations.RunPython(create_uuid_objects('aristotle_mdr','measure', migrate_self=True)),
+        migrations.RunPython(create_uuid_objects('aristotle_mdr','organization', migrate_self=True)),
+        migrations.RunPython(create_uuid_objects('aristotle_mdr','workgroup', migrate_self=True)),
+        migrations.RunPython(create_uuid_objects('aristotle_mdr','_concept', migrate_self=False)),
+
+        
         migrations.AlterField(
             model_name='_concept',
             name='uuid',

@@ -4,7 +4,7 @@ At some point, we will squash the entire migration path for <1.4 and remove this
 running this code.
 """
 from django.db import migrations, models
-# from django.apps import apps
+
 from django.db.migrations.operations.base import Operation
 
 import ckeditor_uploader.fields
@@ -19,22 +19,46 @@ class classproperty(object):
         return self.fget(owner_cls)
 
 
-def create_uuid_objects(app_label, model_name):
-    def foo(apps, schema_editor):
+def create_uuid_objects(app_label, model_name, migrate_self=True):
+    def inner(apps, schema_editor):
         from aristotle_mdr.models import UUID, baseAristotleObject
+        from django.apps import apps as apppps
         from django.contrib.contenttypes.models import ContentType
 
-        object_type = apps.get_model(app_label, model_name)
+        object_type = apppps.get_model(app_label, model_name)
         if not issubclass(object_type, baseAristotleObject):
             return
 
-        for instance in object_type.objects.all().select_subclasses():
-            UUID.objects.create(
-                uuid=instance.uuid,
-                app_label=instance._meta.app_label,
-                model_name=instance._meta.model_name,
-            )
-    return foo
+        print(object_type, baseAristotleObject)
+
+        for ct in ContentType.objects.all():
+            kls = ct.model_class()
+            if kls is None:
+                # Uninstalled app
+                continue
+            if not issubclass(kls, baseAristotleObject):
+                continue
+            if not issubclass(kls, object_type):
+                continue
+            if kls is object_type and not migrate_self:
+                continue
+
+            for instance in kls.objects.all():
+                details = dict(
+                    app_label=instance._meta.app_label,
+                    model_name=instance._meta.model_name,
+                )
+
+                u, c = UUID.objects.get_or_create(
+                    uuid=instance.uuid_id,
+                    defaults=details
+                )
+                if issubclass(kls, object_type) and kls is not object_type:
+                    u.app_label=instance._meta.app_label
+                    u.model_name=instance._meta.model_name
+                    u.save()
+
+    return inner
 
 
 class MoveConceptFields(Operation):
