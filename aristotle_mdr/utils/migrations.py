@@ -29,8 +29,6 @@ def create_uuid_objects(app_label, model_name, migrate_self=True):
         if not issubclass(object_type, baseAristotleObject):
             return
 
-        print(object_type, baseAristotleObject)
-
         for ct in ContentType.objects.all():
             kls = ct.model_class()
             if kls is None:

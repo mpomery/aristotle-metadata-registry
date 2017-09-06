@@ -118,8 +118,8 @@ def bulk_download(request, download_type, items=None):
 
     for iid in request.GET.getlist('items'):
         item = MDR._concept.objects.get_subclass(pk=iid)
-        item = get_if_user_can_view(item.__class__, request.user, iid)
-        items.append(item)
+        if item.can_view(request.user):
+            items.append(item)
 
     downloadOpts = fetch_aristotle_settings().get('DOWNLOADERS', [])
     module_name = ""
@@ -132,9 +132,11 @@ def bulk_download(request, download_type, items=None):
         raise registry_exceptions.BadDownloadTypeAbbreviation("Download type can only be composed of letters, numbers, hyphens or periods.")
     if module_name:
         downloader = get_download_module(module_name)
+
         try:
             return downloader.bulk_download(request, download_type, items)
         except TemplateDoesNotExist:
+            raise
             debug = getattr(settings, 'DEBUG')
             if debug:
                 raise
