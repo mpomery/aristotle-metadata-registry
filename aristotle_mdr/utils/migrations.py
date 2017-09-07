@@ -64,7 +64,6 @@ class DBOnlySQL(migrations.RunSQL):
     reversible = True
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        print(schema_editor.connection.vendor)
         if schema_editor.connection.vendor in ['sqllite']:
             return super(DBOnlySQL, self).database_forwards(app_label, schema_editor, from_state, to_state)
 
