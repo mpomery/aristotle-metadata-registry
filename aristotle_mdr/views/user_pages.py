@@ -75,7 +75,9 @@ def inbox(request, folder=None):
 
 @login_required
 def admin_tools(request):
-    if not request.user.is_superuser:
+    if request.user.is_anonymous():
+        return redirect(reverse('friendly_login') + '?next=%s' % request.path)
+    elif not request.user.has_perm("aristotle_mdr.access_aristotle_dashboard"):
         raise PermissionDenied
 
     aristotle_apps = fetch_metadata_apps()
