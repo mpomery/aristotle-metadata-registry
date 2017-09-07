@@ -34,27 +34,9 @@ skip_migrations = (
 
 
 print("Running test-suite with connection string %s" % os.environ.get('DATABASE_URL'))
-db_from_env = dj_database_url.config(conn_max_age=500)
+db_from_env = dj_database_url.config(conn_max_age=500, default='sqlite:////tmp/db.db')
 
 DATABASES = {'default': db_from_env}
-
-# if os.environ.get('DB') == 'sqlite':
-#     print("Running %s test-suite with SQLite" % ci_runner)
-#     from aristotle_mdr.tests.settings.templates.db.sqlite import DATABASES
-# elif os.environ.get('DB') == 'postgres':
-#     print("Running %s test-suite with POSTGRESQL" % ci_runner)
-#     from aristotle_mdr.tests.settings.templates.db.postgres import DATABASES
-# elif os.environ.get('DB') == 'mariadb':
-#     print("Running %s test-suite with MariaDB" % ci_runner)
-#     skip_migrations = True
-#     from aristotle_mdr.tests.settings.templates.db.mariadb import DATABASES
-# elif os.environ.get('DB') == 'mssql':
-#     print("Running %s test-suite with MSSQL" % ci_runner)
-#     skip_migrations = True  # Sadly, this may not be possible until after migration 0018
-#     from aristotle_mdr.tests.settings.templates.db.mssql import DATABASES
-# elif os.environ.get('TOXDIR'):
-#     print("Running %s test-suite with tox SQLite" % ci_runner)
-#     from aristotle_mdr.tests.settings.tox import DATABASES
 
 if os.environ.get('SEARCH') == 'whoosh':
     print("Running %s test-suite with whoosh" % ci_runner)
