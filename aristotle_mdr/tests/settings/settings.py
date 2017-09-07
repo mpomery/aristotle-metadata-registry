@@ -1,5 +1,6 @@
 import os
 import sys
+import dj_database_url
 from aristotle_mdr.required_settings import *
 
 BASE = os.path.join(os.path.dirname(os.path.dirname(__file__)),'..')
@@ -30,6 +31,7 @@ skip_migrations = (
     "ARISTOTLE_DEV_SKIP_MIGRATIONS" in os.environ or
     os.environ.get('DATABASE_URL').startswith('mssql')
 )
+
 
 print("Running test-suite with connection string %s" % os.environ.get('DATABASE_URL'))
 db_from_env = dj_database_url.config(conn_max_age=500)
