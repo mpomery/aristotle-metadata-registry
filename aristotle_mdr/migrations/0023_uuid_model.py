@@ -23,24 +23,4 @@ class Migration(migrations.Migration):
                 ('model_name', models.CharField(editable=False, max_length=256)),
             ],
         ),
-        migrations.AlterField(
-            model_name='_concept',
-            name='uuid',
-            field=models.OneToOneField(default=None, editable=False, help_text='Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries', null=True, on_delete=django.db.models.deletion.CASCADE, to='aristotle_mdr.UUID'),
-        ),
-        migrations.AlterField(
-            model_name='measure',
-            name='uuid',
-            field=models.OneToOneField(default=None, editable=False, help_text='Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries', null=True, on_delete=django.db.models.deletion.CASCADE, to='aristotle_mdr.UUID'),
-        ),
-        migrations.AlterField(
-            model_name='organization',
-            name='uuid',
-            field=models.OneToOneField(default=None, editable=False, help_text='Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries', null=True, on_delete=django.db.models.deletion.CASCADE, to='aristotle_mdr.UUID'),
-        ),
-        migrations.AlterField(
-            model_name='workgroup',
-            name='uuid',
-            field=models.OneToOneField(default=None, editable=False, help_text='Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries', null=True, on_delete=django.db.models.deletion.CASCADE, to='aristotle_mdr.UUID'),
-        ),
     ]

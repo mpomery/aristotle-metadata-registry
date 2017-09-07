@@ -8,7 +8,7 @@ import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 
 
-class TestMigrations(TestCase):
+class BaseMigrations(TestCase):
     """
     Thanks to: https://www.caktusgroup.com/blog/2016/02/02/writing-unit-tests-django-migrations/
     """
@@ -44,7 +44,7 @@ class TestMigrations(TestCase):
         pass
 
 
-class TestUUIDMigration(TestMigrations):
+class TestUUIDMigration(BaseMigrations, TestCase):
 
     migrate_from = '0022_switch_to_concept_relations'
     migrate_to = '0024_add_uuid_instances'
@@ -56,6 +56,7 @@ class TestUUIDMigration(TestMigrations):
             definition = "",
         )
         self.before_uuid = self.obj.uuid
+
         self.before_pk = self.obj.pk
 
     def test_tags_migrated(self):
