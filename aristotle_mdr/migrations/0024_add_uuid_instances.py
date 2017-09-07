@@ -27,12 +27,23 @@ class Migration(migrations.Migration):
         return deps
 
     operations = [
-        migrations.RunPython(create_uuid_objects('aristotle_mdr','measure', migrate_self=True)),
-        migrations.RunPython(create_uuid_objects('aristotle_mdr','organization', migrate_self=True)),
-        migrations.RunPython(create_uuid_objects('aristotle_mdr','workgroup', migrate_self=True)),
-        migrations.RunPython(create_uuid_objects('aristotle_mdr','_concept', migrate_self=False)),
+        migrations.RunPython(
+            create_uuid_objects('aristotle_mdr','measure', migrate_self=True),
+            reverse_code=migrations.RunPython.noop
+        ),
+        migrations.RunPython(
+            create_uuid_objects('aristotle_mdr','organization', migrate_self=True),
+            reverse_code=migrations.RunPython.noop
+        ),
+        migrations.RunPython(
+            create_uuid_objects('aristotle_mdr','workgroup', migrate_self=True),
+            reverse_code=migrations.RunPython.noop
+        ),
+        migrations.RunPython(
+            create_uuid_objects('aristotle_mdr','_concept', migrate_self=True),
+            reverse_code=migrations.RunPython.noop
+        ),
 
-        
         migrations.AlterField(
             model_name='_concept',
             name='uuid',

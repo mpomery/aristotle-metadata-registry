@@ -849,6 +849,8 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         for sub_item in self.item1.registry_cascade_items:
             if sub_item is not None:
                 self.assertEqual(sub_item.statuses.count(),0)
+            else:
+                pass
 
         response = self.client.post(
             reverse('aristotle:changeStatus',args=[self.item1.id]),

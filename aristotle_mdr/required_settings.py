@@ -130,7 +130,8 @@ STATICFILES_FINDERS = (
 )
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
-if DEBUG:
+if DEBUG:  # pragma: no cover
+    # Testing forces DEBUG=False, so this will never get tested
     STATIC_PRECOMPILER_CACHE_TIMEOUT = 1
     STATIC_PRECOMPILER_DISABLE_AUTO_COMPILE = False
 
