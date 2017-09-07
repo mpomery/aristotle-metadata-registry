@@ -31,7 +31,7 @@ skip_migrations = (
     os.environ.get('DATABASE_URL').startswith('mssql')
 )
 
-print("Running test-suite with connection string" % os.environ.get('DATABASE_URL'))
+print("Running test-suite with connection string %s" % os.environ.get('DATABASE_URL'))
 db_from_env = dj_database_url.config(conn_max_age=500)
 
 DATABASES = {'default': db_from_env}
