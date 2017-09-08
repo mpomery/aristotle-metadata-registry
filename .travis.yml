@@ -15,10 +15,15 @@ defaults:
     before_script:
     # Make a MariaDB database
     # Fix wierdness with MariaDB on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0  
-      - if [[ $DATABASE_URL == mariadb* ]]; then ./aristotle_mdr/tests/bin/prep_mysql.sh ; fi
+      - if [[ $DB == mariadb ]]; then ./aristotle_mdr/tests/bin/prep_mysql.sh ; fi
       - if [[ $SEARCH == elasticsearch ]]; then sleep 10; fi
     # Make a posgres database
-      - if [[ $DATABASE_URL == postgres* ]]; then ./aristotle_mdr/tests/bin/prep_psql.sh; fi
+      - if [[ $DB == postgres* ]]; then ./aristotle_mdr/tests/bin/prep_psql.sh; fi
+
+      - if [[ $DB == sqlite ]]; then export DATABASE_URL=sqlite:///./db.db; fi
+      - if [[ $DB == mariadb ]]; then export DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db; fi
+      - if [[ $DB == postgresql ]]; then export DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db; fi
+
     script: tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
     services:
       - postgresql
@@ -45,9 +50,9 @@ defaults:
 
 jobs:
   allow_failures:
-    - env: DJANGO_VERSION='1.8'  DATABASE_URL=sqlite:///./db.db    SEARCH=whoosh   VARIANT=haystack
-    - env: DJANGO_VERSION='1.8'  DATABASE_URL=sqlite:///./db.db    SEARCH=elastic  VARIANT=haystack
-    - env: DJANGO_VERSION='1.11' DATABASE_URL=sqlite:///./db.db    SEARCH=whoosh
+    - env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
+    - env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
+    - env: DJANGO_VERSION='1.11' DB=sqlite    SEARCH=whoosh
 
   include:
     - stage: stylecheck
@@ -59,42 +64,42 @@ jobs:
       script: tox -e docs --skip-missing-interpreters
 
     - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db  SEARCH=elastic
+      env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
     - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db  SEARCH=elastic
+      env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
     - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=sqlite:///./db.db    SEARCH=whoosh
+      env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh
     - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db  SEARCH=whoosh
+      env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=whoosh
     - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db   SEARCH=whoosh
+      env: DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=whoosh
     - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db   SEARCH=elastic
+      env: DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=elastic
 
     - <<: *main_test_script_py27
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db  SEARCH=elastic
+      env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
     - <<: *main_test_script_py27
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db  SEARCH=elastic
+      env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
     - <<: *main_test_script_py27
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=sqlite:///./db.db    SEARCH=whoosh
+      env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh
     - <<: *main_test_script_py27
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db  SEARCH=whoosh
+      env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=whoosh
     - <<: *main_test_script_py27
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db   SEARCH=whoosh
+      env: DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=whoosh
     - <<: *main_test_script_py27
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db   SEARCH=elastic
+      env: DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=elastic
 
     - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.10' DATABASE_URL=sqlite:///./db.db    SEARCH=elastic
+      env: DJANGO_VERSION='1.10' DB=sqlite    SEARCH=elastic
     - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.10' DATABASE_URL=sqlite:///./db.db    SEARCH=whoosh
+      env: DJANGO_VERSION='1.10' DB=sqlite    SEARCH=whoosh
   # Possible failures:
     - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=sqlite:///./db.db    SEARCH=whoosh   VARIANT=haystack
+      env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
     - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DATABASE_URL=sqlite:///./db.db    SEARCH=elastic  VARIANT=haystack
+      env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
     - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.11' DATABASE_URL=sqlite:///./db.db    SEARCH=whoosh
+      env: DJANGO_VERSION='1.11' DB=sqlite    SEARCH=whoosh
 
     - stage: deploy
       script: true
