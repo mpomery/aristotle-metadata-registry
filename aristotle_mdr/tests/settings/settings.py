@@ -29,11 +29,24 @@ else:
 
 skip_migrations = (
     "ARISTOTLE_DEV_SKIP_MIGRATIONS" in os.environ or
-    os.environ.get('DATABASE_URL').startswith('mssql')
+    os.environ.get('DATABASE_URL', "").startswith('mssql')
 )
 
 
 print("Running test-suite with connection string %s" % os.environ.get('DATABASE_URL'))
+
+if skip_migrations:  # pragma: no cover
+    print("Skipping migrations")
+    class DisableMigrations(object):
+    
+        def __contains__(self, item):
+            return True
+    
+        def __getitem__(self, item):
+            return "notmigrations"
+    
+    MIGRATION_MODULES = DisableMigrations()
+
 db_from_env = dj_database_url.config(conn_max_age=500, default='sqlite:////tmp/db.db')
 
 DATABASES = {'default': db_from_env}
@@ -61,18 +74,6 @@ else:
     print("Running %s test-suite with whoosh" % ci_runner)
     print("Aristotle specific variant")
     from aristotle_mdr.tests.settings.templates.search.whoosh import HAYSTACK_CONNECTIONS
-
-if skip_migrations:  # pragma: no cover
-    print("Skipping migrations")
-    class DisableMigrations(object):
-    
-        def __contains__(self, item):
-            return True
-    
-        def __getitem__(self, item):
-            return "notmigrations"
-    
-    MIGRATION_MODULES = DisableMigrations()
 
 
 INSTALLED_APPS = (
