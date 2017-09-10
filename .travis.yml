@@ -21,9 +21,13 @@ defaults:
       - if [[ $DB == postgres* ]]; then ./aristotle_mdr/tests/bin/prep_psql.sh; fi
 
     script:
-      - if [[ $DB == sqlite ]]; then export DATABASE_URL=sqlite:///./db.db; fi
-      - if [[ $DB == mariadb ]]; then export DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db; fi
-      - if [[ $DB == postgresql ]]; then export DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db; fi
+      - |
+        case "$DB" in
+            mariadb) DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db;;
+         postgresql) DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db;;
+             sqlite) DATABASE_URL=sqlite:///./db.db;;
+                  *) DATABASE_URL=sqlite:///./db.db ;;
+        esac
       - echo "Running script with DATABASE_URL="$DATABASE_URL
       - tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
     services:
