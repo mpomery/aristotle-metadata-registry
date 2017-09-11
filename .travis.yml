@@ -26,10 +26,11 @@ defaults:
             mariadb) DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db;;
          postgresql) DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db;;
              sqlite) DATABASE_URL=sqlite:///./db.db;;
-                  *) DATABASE_URL=sqlite:///./db.db ;;
+                  *) DATABASE_URL=sqlite:///./db.db;;
         esac
-      - echo "Running script with DATABASE_URL="$DATABASE_URL
-      - tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
+        echo "Running script with DATABASE_URL="$DATABASE_URL
+        echo "Running script with DB="$DB
+        tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
     services:
       - postgresql
       - redis-server
@@ -105,6 +106,12 @@ jobs:
       env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
     - <<: *main_test_script_py35
       env: DJANGO_VERSION='1.11' DB=sqlite    SEARCH=whoosh
+
+    - stage: accessibility
+      python: 3.5
+      script: tox -e ally-metadata_item --skip-missing-interpreters
+      script: tox -e ally-metadata_action --skip-missing-interpreters
+      script: tox -e ally-static --skip-missing-interpreters
 
     - stage: deploy
       script: true
