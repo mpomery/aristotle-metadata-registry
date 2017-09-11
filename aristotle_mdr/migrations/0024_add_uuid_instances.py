@@ -27,10 +27,12 @@ class Migration(migrations.Migration):
         return deps
 
     operations = [
-        DBOnlySQL(
-            'SET CONSTRAINTS ALL IMMEDIATE',
+        # This is needed as we modify ForeignKeys before they are made during the migration
+        migrations.RunSQL(
+            'SET CONSTRAINTS ALL IMMEDIATE;',
             reverse_sql=migrations.RunSQL.noop
         ),
+
         migrations.RenameField(
             model_name='_concept',
             old_name='uuid',
@@ -112,8 +114,8 @@ class Migration(migrations.Migration):
             new_name="uuid"
         ),
 
-        DBOnlySQL(
+        migrations.RunSQL(
             migrations.RunSQL.noop,
-            reverse_sql='SET CONSTRAINTS ALL IMMEDIATE'
+            reverse_sql='SET CONSTRAINTS ALL IMMEDIATE;'
         ),
     ]

@@ -23,10 +23,10 @@ defaults:
     script:
       - |
         case "$DB" in
-            mariadb) DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db;;
-         postgresql) DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db;;
-             sqlite) DATABASE_URL=sqlite:///./db.db;;
-                  *) DATABASE_URL=sqlite:///./db.db;;
+          mariadb) DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db;;
+         postgres) DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db;;
+           sqlite) DATABASE_URL=sqlite:///./db.db;;
+                *) DATABASE_URL=sqlite:///./db.db;;
         esac
         echo "Running script with DATABASE_URL="$DATABASE_URL
         echo "Running script with DB="$DB
@@ -110,7 +110,11 @@ jobs:
     - stage: accessibility
       python: 3.5
       script: tox -e ally-metadata_item --skip-missing-interpreters
+    - stage: accessibility
+      python: 3.5
       script: tox -e ally-metadata_action --skip-missing-interpreters
+    - stage: accessibility
+      python: 3.5
       script: tox -e ally-static --skip-missing-interpreters
 
     - stage: deploy
