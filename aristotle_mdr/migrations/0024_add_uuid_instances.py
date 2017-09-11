@@ -6,7 +6,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import uuid
 
-from aristotle_mdr.utils.migrations import create_uuid_objects, classproperty, DBOnlySQL
+from aristotle_mdr.utils.migrations import create_uuid_objects, classproperty
 
 class Migration(migrations.Migration):
 
