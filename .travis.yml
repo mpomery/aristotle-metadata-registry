@@ -54,6 +54,11 @@ defaults:
       python: 3.5
       <<: *main_test_script
 
+  - &test_accessibility_py35
+    stage: accessibility
+    python: 3.5
+    script: tox -e ally-$ALLY --skip-missing-interpreters
+
 jobs:
   allow_failures:
     - env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
@@ -107,15 +112,13 @@ jobs:
     - <<: *main_test_script_py35
       env: DJANGO_VERSION='1.11' DB=sqlite    SEARCH=whoosh
 
-    - stage: accessibility
-      python: 3.5
-      script: tox -e ally-metadata_item --skip-missing-interpreters
-    - stage: accessibility
-      python: 3.5
-      script: tox -e ally-metadata_action --skip-missing-interpreters
-    - stage: accessibility
-      python: 3.5
-      script: tox -e ally-static --skip-missing-interpreters
+  # Test Accessibility
+    - <<: *test_accessibility_py35
+      env: ALLY=metadata_item
+    - <<: *test_accessibility_py35
+      env: ALLY=metadata_action
+    - <<: *test_accessibility_py35
+      env: ALLY=static
 
     - stage: deploy
       script: true
