@@ -6,7 +6,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 import uuid
 
-from aristotle_mdr.utils.migrations import create_uuid_objects, classproperty
+from aristotle_mdr.utils.migrations import create_uuid_objects, classproperty, DBOnlySQL
 
 class Migration(migrations.Migration):
 
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
 
     operations = [
         # This is needed as we modify ForeignKeys before they are made during the migration
-        migrations.RunSQL(
+        DBOnlySQL(
             'SET CONSTRAINTS ALL IMMEDIATE;',
             reverse_sql=migrations.RunSQL.noop
         ),
@@ -114,7 +114,7 @@ class Migration(migrations.Migration):
             new_name="uuid"
         ),
 
-        migrations.RunSQL(
+        DBOnlySQL(
             migrations.RunSQL.noop,
             reverse_sql='SET CONSTRAINTS ALL IMMEDIATE;'
         ),
