@@ -30,7 +30,13 @@ class Migration(migrations.Migration):
         # This is needed as we modify ForeignKeys before they are made during the migration
         DBOnlySQL(
             'SET CONSTRAINTS ALL IMMEDIATE;',
-            reverse_sql=migrations.RunSQL.noop
+            reverse_sql=migrations.RunSQL.noop,
+            vendor="postgresql"
+        ),
+        DBOnlySQL(
+            'set foreign_key_checks=0;',
+            reverse_sql=migrations.RunSQL.noop,
+            vendor="mysql"
         ),
 
         migrations.RenameField(
@@ -116,6 +122,13 @@ class Migration(migrations.Migration):
 
         DBOnlySQL(
             migrations.RunSQL.noop,
-            reverse_sql='SET CONSTRAINTS ALL IMMEDIATE;'
+            reverse_sql='SET CONSTRAINTS ALL IMMEDIATE;',
+            vendor="postgresql"
         ),
+        DBOnlySQL(
+            migrations.RunSQL.noop,
+            reverse_sql='set foreign_key_checks=0;',
+            vendor="mysql"
+        ),
+
     ]

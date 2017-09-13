@@ -6,6 +6,7 @@ from django.db import connection
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
+from django.db import connection
 
 
 class BaseMigrations(TestCase):
@@ -21,6 +22,9 @@ class BaseMigrations(TestCase):
     migrate_to = None
 
     def setUp(self):
+        if connection.vendor == "mssql":
+            return None
+
         assert self.migrate_from and self.migrate_to, \
             "TestCase '{}' must define migrate_from and migrate_to properties".format(type(self).__name__)
         self.migrate_from = [(self.app, self.migrate_from)]
@@ -50,6 +54,9 @@ class TestUUIDMigration(BaseMigrations, TestCase):
     migrate_to = '0024_add_uuid_instances'
 
     def setUpBeforeMigration(self, apps):
+        if connection.vendor == "mssql":
+            return None
+
         DataElement = apps.get_model('aristotle_mdr', 'DataElement')
         self.obj = DataElement.objects.create(
             name = "Some data",
@@ -60,6 +67,8 @@ class TestUUIDMigration(BaseMigrations, TestCase):
         self.before_pk = self.obj.pk
 
     def test_tags_migrated(self):
+        if connection.vendor == "mssql":
+            return None
         DataElement = apps.get_model('aristotle_mdr', 'DataElement')
         UUID = apps.get_model('aristotle_mdr', 'UUID')
         

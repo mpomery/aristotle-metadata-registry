@@ -63,12 +63,16 @@ class DBOnlySQL(migrations.RunSQL):
 
     reversible = True
 
+    def __init__(self, *args, **kwargs):
+        self.vendor = kwargs.pop('vendor')
+        super(DBOnlySQL, self).__init__(*args, **kwargs)
+
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        if schema_editor.connection.vendor not in ['sqlite']:
+        if schema_editor.connection.vendor == self.vendor:
             return super(DBOnlySQL, self).database_forwards(app_label, schema_editor, from_state, to_state)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        if schema_editor.connection.vendor not in ['sqlite']:
+        if schema_editor.connection.vendor == self.vendor:
             return super(DBOnlySQL, self).database_backwards(app_label, schema_editor, from_state, to_state)
 
 

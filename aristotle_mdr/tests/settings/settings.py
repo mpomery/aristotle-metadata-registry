@@ -32,10 +32,6 @@ skip_migrations = (
     os.environ.get('DATABASE_URL', "").startswith('mssql')
 )
 
-if os.environ.get('DATABASE_URL', "").startswith('mysql'):
-    import pymysql 
-    pymysql.install_as_MySQLdb()
-
 
 print("Running test-suite with connection string %s" % os.environ.get('DATABASE_URL'))
 
