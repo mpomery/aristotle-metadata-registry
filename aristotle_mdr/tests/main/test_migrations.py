@@ -11,7 +11,7 @@ from django.db import connection
 import unittest
 
 
-@unittest.skipIf(connection.vendor == "mssql", "MSSQL Doesn't support temporarily disabiling foreign key constraints")
+@unittest.skipIf(connection.vendor in ['microsoft', 'mssql'], "MSSQL Doesn't support temporarily disabling foreign key constraints")
 class BaseMigrations(TestCase):
     """
     Thanks to: https://www.caktusgroup.com/blog/2016/02/02/writing-unit-tests-django-migrations/
@@ -25,9 +25,6 @@ class BaseMigrations(TestCase):
     migrate_to = None
 
     def setUp(self):
-        if connection.vendor == "mssql":
-            return None
-
         assert self.migrate_from and self.migrate_to, \
             "TestCase '{}' must define migrate_from and migrate_to properties".format(type(self).__name__)
         self.migrate_from = [(self.app, self.migrate_from)]
@@ -50,7 +47,7 @@ class BaseMigrations(TestCase):
     def setUpBeforeMigration(self, apps):
         pass
 
-@unittest.skipIf(connection.vendor == "mssql", "MSSQL Doesn't support temporarily disabiling foreign key constraints")
+@unittest.skipIf(connection.vendor in ['microsoft', 'mssql'], "MSSQL Doesn't support temporarily disabling foreign key constraints")
 class TestUUIDMigration(BaseMigrations, TestCase):
 
     migrate_from = '0022_switch_to_concept_relations'
