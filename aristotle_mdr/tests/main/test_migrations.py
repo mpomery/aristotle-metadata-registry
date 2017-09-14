@@ -8,7 +8,10 @@ import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 from django.db import connection
 
+import unittest
 
+
+@unittest.skipIf(connection.vendor == "mssql", "MSSQL Doesn't support temporarily disabiling foreign key constraints")
 class BaseMigrations(TestCase):
     """
     Thanks to: https://www.caktusgroup.com/blog/2016/02/02/writing-unit-tests-django-migrations/
@@ -47,15 +50,13 @@ class BaseMigrations(TestCase):
     def setUpBeforeMigration(self, apps):
         pass
 
-
+@unittest.skipIf(connection.vendor == "mssql", "MSSQL Doesn't support temporarily disabiling foreign key constraints")
 class TestUUIDMigration(BaseMigrations, TestCase):
 
     migrate_from = '0022_switch_to_concept_relations'
     migrate_to = '0024_add_uuid_instances'
 
     def setUpBeforeMigration(self, apps):
-        if connection.vendor == "mssql":
-            return None
 
         DataElement = apps.get_model('aristotle_mdr', 'DataElement')
         self.obj = DataElement.objects.create(
@@ -67,8 +68,6 @@ class TestUUIDMigration(BaseMigrations, TestCase):
         self.before_pk = self.obj.pk
 
     def test_tags_migrated(self):
-        if connection.vendor == "mssql":
-            return None
         DataElement = apps.get_model('aristotle_mdr', 'DataElement')
         UUID = apps.get_model('aristotle_mdr', 'UUID')
         
