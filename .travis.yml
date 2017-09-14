@@ -44,7 +44,7 @@ defaults:
           - elasticsearch
       code_climate:
         repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
-      mariadb: '10.2'
+      mariadb: '10.1'
 
   - &main_test_script_py27
       python: 2.7
