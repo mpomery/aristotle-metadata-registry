@@ -12,7 +12,7 @@ import unittest
 
 
 @unittest.skipIf(connection.vendor in ['microsoft', 'mssql'], "MSSQL Doesn't support temporarily disabling foreign key constraints")
-class BaseMigrations(TestCase):
+class BaseMigrations(object):
     """
     Thanks to: https://www.caktusgroup.com/blog/2016/02/02/writing-unit-tests-django-migrations/
     """
