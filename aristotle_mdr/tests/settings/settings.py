@@ -99,7 +99,7 @@ ARISTOTLE_SETTINGS['CONTENT_EXTENSIONS'] = ARISTOTLE_SETTINGS['CONTENT_EXTENSION
 ARISTOTLE_SETTINGS['DOWNLOADERS'] = ARISTOTLE_SETTINGS['DOWNLOADERS'] + [
     ('txt', 'Text', 'fa-file-pdf-o', 'text_download_test', 'Test Downloader'),
 ]
-ARISTOTLE_SETTINGS['BULK_ACTIONS'] + [
+ARISTOTLE_SETTINGS['BULK_ACTIONS'] = ARISTOTLE_SETTINGS['BULK_ACTIONS'] + [
     'bulk_actions_test.actions.StaffDeleteActionForm',
     'bulk_actions_test.actions.IncompleteActionForm',
     'aristotle_mdr.contrib.slots.forms.BulkAssignSlotsForm',

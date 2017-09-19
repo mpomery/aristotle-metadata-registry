@@ -88,6 +88,9 @@ class UUID(models.Model):
         max_length=256, null=False, editable=False,
     )
 
+    def __str__(self):
+        return str(self.uuid)
+
 
 @python_2_unicode_compatible  # Python 2
 class baseAristotleObject(TimeStampedModel):
