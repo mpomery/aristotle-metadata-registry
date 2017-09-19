@@ -31,7 +31,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'add_favourites',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.AddFavouriteForm',
                 'items': [self.item1.id, self.item2.id],
             }
         )
@@ -45,7 +45,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'add_favourites',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.AddFavouriteForm',
                 'items': [self.item1.id, self.item2.id],
             }
         )
@@ -59,7 +59,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'add_favourites',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.AddFavouriteForm',
                 'items': [self.item1.id, self.item4.id],
             },
             follow=True
@@ -78,7 +78,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'move_workgroup',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
                 'items': [self.item1.id, self.item2.id],
                 'workgroup': [self.new_workgroup.id],
                 "confirmed": True
@@ -94,7 +94,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'move_workgroup',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
                 'items': [self.item1.id, self.item2.id],
                 'workgroup': [self.wg1.id],
                 "confirmed": True
@@ -120,7 +120,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'move_workgroup',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
                 'items': [self.item1.id, self.item2.id, self.item4.id],
                 'workgroup': [self.new_workgroup.id],
                 "confirmed": True
@@ -145,7 +145,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'move_workgroup',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
                 'items': [self.item1.id, self.item2.id, self.item4.id],
                 'workgroup': [self.wg1.id],
                 "confirmed": True
@@ -166,7 +166,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'add_favourites',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.AddFavouriteForm',
                 'items': [self.item1.id, self.item2.id],
             }
         )
@@ -176,7 +176,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'remove_favourites',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.RemoveFavouriteForm',
                 'items': [self.item1.id, self.item2.id],
             }
         )
@@ -203,7 +203,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'change_state',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeStateForm',
                 'state': new_state,
                 'items': [self.item1.id, self.item2.id],
                 'registrationDate': reg_date,
@@ -243,7 +243,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'change_state',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeStateForm',
                 'state': new_state,
                 'items': [self.item1.id, self.item2.id, self.item4.id],
                 'registrationDate': reg_date,
@@ -289,7 +289,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'move_workgroup',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
                 'items': [],
                 'workgroup': [self.new_workgroup.id],
                 "confirmed": True,
@@ -311,7 +311,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'move_workgroup',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
                 'items': [],
                 'workgroup': [self.wg1.pk],
                 "confirmed": True,
@@ -336,7 +336,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'request_review',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
                 'state': 1,
                 'items': [self.item1.id, self.item2.id],
                 'registration_authority': self.ra.id,
@@ -365,7 +365,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'request_review',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
                 'state': 1,
                 'items': [self.item1.id, self.item4.id],
                 'registration_authority': self.ra.id,

@@ -97,13 +97,13 @@ ARISTOTLE_SETTINGS = ARISTOTLE_SETTINGS.copy()
 ARISTOTLE_SETTINGS['SEPARATORS']['DataElementConcept'] = '--'
 ARISTOTLE_SETTINGS['CONTENT_EXTENSIONS'] = ARISTOTLE_SETTINGS['CONTENT_EXTENSIONS'] + ['extension_test', 'aristotle_mdr_links']
 ARISTOTLE_SETTINGS['DOWNLOADERS'] = ARISTOTLE_SETTINGS['DOWNLOADERS'] + [
-    ('txt', 'Text', 'fa-file-pdf-o', 'text_download_test'),
+    ('txt', 'Text', 'fa-file-pdf-o', 'text_download_test', 'Test Downloader'),
 ]
-ARISTOTLE_SETTINGS['BULK_ACTIONS'].update({
-    'delete': 'bulk_actions_test.actions.StaffDeleteActionForm',
-    'incomplete': 'bulk_actions_test.actions.IncompleteActionForm',
-    'add_slots': 'aristotle_mdr.contrib.slots.forms.BulkAssignSlotsForm',
-})
+ARISTOTLE_SETTINGS['BULK_ACTIONS'] + [
+    'bulk_actions_test.actions.StaffDeleteActionForm',
+    'bulk_actions_test.actions.IncompleteActionForm',
+    'aristotle_mdr.contrib.slots.forms.BulkAssignSlotsForm',
+]
 ROOT_URLCONF = 'extension_test.urls'
 
 # disable

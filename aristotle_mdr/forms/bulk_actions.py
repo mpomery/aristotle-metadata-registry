@@ -180,7 +180,7 @@ class RemoveFavouriteForm(LoggedInBulkActionForm):
     classes="fa-minus-square"
     action_text = _('Remove favourite')
     items_label = "Items that will be removed from your favourites list"
-
+    
     def make_changes(self):
         items = self.items_to_change
         self.user.profile.favourites.remove(*items)
@@ -192,7 +192,7 @@ class ChangeStateForm(ChangeStatusForm, BulkActionForm):
     classes="fa-university"
     action_text = _('Change registration status')
     items_label = "These are the items that will be registered. Add or remove additional items with the autocomplete box."
-
+    
     def __init__(self, *args, **kwargs):
         super(ChangeStateForm, self).__init__(*args, **kwargs)
         self.add_registration_authority_field()
@@ -256,7 +256,7 @@ class RequestReviewForm(LoggedInBulkActionForm):
     classes="fa-flag"
     action_text = _('Request review')
     items_label = "These are the items that will be reviewed. Add or remove additional items with the autocomplete box."
-
+    
     registration_authority=forms.ModelChoiceField(
         label="Registration Authority",
         queryset=MDR.RegistrationAuthority.objects.all(),
@@ -326,7 +326,7 @@ class ChangeWorkgroupForm(BulkActionForm):
     classes="fa-users"
     action_text = _('Change workgroup')
     items_label="These are the items that will be moved between workgroups. Add or remove additional items with the autocomplete box."
-
+    
     def __init__(self, *args, **kwargs):
         super(ChangeWorkgroupForm, self).__init__(*args, **kwargs)
 
@@ -410,14 +410,14 @@ class QuickPDFDownloadForm(DownloadActionForm):
     items_label = "Items that are downloaded"
     download_type= 'pdf'
     title = None
-
+    
 
 class BulkDownloadForm(DownloadActionForm):
     confirm_page = "aristotle_mdr/actions/bulk_actions/bulk_download.html"
     classes="fa-download"
     action_text = _('Bulk download')
     items_label="These are the items that will be downloaded"
-
+    
     title = forms.CharField(
         required=False,
         label=_("Title for the document"),

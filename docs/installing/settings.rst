@@ -38,8 +38,8 @@ The following are required within a dictionary in the settings for the configure
     these are used when discovering the available extensions for about pages -
     required format a ``list`` of ``strings``.
 ``BULK_ACTIONS``
-    A dictionary of bulk action names and the associated fully-ualified python 
-    path to the form that completes the action. :doc:`More information on configuring 
+    A list of fully-qualified python paths to the bulk action form classes that 
+    provide the action. :doc:`More information on configuring 
     bulk actions is available here <../extensions/bulk_actions>`.
 ``PDF_PAGE_SIZE``
     The default page size to deliver PDF downloads if a page size is not specified in the URL
@@ -62,7 +62,7 @@ The following are required within a dictionary in the settings for the configure
     An array that specified which classes of user can move items between workgroups.
     Possible options include ``'admin'``, ``'manager'`` or ``'submitter'``.
 ``DOWNLOADERS``
-    n array of download options - explained below
+    A list of download options - explained below:
 
 ``ARISTOTLE_SETTINGS.DOWNLOADERS``
 **********************************

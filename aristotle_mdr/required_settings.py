@@ -145,6 +145,8 @@ ADD_REVERSION_ADMIN = True
 # We need this to make sure users can see all extensions.
 AUTHENTICATION_BACKENDS = ('aristotle_mdr.backends.AristotleBackend',)
 
+# ARISTOTLE_SETTINGS_STRICT_MODE = True
+
 ARISTOTLE_SETTINGS = {
     'SEPARATORS': {
         'DataElement': ', ',
@@ -157,14 +159,14 @@ ARISTOTLE_SETTINGS = {
     'CONTENT_EXTENSIONS': [],
     'PDF_PAGE_SIZE': 'A4',
     'WORKGROUP_CHANGES': [],  # ['admin'] # or manager or submitter,
-    'BULK_ACTIONS': {
-        'add_favourites': 'aristotle_mdr.forms.bulk_actions.AddFavouriteForm',
-        'remove_favourites': 'aristotle_mdr.forms.bulk_actions.RemoveFavouriteForm',
-        'change_state': 'aristotle_mdr.forms.bulk_actions.ChangeStateForm',
-        'move_workgroup': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
-        'request_review': 'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
-        'bulk_download': 'aristotle_mdr.forms.bulk_actions.BulkDownloadForm',
-    },
+    'BULK_ACTIONS': [
+        'aristotle_mdr.forms.bulk_actions.AddFavouriteForm',
+        'aristotle_mdr.forms.bulk_actions.RemoveFavouriteForm',
+        'aristotle_mdr.forms.bulk_actions.ChangeStateForm',
+        'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
+        'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
+        'aristotle_mdr.forms.bulk_actions.BulkDownloadForm',
+    ],
     'DASHBOARD_ADDONS': [],
     'METADATA_CREATION_WIZARDS': [
         {

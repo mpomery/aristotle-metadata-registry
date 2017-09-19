@@ -1,12 +1,18 @@
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
+from django.core.exceptions import ImproperlyConfigured
 from django.forms import model_to_dict
 from django.template.defaultfilters import slugify
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 from django.utils.text import get_text_list
 from django.utils.translation import ugettext as _
+
+import logging
+
+logger = logging.getLogger(__name__)
+logger.debug("Logging started for " + __name__)
 
 
 def concept_to_dict(obj):
@@ -192,10 +198,65 @@ def cache_per_item_user(ttl=None, prefix=None, cache_post=False):
     return decorator
 
 
+error_messages = {
+    "bulk_action_failed": "BULK_ACTION settings for registry are invalid.",
+    "content_extensions_failed": "CONTENT_EXTENSIONS settings for registry are invalid.",
+    "workgroup_changes_failed": "WORKGROUP_CHANGES settings for registry are invalid.",
+    "dashboard_addons_failed": "DASHBOARD_ADDONS settings for registry are invalid.",
+    "downloaders_failed": "DOWNLOADERS settings for registry are invalid.",
+}
+
+
 def fetch_aristotle_settings():
     if hasattr(settings, 'ARISTOTLE_SETTINGS_LOADER'):
-        return import_string(getattr(settings, 'ARISTOTLE_SETTINGS_LOADER'))()
-    return getattr(settings, 'ARISTOTLE_SETTINGS', {})
+        aristotle_settings = import_string(getattr(settings, 'ARISTOTLE_SETTINGS_LOADER'))()
+    else:
+        aristotle_settings = getattr(settings, 'ARISTOTLE_SETTINGS', {})
+
+    strict_mode = getattr(settings, "ARISTOTLE_SETTINGS_STRICT_MODE", True) is not False
+
+    aristotle_settings = validate_aristotle_settings(aristotle_settings, strict_mode)
+    return aristotle_settings
+
+
+def validate_aristotle_settings(aristotle_settings, strict_mode):
+    """
+    This is a separate function to allow us to validate settings in areas apart from
+    just fetching metadata.
+    """
+
+    # Check lists of string based items:
+    for sub_setting, err in [
+        ("BULK_ACTIONS", "bulk_action_failed"),
+        ("WORKGROUP_CHANGES", "workgroup_changes_failed"),
+        ("CONTENT_EXTENSIONS", "content_extensions_failed"),
+        ("DASHBOARD_ADDONS", "dashboard_addons_failed"),
+    ]:
+        try:
+            check_settings=aristotle_settings.get(sub_setting, [])
+            assert(type(check_settings) is list)
+            assert(all(type(f) is str for f in check_settings))
+        except:
+            if strict_mode:
+                raise ImproperlyConfigured(error_messages[err])
+            else:
+                logger.error(error_messages[err])
+                aristotle_settings[sub_setting] = []
+
+    # Check DOWNLOADERS
+    try:
+        check_settings=aristotle_settings.get('DOWNLOADERS', [])
+        assert(type(check_settings) is list)
+        assert(all(type(f) is tuple for f in check_settings))
+        assert(all(len(f) == 5 for f in check_settings))
+    except:
+        if strict_mode:
+            raise ImproperlyConfigured(error_messages['downloaders_failed'])
+        else:
+            logger.error(error_messages['downloaders_failed'])
+            aristotle_settings['DOWNLOADERS'] = []
+
+    return aristotle_settings
 
 
 def fetch_metadata_apps():

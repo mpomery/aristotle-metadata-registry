@@ -3,9 +3,15 @@ Changelog
 - 1.6.0
     - Removed incorrect instructions on login page
     - Improved disabling of metadata extensions in code/configuration
+    - **Configuration change:**
+        - new options - ``ARISTOTLE_SETTINGS_STRICT_MODE``, if False errors in ARISTOTLE_SETTINGS will be logged and not prevent the app from working. Defaults to True.
+        - ``BULK_ACTION`` option will no longer cause critical isuses if incorrectly configured. Errors can be logged instead
+        - ``CONTENT_EXTENSIONS`` option will no longer cause critical isuses if incorrectly configured. Errors can be logged instead
+        - ``DOWNLOADERS`` option will not cause critical isuses if incorrectly configured. Errors can be logged instead
     - **Database migration:** Added concrete UUID model for more flexible lookups
     - **Breaking change:** Download options have been moved into the ``ARISTOTLE_SETTINGS``
         under the ``DOWNLOADERS`` key
+    - **Breaking change:** The Aristotle setting ``BULK_ACTION`` is now a list of python module strings. Update to 1.6.0 by removing keys and keeping the list of associated values
     - **Breaking change:** The PDF download library is no longer included by default,
         and must be installed from github - https://github.com/aristotle-mdr/aristotle-pdf-downloads
 
