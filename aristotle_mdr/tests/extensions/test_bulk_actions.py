@@ -37,7 +37,7 @@ class TestDeleteBulkAction(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'delete',
+                'bulkaction': 'bulk_actions_test.actions.StaffDeleteActionForm',
                 'safe_to_delete': True,
                 'items': [self.item1.id, self.item2.id],
             }
@@ -47,7 +47,7 @@ class TestDeleteBulkAction(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'delete',
+                'bulkaction': 'bulk_actions_test.actions.StaffDeleteActionForm',
                 'safe_to_delete': True,
                 'items': [self.item1.id, self.item2.id],
                 "confirmed": True
@@ -67,7 +67,7 @@ class TestDeleteBulkAction(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'delete',
+                'bulkaction': 'bulk_actions_test.actions.StaffDeleteActionForm',
                 'safe_to_delete': True,
                 'items': [self.item1.id, self.item2.id],
             },
@@ -78,7 +78,7 @@ class TestDeleteBulkAction(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'delete',
+                'bulkaction': 'bulk_actions_test.actions.StaffDeleteActionForm',
                 'safe_to_delete': True,
                 'items': [self.item1.id, self.item2.id],
                 "confirmed": True
@@ -100,7 +100,7 @@ class BulkDownloadTests(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'bulk_download',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.BulkDownloadForm',
                 'items': [self.item1.id, self.item2.id],
                 "title": "The title",
                 "download_type": self.download_type,
@@ -115,7 +115,7 @@ class BulkDownloadTests(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'bulk_download',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.BulkDownloadForm',
                 'items': [self.item1.id, self.item4.id],
                 "title": "The title",
                 "download_type": self.download_type,
@@ -133,7 +133,7 @@ class BulkDownloadTests(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'bulk_download',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.BulkDownloadForm',
                 'items': [self.item1.id, self.item4.id],
                 "title": "The title",
                 "download_type": self.download_type,
@@ -147,7 +147,7 @@ class BulkDownloadTests(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'bulk_download',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.BulkDownloadForm',
                 'items': [self.item1.id, self.item4.id],
                 "title": "The title",
                 "download_type": self.download_type,

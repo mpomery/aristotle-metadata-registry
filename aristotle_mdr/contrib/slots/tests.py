@@ -82,7 +82,7 @@ class TestSlotsBulkAction(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'add_slots',
+                'bulkaction': 'aristotle_mdr.contrib.slots.forms.BulkAssignSlotsForm',
                 'items': [self.item1.id, self.item2.id],
                 'slot_name': self.slot_name,
                 'slot_type': self.slot_type,
@@ -102,7 +102,7 @@ class TestSlotsBulkAction(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'add_slots',
+                'bulkaction': 'aristotle_mdr.contrib.slots.forms.BulkAssignSlotsForm',
                 'items': [self.item1.id, self.item4.id, self.item5.id],
                 'slot_name': self.slot_name,
                 'slot_type': self.slot_type,
