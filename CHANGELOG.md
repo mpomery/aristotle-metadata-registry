@@ -14,6 +14,8 @@ Changelog
     - **Breaking change:** The Aristotle setting ``BULK_ACTION`` is now a list of python module strings. Update to 1.6.0 by removing keys and keeping the list of associated values
     - **Breaking change:** The PDF download library is no longer included by default,
         and must be installed from github - https://github.com/aristotle-mdr/aristotle-pdf-downloads
+    - **Breaking change:** Contrib URLs are no longer loaded automatically. Contrib apps now need 
+        to have URLs loaded manually in a project urls.py
 
 - 1.5.7
     - Pinned bootstrap-timepicker-datepicker version
