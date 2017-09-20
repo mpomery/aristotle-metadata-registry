@@ -49,11 +49,6 @@ def is_in(item, iterable):
 
 
 @register.filter
-def is_installed_app(app_name):
-    return app_name in settings.INSTALLED_APPS
-
-
-@register.filter
 def in_workgroup(user, workgroup):
     """
     A filter that acts as a wrapper around ``aristotle_mdr.perms.user_in_workgroup``.
@@ -414,3 +409,9 @@ def visibility_text(item):
     if item._is_public:
         visibility = _("public")
     return visibility
+
+
+@register.filter
+def is_active_module(module_name):
+    from aristotle_mdr.utils.utils import is_active_module
+    return is_active_module(module_name)

@@ -267,3 +267,11 @@ def fetch_metadata_apps():
     aristotle_apps += ["aristotle_mdr"]
     aristotle_apps = list(set(aristotle_apps))
     return aristotle_apps
+
+
+def is_active_module(module_name):
+    aristotle_settings = fetch_aristotle_settings()
+    if "MODULES" in aristotle_settings:
+        return module_name in settings.INSTALLED_APPS and module_name in aristotle_settings['MODULES']
+    else:
+        return module_name in settings.INSTALLED_APPS

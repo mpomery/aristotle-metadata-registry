@@ -3,6 +3,7 @@ from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.apps import apps
 from django.db import models
+from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_lazy as _
 
 from model_utils import Choices
@@ -105,6 +106,15 @@ def first_letter(j):
     """Extract the first letter of a string"""
     # Defined as a method rather than using a lambda to keep a style guide happy.
     return j[0]
+
+
+def get_permission_sqs(*args, **kwargs):
+    from django.conf import settings
+    psqs_kls = getattr(settings, 'ARISTOTLE_PERMISSION_SEARCH_CLASS', None)
+    if psqs_kls is None:
+        return PermissionSearchQuerySet
+    else:
+        return import_string(psqs_kls)(*args, **kwargs)
 
 
 class EmptyPermissionSearchQuerySet(EmptySearchQuerySet):
@@ -336,7 +346,7 @@ class PermissionSearchForm(TokenSearchForm):
 
     def __init__(self, *args, **kwargs):
         if 'searchqueryset' not in kwargs.keys() or kwargs['searchqueryset'] is None:
-            kwargs['searchqueryset'] = PermissionSearchQuerySet()
+            kwargs['searchqueryset'] = get_permission_sqs()
         if not issubclass(type(kwargs['searchqueryset']), PermissionSearchQuerySet):
             raise ImproperlyConfigured("Aristotle Search Queryset connection must be a subclass of PermissionSearchQuerySet")
         super(PermissionSearchForm, self).__init__(*args, **kwargs)

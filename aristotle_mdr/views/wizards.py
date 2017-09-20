@@ -177,7 +177,7 @@ class ConceptWizard(PermissionWizard):
             return self.similar_items
         self.search_terms = self.get_cleaned_data_for_step('initial')
 
-        from aristotle_mdr.forms.search import PermissionSearchQuerySet as PSQS
+        from aristotle_mdr.forms.search import get_permission_sqs as PSQS
         if model is None:
             model = self.model
 
@@ -254,7 +254,7 @@ class MultiStepAristotleWizard(PermissionWizard):
         Looks for items of a given item type with the given search terms
     """
     def find_similar(self, name, definition, model=None):
-        from aristotle_mdr.forms.search import PermissionSearchQuerySet as PSQS
+        from aristotle_mdr.forms.search import get_permission_sqs as PSQS
         if model is None:
             model = self.model
         if not hasattr(self, "similar_items"):
