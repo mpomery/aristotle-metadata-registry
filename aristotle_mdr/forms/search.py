@@ -112,9 +112,10 @@ def get_permission_sqs(*args, **kwargs):
     from django.conf import settings
     psqs_kls = getattr(settings, 'ARISTOTLE_PERMISSION_SEARCH_CLASS', None)
     if psqs_kls is None:
-        return PermissionSearchQuerySet
+        psqs_kls = PermissionSearchQuerySet
     else:
-        return import_string(psqs_kls)(*args, **kwargs)
+        psqs_kls = import_string(psqs_kls)
+    return psqs_kls(*args, **kwargs)
 
 
 class EmptyPermissionSearchQuerySet(EmptySearchQuerySet):
