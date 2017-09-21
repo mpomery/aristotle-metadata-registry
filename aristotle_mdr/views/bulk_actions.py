@@ -47,7 +47,7 @@ class BulkAction(FormView):
         url = request.GET.get("next", "/")
         message = ""
         action = self.get_action()
-        
+
         if action is None:
             # no action, messed up, redirect
             return HttpResponseRedirect(url)

@@ -438,7 +438,6 @@ class BulkDownloadForm(DownloadActionForm):
             widget=forms.RadioSelect
         )
 
-
     def make_changes(self):
         self.download_type = self.cleaned_data['download_type']
         self.title = self.cleaned_data['title']

@@ -324,7 +324,7 @@ def downloadMenu(item):
                 except template.TemplateDoesNotExist:
                     pass  # This is ok.
                 except:
-                    raise # pass  # Something very bad has happened in the template.
+                    raise  # pass  # Something very bad has happened in the template.
     return get_template(
         "aristotle_mdr/helpers/downloadMenu.html").render(
         Context({'item': item, 'download_options': downloadsForItem, })

@@ -267,6 +267,6 @@ def is_active_module(module_name):
 
 def fetch_aristotle_downloaders():
     return [
-        import_string(dtype) for dtype in 
-        fetch_aristotle_settings().get('DOWNLOADERS', [])
+        import_string(dtype)
+        for dtype in fetch_aristotle_settings().get('DOWNLOADERS', [])
     ]

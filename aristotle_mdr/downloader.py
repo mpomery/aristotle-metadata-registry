@@ -44,7 +44,7 @@ class CSVDownloader(DownloaderBase):
         """Built in download method"""
         template = get_download_template_path_for_item(item, self.download_type)
         from django.conf import settings
-    
+
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="%s.csv"' % (
             item.name
