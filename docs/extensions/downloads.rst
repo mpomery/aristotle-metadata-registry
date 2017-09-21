@@ -62,8 +62,7 @@ For an example of how to handle multiple download formats in a single module,
 review the ``aristotle_mdr.downloader`` module which provides downloads in the
 PDF and CSV format for various content types which is linked below:
 
-.. automodule:: aristotle_mdr.downloader
-   :members: download
+.. autoclass:: aristotle_mdr.downloader.DownloaderBase
 
 
 How the ``download`` view works

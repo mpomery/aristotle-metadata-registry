@@ -11,6 +11,9 @@ from aristotle_mdr.contrib.help.models import ConceptHelp
 
 
 class DownloaderBase(object):
+    """
+    TODO: Add some text 
+    """
     metadata_register = {}
     icon_class = ""
     description = ""
