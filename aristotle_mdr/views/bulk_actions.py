@@ -40,13 +40,14 @@ class BulkAction(FormView):
     def get_action(self):
         actions = get_bulk_actions()
         action = self.request.POST.get("bulkaction", None)
+        print("MY ACTION", action, actions.get(action, None))
         return actions.get(action, None)
 
     def post(self, request, *args, **kwargs):
         url = request.GET.get("next", "/")
         message = ""
         action = self.get_action()
-
+        
         if action is None:
             # no action, messed up, redirect
             return HttpResponseRedirect(url)
@@ -101,6 +102,7 @@ class BulkAction(FormView):
             else:
                 # we need a confirmation, render the next form
                 form = action_form(form=None, initial=dict(request.POST), user=request.user, request=request, items=items)
+
             return render(
                 request,
                 action_form.confirm_page,
@@ -109,6 +111,7 @@ class BulkAction(FormView):
                     "form": form,
                     "next": url,
                     "action": action,
+                    "bulk_action_title": self.request.POST.get("bulkaction", None)
                 }
             )
         return HttpResponseRedirect(url)
@@ -117,23 +120,22 @@ class BulkAction(FormView):
 def get_bulk_actions():
     import re
     config = fetch_aristotle_settings()
-    if not hasattr(get_bulk_actions, 'actions') or not get_bulk_actions.actions:
-        actions = {}
-        for action_name in config.get('BULK_ACTIONS', []):
-            if not re.search('^[a-zA-Z0-9\_\.]+$', action_name):  # pragma: no cover
-                # Invalid download_type
-                raise registry_exceptions.BadBulkActionModuleName("Bulk action isn't a valid Python module name.")
 
-            from django.utils.module_loading import import_string
-            # module, form = form.rsplit('.', 1)
-            # f = exec('from %s import %s as f' % (module, form))
-            f = import_string(action_name)
-            # We need to make this a dictionary, not a class as otherwise
-            # the template engine tries to instantiate it.
-            frm = {'form': f}
-            for prop in ['classes', 'can_use', 'text']:
-                frm[prop] = getattr(f, prop, None)
-            actions[action_name] = frm
-        # Save to method to prevent having to reimport everytime
-        get_bulk_actions.actions = actions
-    return get_bulk_actions.actions
+    actions = {}
+    for action_name in config.get('BULK_ACTIONS', []):
+        if not re.search('^[a-zA-Z0-9\_\.]+$', action_name):  # pragma: no cover
+            # Invalid download_type
+            raise registry_exceptions.BadBulkActionModuleName("Bulk action isn't a valid Python module name.")
+
+        from django.utils.module_loading import import_string
+
+        f = import_string(action_name)
+        # We need to make this a dictionary, not a class as otherwise
+        # the template engine tries to instantiate it.
+        frm = {'form': f}
+        for prop in ['classes', 'can_use', 'text']:
+            frm[prop] = getattr(f, prop, None)
+        actions[action_name] = frm
+    # import pprint
+    # pprint.pprint(actions)
+    return actions

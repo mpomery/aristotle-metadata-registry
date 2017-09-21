@@ -184,8 +184,8 @@ ARISTOTLE_SETTINGS = {
     ],
     "DOWNLOADERS": [
         # (fileType, menu, font-awesome-icon, module)
-        # ('pdf', 'PDF', 'fa-file-pdf-o', 'aristotle_mdr', 'Downloads for various content types in the PDF format'),
-        ('csv-vd', 'CSV list of values', 'fa-file-excel-o', 'aristotle_mdr', 'CSV downloads for value domain codelists'),
+        # ('csv-vd', 'CSV list of values', 'fa-file-excel-o', 'aristotle_mdr', 'CSV downloads for value domain codelists'),
+        'aristotle_mdr.downloader.CSVDownloader'
     ]
 }
 

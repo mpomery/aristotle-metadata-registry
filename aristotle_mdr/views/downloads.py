@@ -18,7 +18,7 @@ from aristotle_mdr.utils import cache_per_item_user
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.views import get_if_user_can_view
-from aristotle_mdr.utils import fetch_aristotle_settings
+from aristotle_mdr.utils import fetch_aristotle_settings, fetch_aristotle_downloaders
 from aristotle_mdr.utils.downloads import get_download_module
 
 import logging
@@ -76,24 +76,17 @@ def download(request, download_type, iid=None):
         else:
             raise PermissionDenied
 
-    downloadOpts = fetch_aristotle_settings().get('DOWNLOADERS', [])
-    module_name = ""
-    for d in downloadOpts:
-        dt = d[0]
-        if dt == download_type:
-            module_name = d[3]
-    if not re.search('^[a-zA-Z0-9\-\.]+$', download_type):  # pragma: no cover
-        # Invalid download_type
-        raise registry_exceptions.BadDownloadTypeAbbreviation("Download type can only be composed of letters, numbers, hyphens or periods.")
-    if module_name:
-        downloader = get_download_module(module_name)
-        try:
-            return downloader.download(request, download_type, item)
-        except TemplateDoesNotExist:
-            debug = getattr(settings, 'DEBUG')
-            if debug:
-                raise
-            raise Http404
+    downloadOpts = fetch_aristotle_downloaders()
+    for kls in downloadOpts:
+        if download_type == kls.download_type:
+            try:
+                return kls.download(request, item)
+            except TemplateDoesNotExist:
+                debug = getattr(settings, 'DEBUG')
+                if debug:
+                    raise
+                # Maybe another downloader can serve this up
+                continue
 
     raise Http404
 
@@ -121,25 +114,18 @@ def bulk_download(request, download_type, items=None):
         if item.can_view(request.user):
             items.append(item)
 
-    downloadOpts = fetch_aristotle_settings().get('DOWNLOADERS', [])
-    module_name = ""
-    for d in downloadOpts:
-        dt = d[0]
-        if dt == download_type:
-            module_name = d[3]
-    if not re.search('^[a-zA-Z0-9\-\.]+$', download_type):  # pragma: no cover
-        # Invalid download_type
-        raise registry_exceptions.BadDownloadTypeAbbreviation("Download type can only be composed of letters, numbers, hyphens or periods.")
-    if module_name:
-        downloader = get_download_module(module_name)
+    # downloadOpts = fetch_aristotle_settings().get('DOWNLOADERS', [])
 
-        try:
-            return downloader.bulk_download(request, download_type, items)
-        except TemplateDoesNotExist:
-            raise
-            debug = getattr(settings, 'DEBUG')
-            if debug:
-                raise
-            raise Http404
+    downloadOpts = fetch_aristotle_downloaders()
+    for kls in downloadOpts:
+        if download_type == kls.download_type:
+            try:
+                return kls.bulk_download(request, items)
+            except TemplateDoesNotExist:
+                debug = getattr(settings, 'DEBUG')
+                if debug:
+                    raise
+                # Maybe another downloader can serve this up
+                continue
 
     raise Http404

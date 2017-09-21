@@ -10,17 +10,41 @@ import csv
 from aristotle_mdr.contrib.help.models import ConceptHelp
 
 
-item_register = {
-    'csv': {'aristotle_mdr': ['valuedomain']},
-}
+class DownloaderBase(object):
+    metadata_register = {}
+    icon_class = ""
+    description = ""
+
+    @classmethod
+    def types(cls):
+        return cls.extension_register.keys()
+
+    @classmethod
+    def download(cls, request, download_type, item):
+        raise NotImplementedError
+
+    @classmethod
+    def bulk_download(cls, request, download_type, item):
+        raise NotImplementedError
 
 
-def download(request, download_type, item):
-    """Built in download method"""
-    template = get_download_template_path_for_item(item, download_type)
-    from django.conf import settings
+class CSVDownloader(DownloaderBase):
+    download_type = "csv-vd"
+    metadata_register = {'aristotle_mdr': ['valuedomain']}
+    label = "CSV list of values"
+    icon_class = "fa-file-excel-o"
+    description = "CSV downloads for value domain codelists"
 
-    if download_type == "csv-vd":
+    @classmethod
+    def bulk_download(cls, request, download_type, item):
+        raise NotImplementedError
+
+    @classmethod
+    def download(cls, request, download_type, item):
+        """Built in download method"""
+        template = get_download_template_path_for_item(item, self.download_type)
+        from django.conf import settings
+    
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="%s.csv"' % (
             item.name

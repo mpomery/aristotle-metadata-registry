@@ -231,6 +231,7 @@ def validate_aristotle_settings(aristotle_settings, strict_mode):
         ("WORKGROUP_CHANGES", "workgroup_changes_failed"),
         ("CONTENT_EXTENSIONS", "content_extensions_failed"),
         ("DASHBOARD_ADDONS", "dashboard_addons_failed"),
+        ("DOWNLOADERS", "downloaders_failed"),
     ]:
         try:
             check_settings=aristotle_settings.get(sub_setting, [])
@@ -243,18 +244,18 @@ def validate_aristotle_settings(aristotle_settings, strict_mode):
                 logger.error(error_messages[err])
                 aristotle_settings[sub_setting] = []
 
-    # Check DOWNLOADERS
-    try:
-        check_settings=aristotle_settings.get('DOWNLOADERS', [])
-        assert(type(check_settings) is list)
-        assert(all(type(f) is tuple for f in check_settings))
-        assert(all(len(f) == 5 for f in check_settings))
-    except:
-        if strict_mode:
-            raise ImproperlyConfigured(error_messages['downloaders_failed'])
-        else:
-            logger.error(error_messages['downloaders_failed'])
-            aristotle_settings['DOWNLOADERS'] = []
+    # # Check DOWNLOADERS
+    # try:
+    #     check_settings=aristotle_settings.get('DOWNLOADERS', [])
+    #     assert(type(check_settings) is list)
+    #     assert(all(type(f) in [tuple, list] for f in check_settings))
+    #     assert(all(len(f) == 5 for f in check_settings))
+    # except:
+    #     if strict_mode:
+    #         raise ImproperlyConfigured(error_messages['downloaders_failed'])
+    #     else:
+    #         logger.error(error_messages['downloaders_failed'])
+    #         aristotle_settings['DOWNLOADERS'] = []
 
     return aristotle_settings
 
@@ -275,3 +276,10 @@ def is_active_module(module_name):
         return module_name in settings.INSTALLED_APPS and module_name in aristotle_settings['MODULES']
     else:
         return module_name in settings.INSTALLED_APPS
+
+
+def fetch_aristotle_downloaders():
+    return [
+        import_string(dtype) for dtype in 
+        fetch_aristotle_settings().get('DOWNLOADERS', [])
+    ]

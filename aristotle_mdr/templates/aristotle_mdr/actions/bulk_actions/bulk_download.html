@@ -4,7 +4,7 @@
 
 {% block content %}
 <form method="post" action="{% url 'aristotle:bulk_action' %}?next={{next}}">{% csrf_token %}
-    <input type="hidden" name="bulkaction" value="bulk_download"/>
+    <input type="hidden" name="bulkaction" value="{{bulk_action_title}}"/>
     <div class="modal-body">
         <header>This form allows you to download multiple items into a single package.<br>
         Only items that you have permission to view, and items which can be downloaded in the requested format
