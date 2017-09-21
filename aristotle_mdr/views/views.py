@@ -26,7 +26,7 @@ from aristotle_mdr import perms
 from aristotle_mdr.utils import cache_per_item_user, url_slugify_concept
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
-from aristotle_mdr.utils import get_concepts_for_apps, fetch_aristotle_settings
+from aristotle_mdr.utils import get_concepts_for_apps, fetch_aristotle_settings, fetch_aristotle_downloaders
 from aristotle_mdr.views.utils import generate_visibility_matrix
 
 from haystack.views import FacetedSearchView
@@ -371,21 +371,11 @@ def extensions(request):
             content.append(app)
 
     content = list(set(content))
-    aristotle_downloads = fetch_aristotle_settings().get('DOWNLOADERS', [])
-    downloads=dict()
+    aristotle_downloads = fetch_aristotle_downloaders()
+    downloads=[]
     if aristotle_downloads:
         for download in aristotle_downloads:
-            app_label = download[3]
-            app_details = downloads.get(
-                app_label,
-                {'app': apps.get_app_config(app_label), 'downloads': []}
-            )
-            try:
-                app_details['about_url'] = reverse('%s:about' % app_label)
-            except:
-                pass  # if there is no about URL, thats ok.
-            app_details['downloads'].append(download)
-            downloads[app_label]=app_details
+            downloads.append(download())
 
     return render(
         request,
