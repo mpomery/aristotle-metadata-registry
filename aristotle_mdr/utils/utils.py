@@ -244,19 +244,6 @@ def validate_aristotle_settings(aristotle_settings, strict_mode):
                 logger.error(error_messages[err])
                 aristotle_settings[sub_setting] = []
 
-    # # Check DOWNLOADERS
-    # try:
-    #     check_settings=aristotle_settings.get('DOWNLOADERS', [])
-    #     assert(type(check_settings) is list)
-    #     assert(all(type(f) in [tuple, list] for f in check_settings))
-    #     assert(all(len(f) == 5 for f in check_settings))
-    # except:
-    #     if strict_mode:
-    #         raise ImproperlyConfigured(error_messages['downloaders_failed'])
-    #     else:
-    #         logger.error(error_messages['downloaders_failed'])
-    #         aristotle_settings['DOWNLOADERS'] = []
-
     return aristotle_settings
 
 
