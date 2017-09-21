@@ -12,22 +12,23 @@ from aristotle_mdr.contrib.help.models import ConceptHelp
 
 class DownloaderBase(object):
     """
-    TODO: Add some text 
+    Required class properties:
+    icon_class: the font-awesome class
     """
     metadata_register = {}
     icon_class = ""
     description = ""
 
     @classmethod
-    def types(cls):
-        return cls.extension_register.keys()
-
-    @classmethod
-    def download(cls, request, download_type, item):
+    def download(cls, request, item):
+        """
+        """
         raise NotImplementedError
 
     @classmethod
-    def bulk_download(cls, request, download_type, item):
+    def bulk_download(cls, request, item):
+        """
+        """
         raise NotImplementedError
 
 
@@ -39,13 +40,13 @@ class CSVDownloader(DownloaderBase):
     description = "CSV downloads for value domain codelists"
 
     @classmethod
-    def bulk_download(cls, request, download_type, item):
+    def bulk_download(cls, request, item):
         raise NotImplementedError
 
     @classmethod
-    def download(cls, request, download_type, item):
+    def download(cls, request, item):
         """Built in download method"""
-        template = get_download_template_path_for_item(item, self.download_type)
+        template = get_download_template_path_for_item(item, cls.download_type)
         from django.conf import settings
 
         response = HttpResponse(content_type='text/csv')

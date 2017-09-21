@@ -40,7 +40,6 @@ class BulkAction(FormView):
     def get_action(self):
         actions = get_bulk_actions()
         action = self.request.POST.get("bulkaction", None)
-        print("MY ACTION", action, actions.get(action, None))
         return actions.get(action, None)
 
     def post(self, request, *args, **kwargs):
@@ -136,6 +135,4 @@ def get_bulk_actions():
         for prop in ['classes', 'can_use', 'text']:
             frm[prop] = getattr(f, prop, None)
         actions[action_name] = frm
-    # import pprint
-    # pprint.pprint(actions)
     return actions
