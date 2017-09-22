@@ -122,16 +122,14 @@ class BulkActionForm(UserAwareForm):
     def items_to_change(self):
         if bool(self.cleaned_data.get('all_in_queryset', False)):
             filters = {}
-            for v in self.cleaned_data.get('qs', "").split(','):
-                if 'user' in v:
-                    # if the queryset even contains a user, cut it right off
-                    # otherwise, it could leak data if people tried to alter the query value
-                    k = v.split('user', 1)[0] + 'user'
-                    v = self.user
-                else:
-                    k, v = v.split('=', 1)
-                filters.update({k: v})
-            items = self.queryset.filter(**filters).visible(self.user)
+            from aristotle_mdr.utils.cached_querysets import get_queryset_from_uuid
+            items = get_queryset_from_uuid(self.cleaned_data.get('qs', ""), MDR._concept)
+            print(items.query.low_mark, items.query.high_mark)
+            _slice = {"low": items.query.low_mark, "high": items.query.high_mark}
+            items.query.low_mark = 0
+            items.query.high_mark = None
+            items = items.filter(**filters).visible(self.user)
+            items.query.set_limits(**_slice)
         else:
             items = self.cleaned_data.get('items')
         return items

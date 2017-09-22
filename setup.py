@@ -75,7 +75,10 @@ setup(
         'asgi-redis',
         
         # This is only needed for Migration 0024 once this is squashed, remove this dependency
-        'sqlparse'
+        'sqlparse',
+        
+        # Required for utils.cached_querysets
+        'dill',
 
     ],
 

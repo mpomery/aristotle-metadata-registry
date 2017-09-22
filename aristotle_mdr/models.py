@@ -962,7 +962,6 @@ class Property(concept):
     (3.2.100)
     """
     template = "aristotle_mdr/concepts/property.html"
-
     class Meta:
         verbose_name_plural = "Properties"
 

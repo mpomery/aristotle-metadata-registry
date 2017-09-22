@@ -34,16 +34,17 @@ def paginated_list(request, items, template, extra_context={}):
 
     page = request.GET.get('page')
     try:
-        items = paginator.page(page)
+        paged_items = paginator.page(page)
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
-        items = paginator.page(1)
+        paged_items = paginator.page(1)
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
-        items = paginator.page(paginator.num_pages)
+        paged_items = paginator.page(paginator.num_pages)
     context = {
+        'object_list': items,
         'sort': sort_by,
-        'page': items,
+        'page': paged_items,
         }
     context.update(extra_context)
     return render(request, template, context)

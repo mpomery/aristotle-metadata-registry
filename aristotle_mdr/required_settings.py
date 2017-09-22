@@ -55,7 +55,16 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 SITE_ID=None
 
 # This gets called because of the DataElementConcept.property attribute.
-# Not sure how to resolve this one yet.
+# We can resolve this by explicitly adding the parent pointer field, to squash Error E006
+# But this will only work for Django 1.10 or above, so we wait until the 1.11 stream
+# See: https://code.djangoproject.com/ticket/28563
+# Archive: http://archive.is/Zpgru
+# _concept_ptr = models.OneToOneField(
+#     _concept,
+#     on_delete=models.CASCADE,
+#     parent_link=True,
+#     related_name='property_subclass',
+# )
 SILENCED_SYSTEM_CHECKS = ['models.E006']
 
 ALLOWED_HOSTS = []
