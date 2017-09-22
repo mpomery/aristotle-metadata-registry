@@ -1,13 +1,13 @@
 Changelog
 
 - 1.6.0
-    - **Dependency note: ** Version 1.6.0 will be the last minor version of Aristotle to support Python 2 and Django 1.8
+    - **Dependency note:** Version 1.6.0 will be the last minor version of Aristotle to support Python 2 and Django 1.8
       The next version of Aristotle will be version 2 and will require:
         - Python 3.5 or above
         - Django 1.11 or above
     - Removed incorrect instructions on login page
-    - Improved disabling of metadata extensions in code/configuration
-        This allows for more dynamic loading of 
+    - Improved disabling of metadata extensions in code/configuration.
+        This allows for more dynamic loading of extensions and APIs at runtime
     - Improved bulk action handling when performing an action with "select all"
         by adding cached querysets - fixes #685 by implementing #543
     - **Configuration change:**
