@@ -276,8 +276,9 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
 
     @override_settings(ARISTOTLE_SETTINGS=dict(settings.ARISTOTLE_SETTINGS, WORKGROUP_CHANGES=['submitter']))
     def test_bulk_workgroup_change_with_all_from_workgroup_list(self):
-        #phew thats one hell of a test
-        
+        #phew thats one hell of a test name
+        from aristotle_mdr.utils.cached_querysets import register_queryset
+
         self.new_workgroup = models.Workgroup.objects.create(name="new workgroup")
         self.new_workgroup.submitters.add(self.editor)
         self.login_editor()
@@ -286,14 +287,16 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(self.item2.concept not in self.new_workgroup.items.all())
         self.assertTrue(self.item4.concept not in self.new_workgroup.items.all())
 
+        qs = self.wg1.items.all()
+
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
                 'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
-                'items': [],
+                'items': qs,
                 'workgroup': [self.new_workgroup.id],
                 "confirmed": True,
-                'qs': 'workgroup__pk=%s'%self.wg1.pk,
+                'qs': register_queryset(qs),
                 'all_in_queryset': True
             },
             follow=True
@@ -307,6 +310,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.logout()
         self.login_superuser()
 
+        qs = self.new_workgroup.items.all()
 
         response = self.client.post(
             reverse('aristotle:bulk_action'),
@@ -315,7 +319,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
                 'items': [],
                 'workgroup': [self.wg1.pk],
                 "confirmed": True,
-                'qs': 'workgroup__pk=%s'%self.new_workgroup.id,
+                'qs': register_queryset(qs),
                 'all_in_queryset': True
             },
             follow=True

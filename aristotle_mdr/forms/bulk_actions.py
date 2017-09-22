@@ -124,7 +124,7 @@ class BulkActionForm(UserAwareForm):
             filters = {}
             from aristotle_mdr.utils.cached_querysets import get_queryset_from_uuid
             items = get_queryset_from_uuid(self.cleaned_data.get('qs', ""), MDR._concept)
-            print(items.query.low_mark, items.query.high_mark)
+
             _slice = {"low": items.query.low_mark, "high": items.query.high_mark}
             items.query.low_mark = 0
             items.query.high_mark = None
