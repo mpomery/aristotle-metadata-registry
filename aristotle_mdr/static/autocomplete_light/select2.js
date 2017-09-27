@@ -1,6 +1,6 @@
 /*
 
-Modification of 
+Modification of
 https://github.com/yourlabs/django-autocomplete-light/blob/63abc0308e1cf308233538d9ed3e969b51f08fc4/src/dal_select2/static/autocomplete_light/select2.js
 
 */
@@ -126,7 +126,7 @@ https://github.com/yourlabs/django-autocomplete-light/blob/63abc0308e1cf30823353
         });
 
     });
-
+    window.__dal__initListenerIsSet = true;
     // Remove this block when this is merged upstream:
     // https://github.com/select2/select2/pull/4249
     $(document).on('DOMSubtreeModified', '[data-autocomplete-light-function=select2] option', function() {
