@@ -34,7 +34,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'add_favourites',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.AddFavouriteForm',
                 'items': [self.item1.id, self.item2.id],
             }
         )
@@ -48,7 +48,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'add_favourites',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.AddFavouriteForm',
                 'items': [self.item1.id, self.item2.id],
             }
         )
@@ -62,7 +62,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'add_favourites',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.AddFavouriteForm',
                 'items': [self.item1.id, self.item4.id],
             },
             follow=True
@@ -81,7 +81,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'move_workgroup',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
                 'items': [self.item1.id, self.item2.id],
                 'workgroup': [self.new_workgroup.id],
                 "confirmed": True
@@ -97,7 +97,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'move_workgroup',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
                 'items': [self.item1.id, self.item2.id],
                 'workgroup': [self.wg1.id],
                 "confirmed": True
@@ -123,7 +123,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'move_workgroup',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
                 'items': [self.item1.id, self.item2.id, self.item4.id],
                 'workgroup': [self.new_workgroup.id],
                 "confirmed": True
@@ -148,7 +148,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'move_workgroup',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
                 'items': [self.item1.id, self.item2.id, self.item4.id],
                 'workgroup': [self.wg1.id],
                 "confirmed": True
@@ -169,7 +169,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'add_favourites',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.AddFavouriteForm',
                 'items': [self.item1.id, self.item2.id],
             }
         )
@@ -179,7 +179,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'remove_favourites',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.RemoveFavouriteForm',
                 'items': [self.item1.id, self.item2.id],
             }
         )
@@ -206,7 +206,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'change_state',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeStateForm',
                 'state': new_state,
                 'items': [self.item1.id, self.item2.id],
                 'registrationDate': reg_date,
@@ -246,7 +246,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'change_state',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeStateForm',
                 'state': new_state,
                 'items': [self.item1.id, self.item2.id, self.item4.id],
                 'registrationDate': reg_date,
@@ -279,8 +279,9 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
 
     @override_settings(ARISTOTLE_SETTINGS=dict(settings.ARISTOTLE_SETTINGS, WORKGROUP_CHANGES=['submitter']))
     def test_bulk_workgroup_change_with_all_from_workgroup_list(self):
-        #phew thats one hell of a test
-        
+        #phew thats one hell of a test name
+        from aristotle_mdr.utils.cached_querysets import register_queryset
+
         self.new_workgroup = models.Workgroup.objects.create(name="new workgroup")
         self.new_workgroup.submitters.add(self.editor)
         self.login_editor()
@@ -289,14 +290,16 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(self.item2.concept not in self.new_workgroup.items.all())
         self.assertTrue(self.item4.concept not in self.new_workgroup.items.all())
 
+        qs = self.wg1.items.all()
+
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'move_workgroup',
-                'items': [],
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
+                'items': qs,
                 'workgroup': [self.new_workgroup.id],
                 "confirmed": True,
-                'qs': 'workgroup__pk=%s'%self.wg1.pk,
+                'qs': register_queryset(qs),
                 'all_in_queryset': True
             },
             follow=True
@@ -310,15 +313,16 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.logout()
         self.login_superuser()
 
+        qs = self.new_workgroup.items.all()
 
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'move_workgroup',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
                 'items': [],
                 'workgroup': [self.wg1.pk],
                 "confirmed": True,
-                'qs': 'workgroup__pk=%s'%self.new_workgroup.id,
+                'qs': register_queryset(qs),
                 'all_in_queryset': True
             },
             follow=True
@@ -339,7 +343,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'request_review',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
                 'state': 1,
                 'items': [self.item1.id, self.item2.id],
                 'registration_authority': self.ra.id,
@@ -368,7 +372,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
-                'bulkaction': 'request_review',
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
                 'state': 1,
                 'items': [self.item1.id, self.item4.id],
                 'registration_authority': self.ra.id,
@@ -386,137 +390,4 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(review.concepts.count() == 1)
         self.assertTrue(self.item1.concept in review.concepts.all())
         self.assertFalse(self.item4.concept in review.concepts.all())
-
-class QuickPDFDownloadTests(BulkActionsTest, TestCase):
-
-    def test_bulk_quick_pdf_download_on_permitted_items(self):
-        self.login_editor()
-
-        self.assertEqual(self.editor.profile.favourites.count(), 0)
-        response = self.client.post(
-            reverse('aristotle:bulk_action'),
-            {
-                'bulkaction': 'quick_pdf_download',
-                'items': [self.item1.id, self.item2.id],
-            }
-        )
-        self.assertEqual(response.status_code, 302)
-
-    def test_bulk_quick_pdf_download_on_forbidden_items(self):
-        self.login_editor()
-
-        self.assertEqual(self.editor.profile.favourites.count(), 0)
-        response = self.client.post(
-            reverse('aristotle:bulk_action'),
-            {
-                'bulkaction': 'quick_pdf_download',
-                'items': [self.item1.id, self.item4.id],
-            },
-            follow=True
-        )
-        self.assertEqual(len(response.redirect_chain), 1)
-        self.assertEqual(response.redirect_chain[0][1], 302)
-
-
-class BulkDownloadTests(BulkActionsTest, TestCase):
-    download_type="pdf"
-
-    def test_bulk_pdf_download_on_permitted_items(self):
-        self.login_editor()
-
-        self.assertEqual(self.editor.profile.favourites.count(), 0)
-        response = self.client.post(
-            reverse('aristotle:bulk_action'),
-            {
-                'bulkaction': 'bulk_download',
-                'items': [self.item1.id, self.item2.id],
-                "title": "The title",
-                "download_type": self.download_type,
-                'confirmed': 'confirmed',
-            }
-        )
-        self.assertEqual(response.status_code, 302)
-
-    def test_bulk_pdf_download_on_forbidden_items(self):
-        self.login_editor()
-
-        response = self.client.post(
-            reverse('aristotle:bulk_action'),
-            {
-                'bulkaction': 'bulk_download',
-                'items': [self.item1.id, self.item4.id],
-                "title": "The title",
-                "download_type": self.download_type,
-                'confirmed': 'confirmed',
-            },
-            follow=True
-        )
-        self.assertEqual(len(response.redirect_chain), 1)
-        self.assertEqual(response.redirect_chain[0][1], 302)
-
-
-    def test_bulk_pdf_download_on_forbidden_items_by_anonymous_user(self):
-        self.logout()
-
-        response = self.client.post(
-            reverse('aristotle:bulk_action'),
-            {
-                'bulkaction': 'bulk_download',
-                'items': [self.item1.id, self.item4.id],
-                "title": "The title",
-                "download_type": self.download_type,
-                'confirmed': 'confirmed',
-            },
-            follow=True
-        )
-        self.assertEqual(len(response.redirect_chain), 1)
-        self.assertEqual(response.redirect_chain[0][1], 302)
-
-        response = self.client.post(
-            reverse('aristotle:bulk_action'),
-            {
-                'bulkaction': 'bulk_download',
-                'items': [self.item1.id, self.item4.id],
-                "title": "The title",
-                "download_type": self.download_type,
-                'confirmed': 'confirmed',
-            },
-        )
-        self.assertRedirects(
-            response,
-            reverse(
-                'aristotle:bulk_download',
-                kwargs={
-                    "download_type": self.download_type,
-                }
-            )+"?title=The%20title"+"&items=%s&items=%s"%(self.item1.id, self.item4.id)
-        )
-
-    def test_content_exists_in_bulk_pdf_download_on_permitted_items(self):
-        self.login_editor()
-
-        self.item5 = models.DataElementConcept.objects.create(name="DEC1", definition="DEC5 definition", objectClass=self.item2, workgroup=self.wg1)
-
-        response = self.client.get(
-            reverse(
-                'aristotle:bulk_download',
-                kwargs={
-                    "download_type": self.download_type,
-                }
-            ),
-            {
-                "items": [self.item1.id, self.item5.id],
-                "title": "The title",
-                "html": True  # Force HTML to debug content
-            }
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.item1.name)
-        self.assertContains(response, self.item2.name)  # Will be in as its a component of DEC5
-        self.assertContains(response, self.item5.name)
-
-        self.assertContains(response, self.item1.definition)
-        self.assertContains(response, self.item2.definition)  # Will be in as its a component of DEC5
-        self.assertContains(response, self.item5.definition)
 

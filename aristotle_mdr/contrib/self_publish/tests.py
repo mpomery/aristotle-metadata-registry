@@ -9,7 +9,7 @@ import datetime
 from reversion import revisions as reversion
 
 from aristotle_mdr.contrib.self_publish import models as pub
-from aristotle_mdr.forms.search import PermissionSearchQuerySet
+from aristotle_mdr.forms.search import get_permission_sqs
 from aristotle_mdr.models import ObjectClass, Workgroup
 from aristotle_mdr.tests import utils
 from aristotle_mdr.utils import setup_aristotle_test_environment
@@ -51,7 +51,7 @@ class TestSelfPublishing(utils.LoggedInViewPages, TestCase):
         self.item = ObjectClass.objects.get(pk=self.item.pk)
         self.assertFalse(self.item._is_public)
 
-        psqs = PermissionSearchQuerySet()
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('published').apply_permission_checks()
 
         self.assertEqual(len(psqs), 0)
@@ -68,7 +68,7 @@ class TestSelfPublishing(utils.LoggedInViewPages, TestCase):
         self.item = ObjectClass.objects.get(pk=self.item.pk)
         self.assertTrue(self.item._is_public)
 
-        psqs = PermissionSearchQuerySet()
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('published').apply_permission_checks()
         self.assertEqual(len(psqs), 1)
 

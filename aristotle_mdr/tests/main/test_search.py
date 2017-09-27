@@ -217,8 +217,8 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertFalse(dp.is_public())
 
         # Charles isn't a viewer of X-men yet, so no results.
-        from aristotle_mdr.forms.search import PermissionSearchQuerySet
-        psqs = PermissionSearchQuerySet()
+        from aristotle_mdr.forms.search import get_permission_sqs
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('deadpool').apply_permission_checks(self.viewer)
         self.assertEqual(len(psqs),0)
         #response = self.client.get(reverse('aristotle:search')+"?q=deadpool")
@@ -229,7 +229,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertFalse(perms.user_can_view(self.viewer,dp))
 
         # Deadpool isn't an Xman yet, still no results.
-        psqs = PermissionSearchQuerySet()
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('deadpool').apply_permission_checks(self.viewer)
         self.assertDelayedEqual(len(psqs),0)
 
@@ -239,7 +239,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         dp = models.ObjectClass.objects.get(pk=dp.pk) # Un-cache
 
         # Charles is a viewer, Deadpool is in X-men, should have results now.
-        psqs = PermissionSearchQuerySet()
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('deadpool').apply_permission_checks(self.viewer)
         self.assertDelayedEqual(len(psqs),1)
 
@@ -250,7 +250,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         # Take away Charles viewing rights and no results again.
         self.xmen_wg.removeRoleFromUser('viewer',self.viewer)
-        psqs = PermissionSearchQuerySet()
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('deadpool').apply_permission_checks(self.viewer)
         self.assertDelayedEqual(len(psqs),0)
 
@@ -488,7 +488,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         self.login_superuser()
 
-        from aristotle_mdr.forms.search import PermissionSearchQuerySet
+        from aristotle_mdr.forms.search import get_permission_sqs
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
         
         objs = response.context['page'].object_list
@@ -502,7 +502,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         # Confirm spaces are included in the facet
         self.assertTrue(dec.name in [v[0] for v in dict(extra_facets)['data_element_concept']['values']])
 
-        psqs = PermissionSearchQuerySet()
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('pokemon').apply_permission_checks(self.su)
         self.assertDelayedEqual(len(psqs),3)
 
@@ -547,7 +547,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         self.login_superuser()
 
-        from aristotle_mdr.forms.search import PermissionSearchQuerySet
+        from aristotle_mdr.forms.search import get_permission_sqs
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
         
         objs = response.context['page'].object_list
@@ -561,8 +561,8 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
     def test_values_in_conceptual_domain_search(self):
         # For bug #676
-        from aristotle_mdr.forms.search import PermissionSearchQuerySet
-        PSQS = PermissionSearchQuerySet()
+        from aristotle_mdr.forms.search import get_permission_sqs
+        PSQS = get_permission_sqs()
         psqs = PSQS.auto_query('flight').apply_permission_checks(self.su)
         self.assertEqual(len(psqs),0)
         psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
@@ -587,8 +587,8 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
     def test_values_in_value_domain_search(self):
         # For bug #676
-        from aristotle_mdr.forms.search import PermissionSearchQuerySet
-        PSQS = PermissionSearchQuerySet()
+        from aristotle_mdr.forms.search import get_permission_sqs
+        PSQS = get_permission_sqs()
         psqs = PSQS.auto_query('flight').apply_permission_checks(self.su)
         self.assertEqual(len(psqs),0)
         psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)

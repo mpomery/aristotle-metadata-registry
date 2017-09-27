@@ -16,7 +16,7 @@ from django.views.generic import DetailView, ListView
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.views.utils import paginated_list, paginated_workgroup_list
-from aristotle_mdr.utils import fetch_aristotle_settings
+from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
 
 
 def friendly_redirect_login(request):
@@ -75,11 +75,12 @@ def inbox(request, folder=None):
 
 @login_required
 def admin_tools(request):
-    if not request.user.is_superuser:
+    if request.user.is_anonymous():
+        return redirect(reverse('friendly_login') + '?next=%s' % request.path)
+    elif not request.user.has_perm("aristotle_mdr.access_aristotle_dashboard"):
         raise PermissionDenied
 
-    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
-    aristotle_apps += ["aristotle_mdr"]
+    aristotle_apps = fetch_metadata_apps()
 
     from django.contrib.contenttypes.models import ContentType
     models = ContentType.objects.filter(app_label__in=aristotle_apps).all()
@@ -113,8 +114,7 @@ def admin_stats(request):
     if not request.user.is_superuser:
         raise PermissionDenied
 
-    aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
-    aristotle_apps += ["aristotle_mdr"]
+    aristotle_apps = fetch_metadata_apps()
 
     from django.contrib.contenttypes.models import ContentType
     models = ContentType.objects.filter(app_label__in=aristotle_apps).all()
@@ -218,7 +218,7 @@ def favourites(request):
     context = {
         'help': request.GET.get("help", False),
         'favourite': request.GET.get("favourite", False),
-        "select_all_list_queryset_filter": 'favourited_by__user=user'  # no information leakage here.
+        # "select_all_list_queryset_filter": 'favourited_by__user=user'  # no information leakage here.
     }
     return paginated_list(request, items, "aristotle_mdr/user/userFavourites.html", context)
 

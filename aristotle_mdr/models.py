@@ -4,17 +4,16 @@ from __future__ import absolute_import
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.db import models, transaction
 from django.db.models import Q
-from django.db.models.signals import post_save, m2m_changed, post_delete
+from django.db.models.signals import post_save, m2m_changed, post_delete, pre_save
 from django.dispatch import receiver, Signal
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible  # Python 2
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_lazy as _
 
-from model_utils.managers import InheritanceManager, InheritanceQuerySet
 from model_utils.models import TimeStampedModel
 from model_utils import Choices, FieldTracker
 from aristotle_mdr.contrib.channels.utils import fire
@@ -29,16 +28,17 @@ from ckeditor_uploader.fields import RichTextUploadingField as RichTextField
 from aristotle_mdr import perms
 from aristotle_mdr import messages
 from aristotle_mdr.utils import (
+    fetch_aristotle_settings,
+    fetch_metadata_apps,
     url_slugify_concept,
     url_slugify_workgroup,
     url_slugify_registration_authoritity,
-    url_slugify_organization
+    url_slugify_organization,
 )
 from aristotle_mdr import comparators
-from aristotle_mdr.utils import fetch_aristotle_settings
 
-from model_utils.fields import AutoLastModifiedField
 from .fields import ConceptForeignKey, ConceptManyToManyField
+from .managers import MetadataItemManager, ConceptManager, UUIDManager
 
 import logging
 logger = logging.getLogger(__name__)
@@ -74,11 +74,30 @@ VERY_RECENTLY_SECONDS = 15
 concept_visibility_updated = Signal(providing_args=["concept"])
 
 
-@python_2_unicode_compatible  # Python 2
-class baseAristotleObject(TimeStampedModel):
+class UUID(models.Model):
+    objects = UUIDManager()
     uuid = models.UUIDField(
         help_text=_("Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries"),
-        unique=True, default=uuid.uuid1, editable=False, null=False
+        unique=True, default=uuid.uuid1, editable=False, null=False,
+        primary_key=True
+    )
+    app_label = models.CharField(
+        max_length=256, null=False, editable=False,
+    )
+    model_name = models.CharField(
+        max_length=256, null=False, editable=False,
+    )
+
+    def __str__(self):
+        return str(self.uuid)
+
+
+@python_2_unicode_compatible  # Python 2
+class baseAristotleObject(TimeStampedModel):
+    uuid = models.OneToOneField(
+        UUID,
+        help_text=_("Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries"),
+        unique=True, editable=False, null=True, default=None,
     )
     name = models.TextField(
         help_text=_("The primary name used for human identification purposes.")
@@ -88,7 +107,7 @@ class baseAristotleObject(TimeStampedModel):
         help_text=_("Representation of a concept by a descriptive statement "
                     "which serves to differentiate it from related concepts. (3.2.39)")
     )
-    objects = InheritanceManager()
+    objects = MetadataItemManager()
 
     class Meta:
         # So the url_name works for items we can't determine
@@ -138,6 +157,13 @@ class baseAristotleObject(TimeStampedModel):
     def meta(self):
         # I know what I'm doing, get out the way.
         return self._meta
+
+
+@receiver(pre_save)
+def force_add_uuid(sender, instance, **kwargs):
+    if not issubclass(sender, baseAristotleObject):
+        return
+    UUID.objects.create_uuid(instance)
 
 
 class unmanagedObject(baseAristotleObject):
@@ -521,113 +547,6 @@ class DiscussionComment(discussionAbstract):
 #     url = models.URLField()
 #     definition = models.TextField()
 #     object = models.ForeignKey(managedObject)
-
-
-class ConceptQuerySet(InheritanceQuerySet):
-    def visible(self, user):
-        """
-        Returns a queryset that returns all items that the given user has
-        permission to view.
-
-        It is **chainable** with other querysets. For example, both of these
-        will work and return the same list::
-
-            ObjectClass.objects.filter(name__contains="Person").visible()
-            ObjectClass.objects.visible().filter(name__contains="Person")
-        """
-        if user.is_superuser:
-            return self.all()
-        if user.is_anonymous():
-            return self.public()
-        q = Q(_is_public=True)
-
-        if user.is_active:
-            # User can see everything they've made.
-            q |= Q(submitter=user)
-            if user.profile.workgroups:
-                # User can see everything in their workgroups.
-                q |= Q(workgroup__in=user.profile.workgroups)
-                # q |= Q(workgroup__user__profile=user)
-            if user.profile.is_registrar:
-                # Registars can see items they have been asked to review
-                q |= Q(
-                    Q(review_requests__registration_authority__registrars__profile__user=user) & ~Q(review_requests__status=REVIEW_STATES.cancelled)
-                )
-                # Registars can see items that have been registered in their registration authority
-                q |= Q(
-                    Q(statuses__registrationAuthority__registrars__profile__user=user)
-                )
-        extra_q = fetch_aristotle_settings().get('EXTRA_CONCEPT_QUERYSETS', {}).get('visible', None)
-        if extra_q:
-            for func in extra_q:
-                q |= import_string(func)(user)
-        return self.filter(q)
-
-    def editable(self, user):
-        """
-        Returns a queryset that returns all items that the given user has
-        permission to edit.
-
-        It is **chainable** with other querysets. For example, both of these
-        will work and return the same list::
-
-            ObjectClass.objects.filter(name__contains="Person").editable()
-            ObjectClass.objects.editable().filter(name__contains="Person")
-        """
-        if user.is_superuser:
-            return self.all()
-        if user.is_anonymous():
-            return self.none()
-        q = Q()
-
-        # User can edit everything they've made thats not locked
-        q |= Q(submitter=user, _is_locked=False)
-
-        if user.submitter_in.exists() or user.steward_in.exists():
-            if user.submitter_in.exists():
-                q |= Q(_is_locked=False, workgroup__submitters__profile__user=user)
-            if user.steward_in.exists():
-                q |= Q(workgroup__stewards__profile__user=user)
-        return self.filter(q)
-
-    def public(self):
-        """
-        Returns a list of public items from the queryset.
-
-        This is a chainable query set, that filters on items which have the
-        internal `_is_public` flag set to true.
-
-        Both of these examples will work and return the same list::
-
-            ObjectClass.objects.filter(name__contains="Person").public()
-            ObjectClass.objects.public().filter(name__contains="Person")
-        """
-        return self.filter(_is_public=True)
-
-    def __contains__(self, item):
-        if not issubclass(type(item), _concept):
-            return False
-        else:
-            return self.all().filter(pk=item.concept.pk).exists()
-
-
-class ConceptManager(InheritanceManager):
-    """
-    The ``ConceptManager`` is the default object manager for ``concept`` and
-    ``_concept`` items, and extends from the django-model-utils
-    ``InheritanceManager``.
-
-    It provides access to the ``ConceptQuerySet`` to allow for easy
-    permissions-based filtering of ISO 11179 Concept-based items.
-    """
-    def get_queryset(self):
-        return ConceptQuerySet(self.model)
-
-    def __getattr__(self, attr, *args):
-        if attr in ['editable', 'visible', 'public']:
-            return getattr(self.get_queryset(), attr, *args)
-        else:
-            return getattr(self.__class__, attr, *args)
 
 
 class _concept(baseAristotleObject):
@@ -1491,6 +1410,7 @@ post_save.connect(create_user_profile, sender=User)
 def concept_saved(sender, instance, **kwargs):
     if not issubclass(sender, _concept):
         return
+
     if not instance.non_cached_fields_changed:
         # If the only thing that has changed is a cached public/locked status
         # then don't notify.
@@ -1500,6 +1420,19 @@ def concept_saved(sender, instance, **kwargs):
         return
     kwargs['changed_fields'] = instance.changed_fields
     fire("concept_changes.concept_saved", obj=instance, **kwargs)
+
+
+@receiver(pre_save)
+def check_concept_app_label(sender, instance, **kwargs):
+    if not issubclass(sender, _concept):
+        return
+    if instance._meta.app_label not in fetch_metadata_apps():
+        raise ImproperlyConfigured(
+            "Trying to save item <{instance_name}> when app_label <{app_label}> is not enabled".format(
+                app_label=instance._meta.app_label,
+                instance_name=instance.name
+            )
+        )
 
 
 @receiver(post_save, sender=DiscussionComment)

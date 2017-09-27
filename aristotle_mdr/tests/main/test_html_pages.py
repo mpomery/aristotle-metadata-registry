@@ -477,27 +477,6 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         self.item1 = self.itemType.objects.get(id=self.item1.id) # Stupid cache
         self.assertTrue('cloned' not in self.item1.name)
 
-    def test_su_can_download_pdf(self):
-        self.login_superuser()
-        response = self.client.get(reverse('aristotle:download',args=['pdf',self.item1.id]))
-        self.assertEqual(response.status_code,200)
-        response = self.client.get(reverse('aristotle:download',args=['pdf',self.item2.id]))
-        self.assertEqual(response.status_code,200)
-
-    def test_editor_can_download_pdf(self):
-        self.login_editor()
-        response = self.client.get(reverse('aristotle:download',args=['pdf',self.item1.id]))
-        self.assertEqual(response.status_code,200)
-        response = self.client.get(reverse('aristotle:download',args=['pdf',self.item2.id]))
-        self.assertEqual(response.status_code,403)
-
-    def test_viewer_can_download_pdf(self):
-        self.login_viewer()
-        response = self.client.get(reverse('aristotle:download',args=['pdf',self.item1.id]))
-        self.assertEqual(response.status_code,200)
-        response = self.client.get(reverse('aristotle:download',args=['pdf',self.item2.id]))
-        self.assertEqual(response.status_code,403)
-
     def test_viewer_cannot_view_supersede_page(self):
         self.login_viewer()
         response = self.client.get(reverse('aristotle:supersede',args=[self.item1.id]))
@@ -873,6 +852,8 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         for sub_item in self.item1.registry_cascade_items:
             if sub_item is not None:
                 self.assertEqual(sub_item.statuses.count(),0)
+            else:
+                pass
 
         response = self.client.post(
             reverse('aristotle:changeStatus',args=[self.item1.id]),

@@ -71,6 +71,6 @@ body>footer.footer {
     }
 }
 
-body .navbar-inverse .navbar-nav a:hover {
+body .navbar-inverse .navbar-nav>li>a:hover {
     background-color: #5f8f8e;
 }

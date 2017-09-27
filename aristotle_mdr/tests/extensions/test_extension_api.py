@@ -7,6 +7,7 @@ from django.template import TemplateDoesNotExist
 
 from aristotle_mdr.tests.main.test_html_pages import LoggedInViewConceptPages
 from aristotle_mdr.tests.main.test_admin_pages import AdminPageForConcept
+from django.test.utils import override_settings
 
 from extension_test.models import Question, Questionnaire
 
@@ -22,11 +23,11 @@ class TestExtensionListVisibility(TestCase):
         response = self.client.get(reverse('aristotle_mdr:extensions'))
         self.assertEqual(response.status_code, 200)
         ext = apps.get_app_config('extension_test')
-        download = apps.get_app_config('text_download_test')
-        self.assertContains(response, download.verbose_name)
-        self.assertTrue('text_download_test' in response.context['download_extensions'].keys())
-        self.assertContains(response, ext.verbose_name)
-        self.assertTrue(ext in response.context['content_extensions'])
+
+        from django.utils.module_loading import import_string
+        dowloader = import_string('text_download_test.downloader.TestTextDownloader')
+        
+        self.assertContains(response, dowloader.description)
 
 
 class QuestionVisibility(utils.ManagedObjectVisibility, TestCase):
@@ -162,4 +163,3 @@ class QuestionnaireViewPage(LoggedInViewExtensionConceptPages, TestCase):
         self.assertEqual(response.status_code, 200)
         form = response.context['form']
         self.assertContains(response, 'glyphicon-calendar')  # While we use bootstrap-datewidget, this should be there.
-

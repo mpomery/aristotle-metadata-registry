@@ -14,13 +14,22 @@ defaults:
     before_script:
     # Make a MariaDB database
     # Fix wierdness with MariaDB on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0  
-      - if [[ $DB == mariadb ]]; then mysql -e 'create database aristotle_test_db;' -u root ; fi
-      - if [[ $DB == mariadb ]]; then mysql -e 'SET GLOBAL wait_timeout = 36000;' ; fi
-      - if [[ $DB == mariadb ]]; then mysql -e 'SET GLOBAL max_allowed_packet = 134209536;' ; fi
+      - if [[ $DB == mariadb ]]; then ./aristotle_mdr/tests/bin/prep_mysql.sh ; fi
       - if [[ $SEARCH == elasticsearch ]]; then sleep 10; fi
     # Make a posgres database
-      - if [[ $DB == postgres ]]; then psql -c 'create database aristotle_test_db;' -U postgres; fi
-    script: tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
+      - if [[ $DB == postgres* ]]; then ./aristotle_mdr/tests/bin/prep_psql.sh; fi
+
+    script:
+      - |
+        case "$DB" in
+          mariadb) export DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db;;
+         postgres) export DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db;;
+           sqlite) export DATABASE_URL=sqlite:///./db.db;;
+                *) export DATABASE_URL=sqlite:///./db.db;;
+        esac
+        echo "Running script with DATABASE_URL="$DATABASE_URL
+        echo "Running script with DB="$DB
+        tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
     services:
       - postgresql
       - redis-server
@@ -35,6 +44,19 @@ defaults:
       code_climate:
         repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
       mariadb: '10.1'
+
+  - &main_test_script_py27
+      python: 2.7
+      <<: *main_test_script
+
+  - &main_test_script_py35
+      python: 3.5
+      <<: *main_test_script
+
+  - &test_accessibility_py35
+    stage: accessibility
+    python: 3.5
+    script: tox -e ally-$ALLY --skip-missing-interpreters
 
 jobs:
 
@@ -81,6 +103,26 @@ jobs:
     - stage: accessibility
       script: tox -e ally-static --skip-missing-interpreters
 
+  # Test Accessibility
+    - <<: *test_accessibility_py35
+      env: ALLY=metadata_item
+    - <<: *test_accessibility_py35
+      env: ALLY=metadata_action
+    - <<: *test_accessibility_py35
+      env: ALLY=static
+
+    - stage: deploy
+      script: true
+      deploy:
+        provider: pypi
+        user: Samuel.Spencer
+        skip_upload_docs: true
+        password:
+          secure: hJVN74vhyDjG22Ei5/gz0g0d/KfaW2kzjx85c3pT+4jmbTOC3OcGN7Exj+/2wEAygvQDmlijRGJ0yldL3IpE0+N7TASs0/6dNf8fMoG0zRTcuu1ywhUhSgqntRGMjRBpbXeVUeb6ydeAciDkrkmfyuGVQd6bXJQeCxcdU1X5iJ+mnbS9Lu1oUfXt6MZroMImwh+ZCvDn95e8QMFbSmO/3OE7CBtBiCaUMemlgzf1THJsw0JoO/GaU37NEjmsnt6xg8EcXRi/h+Pznnr+8LEs6gqcNRg8uS0mh3e6B3ynvovY6Pr8YdAazG6FTFezc3eQWjViQyBxHGbCcY1z0w7bATa+BT18k2/I6dfF6MFoitPtTmJ9tQEB1HOdL/ngJoYEa2TQxxsCal4qqCWNEgP6O5Jl7uK4u1y00wXQ1M3scGmP1kxu+4DWY9ywfnBvbF8SNKLd4qEkdxQIkZBYd7/4aU/3pHFVE1f+J7LSzLt8gIy/hnLCB23T/DEaLnQJDIBlP4Kcpb277vkayVjuRuGNfU5QXf29Sj4PKvXbVS9gtYDY8U5KheOhb7MmWTlq+WfGvyrpgLfasFQDjWGOqs4oJ4LDO4IJ6BG40LX/OozTXoiT1//DcwDU34SJQlfTiTidZMeOq1fdpQNG84Tig2MkuRnmvO8LF5uIS0I6G3GWP6U=
+        on:
+          branch: master
+          distributions: sdist bdist_wheel
+          repo: aristotle-mdr/aristotle-metadata-registry
 
   allow_failures:
     - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
