@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from aristotle_mdr.utils import fetch_aristotle_settings
 
@@ -19,7 +19,7 @@ def user_can_view(user, item):
     """Can the user view the item?"""
     if user.is_superuser:
         return True
-    if item.__class__ == User:              # -- Sometimes duck-typing fails --
+    if item.__class__ == get_user_model():  # -- Sometimes duck-typing fails --
         return user == item                 # A user can edit their own details
 
     if user.is_anonymous():
@@ -53,7 +53,7 @@ def user_can_edit(user, item):
     if user.is_anonymous():
         return False
     # A user can edit their own details
-    if item.__class__ == User:              # -- Sometimes duck-typing fails --
+    if item.__class__ == get_user_model():  # -- Sometimes duck-typing fails --
         return user == item
 
     if hasattr(item, "was_modified_very_recently") and item.was_modified_very_recently():
@@ -165,7 +165,7 @@ def user_can_add_or_remove_workgroup(user, workgroup):
 
     if user.is_superuser:
         return True
-    if 'admin' in workgroup_change_access and user.is_staff:
+    if 'admin' in workgroup_change_access and user.has_perm("aristotle_mdr.is_registry_administrator"):
         return True
     if 'manager' in workgroup_change_access and user in workgroup.managers.all():
         return True

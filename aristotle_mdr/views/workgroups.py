@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -60,7 +60,7 @@ def remove_role(request, iid, role, userid):
     if not (workgroup and user_is_workgroup_manager(request.user, workgroup)):
         raise PermissionDenied
     try:
-        user = User.objects.get(id=userid)
+        user = get_user_model().objects.get(id=userid)
         workgroup.removeRoleFromUser(role, user)
     except:
         pass

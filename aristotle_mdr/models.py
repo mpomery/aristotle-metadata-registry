@@ -3,7 +3,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.db import models, transaction
@@ -43,6 +43,7 @@ from .managers import MetadataItemManager, ConceptManager, UUIDManager
 import logging
 logger = logging.getLogger(__name__)
 logger.debug("Logging started for " + __name__)
+
 
 """
 This is the core modelling for Aristotle mapping ISO/IEC 11179 classes to Python classes/Django models.
@@ -194,7 +195,7 @@ class aristotleComponent(models.Model):
 
 class registryGroup(unmanagedObject):
     managers = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         blank=True,
         related_name="%(class)s_manager_in",
         verbose_name=_('Managers')
@@ -253,7 +254,7 @@ class RegistrationAuthority(Organization):
     )
 
     registrars = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         blank=True,
         related_name='registrar_in',
         verbose_name=_('Registrars')
@@ -432,19 +433,19 @@ class Workgroup(registryGroup):
     )
 
     viewers = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         blank=True,
         related_name='viewer_in',
         verbose_name=_('Viewers')
     )
     submitters = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         blank=True,
         related_name='submitter_in',
         verbose_name=_('Submitters')
     )
     stewards = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         blank=True,
         related_name='steward_in',
         verbose_name=_('Stewards')
@@ -508,7 +509,7 @@ class Workgroup(registryGroup):
 
 class discussionAbstract(TimeStampedModel):
     body = models.TextField()
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     class Meta:
         abstract = True
@@ -567,7 +568,7 @@ class _concept(baseAristotleObject):
 
     workgroup = models.ForeignKey(Workgroup, related_name="items", null=True, blank=True)
     submitter = models.ForeignKey(
-        User, related_name="created_items",
+        settings.AUTH_USER_MODEL, related_name="created_items",
         null=True, blank=True,
         help_text=_('This is the person who first created an item. Users can always see items they made.'))
     # We will query on these, so want them cached with the items themselves
@@ -855,9 +856,9 @@ class ReviewRequest(TimeStampedModel):
         RegistrationAuthority,
         help_text=_("The registration authority the requester wishes to endorse the metadata item")
     )
-    requester = models.ForeignKey(User, help_text=_("The user requesting a review"), related_name='requested_reviews')
+    requester = models.ForeignKey(settings.AUTH_USER_MODEL, help_text=_("The user requesting a review"), related_name='requested_reviews')
     message = models.TextField(blank=True, null=True, help_text=_("An optional message accompanying a request, this will accompany the approved registration status"))
-    reviewer = models.ForeignKey(User, null=True, help_text=_("The user performing a review"), related_name='reviewed_requests')
+    reviewer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, help_text=_("The user performing a review"), related_name='reviewed_requests')
     response = models.TextField(blank=True, null=True, help_text=_("An optional message responding to a request"))
     status = models.IntegerField(
         choices=REVIEW_STATES,
@@ -1315,7 +1316,7 @@ class DataElementDerivation(concept):
 # Thanks to http://stackoverflow.com/a/965883/764357
 class PossumProfile(models.Model):
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         related_name='profile'
     )
     savedActiveWorkgroup = models.ForeignKey(
@@ -1403,7 +1404,7 @@ class PossumProfile(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         profile, created = PossumProfile.objects.get_or_create(user=instance)
-post_save.connect(create_user_profile, sender=User)
+post_save.connect(create_user_profile, sender=settings.AUTH_USER_MODEL)
 
 
 @receiver(post_save)

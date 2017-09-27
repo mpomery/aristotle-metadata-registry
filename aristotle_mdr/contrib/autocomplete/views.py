@@ -1,5 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 
 from django.conf import settings
@@ -93,13 +93,16 @@ class GenericConceptAutocomplete(GenericAutocomplete):
 
 
 class UserAutocomplete(autocomplete.Select2QuerySetView):
-    model = User
+    # model = User
+    model = None
     template_name = "autocomplete_light/item.html"
 
     def dispatch(self, request, *args, **kwargs):
         return super(UserAutocomplete, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
+        User = get_user_model()
+        
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated():
             raise PermissionDenied

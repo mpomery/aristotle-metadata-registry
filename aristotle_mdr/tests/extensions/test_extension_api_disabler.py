@@ -1,7 +1,6 @@
 from django.test import TestCase
 
 import aristotle_mdr.tests.utils as utils
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template import TemplateDoesNotExist
 from aristotle_mdr.tests.main.test_html_pages import LoggedInViewConceptPages
