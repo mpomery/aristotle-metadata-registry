@@ -13,7 +13,15 @@ from aristotle_mdr.contrib.help.models import ConceptHelp
 class DownloaderBase(object):
     """
     Required class properties:
-    icon_class: the font-awesome class
+
+    * description: a description of the downloader type
+    * download_type: the extension or name of the download to support
+    * icon_class: the font-awesome class
+    * metadata_register: can be one of:
+
+      * a dictionary with keys corresponding to django app labels and values as lists of models within that app the downloader supports
+      * the string "__all__" indicating the downloader supports all metadata types
+      * the string "__template__" indicating the downloader supports any metadata type with a matching download template
     """
     metadata_register = {}
     icon_class = ""
@@ -22,12 +30,14 @@ class DownloaderBase(object):
     @classmethod
     def download(cls, request, item):
         """
+        This method must be overriden and return the downloadable object as an appropriate django response
         """
         raise NotImplementedError
 
     @classmethod
     def bulk_download(cls, request, item):
         """
+        This method must be overriden and return a bulk downloaded set of items as an appropriate django response
         """
         raise NotImplementedError
 

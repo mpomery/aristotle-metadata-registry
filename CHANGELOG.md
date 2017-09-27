@@ -11,6 +11,7 @@ Changelog
     - Improved bulk action handling when performing an action with "select all"
         by adding cached querysets - fixes #685 by implementing #543
     - Changes to dropdown menu list items in the the default theme to improve accessibility checks
+    - Javascript fixes to ensure rich text and relation editors load correctly (Thanks @rafen)
     - **Configuration change:**
         - new options - ``ARISTOTLE_SETTINGS_STRICT_MODE``, if False errors in ARISTOTLE_SETTINGS will be logged and not prevent the app from working. Defaults to True.
         - ``BULK_ACTION`` option will no longer cause critical isuses if incorrectly configured. Errors can be logged instead
