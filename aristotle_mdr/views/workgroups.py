@@ -6,6 +6,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.defaultfilters import slugify
 
+from django.views.generic import CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from aristotle_mdr import models as MDR
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr.views.utils import paginated_list, workgroup_item_statuses
@@ -17,7 +20,7 @@ def workgroup(request, iid, name_slug):
     wg = get_object_or_404(MDR.Workgroup, pk=iid)
     if not slugify(wg.name).startswith(str(name_slug)):
         return redirect(wg.get_absolute_url())
-    if not user_in_workgroup(request.user, wg):
+    if not request.user.has_perm("aristotle_mdr.view_workgroup", wg):
         raise PermissionDenied
     renderDict = {
         "item": wg,
@@ -33,7 +36,7 @@ def workgroup(request, iid, name_slug):
 @login_required
 def items(request, iid):
     wg = get_object_or_404(MDR.Workgroup, pk=iid)
-    if not user_in_workgroup(request.user, wg):
+    if not request.user.has_perm("aristotle_mdr.view_workgroup", wg):
         raise PermissionDenied
     items = MDR._concept.objects.filter(workgroup=iid).select_subclasses()
     context = {
@@ -49,7 +52,7 @@ def items(request, iid):
 def members(request, iid):
     wg = get_object_or_404(MDR.Workgroup, pk=iid)
     renderDict = {"item": wg, "workgroup": wg, "user_is_admin": user_is_workgroup_manager(request.user, wg)}
-    if not user_in_workgroup(request.user, wg):
+    if not request.user.has_perm("aristotle_mdr.view_workgroup", wg):
         raise PermissionDenied
     return render(request, "aristotle_mdr/workgroupMembers.html", renderDict)
 
@@ -57,7 +60,7 @@ def members(request, iid):
 @login_required
 def remove_role(request, iid, role, userid):
     workgroup = get_object_or_404(MDR.Workgroup, pk=iid)
-    if not (workgroup and user_is_workgroup_manager(request.user, workgroup)):
+    if not request.user.has_perm("aristotle_mdr.change_workgroup_memberships", workgroup):
         raise PermissionDenied
     try:
         user = get_user_model().objects.get(id=userid)
@@ -70,7 +73,7 @@ def remove_role(request, iid, role, userid):
 @login_required
 def archive(request, iid):
     workgroup = get_object_or_404(MDR.Workgroup, pk=iid)
-    if not (workgroup and user_is_workgroup_manager(request.user, workgroup)):
+    if not request.user.has_perm("aristotle_mdr.can_archive_workgroup", workgroup):
         raise PermissionDenied
     if request.method == 'POST':  # If the form has been submitted...
         workgroup.archived = not workgroup.archived
@@ -83,7 +86,7 @@ def archive(request, iid):
 @login_required
 def add_members(request, iid):
     workgroup = get_object_or_404(MDR.Workgroup, pk=iid)
-    if not (workgroup and user_is_workgroup_manager(request.user, workgroup)):
+    if not request.user.has_perm("aristotle_mdr.change_workgroup_memberships", workgroup):
         raise PermissionDenied
     if request.method == 'POST':  # If the form has been submitted...
         form = MDRForms.workgroups.AddMembers(request.POST)  # A form bound to the POST data
@@ -112,7 +115,7 @@ def add_members(request, iid):
 @login_required
 def leave(request, iid):
     workgroup = get_object_or_404(MDR.Workgroup, pk=iid)
-    if not (workgroup and request.user in workgroup.members):
+    if not request.user.has_perm("aristotle_mdr.view_workgroup", wg):
         raise PermissionDenied
 
     if request.method == 'POST':  # If the form has been submitted...
@@ -126,3 +129,15 @@ def leave(request, iid):
             "item": workgroup,
         }
     )
+
+
+class CreateWorkgroup(LoginRequiredMixin, CreateView):
+    model = MDR.Workgroup
+    template_name = "aristotle_mdr/user/workgroups/add.html"
+    fields = ['name', 'definition']
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.has_perm("aristotle_mdr.add_workgroup"):
+            raise PermissionDenied
+        print(request.user.has_perm("aristotle_mdr.add_workgroup"))
+        return super(CreateWorkgroup, self).dispatch(request, *args, **kwargs)
