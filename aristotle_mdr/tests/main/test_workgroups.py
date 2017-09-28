@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
+from django.core.exceptions import PermissionDenied
 
 from django.test.utils import setup_test_environment
 setup_test_environment()
@@ -110,6 +111,101 @@ class WorkgroupAnonTests(utils.LoggedInViewPages,TestCase):
             reverse('aristotle:addWorkgroupMembers', args=[self.wg1.id])
         )
         self.assertListEqual(list(self.newuser.profile.workgroups.all()),[])
+
+
+class WorkgroupCreationTests(utils.LoggedInViewPages,TestCase):
+    def test_anon_cannot_create(self):
+        self.logout()
+        response = self.client.get(reverse('aristotle:workgroup_create'))
+        self.assertRedirects(response,
+            reverse("friendly_login",)+"?next="+
+            reverse('aristotle:workgroup_create')
+            )
+
+    def test_viewer_cannot_create(self):
+        self.login_viewer()
+
+        response = self.client.get(reverse('aristotle:workgroup_create'))
+        self.assertEqual(response.status_code, 403)
+
+        before_count = models.Workgroup.objects.count()
+        response = self.client.post(
+            reverse('aristotle:workgroup_create'),
+            {
+                'name':"My cool team",
+                'definition':"This team rocks!"
+            }
+        )
+        self.assertEqual(response.status_code, 403)
+        after_count = models.Workgroup.objects.count()
+        self.assertEqual(after_count, before_count)
+
+    def test_manager_cannot_create(self):
+        self.login_manager()
+
+        response = self.client.get(reverse('aristotle:workgroup_create'))
+        self.assertEqual(response.status_code, 403)
+
+        before_count = models.Workgroup.objects.count()
+        response = self.client.post(
+            reverse('aristotle:workgroup_create'),
+            {
+                'name':"My cool team",
+                'definition':"This team rocks!"
+            }
+        )
+        self.assertEqual(response.status_code, 403)
+        after_count = models.Workgroup.objects.count()
+        self.assertEqual(after_count, before_count)
+
+    def test_registry_owner_can_create(self):
+        self.login_superuser()
+
+        response = self.client.get(reverse('aristotle:workgroup_create'))
+        self.assertEqual(response.status_code, 200)
+
+        before_count = models.Workgroup.objects.count()
+        response = self.client.post(
+            reverse('aristotle:workgroup_create'),
+            {
+                'name':"My cool team",
+                'definition':"This team rocks!"
+            }
+        )
+        self.assertEqual(response.status_code, 302)
+        after_count = models.Workgroup.objects.count()
+        self.assertEqual(after_count, before_count + 1)
+        new_wg = models.Workgroup.objects.order_by('-created').first()
+        self.assertEqual(new_wg.name, "My cool team")
+        self.assertEqual(new_wg.definition, "This team rocks!")
+        
+class WorkgroupListTests(utils.LoggedInViewPages,TestCase):
+    def test_anon_cannot_create(self):
+        self.logout()
+        response = self.client.get(reverse('aristotle:workgroup_list'))
+        self.assertRedirects(response,
+            reverse("friendly_login",)+"?next="+
+            reverse('aristotle:workgroup_list')
+            )
+
+    def test_viewer_cannot_create(self):
+        self.login_viewer()
+
+        response = self.client.get(reverse('aristotle:workgroup_list'))
+        self.assertEqual(response.status_code, 403)
+
+    def test_manager_cannot_create(self):
+        self.login_manager()
+
+        response = self.client.get(reverse('aristotle:workgroup_list'))
+        self.assertEqual(response.status_code, 403)
+
+    def test_registry_owner_can_create(self):
+        self.login_superuser()
+
+        response = self.client.get(reverse('aristotle:workgroup_list'))
+        self.assertEqual(response.status_code, 200)
+
 
 class WorkgroupMemberTests(utils.LoggedInViewPages,TestCase):
     def setUp(self):

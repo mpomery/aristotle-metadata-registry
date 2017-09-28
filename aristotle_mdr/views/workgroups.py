@@ -2,16 +2,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.defaultfilters import slugify
 
-from django.views.generic import CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import CreateView, ListView
 
 from aristotle_mdr import models as MDR
 from aristotle_mdr import forms as MDRForms
-from aristotle_mdr.views.utils import paginated_list, workgroup_item_statuses
+from aristotle_mdr.views.utils import paginated_list, workgroup_item_statuses, paginated_workgroup_list
 from aristotle_mdr.perms import user_in_workgroup, user_is_workgroup_manager
 
 
@@ -115,7 +115,7 @@ def add_members(request, iid):
 @login_required
 def leave(request, iid):
     workgroup = get_object_or_404(MDR.Workgroup, pk=iid)
-    if not request.user.has_perm("aristotle_mdr.view_workgroup", wg):
+    if not request.user.has_perm("aristotle_mdr.view_workgroup", workgroup):
         raise PermissionDenied
 
     if request.method == 'POST':  # If the form has been submitted...
@@ -131,13 +131,37 @@ def leave(request, iid):
     )
 
 
-class CreateWorkgroup(LoginRequiredMixin, CreateView):
+class CreateWorkgroup(CreateView):
     model = MDR.Workgroup
     template_name = "aristotle_mdr/user/workgroups/add.html"
     fields = ['name', 'definition']
 
     def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect(
+                reverse('friendly_login') + '?next=%s' % request.path
+            )
         if not request.user.has_perm("aristotle_mdr.add_workgroup"):
             raise PermissionDenied
-        print(request.user.has_perm("aristotle_mdr.add_workgroup"))
         return super(CreateWorkgroup, self).dispatch(request, *args, **kwargs)
+
+
+class ListWorkgroup(ListView):
+    model = MDR.Workgroup
+    template_name = "aristotle_mdr/user/workgroups/list_all.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect(
+                reverse('friendly_login') + '?next=%s' % request.path
+            )
+        if not request.user.has_perm("aristotle_mdr.is_registry_administrator"):
+            raise PermissionDenied
+        workgroups = MDR.Workgroup.objects.all()
+
+        text_filter = request.GET.get('filter', "")
+        if text_filter:
+            workgroups = workgroups.filter(Q(name__icontains=text_filter) | Q(definition__icontains=text_filter))
+        context = {'filter': text_filter}
+        return paginated_workgroup_list(request, workgroups, "aristotle_mdr/user/workgroups/list_all.html", context)
+        # return super(ListWorkgroup, self).dispatch(request, *args, **kwargs)

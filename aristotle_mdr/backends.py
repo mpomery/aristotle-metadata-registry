@@ -32,18 +32,17 @@ class AristotleBackend(ModelBackend):
         if app_label == "aristotle_mdr" and hasattr(perms, perm_name):
             return getattr(perms, perm_name)(user_obj, obj)
 
-        if app_label in extensions + ["aristotle_mdr"]:
-            # This is required so that a user can correctly delete the 'concept' parent class in the admin site.
-            perm_parts = perm.split("_")
-            if len(perm_parts) != 2:
-                return False
-            
-            from django.apps import apps
-            from aristotle_mdr.models import _concept
+        from django.apps import apps
+        from aristotle_mdr.models import _concept
+
+        perm_parts = perm_name.split("_")
+        if len(perm_parts) == 2:
             model = apps.get_model(app_label, perm_parts[1])
-            
-            if not issubclass(model, _concept):
-                return False
+        else:
+            model = int
+
+        if app_label in extensions + ["aristotle_mdr"] and issubclass(model, _concept):
+            # This is required so that a user can correctly delete the 'concept' parent class in the admin site.
 
             if perm_name == "delete_concept_from_admin":
                 return obj is None or perms.user_can_edit(user_obj, obj)
@@ -60,11 +59,11 @@ class AristotleBackend(ModelBackend):
                 else:
                     return perms.user_can_edit(user_obj, obj)
 
-        if perm is "aristotle_mdr.view_workgroup":
-            return perms.user_in_workgroup(user, obj)
-        if perm is "aristotle_mdr.change_workgroup_memberships":
-            return perms.user_is_workgroup_manager(user, obj)
-        if perm is "aristotle_mdr.can_archive_workgroup":
-            return perms.user_is_workgroup_manager(user, obj)
+        if perm == "aristotle_mdr.view_workgroup":
+            return perms.user_in_workgroup(user_obj, obj)
+        if perm == "aristotle_mdr.change_workgroup_memberships":
+            return perms.user_is_workgroup_manager(user_obj, obj)
+        if perm == "aristotle_mdr.can_archive_workgroup":
+            return perms.user_is_workgroup_manager(user_obj, obj)
 
         return super(AristotleBackend, self).has_perm(user_obj, perm, obj)
