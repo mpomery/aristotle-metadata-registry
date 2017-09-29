@@ -71,7 +71,7 @@ Showing {{ page.paginator.count }} results.
             {% endif %}
         </td>
         {% endif %}
-        <td><a class="btn btn-primary btn-small" href="{% url 'aristotle:edit_workgroup' %}">Edit</a></td>
+        <td><a class="btn btn-primary btn-small" href="{% url 'aristotle:workgroup_edit' item.pk %}">Edit</a></td>
     </tr>
     {% endfor %}
 

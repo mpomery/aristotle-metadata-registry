@@ -101,7 +101,7 @@ class UserAutocomplete(autocomplete.Select2QuerySetView):
         return super(UserAutocomplete, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        User = get_user_model()
+        self.model = get_user_model()
 
         # Don't forget to filter out results depending on the visitor !
         if not self.request.user.is_authenticated():

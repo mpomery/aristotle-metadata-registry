@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.defaultfilters import slugify
 
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, UpdateView
 
 from aristotle_mdr import models as MDR
 from aristotle_mdr import forms as MDRForms
@@ -169,3 +169,25 @@ class ListWorkgroup(ListView):
         context = {'filter': text_filter}
         return paginated_workgroup_list(request, workgroups, self.template_name, context)
         # return super(ListWorkgroup, self).dispatch(request, *args, **kwargs)
+
+
+class EditWorkgroup(UpdateView):
+    model = MDR.Workgroup
+    template_name = "aristotle_mdr/user/workgroups/edit.html"
+
+    fields = [
+        'name',
+        'definition',
+    ]
+
+    pk_url_kwarg = 'iid'
+    context_object_name = "item"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect(
+                reverse('friendly_login') + '?next=%s' % request.path
+            )
+        if not request.user.has_perm("aristotle_mdr.change_workgroup"):
+            raise PermissionDenied
+        return super(EditWorkgroup, self).dispatch(request, *args, **kwargs)
