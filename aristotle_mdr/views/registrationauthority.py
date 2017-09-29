@@ -92,7 +92,7 @@ class ManageRegistrationAuthority(DetailView):
 
     pk_url_kwarg = 'iid'
     context_object_name = "item"
-    
+
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect(
@@ -106,7 +106,7 @@ class ManageRegistrationAuthority(DetailView):
 class EditRegistrationAuthority(UpdateView):
     model = MDR.RegistrationAuthority
     template_name = "aristotle_mdr/user/registration_authority/edit.html"
-    
+
     fields = [
         'name',
         'definition',
@@ -127,11 +127,10 @@ class EditRegistrationAuthority(UpdateView):
     context_object_name = "item"
 
     def dispatch(self, request, *args, **kwargs):
-        # Try to dispatch to the right method; if a method doesn't exist,
-        # defer to the error handler. Also defer to the error handler if the
-        # request method isn't on the approved list.
-        if request.method.lower() in self.http_method_names:
-            handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
-        else:
-            handler = self.http_method_not_allowed
-        return handler(request, *args, **kwargs)
+        if not request.user.is_authenticated:
+            return redirect(
+                reverse('friendly_login') + '?next=%s' % request.path
+            )
+        if not request.user.has_perm("aristotle_mdr.change_registration_authority"):
+            raise PermissionDenied
+        return super(EditRegistrationAuthority, self).dispatch(request, *args, **kwargs)

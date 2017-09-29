@@ -127,7 +127,7 @@ def paginated_workgroup_list(request, workgroups, template, extra_context={}):
 
 paginate_registration_authority_sort_opts = {
     "name": "name",
-    "users": ("user_count", lambda qs: qs.annotate(user_count=Count('registrars')+Count('managers'))),
+    "users": ("user_count", lambda qs: qs.annotate(user_count=Count('registrars') + Count('managers'))),
 }
 
 
@@ -153,7 +153,7 @@ def paginated_registration_authority_list(request, ras, template, extra_context=
         sort_field = opts
 
     qs = qs.order_by(direction + sort_field)
-    qs = qs.annotate(user_count=Count('registrars')+Count('managers'))
+    qs = qs.annotate(user_count=Count('registrars') + Count('managers'))
     paginator = Paginator(
         qs,
         request.GET.get('pp', 20)  # per page
