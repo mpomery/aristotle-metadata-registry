@@ -125,6 +125,59 @@ def paginated_workgroup_list(request, workgroups, template, extra_context={}):
     return render(request, template, context)
 
 
+paginate_registration_authority_sort_opts = {
+    "name": "name",
+    "users": ("user_count", lambda qs: qs.annotate(user_count=Count('registrars')+Count('managers'))),
+}
+
+
+@login_required
+def paginated_registration_authority_list(request, ras, template, extra_context={}):
+    sort_by=request.GET.get('sort', "name_desc")
+    try:
+        sorter, direction = sort_by.split('_')
+        if sorter not in paginate_registration_authority_sort_opts.keys():
+            sorter="name"
+            sort_by = "name_desc"
+        direction = {'asc': '', 'desc': '-'}.get(direction, '')
+    except:
+        sorter, direction = 'name', ''
+
+    opts = paginate_registration_authority_sort_opts.get(sorter)
+    qs = ras
+
+    try:
+        sort_field, extra = opts
+        qs = extra(qs)
+    except:
+        sort_field = opts
+
+    qs = qs.order_by(direction + sort_field)
+    qs = qs.annotate(user_count=Count('registrars')+Count('managers'))
+    paginator = Paginator(
+        qs,
+        request.GET.get('pp', 20)  # per page
+    )
+
+    page = request.GET.get('page')
+    try:
+        items = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        items = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        items = paginator.page(paginator.num_pages)
+    context = {
+        'sort': sort_by,
+        'page': items,
+        }
+    f = qs.first()
+
+    context.update(extra_context)
+    return render(request, template, context)
+
+
 def get_concept_redirect_or_404(get_item_perm, request, iid, objtype=None):
     if objtype is None:
         from aristotle_mdr.models import _concept

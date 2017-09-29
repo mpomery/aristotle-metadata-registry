@@ -11,7 +11,11 @@ from django.views.generic import CreateView, ListView
 
 from aristotle_mdr import models as MDR
 from aristotle_mdr import forms as MDRForms
-from aristotle_mdr.views.utils import paginated_list, workgroup_item_statuses, paginated_workgroup_list
+from aristotle_mdr.views.utils import (
+    workgroup_item_statuses,
+    paginated_list,
+    paginated_workgroup_list,
+)
 from aristotle_mdr.perms import user_in_workgroup, user_is_workgroup_manager
 
 
@@ -163,5 +167,5 @@ class ListWorkgroup(ListView):
         if text_filter:
             workgroups = workgroups.filter(Q(name__icontains=text_filter) | Q(definition__icontains=text_filter))
         context = {'filter': text_filter}
-        return paginated_workgroup_list(request, workgroups, "aristotle_mdr/user/workgroups/list_all.html", context)
+        return paginated_workgroup_list(request, workgroups, self.template_name, context)
         # return super(ListWorkgroup, self).dispatch(request, *args, **kwargs)

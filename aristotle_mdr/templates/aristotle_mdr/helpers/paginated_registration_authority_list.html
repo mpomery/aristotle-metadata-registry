@@ -1,7 +1,7 @@
 {% load i18n aristotle_tags %}
 <form class="form-inline" action="#" method="get">
   <div class="form-group">
-    <label for="id_filter">{% trans 'Filter workgroups by name and description' %}</label>
+    <label for="id_filter">{% trans 'Filter registration authorities by name and description' %}</label>
     <input id="id_filter" name="filter" class="form-control" value="{{filter}}">
     <input name="sort" type="hidden" value="{{sort}}">
   </div>
@@ -16,7 +16,7 @@ Showing {{ page.paginator.count }} results.
 <table class="table">
 <thead>
     <tr>
-        <th>{% trans 'Workgroup' %}
+        <th>{% trans 'Registration Authority' %}
             {% if sort == "name_asc" %}
             <a href="?{% paginator_get request page.number pop='sort' %}&sort=name_desc"><i class="fa fa-sort-asc"></i></a>
             {% elif sort == "name_desc" %}
@@ -37,41 +37,22 @@ Showing {{ page.paginator.count }} results.
         {% endif %}
             <i class="fa fa-users" title="{% trans 'Number of members' %}"></i>
         </th>
-        <th>
-        {% if sort == "items_asc" %}
-        <a href="?{% paginator_get request page.number pop='sort' %}&sort=items_desc"><i class="fa fa-sort-asc"></i></a>
-        {% elif sort == "items_desc" %}
-        <a href="?{% paginator_get request page.number pop='sort' %}&sort=items_asc"><i class="fa fa-sort-desc"></i></a>
-        {% else %}
-        <a href="?{% paginator_get request page.number pop='sort' %}&sort=items_desc"><i class="fa fa-sort"></i></a>
-        {% endif %}
-            <i class="fa fa-file" title="{% trans 'Number of items' %}"></i>
-        </th>
-        {% if show_all %}
-        <th>{% trans "Status" %}</th>
-        {% endif %}
-        <th></th>
     </tr>
 </thead>
 <tbody>
     {% for item in page %}
     <tr>
         <td>
-            <a href="{{ item.get_absolute_url }}">{{ item.name }}</a>
-        </td>
-        <td>{{ item.definition|striptags|safe|truncatewords:50 }}</td>
-        <td>{{ item.members.count }}</td>
-        <td>{{ item.items.count }}</td>
-        {% if show_all %}
-        <td>
-            {% if item.archived %}
-                {% trans "Archived" %}
+            {% if manage %}
+            <a href="{% url 'aristotle:registration_authority_manage' item.id %}">{{ item.name }}</a>
             {% else %}
-                {% trans "Active" %}
+            <a href="{{ item.get_absolute_url }}">{{ item.name }}</a>
             {% endif %}
         </td>
+        <td>{{ item.definition|striptags|safe|truncatewords:50 }}</td>
+        <td>{{ item.user_count }}</td>
+        {% if show_all %}
         {% endif %}
-        <td><a class="btn btn-primary btn-small" href="{% url 'aristotle:edit_workgroup' %}">Edit</a></td>
     </tr>
     {% endfor %}
 

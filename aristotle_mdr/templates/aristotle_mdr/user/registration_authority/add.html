@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block collapse-link %}
-    <i class="fa fa-users fa-fw"></i> Add Workgroup </a>
+    <i class="fa fa-users fa-fw"></i> My Workgroups </a>
 {% endblock %}
 
 {% block sidebar %}
@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block page %}
-<h1>{% block title %}New Workgroup{% endblock %}</h1>
+<h1>{% block title %}New Registration Authority{% endblock %}</h1>
     <form action="" method="POST">
         {% csrf_token %}
         <div class="form-group {% if form.name.errors %}has-error{% endif %}">
@@ -39,6 +39,6 @@
                 {{ form.definition }}
         </div>
 
-        <button type="Submit" class="btn btn-primary">Create new workgroup</button>
+        <button type="Submit" class="btn btn-primary">Create new Registration Authority</button>
     </form>
 {% endblock %}

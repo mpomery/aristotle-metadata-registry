@@ -152,10 +152,17 @@ urlpatterns=[
     url(r'^account/registrartools/review/accept/(?P<review_id>\d+)/?$', views.actions.ReviewAcceptView.as_view(), name='userReviewAccept'),
     url(r'^account/registrartools/review/reject/(?P<review_id>\d+)/?$', views.actions.ReviewRejectView.as_view(), name='userReviewReject'),
 
-    url(r'^organization/registrationauthority/(?P<iid>\d+)?(?:\/(?P<name_slug>.+))?/?$', views.registrationauthority, name='registrationAuthority'),
-    url(r'^organization/(?P<iid>\d+)?(?:\/(?P<name_slug>.+))?/?$', views.organization, name='organization'),
-    url(r'^organizations/?$', views.all_organizations, name='all_organizations'),
-    url(r'^registrationauthorities/?$', views.all_registration_authorities, name='all_registration_authorities'),
+
+    url(r'^registrationauthority/create/?$', views.registrationauthority.CreateRegistrationAuthority.as_view(), name='registration_authority_create'),
+    url(r'^registrationauthority/all/?$', views.registrationauthority.ListRegistrationAuthority.as_view(), name='registration_authority_list'),
+
+    url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/manage$', views.registrationauthority.ManageRegistrationAuthority.as_view(), name='registration_authority_manage'),
+    url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/edit', views.registrationauthority.EditRegistrationAuthority.as_view(), name='registration_authority_edit'),
+    url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/?$', views.registrationauthority.registrationauthority, name='registrationAuthority'),
+    url(r'^organization/(?P<iid>\d+)?(?:\/(?P<name_slug>.+))?/?$', views.registrationauthority.organization, name='organization'),
+    url(r'^organizations/?$', views.registrationauthority.all_organizations, name='all_organizations'),
+    url(r'^registrationauthorities/?$', views.registrationauthority.all_registration_authorities, name='all_registration_authorities'),
+
     url(r'^account/toggleFavourite/(?P<iid>\d+)/?$', views.toggleFavourite, name='toggleFavourite'),
 
     url(r'^extensions/?$', views.extensions, name='extensions'),
