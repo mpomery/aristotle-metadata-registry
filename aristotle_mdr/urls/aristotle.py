@@ -74,13 +74,13 @@ urlpatterns=[
         name='generic_foreign_key_editor'),
 
 
-    url(r'^workgroup/(?P<iid>\d+)(?:-(?P<name_slug>[A-Za-z0-9\-]+))?/?$', views.workgroups.workgroup, name='workgroup'),
-    url(r'^workgroup/(?P<iid>\d+)/members/?$', views.workgroups.members, name='workgroupMembers'),
-    url(r'^workgroup/(?P<iid>\d+)/items/?$', views.workgroups.items, name='workgroupItems'),
-    url(r'^workgroup/(?P<iid>\d+)/leave/?$', views.workgroups.leave, name='workgroup_leave'),
-    url(r'^workgroup/addMembers/(?P<iid>\d+)$', views.workgroups.add_members, name='addWorkgroupMembers'),
-    url(r'^workgroup/(?P<iid>\d+)/archive/?$', views.workgroups.archive, name='archive_workgroup'),
-    url(r'^action/remove/WorkgroupRole/(?P<iid>\d+)/(?P<role>[A-Za-z\-]+)/(?P<userid>\d+)/?$', views.workgroups.remove_role, name='removeWorkgroupRole'),
+    url(r'^workgroup/(?P<iid>\d+)(?:-(?P<name_slug>[A-Za-z0-9\-]+))?/?$', views.workgroups.WorkgroupView.as_view(), name='workgroup'),
+    url(r'^workgroup/(?P<iid>\d+)/members/?$', views.workgroups.MembersView.as_view(), name='workgroupMembers'),
+    url(r'^workgroup/(?P<iid>\d+)/items/?$', views.workgroups.ItemsView.as_view(), name='workgroupItems'),
+    url(r'^workgroup/(?P<iid>\d+)/leave/?$', views.workgroups.LeaveView.as_view(), name='workgroup_leave'),
+    url(r'^workgroup/addMembers/(?P<iid>\d+)$', views.workgroups.AddMembersView.as_view(), name='addWorkgroupMembers'),
+    url(r'^workgroup/(?P<iid>\d+)/archive/?$', views.workgroups.ArchiveView.as_view(), name='archive_workgroup'),
+    url(r'^action/remove/WorkgroupRole/(?P<iid>\d+)/(?P<role>[A-Za-z\-]+)/(?P<userid>\d+)/?$', views.workgroups.RemoveRoleView.as_view(), name='removeWorkgroupRole'),
 
     url(r'^discussions/?$', views.discussions.all, name='discussions'),
     url(r'^discussions/new/?$', views.discussions.new, name='discussionsNew'),
