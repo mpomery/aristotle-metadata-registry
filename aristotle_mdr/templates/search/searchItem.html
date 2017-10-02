@@ -3,7 +3,7 @@
 <a href="{% url 'aristotle:item' item.id %}">{{ item.name }}</a>
 <span class="item_type">({{ item.get_verbose_name }})</span>
 <p>
-    {{ item.definition|truncatewords:20|striptags }}
+    {{ item.definition|striptags|safe|truncatewords:20 }}
 </p>
 <div class="attrs">
     <span class="attr">
