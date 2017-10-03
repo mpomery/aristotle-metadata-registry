@@ -509,6 +509,9 @@ class DiscussionPost(discussionAbstract):
     def active(self):
         return not self.closed
 
+    def get_absolute_url(self):
+        return ('')    
+
 
 class DiscussionComment(discussionAbstract):
     post = models.ForeignKey(DiscussionPost, related_name='comments')

@@ -6,6 +6,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 
+from django.http import Http404
+
 from aristotle_mdr import models as MDR
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import perms
@@ -13,7 +15,7 @@ from aristotle_mdr import perms
 from aristotle_mdr.models import DiscussionPost
 
 #imports CBV
-from django.views.generic import TemplateView, ListView, View, FormView
+from django.views.generic import DeleteView, TemplateView, ListView, View, FormView, UpdateView
 from django.utils.decorators import method_decorator
 
 class All(TemplateView):
@@ -128,16 +130,19 @@ class New(FormView):
         return render(request, "aristotle_mdr/discussions/new.html", {"form": form})
 
 
-@login_required
-def new_comment(request, pid):
-    post = get_object_or_404(MDR.DiscussionPost, pk=pid)
-    if not perms.user_in_workgroup(request.user, post.workgroup):
-        raise PermissionDenied
-    if post.closed:
-        messages.error(request, _('This post is closed. Your comment was not added.'))
-        return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
-    if request.method == 'POST':
+
+class New_comment(FormView):
+    def post(self, request, *args, **kwargs):
+        post = get_object_or_404(MDR.DiscussionPost, pk=self.kwargs['pid'])
+
+        if not perms.user_in_workgroup(request.user, post.workgroup):
+            raise PermissionDenied
+        if post.closed:
+            messages.error(request, _('This post is closed. Your comment was not added.'))
+            return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
+        
         form = MDRForms.discussions.CommentForm(request.POST)
+        
         if form.is_valid():
             new = MDR.DiscussionComment(
                 post=post,
@@ -148,33 +153,76 @@ def new_comment(request, pid):
             return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[new.post.pk]) + "#comment_%s" % new.id)
         else:
             return render(request, "aristotle_mdr/discussions/new.html", {"form": form})
-    else:
+
+    def get(self, request, *args, **kwargs): 
         # It makes no sense to "GET" this comment, so push them back to the discussion
         return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
 
 
-@login_required
-def delete_comment(request, cid):
-    comment = get_object_or_404(MDR.DiscussionComment, pk=cid)
-    post = comment.post
-    if not perms.user_can_alter_comment(request.user, comment):
-        raise PermissionDenied
-    comment.delete()
-    return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
+
+class Delete_comment(DeleteView):
+    model = MDR.DiscussionComment
+
+    def get_success_url(self):
+        success_url = lazy(reverse, self)('aristotle:discussionsPost', args=self.kwargs['cid'])        
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        if queryset is None:
+                queryset = self.get_queryset()
+
+        comment = get_object_or_404(MDR.DiscussionComment, pk=self.kwargs['cid'])
+
+        return comment
+
+    def delete(self, request, *args, **kwargs):    
+        comment = get_object_or_404(MDR.DiscussionComment, pk=self.kwargs['cid'])        
+        post = comment.post
+        
+        if not comment or not post:
+            raise Http404
+
+        if not perms.user_can_alter_comment(request.user, comment):
+            raise PermissionDenied
+
+        comment.delete()
+
+        return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
 
 
-@login_required
-def delete_post(request, pid):
-    post = get_object_or_404(MDR.DiscussionPost, pk=pid)
-    workgroup = post.workgroup
-    if not perms.user_can_alter_post(request.user, post):
-        raise PermissionDenied
-    post.comments.all().delete()
-    post.delete()
-    return HttpResponseRedirect(reverse("aristotle:discussionsWorkgroup", args=[workgroup.pk]))
+
+class Delete_post(DeleteView):
+    model = MDR.DiscussionPost
+
+    def get_object(self, queryset=None):
+        post = get_object_or_404(MDR.DiscussionPost, pk=self.kwargs['pid'])
+        return post
+
+    def delete(self, request, *args, **kwargs):
+        post = get_object_or_404(MDR.DiscussionPost, pk=self.kwargs['pid'])
+        workgroup = post.workgroup
+
+        if not perms.user_can_alter_post(request.user, post):
+            raise PermissionDenied
+        
+        post.comments.all().delete()
+        post.delete()
+
+        return HttpResponseRedirect(reverse("aristotle:discussionsWorkgroup", args=[workgroup.pk]))
+    
+    def get_success_url(self):
+        post = get_object_or_404(MDR.DiscussionPost, pk=self.kwargs['pid'])
+        workgroup = post.workgroup
+
+        return HttpResponseRedirect(reverse("aristotle:discussionsWorkgroup", args=[workgroup.pk]))
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
 
 
-@login_required
+
 def edit_comment(request, cid):
     comment = get_object_or_404(MDR.DiscussionComment, pk=cid)
     post = comment.post
