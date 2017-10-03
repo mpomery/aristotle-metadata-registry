@@ -44,12 +44,9 @@ class AristotleBackend(ModelBackend):
         if app_label in extensions + ["aristotle_mdr"] and issubclass(model, _concept):
             # This is required so that a user can correctly delete the 'concept' parent class in the admin site.
 
-            if perm_name == "delete_concept_from_admin":
-                return obj is None or perms.user_can_edit(user_obj, obj)
-
             # This is a rough catch all, and is designed to indicate a user could
             # delete an item type, but not a specific item.
-            elif (
+            if (
                 perm_name.startswith('delete_') or
                 perm_name.startswith('create_') or
                 perm_name.startswith('add_')
@@ -58,6 +55,10 @@ class AristotleBackend(ModelBackend):
                     return perms.user_is_editor(user_obj)
                 else:
                     return perms.user_can_edit(user_obj, obj)
+
+        if app_label in extensions + ["aristotle_mdr"]:
+            if perm_name == "delete_concept_from_admin":
+                return obj is None or perms.user_can_edit(user_obj, obj)
 
         if perm == "aristotle_mdr.view_workgroup":
             return perms.user_in_workgroup(user_obj, obj)
