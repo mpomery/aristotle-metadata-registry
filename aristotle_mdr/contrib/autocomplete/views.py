@@ -112,11 +112,11 @@ class UserAutocomplete(autocomplete.Select2QuerySetView):
 
         if self.q:
             if self.request.user.is_superuser:
-                qs = User.objects.filter(
+                qs = self.model.objects.filter(
                     Q(username__icontains=self.q) | Q(email__icontains=self.q)
                 )
             else:
-                qs = User.objects.filter(
+                qs = self.model.objects.filter(
                     Q(username__iexact=self.q) | Q(email__iexact=self.q)
                 )
         else:
