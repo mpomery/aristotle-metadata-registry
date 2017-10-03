@@ -14,6 +14,7 @@ Changelog
     - Javascript fixes to ensure rich text and relation editors load correctly (Thanks @rafen)
     - Fixed workgroup pagination filter label to connect to search box
     - New workgroup creation and list pages
+    - Fixed a bug where search results where showing HTML entities - see #707 (Thanks @rafen)
     - **Configuration change:**
         - new options - ``ARISTOTLE_SETTINGS_STRICT_MODE``, if False errors in ARISTOTLE_SETTINGS will be logged and not prevent the app from working. Defaults to True.
         - ``BULK_ACTION`` option will no longer cause critical isuses if incorrectly configured. Errors can be logged instead
