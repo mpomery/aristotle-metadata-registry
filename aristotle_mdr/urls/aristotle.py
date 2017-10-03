@@ -92,8 +92,8 @@ urlpatterns=[
     url(r'^discussions/post/(?P<pid>\d+)/newcomment/?$', login_required(views.discussions.New_comment.as_view()), name='discussionsPostNewComment'),
     url(r'^discussions/delete/comment/(?P<cid>\d+)/?$', login_required(views.discussions.Delete_comment.as_view()), name='discussionsDeleteComment'),
     url(r'^discussions/delete/post/(?P<pid>\d+)/?$', login_required(views.discussions.Delete_post.as_view()), name='discussionsDeletePost'),
-    url(r'^discussions/edit/comment/(?P<cid>\d+)/?$', views.discussions.edit_comment, name='discussionsEditComment'),
-    url(r'^discussions/edit/post/(?P<pid>\d+)/?$', views.discussions.edit_post, name='discussionsEditPost'),
+    url(r'^discussions/edit/comment/(?P<pk>\d+)/?$', login_required(views.discussions.Edit_comment.as_view()), name='discussionsEditComment'),
+    url(r'^discussions/edit/post/(?P<pid>\d+)/?$', login_required(views.discussions.Edit_post.as_view()), name='discussionsEditPost'),
     url(r'^discussions/post/(?P<pid>\d+)/toggle/?$', login_required(views.discussions.Toggle_post.as_view()), name='discussionsPostToggle'),
 
     # url(r'^item/(?P<iid>\d+)/?$', views.items.concept, name='item'),

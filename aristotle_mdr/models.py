@@ -507,10 +507,7 @@ class DiscussionPost(discussionAbstract):
 
     @property
     def active(self):
-        return not self.closed
-
-    def get_absolute_url(self):
-        return ('')    
+        return not self.closed  
 
 
 class DiscussionComment(discussionAbstract):

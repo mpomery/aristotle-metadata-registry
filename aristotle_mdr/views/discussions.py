@@ -223,32 +223,50 @@ class Delete_post(DeleteView):
 
 
 
-def edit_comment(request, cid):
-    comment = get_object_or_404(MDR.DiscussionComment, pk=cid)
-    post = comment.post
-    if not perms.user_can_alter_comment(request.user, comment):
-        raise PermissionDenied
-    if request.method == 'POST':
+class Edit_comment(UpdateView):
+    model = MDR.DiscussionComment
+    fields = ['post']
+
+    def get(self, request, *args, **kwargs):
+        comment = get_object_or_404(MDR.DiscussionComment, pk=self.kwargs['pk'])
+        post = comment.post
+        form = MDRForms.discussions.CommentForm(instance=comment)
+
+        return render(request, "aristotle_mdr/discussions/edit_comment.html", {
+        'post': post,
+        'comment_form': form})
+
+    def post(self, request, *args, **kwargs):
+        comment = get_object_or_404(MDR.DiscussionComment, pk=self.kwargs['pk'])
+        post = comment.post
+
+        if not perms.user_can_alter_comment(request.user, comment):
+            raise PermissionDenied
+
         form = MDRForms.discussions.CommentForm(request.POST)
         if form.is_valid():
             comment.body = form.cleaned_data['body']
             comment.save()
-            return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[comment.post.pk]) + "#comment_%s" % comment.id)
-    else:
-        form = MDRForms.discussions.CommentForm(instance=comment)
+            return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[comment.post.pk]) + "#comment_%s" % comment.id)    
+    
 
-    return render(request, "aristotle_mdr/discussions/edit_comment.html", {
-        'post': post,
-        'comment_form': form})
+class Edit_post(UpdateView):
+    model = MDR.DiscussionPost
+    fields = ['workgorup', 'title', 'relatedItems']
 
+    def get(self, request, *args, **kwargs):
+        post = get_object_or_404(MDR.DiscussionPost, pk=self.kwargs['pid'])
+        form = MDRForms.discussions.EditPostForm(instance=post)
+        
+        return render(request, "aristotle_mdr/discussions/edit.html", {"form": form, 'post': post})
 
-@login_required
-def edit_post(request, pid):
-    post = get_object_or_404(MDR.DiscussionPost, pk=pid)
-    if not perms.user_can_alter_post(request.user, post):
-        raise PermissionDenied
-    if request.method == 'POST':  # If the form has been submitted...
+    def post(self, request, *args, **kwargs):
+        post = get_object_or_404(MDR.DiscussionPost, pk=self.kwargs['pid'])
         form = MDRForms.discussions.EditPostForm(request.POST)  # A form bound to the POST data
+        
+        if not perms.user_can_alter_post(request.user, post):
+            raise PermissionDenied    
+        
         if form.is_valid():
             # process the data in form.cleaned_data as required
             post.title = form.cleaned_data['title']
@@ -256,6 +274,4 @@ def edit_post(request, pid):
             post.save()
             post.relatedItems = form.cleaned_data['relatedItems']
             return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
-    else:
-        form = MDRForms.discussions.EditPostForm(instance=post)
-    return render(request, "aristotle_mdr/discussions/edit.html", {"form": form, 'post': post})
+        
