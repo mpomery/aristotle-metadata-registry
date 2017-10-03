@@ -86,7 +86,7 @@ urlpatterns=[
     url(r'^action/remove/WorkgroupRole/(?P<iid>\d+)/(?P<role>[A-Za-z\-]+)/(?P<userid>\d+)/?$', views.workgroups.remove_role, name='removeWorkgroupRole'),
 
     url(r'^discussions/?$', login_required(views.discussions.All.as_view()), name='discussions'),
-    url(r'^discussions/new/?$', views.discussions.new, name='discussionsNew'),
+    url(r'^discussions/new/?$', login_required(views.discussions.New.as_view()), name='discussionsNew'),
     url(r'^discussions/workgroup/(?P<wgid>\d+)/?$', login_required(views.discussions.Workgroup.as_view()), name='discussionsWorkgroup'),
     url(r'^discussions/post/(?P<pid>\d+)/?$', login_required(views.discussions.Post.as_view()), name='discussionsPost'),
     url(r'^discussions/post/(?P<pid>\d+)/newcomment/?$', views.discussions.new_comment, name='discussionsPostNewComment'),
@@ -94,7 +94,7 @@ urlpatterns=[
     url(r'^discussions/delete/post/(?P<pid>\d+)/?$', views.discussions.delete_post, name='discussionsDeletePost'),
     url(r'^discussions/edit/comment/(?P<cid>\d+)/?$', views.discussions.edit_comment, name='discussionsEditComment'),
     url(r'^discussions/edit/post/(?P<pid>\d+)/?$', views.discussions.edit_post, name='discussionsEditPost'),
-    url(r'^discussions/post/(?P<pid>\d+)/toggle/?$', views.discussions.toggle_post, name='discussionsPostToggle'),
+    url(r'^discussions/post/(?P<pid>\d+)/toggle/?$', login_required(views.discussions.Toggle_post.as_view()), name='discussionsPostToggle'),
 
     # url(r'^item/(?P<iid>\d+)/?$', views.items.concept, name='item'),
     url(r'^item/(?P<iid>\d+)/edit/?$', views.editors.EditItemView.as_view(), name='edit_item'),

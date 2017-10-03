@@ -13,7 +13,7 @@ from aristotle_mdr import perms
 from aristotle_mdr.models import DiscussionPost
 
 #imports CBV
-from django.views.generic import TemplateView, ListView, View
+from django.views.generic import TemplateView, ListView, View, FormView
 from django.utils.decorators import method_decorator
 
 class All(TemplateView):
@@ -74,19 +74,27 @@ class Post(TemplateView):
 
         return render(request, self.template_name, context)
 
-@login_required
-def toggle_post(request, pid):
-    post = get_object_or_404(MDR.DiscussionPost, pk=pid)
-    if not perms.user_can_alter_post(request.user, post):
-        raise PermissionDenied
-    post.closed = not post.closed
-    post.save()
-    return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
+class Toggle_post(TemplateView):
 
+    def get(self, request, *args, **kwargs):
+        context = super(Toggle_post, self).get_context_data(*args, **kwargs)
 
-@login_required
-def new(request):
-    if request.method == 'POST':  # If the form has been submitted...
+        pid = self.kwargs['pid']
+
+        post = get_object_or_404(MDR.DiscussionPost, pk=pid)
+        
+        if not perms.user_can_alter_post(request.user, post):
+            raise PermissionDenied
+
+        post.closed = not post.closed
+
+        post.save()
+
+        return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
+
+class New(FormView):
+    def post(self, request, *args, **kwargs): 
+         # If the form has been submitted...
         form = MDRForms.discussions.NewPostForm(request.POST, user=request.user)  # A form bound to the POST data
         if form.is_valid():
             # process the data in form.cleaned_data as required
@@ -99,7 +107,10 @@ def new(request):
             new.save()
             new.relatedItems = form.cleaned_data['relatedItems']
             return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[new.pk]))
-    else:
+
+        return render(request, "aristotle_mdr/discussions/new.html", {"form": form})    
+
+    def get(self, request, *args, **kwargs):
         initial = {}
         if request.GET.get('workgroup'):
             if request.user.profile.myWorkgroups.filter(id=request.GET.get('workgroup')).exists():
@@ -113,7 +124,8 @@ def new(request):
                 initial.update({'relatedItems': workgroup.items.filter(id__in=items)})
 
         form = MDRForms.discussions.NewPostForm(user=request.user, initial=initial)
-    return render(request, "aristotle_mdr/discussions/new.html", {"form": form})
+
+        return render(request, "aristotle_mdr/discussions/new.html", {"form": form})
 
 
 @login_required
