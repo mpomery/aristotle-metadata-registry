@@ -2,6 +2,8 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
+from django.contrib.auth.decorators import login_required
+
 from haystack.views import search_view_factory
 
 import aristotle_mdr.views as views
@@ -83,10 +85,10 @@ urlpatterns=[
     url(r'^workgroup/(?P<iid>\d+)/archive/?$', views.workgroups.archive, name='archive_workgroup'),
     url(r'^action/remove/WorkgroupRole/(?P<iid>\d+)/(?P<role>[A-Za-z\-]+)/(?P<userid>\d+)/?$', views.workgroups.remove_role, name='removeWorkgroupRole'),
 
-    url(r'^discussions/?$', views.discussions.All.as_view(), name='discussions'),
+    url(r'^discussions/?$', login_required(views.discussions.All.as_view()), name='discussions'),
     url(r'^discussions/new/?$', views.discussions.new, name='discussionsNew'),
-    url(r'^discussions/workgroup/(?P<wgid>\d+)/?$', views.discussions.workgroup, name='discussionsWorkgroup'),
-    url(r'^discussions/post/(?P<pid>\d+)/?$', views.discussions.post, name='discussionsPost'),
+    url(r'^discussions/workgroup/(?P<wgid>\d+)/?$', login_required(views.discussions.Workgroup.as_view()), name='discussionsWorkgroup'),
+    url(r'^discussions/post/(?P<pid>\d+)/?$', login_required(views.discussions.Post.as_view()), name='discussionsPost'),
     url(r'^discussions/post/(?P<pid>\d+)/newcomment/?$', views.discussions.new_comment, name='discussionsPostNewComment'),
     url(r'^discussions/delete/comment/(?P<cid>\d+)/?$', views.discussions.delete_comment, name='discussionsDeleteComment'),
     url(r'^discussions/delete/post/(?P<pid>\d+)/?$', views.discussions.delete_post, name='discussionsDeletePost'),

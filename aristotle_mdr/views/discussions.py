@@ -10,17 +10,24 @@ from aristotle_mdr import models as MDR
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import perms
 
+from aristotle_mdr.models import DiscussionPost
+
 #imports CBV
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView, View
 from django.utils.decorators import method_decorator
 
 class All(TemplateView):
     # Show all discussions for all of a users workgroups
     template_name = "aristotle_mdr/discussions/all.html"
     
+    """
+    I put the decorator on urls.py, just in case to
+    sign a pattern, use this in the controller:
+
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(All, self).dispatch(request, *args, **kwargs)
+    """    
 
     def get(self, request, *args, **kwargs): 
         context = super(All, self).get_context_data(*args, **kwargs)
@@ -28,33 +35,44 @@ class All(TemplateView):
 
         return render(request, self.template_name, context)
 
-@login_required
-def workgroup(request, wgid):
-    wg = get_object_or_404(MDR.Workgroup, pk=wgid)
-    if not perms.user_in_workgroup(request.user, wg):
-        raise PermissionDenied
-    # Show all discussions for a workgroups
-    page = render(request, "aristotle_mdr/discussions/workgroup.html", {
-        'workgroup': wg,
-        'discussions': wg.discussions.all()  # MDR.DiscussionPost.objects.filter(workgroup=wg)
-        })
-    return page
+class Workgroup(TemplateView):
+    template_name = "aristotle_mdr/discussions/workgroup.html"
+    # Show all discussions for a workgroups 
+    def get(self, request, *args, **kwargs): 
+        context = super(Workgroup, self).get_context_data(*args, **kwargs)
+        
+        wg = get_object_or_404(MDR.Workgroup, pk=self.kwargs['wgid'])
+        
+        if not perms.user_in_workgroup(request.user, wg):
+            raise PermissionDenied
+        
+        context['workgroup'] = wg
+        context['discussions'] = wg.discussions.all()
+
+        return render(request, self.template_name, context)
 
 
-@login_required
-def post(request, pid):
-    post = get_object_or_404(MDR.DiscussionPost, pk=pid)
-    if not perms.user_in_workgroup(request.user, post.workgroup):
-        raise PermissionDenied
-    # Show all discussions for a workgroups
-    comment_form = MDRForms.discussions.CommentForm(initial={'post': pid})
-    page = render(request, "aristotle_mdr/discussions/post.html", {
-        'workgroup': post.workgroup,
-        'post': post,
-        'comment_form': comment_form
-        })
-    return page
 
+class Post(TemplateView):
+    template_name = "aristotle_mdr/discussions/post.html"
+    
+    def get(self, request, *args, **kwargs): 
+        context = super(Post, self).get_context_data(*args, **kwargs)
+
+        post = get_object_or_404(MDR.DiscussionPost, pk=self.kwargs['pid'])
+        
+        if not perms.user_in_workgroup(request.user, post.workgroup):
+            raise PermissionDenied
+    
+        comment_form = MDRForms.discussions.CommentForm(initial={
+            'post': self.kwargs['pid']
+            })
+
+        context['workgroup'] = post.workgroup
+        context['post'] = post
+        context['comment_form'] = comment_form
+
+        return render(request, self.template_name, context)
 
 @login_required
 def toggle_post(request, pid):
