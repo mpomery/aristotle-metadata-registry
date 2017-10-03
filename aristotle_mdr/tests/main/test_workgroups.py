@@ -193,7 +193,7 @@ class WorkgroupMemberTests(utils.LoggedInViewPages,TestCase):
         # Logged in non-member can't see workgroup pages
         response = self.client.post(reverse('friendly_login'), {'username': 'nathan', 'password': 'noobie'})
         response = self.client.get(reverse('aristotle:workgroup',args=[self.wg1.id]))
-        self.assertEqual(response.status_code,302) # can't use assertRedirect as we redirect to a forbidden page?
+        self.assertEqual(response.status_code,403)
 
         response = self.client.get(self.wg1.get_absolute_url())
         self.assertEqual(response.status_code,403)
@@ -214,7 +214,7 @@ class WorkgroupMemberTests(utils.LoggedInViewPages,TestCase):
         response = self.client.get(reverse('aristotle:workgroupItems',args=[self.wg1.id]))
         self.assertEqual(response.status_code,200)
         response = self.client.get(reverse('aristotle:workgroupItems',args=[self.wg1.id])+"?page=100") # deliberately overshoot
-        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.status_code,404)
 
         self.login_manager()
 

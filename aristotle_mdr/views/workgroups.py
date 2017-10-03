@@ -28,6 +28,10 @@ class WorkgroupContextMixin:
         if not self.workgroup or not user_in_workgroup(self.request.user, self.workgroup):
             raise PermissionDenied
 
+    def check_manager_permission(self):
+        if not self.workgroup or not user_is_workgroup_manager(self.request.user, self.workgroup):
+            raise PermissionDenied
+
 
 class WorkgroupView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
     model = MDR.Workgroup
@@ -36,10 +40,10 @@ class WorkgroupView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.workgroup = self.get_object()
-        slug = self.kwargs.get(self.slug_url_kwarg, None)
-        if slug is not None and not slugify(self.object.name).startswith(slug):
-            return redirect(self.object.get_absolute_url())
         self.check_user_permission()
+        slug = self.kwargs.get(self.slug_url_kwarg)
+        if not slug or not slugify(self.object.name).startswith(slug):
+            return redirect(self.object.get_absolute_url())
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
@@ -103,7 +107,7 @@ class RemoveRoleView(LoginRequiredMixin, WorkgroupContextMixin, RedirectView):
         role = self.kwargs.get('role')
         userid = self.kwargs.get('userid')
         self.workgroup = get_object_or_404(MDR.Workgroup, pk=iid)
-        self.check_user_permission()
+        self.check_manager_permission()
         user = User.objects.filter(id=userid).first()
         if user:
             self.workgroup.removeRoleFromUser(role, user)
@@ -117,7 +121,7 @@ class ArchiveView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
 
     def get_object(self, queryset=None):
         self.workgroup = super().get_object(queryset)
-        self.check_user_permission()
+        self.check_manager_permission()
         return self.workgroup
 
     def post(self, request, *args, **kwargs):
@@ -134,7 +138,7 @@ class AddMembersView(LoginRequiredMixin, WorkgroupContextMixin, FormView):
     def get_form(self, form_class=None):
         iid = self.kwargs.get('iid')
         self.workgroup = get_object_or_404(MDR.Workgroup, pk=iid)
-        self.check_user_permission()
+        self.check_manager_permission()
         return super().get_form(form_class)
 
     def get_context_data(self, **kwargs):
