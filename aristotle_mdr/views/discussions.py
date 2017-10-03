@@ -10,15 +10,23 @@ from aristotle_mdr import models as MDR
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import perms
 
+#imports CBV
+from django.views.generic import TemplateView
+from django.utils.decorators import method_decorator
 
-@login_required
-def all(request):
+class All(TemplateView):
     # Show all discussions for all of a users workgroups
-    page = render(request, "aristotle_mdr/discussions/all.html", {
-        'discussions': request.user.profile.discussions
-        })
-    return page
+    template_name = "aristotle_mdr/discussions/all.html"
+    
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(All, self).dispatch(request, *args, **kwargs)
 
+    def get(self, request, *args, **kwargs): 
+        context = super(All, self).get_context_data(*args, **kwargs)
+        context['discussions'] = self.request.user.profile.discussions
+
+        return render(request, self.template_name, context)
 
 @login_required
 def workgroup(request, wgid):

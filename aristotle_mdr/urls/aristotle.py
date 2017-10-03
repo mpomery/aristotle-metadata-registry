@@ -12,6 +12,7 @@ from aristotle_mdr.contrib.generic.views import (
     GenericAlterManyToManyView,
     generic_foreign_key_factory_view
 )
+
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -82,7 +83,7 @@ urlpatterns=[
     url(r'^workgroup/(?P<iid>\d+)/archive/?$', views.workgroups.archive, name='archive_workgroup'),
     url(r'^action/remove/WorkgroupRole/(?P<iid>\d+)/(?P<role>[A-Za-z\-]+)/(?P<userid>\d+)/?$', views.workgroups.remove_role, name='removeWorkgroupRole'),
 
-    url(r'^discussions/?$', views.discussions.all, name='discussions'),
+    url(r'^discussions/?$', views.discussions.All.as_view(), name='discussions'),
     url(r'^discussions/new/?$', views.discussions.new, name='discussionsNew'),
     url(r'^discussions/workgroup/(?P<wgid>\d+)/?$', views.discussions.workgroup, name='discussionsWorkgroup'),
     url(r'^discussions/post/(?P<pid>\d+)/?$', views.discussions.post, name='discussionsPost'),
