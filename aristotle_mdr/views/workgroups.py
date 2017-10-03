@@ -22,7 +22,7 @@ class WorkgroupContextMixin:
             'workgroup': self.workgroup,
             'user_is_admin': user_is_workgroup_manager(self.request.user, self.workgroup),
         })
-        return super().get_context_data(**kwargs)
+        return super(WorkgroupContextMixin, self).get_context_data(**kwargs)
 
     def check_user_permission(self):
         if not self.workgroup or not user_in_workgroup(self.request.user, self.workgroup):
@@ -53,7 +53,7 @@ class WorkgroupView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
             'recent': MDR._concept.objects.filter(
                 workgroup=self.object).select_subclasses().order_by('-modified')[:5]
         })
-        return super().get_context_data(**kwargs)
+        return super(WorkgroupView, self).get_context_data(**kwargs)
 
     def get_template_names(self):
         return self.object and [self.object.template] or []
@@ -71,7 +71,7 @@ class ItemsView(LoginRequiredMixin, WorkgroupContextMixin, ListView):
             'sort': self.sort_by,
             'select_all_list_queryset_filter': 'workgroup__pk=%s' % self.workgroup.pk
         })
-        context = super().get_context_data(**kwargs)
+        context = super(ItemsView, self).get_context_data(**kwargs)
         context['page'] = context.get('page_obj')  # dirty hack for current template
         return context
 
@@ -93,7 +93,7 @@ class MembersView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
     pk_url_kwarg = 'iid'
 
     def get_object(self, queryset=None):
-        self.workgroup = super().get_object(queryset)
+        self.workgroup = super(MembersView, self).get_object(queryset)
         self.check_user_permission()
         return self.workgroup
 
@@ -111,7 +111,7 @@ class RemoveRoleView(LoginRequiredMixin, WorkgroupContextMixin, RedirectView):
         user = User.objects.filter(id=userid).first()
         if user:
             self.workgroup.removeRoleFromUser(role, user)
-        return super().get_redirect_url(self.workgroup.pk)
+        return super(RemoveRoleView, self).get_redirect_url(self.workgroup.pk)
 
 
 class ArchiveView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
@@ -120,7 +120,7 @@ class ArchiveView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
     template_name = 'aristotle_mdr/actions/archive_workgroup.html'
 
     def get_object(self, queryset=None):
-        self.workgroup = super().get_object(queryset)
+        self.workgroup = super(ArchiveView, self).get_object(queryset)
         self.check_manager_permission()
         return self.workgroup
 
@@ -139,13 +139,13 @@ class AddMembersView(LoginRequiredMixin, WorkgroupContextMixin, FormView):
         iid = self.kwargs.get('iid')
         self.workgroup = get_object_or_404(MDR.Workgroup, pk=iid)
         self.check_manager_permission()
-        return super().get_form(form_class)
+        return super(AddMembersView, self).get_form(form_class)
 
     def get_context_data(self, **kwargs):
         kwargs.update({
             'role': self.request.GET.get('role')
         })
-        return super().get_context_data(**kwargs)
+        return super(AddMembersView, self).get_context_data(**kwargs)
 
     def form_valid(self, form):
         users = form.cleaned_data['users']
@@ -153,7 +153,7 @@ class AddMembersView(LoginRequiredMixin, WorkgroupContextMixin, FormView):
         for user in users:
             for role in roles:
                 self.workgroup.giveRoleToUser(role, user)
-        return super().form_valid(form)
+        return super(AddMembersView, self).form_valid(form)
 
     def get_initial(self):
         return {'roles': self.request.GET.getlist('role')}
@@ -168,7 +168,7 @@ class LeaveView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
     template_name = 'aristotle_mdr/actions/workgroup_leave.html'
 
     def get_object(self, queryset=None):
-        self.workgroup = super().get_object(queryset)
+        self.workgroup = super(LeaveView, self).get_object(queryset)
         self.check_user_permission()
         return self.workgroup
 
