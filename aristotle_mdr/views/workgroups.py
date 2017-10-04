@@ -13,7 +13,7 @@ from aristotle_mdr.perms import user_in_workgroup, user_is_workgroup_manager
 from aristotle_mdr.views.utils import workgroup_item_statuses, paginate_sort_opts
 
 
-class WorkgroupContextMixin:
+class WorkgroupContextMixin(object):
     workgroup = None
 
     def get_context_data(self, **kwargs):
