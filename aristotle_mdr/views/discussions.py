@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -12,54 +12,51 @@ from aristotle_mdr import models as MDR
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import perms
 
-from aristotle_mdr.models import DiscussionPost
-
 from braces.views import LoginRequiredMixin
-from django.views.generic import DeleteView, TemplateView, ListView, View, FormView, UpdateView
-from django.utils.decorators import method_decorator
+from django.views.generic import DeleteView, TemplateView, FormView, UpdateView
+
 
 class All(LoginRequiredMixin, TemplateView):
     # Show all discussions for all of a users workgroups
     template_name = "aristotle_mdr/discussions/all.html"
-        
-    def get_context_data(self, **kwargs): 
+
+    def get_context_data(self, **kwargs):
         context = super(All, self).get_context_data(**kwargs)
         context['discussions'] = self.request.user.profile.discussions
 
         return context
 
+
 class Workgroup(LoginRequiredMixin, TemplateView):
     template_name = "aristotle_mdr/discussions/workgroup.html"
-    # Show all discussions for a workgroups 
-    def get(self, request, *args, **kwargs): 
+    # Show all discussions for a workgroups
+
+    def get(self, request, *args, **kwargs):
         context = super(Workgroup, self).get_context_data(*args, **kwargs)
-        
         wg = get_object_or_404(MDR.Workgroup, pk=self.kwargs['wgid'])
-        
+
         if not perms.user_in_workgroup(request.user, wg):
             raise PermissionDenied
-        
+
         context['workgroup'] = wg
         context['discussions'] = wg.discussions.all()
 
         return render(request, self.template_name, context)
 
 
-
 class Post(LoginRequiredMixin, TemplateView):
     template_name = "aristotle_mdr/discussions/post.html"
-    
-    def get(self, request, *args, **kwargs): 
+
+    def get(self, request, *args, **kwargs):
         context = super(Post, self).get_context_data(*args, **kwargs)
 
         post = get_object_or_404(MDR.DiscussionPost, pk=self.kwargs['pid'])
-        
+
         if not perms.user_in_workgroup(request.user, post.workgroup):
             raise PermissionDenied
-    
         comment_form = MDRForms.discussions.CommentForm(initial={
             'post': self.kwargs['pid']
-            })
+        })
 
         context['workgroup'] = post.workgroup
         context['post'] = post
@@ -67,15 +64,13 @@ class Post(LoginRequiredMixin, TemplateView):
 
         return render(request, self.template_name, context)
 
+
 class TogglePost(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
-        context = super(Toggle_post, self).get_context_data(*args, **kwargs)
-
         pid = self.kwargs['pid']
 
         post = get_object_or_404(MDR.DiscussionPost, pk=pid)
-        
         if not perms.user_can_alter_post(request.user, post):
             raise PermissionDenied
 
@@ -85,9 +80,10 @@ class TogglePost(LoginRequiredMixin, TemplateView):
 
         return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
 
+
 class New(LoginRequiredMixin, FormView):
-    def post(self, request, *args, **kwargs): 
-         # If the form has been submitted...
+    def post(self, request, *args, **kwargs):
+        # If the form has been submitted...
         form = MDRForms.discussions.NewPostForm(request.POST, user=request.user)  # A form bound to the POST data
         if form.is_valid():
             # process the data in form.cleaned_data as required
@@ -101,7 +97,7 @@ class New(LoginRequiredMixin, FormView):
             new.relatedItems = form.cleaned_data['relatedItems']
             return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[new.pk]))
 
-        return render(request, "aristotle_mdr/discussions/new.html", {"form": form})    
+        return render(request, "aristotle_mdr/discussions/new.html", {"form": form})
 
     def get(self, request, *args, **kwargs):
         initial = {}
@@ -109,7 +105,8 @@ class New(LoginRequiredMixin, FormView):
             if request.user.profile.myWorkgroups.filter(id=request.GET.get('workgroup')).exists():
                 initial={'workgroup': request.GET.get('workgroup')}
             else:
-                # If a user tries to navigate to a page to post to a workgroup they aren't in, redirect them to the regular post page.
+                # If a user tries to navigate to a page to post
+                # to a workgroup they aren't in, redirect them to the regular post page.
                 return HttpResponseRedirect(reverse("aristotle:discussionsNew"))
             if request.GET.getlist('item'):
                 workgroup = request.user.profile.myWorkgroups.get(id=request.GET.get('workgroup'))
@@ -121,7 +118,6 @@ class New(LoginRequiredMixin, FormView):
         return render(request, "aristotle_mdr/discussions/new.html", {"form": form})
 
 
-
 class NewComment(LoginRequiredMixin, FormView):
     def post(self, request, *args, **kwargs):
         post = get_object_or_404(MDR.DiscussionPost, pk=self.kwargs['pid'])
@@ -131,9 +127,9 @@ class NewComment(LoginRequiredMixin, FormView):
         if post.closed:
             messages.error(request, _('This post is closed. Your comment was not added.'))
             return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
-        
+
         form = MDRForms.discussions.CommentForm(request.POST)
-        
+
         if form.is_valid():
             new = MDR.DiscussionComment(
                 post=post,
@@ -145,17 +141,17 @@ class NewComment(LoginRequiredMixin, FormView):
         else:
             return render(request, "aristotle_mdr/discussions/new.html", {"form": form})
 
-    def get(self, request, *args, **kwargs): 
+    def get(self, request, *args, **kwargs):
         # It makes no sense to "GET" this comment, so push them back to the discussion
         return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
-
 
 
 class DeleteComment(LoginRequiredMixin, DeleteView):
     model = MDR.DiscussionComment
 
     def get_success_url(self):
-        success_url = lazy(reverse, self)('aristotle:discussionsPost', args=self.kwargs['cid'])        
+        success_url = lazy(reverse, self)('aristotle:discussionsPost', args=self.kwargs['cid'])
+        return success_url
 
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
@@ -168,10 +164,10 @@ class DeleteComment(LoginRequiredMixin, DeleteView):
 
         return comment
 
-    def delete(self, request, *args, **kwargs):    
-        comment = get_object_or_404(MDR.DiscussionComment, pk=self.kwargs['cid'])        
+    def delete(self, request, *args, **kwargs):
+        comment = get_object_or_404(MDR.DiscussionComment, pk=self.kwargs['cid'])
         post = comment.post
-        
+
         if not comment or not post:
             raise Http404
 
@@ -181,7 +177,6 @@ class DeleteComment(LoginRequiredMixin, DeleteView):
         comment.delete()
 
         return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
-
 
 
 class DeletePost(LoginRequiredMixin, DeleteView):
@@ -197,12 +192,13 @@ class DeletePost(LoginRequiredMixin, DeleteView):
 
         if not perms.user_can_alter_post(request.user, post):
             raise PermissionDenied
-        
+
         post.comments.all().delete()
+
         post.delete()
 
         return HttpResponseRedirect(reverse("aristotle:discussionsWorkgroup", args=[workgroup.pk]))
-    
+
     def get_success_url(self):
         post = get_object_or_404(MDR.DiscussionPost, pk=self.kwargs['pid'])
         workgroup = post.workgroup
@@ -211,7 +207,6 @@ class DeletePost(LoginRequiredMixin, DeleteView):
 
     def get(self, request, *args, **kwargs):
         return self.post(request, *args, **kwargs)
-
 
 
 class EditComment(LoginRequiredMixin, UpdateView):
@@ -223,9 +218,7 @@ class EditComment(LoginRequiredMixin, UpdateView):
         post = comment.post
         form = MDRForms.discussions.CommentForm(instance=comment)
 
-        return render(request, "aristotle_mdr/discussions/edit_comment.html", {
-        'post': post,
-        'comment_form': form})
+        return render(request, "aristotle_mdr/discussions/edit_comment.html", {'post': post, 'comment_form': form})
 
     def post(self, request, *args, **kwargs):
         comment = get_object_or_404(MDR.DiscussionComment, pk=self.kwargs['pk'])
@@ -238,8 +231,9 @@ class EditComment(LoginRequiredMixin, UpdateView):
         if form.is_valid():
             comment.body = form.cleaned_data['body']
             comment.save()
-            return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[comment.post.pk]) + "#comment_%s" % comment.id)    
-    
+
+            return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[comment.post.pk]) + "#comment_%s" % comment.id)
+
 
 class EditPost(LoginRequiredMixin, UpdateView):
     model = MDR.DiscussionPost
@@ -248,20 +242,21 @@ class EditPost(LoginRequiredMixin, UpdateView):
     def get(self, request, *args, **kwargs):
         post = get_object_or_404(MDR.DiscussionPost, pk=self.kwargs['pid'])
         form = MDRForms.discussions.EditPostForm(instance=post)
-        
+
         return render(request, "aristotle_mdr/discussions/edit.html", {"form": form, 'post': post})
 
     def post(self, request, *args, **kwargs):
         post = get_object_or_404(MDR.DiscussionPost, pk=self.kwargs['pid'])
         form = MDRForms.discussions.EditPostForm(request.POST)  # A form bound to the POST data
-        
+
         if not perms.user_can_alter_post(request.user, post):
-            raise PermissionDenied    
-        
+            raise PermissionDenied
+
         if form.is_valid():
             # process the data in form.cleaned_data as required
             post.title = form.cleaned_data['title']
             post.body = form.cleaned_data['body']
             post.save()
             post.relatedItems = form.cleaned_data['relatedItems']
+
             return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))

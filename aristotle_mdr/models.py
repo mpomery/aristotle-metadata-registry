@@ -507,7 +507,7 @@ class DiscussionPost(discussionAbstract):
 
     @property
     def active(self):
-        return not self.closed  
+        return not self.closed
 
 
 class DiscussionComment(discussionAbstract):
