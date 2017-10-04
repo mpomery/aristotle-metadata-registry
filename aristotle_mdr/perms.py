@@ -94,6 +94,17 @@ def user_is_registrar(user, ra=None):
         return user in ra.registrars.all()
 
 
+def user_is_registation_authority_manager(user, ra=None):
+    if user.is_anonymous():
+        return False
+    if user.is_superuser:
+        return True
+    elif ra is None:
+        return user.organization_manager_in.count() > 0
+    else:
+        return user in ra.managers.all()
+
+
 def user_is_workgroup_manager(user, workgroup=None):
     if user.is_superuser:
         return True

@@ -178,7 +178,96 @@ class WorkgroupCreationTests(utils.LoggedInViewPages,TestCase):
         new_wg = models.Workgroup.objects.order_by('-created').first()
         self.assertEqual(new_wg.name, "My cool team")
         self.assertEqual(new_wg.definition, "This team rocks!")
+
+
+class WorkgroupUpdateTests(utils.LoggedInViewPages,TestCase):
+    def test_anon_cannot_update(self):
+        self.logout()
+        response = self.client.get(reverse('aristotle:workgroup_create'))
+        self.assertRedirects(response,
+            reverse("friendly_login",)+"?next="+
+            reverse('aristotle:workgroup_create')
+            )
+
+    def test_viewer_cannot_update(self):
+        self.login_viewer()
+
+        my_wg = models.Workgroup.objects.create(name="My new Workgroup", definition="")
+
+        response = self.client.get(reverse('aristotle:workgroup_edit', args=[my_wg.pk]))
+        self.assertEqual(response.status_code, 403)
+
+        data = {
+            'name':"My cool registrar",
+            'definition':"This Workgroup rocks!"
+        }
+
+        response = self.client.post(
+            reverse('aristotle:workgroup_edit', args=[my_wg.pk]),
+            data
+        )
+        self.assertEqual(response.status_code, 403)
+        my_wg = models.Workgroup.objects.get(pk=my_wg.pk)
+
+        self.assertNotEqual(my_wg.name, "My cool registrar")
+        self.assertNotEqual(my_wg.definition, "This Workgroup rocks!")
+
+    def test_registry_owner_can_edit(self):
+        self.login_superuser()
+
+        my_wg = models.Workgroup.objects.create(name="My new Workgroup", definition="")
+
+        response = self.client.get(reverse('aristotle:workgroup_edit', args=[my_wg.pk]))
+        self.assertEqual(response.status_code, 200)
         
+        data = response.context['form'].initial
+        data.update({
+            'name':"My cool registrar",
+            'definition':"This Workgroup rocks!"
+        })
+
+        response = self.client.post(
+            reverse('aristotle:workgroup_edit', args=[my_wg.pk]),
+            data
+        )
+        self.assertEqual(response.status_code, 302)
+        my_wg = models.Workgroup.objects.get(pk=my_wg.pk)
+
+        self.assertEqual(my_wg.name, "My cool registrar")
+        self.assertEqual(my_wg.definition, "This Workgroup rocks!")
+
+    def test_manager_can_edit(self):
+        self.login_manager()
+
+        my_wg = models.Workgroup.objects.create(name="My new Workgroup", definition="")
+
+        response = self.client.get(reverse('aristotle:workgroup_edit', args=[my_wg.pk]))
+        self.assertEqual(response.status_code, 403)
+
+        my_wg.managers.add(self.manager)
+        my_wg = models.Workgroup.objects.get(pk=my_wg.pk)
+        self.assertTrue(self.manager in my_wg.managers.all())
+
+        response = self.client.get(reverse('aristotle:workgroup_edit', args=[my_wg.pk]))
+        self.assertEqual(response.status_code, 200)
+
+        data = response.context['form'].initial
+        data.update({
+            'name':"My cool registrar",
+            'definition':"This Workgroup rocks!",
+        })
+
+        response = self.client.post(
+            reverse('aristotle:workgroup_edit', args=[my_wg.pk]),
+            data
+        )
+        self.assertEqual(response.status_code, 302)
+        my_wg = models.Workgroup.objects.get(pk=my_wg.pk)
+
+        self.assertEqual(my_wg.name, "My cool registrar")
+        self.assertEqual(my_wg.definition, "This Workgroup rocks!")
+
+
 class WorkgroupListTests(utils.LoggedInViewPages,TestCase):
     def test_anon_cannot_list(self):
         self.logout()

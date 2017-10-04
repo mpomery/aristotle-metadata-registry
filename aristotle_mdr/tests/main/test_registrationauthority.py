@@ -94,6 +94,21 @@ class RAUpdateTests(utils.LoggedInViewPages,TestCase):
         response = self.client.get(reverse('aristotle:registrationauthority_edit', args=[my_ra.pk]))
         self.assertEqual(response.status_code, 403)
 
+        data = {
+            'name':"My cool registrar",
+            'definition':"This RA rocks!"
+        }
+
+        response = self.client.post(
+            reverse('aristotle:registrationauthority_edit', args=[my_ra.pk]),
+            data
+        )
+        self.assertEqual(response.status_code, 403)
+        my_ra = models.RegistrationAuthority.objects.get(pk=my_ra.pk)
+
+        self.assertNotEqual(my_ra.name, "My cool registrar")
+        self.assertNotEqual(my_ra.definition, "This RA rocks!")
+
     def test_registry_owner_can_edit(self):
         self.login_superuser()
 
@@ -113,7 +128,7 @@ class RAUpdateTests(utils.LoggedInViewPages,TestCase):
             data
         )
         self.assertEqual(response.status_code, 302)
-        my_ra = models.RegistrationAuthority.objects.get(pk=my_ra)
+        my_ra = models.RegistrationAuthority.objects.get(pk=my_ra.pk)
 
         self.assertEqual(my_ra.name, "My cool registrar")
         self.assertEqual(my_ra.definition, "This RA rocks!")
@@ -124,17 +139,27 @@ class RAUpdateTests(utils.LoggedInViewPages,TestCase):
         my_ra = models.RegistrationAuthority.objects.create(name="My new RA", definition="")
 
         response = self.client.get(reverse('aristotle:registrationauthority_edit', args=[my_ra.pk]))
+        self.assertEqual(response.status_code, 403)
+
+        my_ra.managers.add(self.ramanager)
+        my_ra = models.RegistrationAuthority.objects.get(pk=my_ra.pk)
+        self.assertTrue(self.ramanager in my_ra.managers.all())
+
+        response = self.client.get(reverse('aristotle:registrationauthority_edit', args=[my_ra.pk]))
         self.assertEqual(response.status_code, 200)
+
+        data = response.context['form'].initial
+        data.update({
+            'name':"My cool registrar",
+            'definition':"This RA rocks!",
+        })
 
         response = self.client.post(
             reverse('aristotle:registrationauthority_edit', args=[my_ra.pk]),
-            {
-                'name':"My cool registrar",
-                'definition':"This RA rocks!"
-            }
+            data
         )
         self.assertEqual(response.status_code, 302)
-        my_ra = models.RegistrationAuthority.objects.get(pk=my_ra)
+        my_ra = models.RegistrationAuthority.objects.get(pk=my_ra.pk)
 
         self.assertEqual(my_ra.name, "My cool registrar")
         self.assertEqual(my_ra.definition, "This RA rocks!")
