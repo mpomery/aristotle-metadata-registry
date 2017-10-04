@@ -14,30 +14,21 @@ from aristotle_mdr import perms
 
 from aristotle_mdr.models import DiscussionPost
 
-#imports CBV
+from braces.views import LoginRequiredMixin
 from django.views.generic import DeleteView, TemplateView, ListView, View, FormView, UpdateView
 from django.utils.decorators import method_decorator
 
-class All(TemplateView):
+class All(LoginRequiredMixin, TemplateView):
     # Show all discussions for all of a users workgroups
     template_name = "aristotle_mdr/discussions/all.html"
-    
-    """
-    I put the decorator on urls.py, just in case to
-    sign a pattern, use this in the controller:
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super(All, self).dispatch(request, *args, **kwargs)
-    """    
-
-    def get(self, request, *args, **kwargs): 
-        context = super(All, self).get_context_data(*args, **kwargs)
+        
+    def get_context_data(self, **kwargs): 
+        context = super(All, self).get_context_data(**kwargs)
         context['discussions'] = self.request.user.profile.discussions
 
-        return render(request, self.template_name, context)
+        return context
 
-class Workgroup(TemplateView):
+class Workgroup(LoginRequiredMixin, TemplateView):
     template_name = "aristotle_mdr/discussions/workgroup.html"
     # Show all discussions for a workgroups 
     def get(self, request, *args, **kwargs): 
@@ -55,7 +46,7 @@ class Workgroup(TemplateView):
 
 
 
-class Post(TemplateView):
+class Post(LoginRequiredMixin, TemplateView):
     template_name = "aristotle_mdr/discussions/post.html"
     
     def get(self, request, *args, **kwargs): 
@@ -76,7 +67,7 @@ class Post(TemplateView):
 
         return render(request, self.template_name, context)
 
-class Toggle_post(TemplateView):
+class TogglePost(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         context = super(Toggle_post, self).get_context_data(*args, **kwargs)
@@ -94,7 +85,7 @@ class Toggle_post(TemplateView):
 
         return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
 
-class New(FormView):
+class New(LoginRequiredMixin, FormView):
     def post(self, request, *args, **kwargs): 
          # If the form has been submitted...
         form = MDRForms.discussions.NewPostForm(request.POST, user=request.user)  # A form bound to the POST data
@@ -131,7 +122,7 @@ class New(FormView):
 
 
 
-class New_comment(FormView):
+class NewComment(LoginRequiredMixin, FormView):
     def post(self, request, *args, **kwargs):
         post = get_object_or_404(MDR.DiscussionPost, pk=self.kwargs['pid'])
 
@@ -160,7 +151,7 @@ class New_comment(FormView):
 
 
 
-class Delete_comment(DeleteView):
+class DeleteComment(LoginRequiredMixin, DeleteView):
     model = MDR.DiscussionComment
 
     def get_success_url(self):
@@ -193,7 +184,7 @@ class Delete_comment(DeleteView):
 
 
 
-class Delete_post(DeleteView):
+class DeletePost(LoginRequiredMixin, DeleteView):
     model = MDR.DiscussionPost
 
     def get_object(self, queryset=None):
@@ -223,7 +214,7 @@ class Delete_post(DeleteView):
 
 
 
-class Edit_comment(UpdateView):
+class EditComment(LoginRequiredMixin, UpdateView):
     model = MDR.DiscussionComment
     fields = ['post']
 
@@ -250,7 +241,7 @@ class Edit_comment(UpdateView):
             return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[comment.post.pk]) + "#comment_%s" % comment.id)    
     
 
-class Edit_post(UpdateView):
+class EditPost(LoginRequiredMixin, UpdateView):
     model = MDR.DiscussionPost
     fields = ['workgorup', 'title', 'relatedItems']
 
@@ -274,4 +265,3 @@ class Edit_post(UpdateView):
             post.save()
             post.relatedItems = form.cleaned_data['relatedItems']
             return HttpResponseRedirect(reverse("aristotle:discussionsPost", args=[post.pk]))
-        
