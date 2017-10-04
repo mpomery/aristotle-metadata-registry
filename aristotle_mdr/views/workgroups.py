@@ -1,3 +1,4 @@
+from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
@@ -135,32 +136,20 @@ def leave(request, iid):
     )
 
 
-class CreateWorkgroup(CreateView):
+class CreateWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = MDR.Workgroup
     template_name = "aristotle_mdr/user/workgroups/add.html"
     fields = ['name', 'definition']
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect(
-                reverse('friendly_login') + '?next=%s' % request.path
-            )
-        if not request.user.has_perm("aristotle_mdr.add_workgroup"):
-            raise PermissionDenied
-        return super(CreateWorkgroup, self).dispatch(request, *args, **kwargs)
+    permission_required = "aristotle_mdr.add_workgroup"
 
 
-class ListWorkgroup(ListView):
+
+class ListWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = MDR.Workgroup
     template_name = "aristotle_mdr/user/workgroups/list_all.html"
+    permission_required = "aristotle_mdr.is_registry_administrator"
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect(
-                reverse('friendly_login') + '?next=%s' % request.path
-            )
-        if not request.user.has_perm("aristotle_mdr.is_registry_administrator"):
-            raise PermissionDenied
         workgroups = MDR.Workgroup.objects.all()
 
         text_filter = request.GET.get('filter', "")
@@ -171,7 +160,7 @@ class ListWorkgroup(ListView):
         # return super(ListWorkgroup, self).dispatch(request, *args, **kwargs)
 
 
-class EditWorkgroup(UpdateView):
+class EditWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = MDR.Workgroup
     template_name = "aristotle_mdr/user/workgroups/edit.html"
 
@@ -182,12 +171,4 @@ class EditWorkgroup(UpdateView):
 
     pk_url_kwarg = 'iid'
     context_object_name = "item"
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect(
-                reverse('friendly_login') + '?next=%s' % request.path
-            )
-        if not request.user.has_perm("aristotle_mdr.change_workgroup"):
-            raise PermissionDenied
-        return super(EditWorkgroup, self).dispatch(request, *args, **kwargs)
+    permission_required = "aristotle_mdr.change_workgroup"

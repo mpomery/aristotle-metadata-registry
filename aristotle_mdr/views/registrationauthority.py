@@ -1,3 +1,4 @@
+from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
@@ -50,32 +51,19 @@ def all_organizations(request):
     return render(request, "aristotle_mdr/organization/all_organizations.html", {'organization': orgs})
 
 
-class CreateRegistrationAuthority(CreateView):
+class CreateRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = MDR.RegistrationAuthority
     template_name = "aristotle_mdr/user/registration_authority/add.html"
     fields = ['name', 'definition']
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect(
-                reverse('friendly_login') + '?next=%s' % request.path
-            )
-        if not request.user.has_perm("aristotle_mdr.add_registration_authority"):
-            raise PermissionDenied
-        return super(CreateRegistrationAuthority, self).dispatch(request, *args, **kwargs)
+    permission_required = "aristotle_mdr.add_registration_authority"
 
 
-class ListRegistrationAuthority(ListView):
+class ListRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = MDR.RegistrationAuthority
     template_name = "aristotle_mdr/user/registration_authority/list_all.html"
+    permission_required = "aristotle_mdr.is_registry_administrator"
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect(
-                reverse('friendly_login') + '?next=%s' % request.path
-            )
-        if not request.user.has_perm("aristotle_mdr.is_registry_administrator"):
-            raise PermissionDenied
         ras = MDR.RegistrationAuthority.objects.all()
 
         text_filter = request.GET.get('filter', "")
@@ -86,26 +74,19 @@ class ListRegistrationAuthority(ListView):
         # return super(ListRegistrationAuthority, self).dispatch(request, *args, **kwargs)
 
 
-class ManageRegistrationAuthority(DetailView):
+class ManageRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = MDR.RegistrationAuthority
     template_name = "aristotle_mdr/user/registration_authority/manage.html"
+    permission_required = "aristotle_mdr.change_registration_authority"
 
     pk_url_kwarg = 'iid'
     context_object_name = "item"
 
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect(
-                reverse('friendly_login') + '?next=%s' % request.path
-            )
-        if not request.user.has_perm("aristotle_mdr.change_registration_authority"):
-            raise PermissionDenied
-        return super(ManageRegistrationAuthority, self).dispatch(request, *args, **kwargs)
 
-
-class EditRegistrationAuthority(UpdateView):
+class EditRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = MDR.RegistrationAuthority
     template_name = "aristotle_mdr/user/registration_authority/edit.html"
+    permission_required = "aristotle_mdr.change_registration_authority"
 
     fields = [
         'name',
@@ -125,12 +106,3 @@ class EditRegistrationAuthority(UpdateView):
 
     pk_url_kwarg = 'iid'
     context_object_name = "item"
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect(
-                reverse('friendly_login') + '?next=%s' % request.path
-            )
-        if not request.user.has_perm("aristotle_mdr.change_registration_authority"):
-            raise PermissionDenied
-        return super(EditRegistrationAuthority, self).dispatch(request, *args, **kwargs)
