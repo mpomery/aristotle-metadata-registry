@@ -17,12 +17,14 @@ class WorkgroupContextMixin:
     workgroup = None
 
     def get_context_data(self, **kwargs):
-        kwargs.update({
+        # Get context from super-classes, because if may set value for workgroup
+        context = super(WorkgroupContextMixin, self).get_context_data(**kwargs)
+        context.update({
             'item': self.workgroup,
             'workgroup': self.workgroup,
             'user_is_admin': user_is_workgroup_manager(self.request.user, self.workgroup),
         })
-        return super(WorkgroupContextMixin, self).get_context_data(**kwargs)
+        return context
 
     def check_user_permission(self):
         if not self.workgroup or not user_in_workgroup(self.request.user, self.workgroup):
