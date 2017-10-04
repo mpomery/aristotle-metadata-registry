@@ -141,15 +141,19 @@ class CreateWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     template_name = "aristotle_mdr/user/workgroups/add.html"
     fields = ['name', 'definition']
     permission_required = "aristotle_mdr.add_workgroup"
-
+    raise_exception = True
+    redirect_unauthenticated_users = True
 
 
 class ListWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = MDR.Workgroup
     template_name = "aristotle_mdr/user/workgroups/list_all.html"
     permission_required = "aristotle_mdr.is_registry_administrator"
+    raise_exception = True
+    redirect_unauthenticated_users = True
 
     def dispatch(self, request, *args, **kwargs):
+        super(ListWorkgroup, self).dispatch(request, *args, **kwargs)
         workgroups = MDR.Workgroup.objects.all()
 
         text_filter = request.GET.get('filter', "")
@@ -157,12 +161,14 @@ class ListWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, ListView):
             workgroups = workgroups.filter(Q(name__icontains=text_filter) | Q(definition__icontains=text_filter))
         context = {'filter': text_filter}
         return paginated_workgroup_list(request, workgroups, self.template_name, context)
-        # return super(ListWorkgroup, self).dispatch(request, *args, **kwargs)
 
 
 class EditWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = MDR.Workgroup
     template_name = "aristotle_mdr/user/workgroups/edit.html"
+    permission_required = "aristotle_mdr.change_workgroup"
+    raise_exception = True
+    redirect_unauthenticated_users = True
 
     fields = [
         'name',
@@ -171,4 +177,3 @@ class EditWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 
     pk_url_kwarg = 'iid'
     context_object_name = "item"
-    permission_required = "aristotle_mdr.change_workgroup"

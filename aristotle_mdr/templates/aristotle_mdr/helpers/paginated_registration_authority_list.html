@@ -44,7 +44,7 @@ Showing {{ page.paginator.count }} results.
     <tr>
         <td>
             {% if manage %}
-            <a href="{% url 'aristotle:registration_authority_manage' item.id %}">{{ item.name }}</a>
+            <a href="{% url 'aristotle:registrationauthority_manage' item.id %}">{{ item.name }}</a>
             {% else %}
             <a href="{{ item.get_absolute_url }}">{{ item.name }}</a>
             {% endif %}

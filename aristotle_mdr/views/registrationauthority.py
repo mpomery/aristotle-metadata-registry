@@ -56,14 +56,19 @@ class CreateRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, C
     template_name = "aristotle_mdr/user/registration_authority/add.html"
     fields = ['name', 'definition']
     permission_required = "aristotle_mdr.add_registration_authority"
+    raise_exception = True
+    redirect_unauthenticated_users = True
 
 
 class ListRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = MDR.RegistrationAuthority
     template_name = "aristotle_mdr/user/registration_authority/list_all.html"
     permission_required = "aristotle_mdr.is_registry_administrator"
+    raise_exception = True
+    redirect_unauthenticated_users = True
 
     def dispatch(self, request, *args, **kwargs):
+        super(ListRegistrationAuthority, self).dispatch(request, *args, **kwargs)
         ras = MDR.RegistrationAuthority.objects.all()
 
         text_filter = request.GET.get('filter', "")
@@ -71,13 +76,14 @@ class ListRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, Lis
             ras = ras.filter(Q(name__icontains=text_filter) | Q(definition__icontains=text_filter))
         context = {'filter': text_filter}
         return paginated_registration_authority_list(request, ras, self.template_name, context)
-        # return super(ListRegistrationAuthority, self).dispatch(request, *args, **kwargs)
 
 
 class ManageRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = MDR.RegistrationAuthority
     template_name = "aristotle_mdr/user/registration_authority/manage.html"
     permission_required = "aristotle_mdr.change_registration_authority"
+    raise_exception = True
+    redirect_unauthenticated_users = True
 
     pk_url_kwarg = 'iid'
     context_object_name = "item"
@@ -87,6 +93,8 @@ class EditRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, Upd
     model = MDR.RegistrationAuthority
     template_name = "aristotle_mdr/user/registration_authority/edit.html"
     permission_required = "aristotle_mdr.change_registration_authority"
+    raise_exception = True
+    redirect_unauthenticated_users = True
 
     fields = [
         'name',

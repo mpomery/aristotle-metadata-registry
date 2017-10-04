@@ -180,7 +180,7 @@ class WorkgroupCreationTests(utils.LoggedInViewPages,TestCase):
         self.assertEqual(new_wg.definition, "This team rocks!")
         
 class WorkgroupListTests(utils.LoggedInViewPages,TestCase):
-    def test_anon_cannot_create(self):
+    def test_anon_cannot_list(self):
         self.logout()
         response = self.client.get(reverse('aristotle:workgroup_list'))
         self.assertRedirects(response,
@@ -188,19 +188,19 @@ class WorkgroupListTests(utils.LoggedInViewPages,TestCase):
             reverse('aristotle:workgroup_list')
             )
 
-    def test_viewer_cannot_create(self):
+    def test_viewer_cannot_list(self):
         self.login_viewer()
 
         response = self.client.get(reverse('aristotle:workgroup_list'))
         self.assertEqual(response.status_code, 403)
 
-    def test_manager_cannot_create(self):
+    def test_manager_cannot_list(self):
         self.login_manager()
 
         response = self.client.get(reverse('aristotle:workgroup_list'))
         self.assertEqual(response.status_code, 403)
 
-    def test_registry_owner_can_create(self):
+    def test_registry_owner_can_list(self):
         self.login_superuser()
 
         response = self.client.get(reverse('aristotle:workgroup_list'))
