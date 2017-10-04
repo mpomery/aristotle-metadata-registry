@@ -77,7 +77,7 @@ jobs:
     - <<: *main_test_script_py35
       env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
     - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
+      env: DJANGO_VERSION='1.10'  DB=postgres  SEARCH=elastic
     - <<: *main_test_script_py35
       env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh
     - <<: *main_test_script_py35
@@ -90,7 +90,7 @@ jobs:
     - <<: *main_test_script_py27
       env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
     - <<: *main_test_script_py27
-      env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
+      env: DJANGO_VERSION='1.10'  DB=postgres  SEARCH=elastic
     - <<: *main_test_script_py27
       env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh
     - <<: *main_test_script_py27
