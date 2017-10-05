@@ -170,12 +170,18 @@ class WorkgroupCreationTests(utils.LoggedInViewPages,TestCase):
             {
                 'name':"My cool team",
                 'definition':"This team rocks!"
-            }
+            },
+            follow=True
         )
-        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.redirect_chain[0][1] == 302)
+
+        self.assertEqual(response.status_code, 200)
         after_count = models.Workgroup.objects.count()
         self.assertEqual(after_count, before_count + 1)
-        new_wg = models.Workgroup.objects.order_by('-created').first()
+
+        # new_wg = models.Workgroup.objects.order_by('-created').first()
+        new_wg = response.context['item']
+
         self.assertEqual(new_wg.name, "My cool team")
         self.assertEqual(new_wg.definition, "This team rocks!")
 

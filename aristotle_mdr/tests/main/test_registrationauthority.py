@@ -68,14 +68,21 @@ class RACreationTests(utils.LoggedInViewPages,TestCase):
             {
                 'name':"My cool registrar",
                 'definition':"This RA rocks!"
-            }
+            },
+            follow=True
         )
-        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.redirect_chain[0][1] == 302)
+
+        self.assertEqual(response.status_code, 200)
         after_count = models.RegistrationAuthority.objects.count()
         self.assertEqual(after_count, before_count + 1)
-        new_ra = models.RegistrationAuthority.objects.order_by('-created').first()
+
+        new_ra = response.context['item']
+
         self.assertEqual(new_ra.name, "My cool registrar")
         self.assertEqual(new_ra.definition, "This RA rocks!")
+
+
 
 class RAUpdateTests(utils.LoggedInViewPages,TestCase):
     def test_anon_cannot_update(self):
