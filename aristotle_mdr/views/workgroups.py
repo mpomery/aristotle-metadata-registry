@@ -187,6 +187,7 @@ class LeaveView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
         self.get_object().removeUser(request.user)
         return HttpResponseRedirect(reverse("aristotle:userHome"))
 
+
 class CreateWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = MDR.Workgroup
     template_name = "aristotle_mdr/user/workgroups/add.html"
@@ -236,7 +237,7 @@ class EditWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         """
         perms = self.get_permission_required(request)
         has_permission = False
-        if hasattr(self, 'object')  and self.object is not None: 
+        if hasattr(self, 'object') and self.object is not None:
             has_permission = request.user.has_perm(self.get_permission_required(request), self.object)
         elif hasattr(self, 'get_object') and callable(self.get_object):
             has_permission = request.user.has_perm(self.get_permission_required(request), self.get_object())
