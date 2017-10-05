@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.test.utils import setup_test_environment

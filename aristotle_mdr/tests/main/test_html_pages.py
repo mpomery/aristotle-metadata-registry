@@ -336,7 +336,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         self.assertEqual(response.status_code,200)
         updated_item = utils.model_to_dict_with_change_time(response.context['item'])
         updated_item['workgroup'] = str(self.wg_other.pk)
-        # print updated_item
+
         response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
         self.assertEqual(response.status_code,200)
 
@@ -345,11 +345,11 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         self.assertTrue('Select a valid choice.' in form.errors['workgroup'][0])
 
         self.wg_other.submitters.add(self.editor)
-        # print self.editor, models.Property.objects.visible(self.editor), [i.pk for i in models.Property.objects.visible(self.editor)], updated_item
+
         response = self.client.get(reverse('aristotle:edit_item',args=[self.item1.id]))
-        # print response
+
         response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
-        # print response
+
         self.assertEqual(response.status_code,302)
         updated_item['workgroup'] = str(self.wg2.pk)
         response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
@@ -1191,10 +1191,10 @@ class DataElementConceptViewPage(LoggedInViewConceptPages, TestCase):
 
         self.assertFalse(self.prop.can_view(self.regular))
         self.assertFalse(different_prop.can_view(self.regular))
-        # print updated_item
+
         response = self.client.post(reverse('aristotle:edit_item',args=[self.regular_item.id]), updated_item)
         self.regular_item = self.itemType.objects.get(pk=self.regular_item.pk)
-        # print self.regular_item.property
+
         self.assertEqual(response.status_code,200)
         self.assertTrue('not one of the available choices' in response.context['form'].errors['property'][0])
         self.assertFalse(self.regular_item.name == updated_name)
