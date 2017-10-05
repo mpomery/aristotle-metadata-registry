@@ -2,8 +2,6 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
-from django.contrib.auth.decorators import login_required
-
 from haystack.views import search_view_factory
 
 import aristotle_mdr.views as views
