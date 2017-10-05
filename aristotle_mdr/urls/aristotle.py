@@ -2,6 +2,8 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
+from django.contrib.auth.decorators import login_required
+
 from haystack.views import search_view_factory
 
 import aristotle_mdr.views as views
@@ -12,6 +14,7 @@ from aristotle_mdr.contrib.generic.views import (
     GenericAlterManyToManyView,
     generic_foreign_key_factory_view
 )
+
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -86,16 +89,16 @@ urlpatterns=[
     url(r'^workgroups/all/?$', views.workgroups.ListWorkgroup.as_view(), name='workgroup_list'),
 
 
-    url(r'^discussions/?$', views.discussions.all, name='discussions'),
-    url(r'^discussions/new/?$', views.discussions.new, name='discussionsNew'),
-    url(r'^discussions/workgroup/(?P<wgid>\d+)/?$', views.discussions.workgroup, name='discussionsWorkgroup'),
-    url(r'^discussions/post/(?P<pid>\d+)/?$', views.discussions.post, name='discussionsPost'),
-    url(r'^discussions/post/(?P<pid>\d+)/newcomment/?$', views.discussions.new_comment, name='discussionsPostNewComment'),
-    url(r'^discussions/delete/comment/(?P<cid>\d+)/?$', views.discussions.delete_comment, name='discussionsDeleteComment'),
-    url(r'^discussions/delete/post/(?P<pid>\d+)/?$', views.discussions.delete_post, name='discussionsDeletePost'),
-    url(r'^discussions/edit/comment/(?P<cid>\d+)/?$', views.discussions.edit_comment, name='discussionsEditComment'),
-    url(r'^discussions/edit/post/(?P<pid>\d+)/?$', views.discussions.edit_post, name='discussionsEditPost'),
-    url(r'^discussions/post/(?P<pid>\d+)/toggle/?$', views.discussions.toggle_post, name='discussionsPostToggle'),
+    url(r'^discussions/?$', views.discussions.All.as_view(), name='discussions'),
+    url(r'^discussions/new/?$', views.discussions.New.as_view(), name='discussionsNew'),
+    url(r'^discussions/workgroup/(?P<wgid>\d+)/?$', views.discussions.Workgroup.as_view(), name='discussionsWorkgroup'),
+    url(r'^discussions/post/(?P<pid>\d+)/?$', views.discussions.Post.as_view(), name='discussionsPost'),
+    url(r'^discussions/post/(?P<pid>\d+)/newcomment/?$', views.discussions.NewComment.as_view(), name='discussionsPostNewComment'),
+    url(r'^discussions/delete/comment/(?P<cid>\d+)/?$', views.discussions.DeleteComment.as_view(), name='discussionsDeleteComment'),
+    url(r'^discussions/delete/post/(?P<pid>\d+)/?$', views.discussions.DeletePost.as_view(), name='discussionsDeletePost'),
+    url(r'^discussions/edit/comment/(?P<pk>\d+)/?$', views.discussions.EditComment.as_view(), name='discussionsEditComment'),
+    url(r'^discussions/edit/post/(?P<pid>\d+)/?$', views.discussions.EditPost.as_view(), name='discussionsEditPost'),
+    url(r'^discussions/post/(?P<pid>\d+)/toggle/?$', views.discussions.TogglePost.as_view(), name='discussionsPostToggle'),
 
     # url(r'^item/(?P<iid>\d+)/?$', views.items.concept, name='item'),
     url(r'^item/(?P<iid>\d+)/edit/?$', views.editors.EditItemView.as_view(), name='edit_item'),
