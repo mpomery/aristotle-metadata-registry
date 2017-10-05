@@ -181,20 +181,54 @@ class RAListTests(utils.LoggedInViewPages,TestCase):
             reverse('aristotle:registrationauthority_list')
             )
 
-    def test_viewer_cannot_create(self):
+    def test_viewer_cannot_list(self):
         self.login_viewer()
 
         response = self.client.get(reverse('aristotle:registrationauthority_list'))
         self.assertEqual(response.status_code, 403)
 
-    def test_ramanager_cannot_create(self):
+    def test_ramanager_cannot_list(self):
         self.login_ramanager()
 
         response = self.client.get(reverse('aristotle:registrationauthority_list'))
         self.assertEqual(response.status_code, 403)
 
-    def test_registry_owner_can_create(self):
+    def test_registry_owner_can_list(self):
         self.login_superuser()
 
         response = self.client.get(reverse('aristotle:registrationauthority_list'))
+        self.assertEqual(response.status_code, 200)
+
+
+
+class RAManageTests(utils.LoggedInViewPages,TestCase):
+    def test_anon_cannot_create(self):
+        self.logout()
+        response = self.client.get(reverse('aristotle:registrationauthority_manage', args=[self.ra.pk]))
+        self.assertRedirects(response,
+            reverse("friendly_login",)+"?next="+
+            reverse('aristotle:registrationauthority_manage', args=[self.ra.pk])
+            )
+
+    def test_viewer_cannot_view_manage(self):
+        self.login_viewer()
+
+        response = self.client.get(reverse('aristotle:registrationauthority_manage', args=[self.ra.pk]))
+        self.assertEqual(response.status_code, 403)
+
+    def test_ramanager_can_view_manage(self):
+        self.login_ramanager()
+
+        response = self.client.get(reverse('aristotle:registrationauthority_manage', args=[self.ra.pk]))
+        self.assertEqual(response.status_code, 200)
+
+        self.ra.managers.remove(self.ramanager)
+        self.ra = models.RegistrationAuthority.objects.get(pk=self.ra.pk)
+        response = self.client.get(reverse('aristotle:registrationauthority_manage', args=[self.ra.pk]))
+        self.assertEqual(response.status_code, 403)
+
+    def test_registry_owner_can_view_manage(self):
+        self.login_superuser()
+
+        response = self.client.get(reverse('aristotle:registrationauthority_manage', args=[self.ra.pk]))
         self.assertEqual(response.status_code, 200)
