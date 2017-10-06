@@ -231,4 +231,3 @@ class EditWorkgroup(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, Upda
 
     pk_url_kwarg = 'iid'
     context_object_name = "item"
-
