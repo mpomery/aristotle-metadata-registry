@@ -15,6 +15,22 @@ def user_can_alter_post(user, post):
     return user.is_superuser or user == post.author or user_is_workgroup_manager(user, post.workgroup)
 
 
+def can_post_discussion(user, _):
+    return user.is_active and user.profile.myWorkgroups.count() > 0
+
+
+def can_comment_on_post(user, post):
+    return user_in_workgroup(user, post.workgroup)
+
+
+def can_delete_comment(user, comment):
+    return user_can_alter_comment(user, comment)
+
+
+def can_delete_discussion_post(user, post):
+    return user_can_alter_post(user, post)
+
+
 def user_can_view(user, item):
     """Can the user view the item?"""
     if user.is_superuser:

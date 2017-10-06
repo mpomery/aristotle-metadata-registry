@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
+from django.urls import reverse_lazy
 
 from haystack.views import search_view_factory
 
@@ -94,7 +95,7 @@ urlpatterns=[
     url(r'^discussions/post/(?P<pid>\d+)/newcomment/?$', views.discussions.NewComment.as_view(), name='discussionsPostNewComment'),
     url(r'^discussions/delete/comment/(?P<cid>\d+)/?$', views.discussions.DeleteComment.as_view(), name='discussionsDeleteComment'),
     url(r'^discussions/delete/post/(?P<pid>\d+)/?$', views.discussions.DeletePost.as_view(), name='discussionsDeletePost'),
-    url(r'^discussions/edit/comment/(?P<pk>\d+)/?$', views.discussions.EditComment.as_view(), name='discussionsEditComment'),
+    url(r'^discussions/edit/comment/(?P<cid>\d+)/?$', views.discussions.EditComment.as_view(), name='discussionsEditComment'),
     url(r'^discussions/edit/post/(?P<pid>\d+)/?$', views.discussions.EditPost.as_view(), name='discussionsEditPost'),
     url(r'^discussions/post/(?P<pid>\d+)/toggle/?$', views.discussions.TogglePost.as_view(), name='discussionsPostToggle'),
 
@@ -129,7 +130,7 @@ urlpatterns=[
     url(r'^action/changestatus/(?P<iid>\d+)$', views.changeStatus, name='changeStatus'),
     # url(r'^remove/WorkgroupUser/(?P<iid>\d+)/(?P<userid>\d+)$', views.removeWorkgroupUser, name='removeWorkgroupUser'),
 
-    url(r'^account/?$', RedirectView.as_view(url='account/home/', permanent=True)),
+    url(r'^account/?$', RedirectView.as_view(url=reverse_lazy("aristotle:userHome"), permanent=True)),
     url(r'^account/home/?$', views.user_pages.home, name='userHome'),
     url(r'^account/sandbox/?$', views.user_pages.CreatedItemsListView.as_view(), name='userSandbox'),
     url(r'^account/roles/?$', views.user_pages.roles, name='userRoles'),

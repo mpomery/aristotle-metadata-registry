@@ -69,6 +69,14 @@ class AristotleBackend(ModelBackend):
         if perm == "aristotle_mdr.can_archive_workgroup":
             return perms.user_is_workgroup_manager(user_obj, obj)
 
+
+        if perm == "aristotle_mdr.can_view_discussions_in_workgroup":
+            return perms.user_in_workgroup(user_obj, obj)
+        if perm == "aristotle_mdr.can_post_discussion_in_workgroup":
+            return perms.user_in_workgroup(user_obj, obj)
+        if perm == "aristotle_mdr.can_view_discussion_post":
+            return perms.user_in_workgroup(user_obj, obj.workgroup)
+
         if perm == "aristotle_mdr.change_registrationauthority":
             return perms.user_is_registation_authority_manager(user_obj, obj)
         if perm == "aristotle_mdr.change_registrationauthority_memberships":

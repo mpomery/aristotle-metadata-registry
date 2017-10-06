@@ -19,6 +19,7 @@ from aristotle_mdr.views.utils import (
     paginate_sort_opts,
     paginated_workgroup_list,
     workgroup_item_statuses,
+    ObjectLevelPermissionRequiredMixin
 )
 
 
@@ -215,7 +216,7 @@ class ListWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         return paginated_workgroup_list(request, workgroups, self.template_name, context)
 
 
-class EditWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+class EditWorkgroup(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, UpdateView):
     model = MDR.Workgroup
     template_name = "aristotle_mdr/user/workgroups/edit.html"
     permission_required = "aristotle_mdr.change_workgroup"
@@ -231,16 +232,3 @@ class EditWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     pk_url_kwarg = 'iid'
     context_object_name = "item"
 
-    def check_permissions(self, request):
-        """
-        Returns whether or not the user has permissions
-        """
-        perms = self.get_permission_required(request)
-        has_permission = False
-        if hasattr(self, 'object') and self.object is not None:
-            has_permission = request.user.has_perm(self.get_permission_required(request), self.object)
-        elif hasattr(self, 'get_object') and callable(self.get_object):
-            has_permission = request.user.has_perm(self.get_permission_required(request), self.get_object())
-        else:
-            has_permission = request.user.has_perm(self.get_permission_required(request))
-        return has_permission

@@ -1,3 +1,4 @@
+from braces.views import PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -229,3 +230,19 @@ def generate_visibility_matrix(user):
                 ra_matrix['states'][s] = "hidden"
         matrix[ra.id] = ra_matrix
     return matrix
+
+
+class ObjectLevelPermissionRequiredMixin(PermissionRequiredMixin):
+    def check_permissions(self, request):
+        """
+        Returns whether or not the user has permissions
+        """
+        perms = self.get_permission_required(request)
+        has_permission = False
+        if hasattr(self, 'object') and self.object is not None:
+            has_permission = request.user.has_perm(self.get_permission_required(request), self.object)
+        elif hasattr(self, 'get_object') and callable(self.get_object):
+            has_permission = request.user.has_perm(self.get_permission_required(request), self.get_object())
+        else:
+            has_permission = request.user.has_perm(self.get_permission_required(request))
+        return has_permission
