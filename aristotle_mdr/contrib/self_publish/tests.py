@@ -2,6 +2,8 @@ from django.conf import settings
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.test import TestCase, override_settings, modify_settings
+from django.test.utils import setup_test_environment
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 import datetime
@@ -29,7 +31,7 @@ setup_aristotle_test_environment()
 class TestSelfPublishing(utils.LoggedInViewPages, TestCase):
     def setUp(self):
         super(TestSelfPublishing, self).setUp()
-        self.submitting_user = User.objects.create_user(
+        self.submitting_user = get_user_model().objects.create_user(
             username="self-publisher",
             email="self@publisher.net",
             password="self-publisher")

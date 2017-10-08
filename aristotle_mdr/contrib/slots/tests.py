@@ -16,8 +16,6 @@ class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):
         # from django.conf import settings
         # from django.utils.module_loading import import_string
         # conf = import_string(settings.ROOT_URLCONF)
-        # print(3)
-        # print(conf, conf.urlpatterns)
 
         slot_name = 'my_slot_name'
         slot_type = ''

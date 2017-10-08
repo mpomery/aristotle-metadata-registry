@@ -223,32 +223,6 @@ def toggleFavourite(request, iid):
     return redirect(url_slugify_concept(item))
 
 
-def registrationauthority(request, iid, *args, **kwargs):
-    if iid is None:
-        return redirect(reverse("aristotle_mdr:all_registration_authorities"))
-    item = get_object_or_404(MDR.RegistrationAuthority, pk=iid).item
-
-    return render(request, item.template, {'item': item.item})
-
-
-def organization(request, iid, *args, **kwargs):
-    if iid is None:
-        return redirect(reverse("aristotle_mdr:all_organizations"))
-    item = get_object_or_404(MDR.Organization, pk=iid).item
-
-    return render(request, item.template, {'item': item.item})
-
-
-def all_registration_authorities(request):
-    ras = MDR.RegistrationAuthority.objects.order_by('name')
-    return render(request, "aristotle_mdr/organization/all_registration_authorities.html", {'registrationAuthorities': ras})
-
-
-def all_organizations(request):
-    orgs = MDR.Organization.objects.order_by('name')
-    return render(request, "aristotle_mdr/organization/all_organizations.html", {'organization': orgs})
-
-
 # Actions
 
 

@@ -95,14 +95,6 @@ jobs:
       env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
       <<: *main_test_script
 
-
-    - stage: accessibility
-      script: tox -e ally-metadata_item --skip-missing-interpreters
-    - stage: accessibility
-      script: tox -e ally-metadata_action --skip-missing-interpreters
-    - stage: accessibility
-      script: tox -e ally-static --skip-missing-interpreters
-
   # Test Accessibility
     - <<: *test_accessibility_py35
       env: ALLY=metadata_item

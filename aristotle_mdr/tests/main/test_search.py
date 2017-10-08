@@ -4,7 +4,7 @@ import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test.utils import override_settings
 
@@ -31,7 +31,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         self.ra = models.RegistrationAuthority.objects.create(name="Kelly Act")
         self.ra1 = models.RegistrationAuthority.objects.create(name="Superhuman Registration Act") # Anti-registration!
-        self.registrar = User.objects.create_user('stryker','william.styker@weaponx.mil','mutantsMustDie')
+        self.registrar = get_user_model().objects.create_user('stryker','william.styker@weaponx.mil','mutantsMustDie')
         self.ra.giveRoleToUser('registrar',self.registrar)
         self.assertTrue(perms.user_is_registrar(self.registrar,self.ra))
         xmen = "professorX cyclops iceman angel beast phoenix wolverine storm nightcrawler"
@@ -195,7 +195,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
     def test_workgroup_member_search(self):
         self.logout()
-        self.viewer = User.objects.create_user('charles.xavier','charles@schoolforgiftedyoungsters.edu','equalRightsForAll')
+        self.viewer = get_user_model().objects.create_user('charles.xavier','charles@schoolforgiftedyoungsters.edu','equalRightsForAll')
         self.weaponx_wg = models.Workgroup.objects.create(name="WeaponX")
 
         response = self.client.post(reverse('friendly_login'),
@@ -259,7 +259,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
     def test_workgroup_member_search_has_valid_facets(self):
         self.logout()
-        self.viewer = User.objects.create_user('charles.xavier','charles@schoolforgiftedyoungsters.edu','equalRightsForAll')
+        self.viewer = get_user_model().objects.create_user('charles.xavier','charles@schoolforgiftedyoungsters.edu','equalRightsForAll')
         response = self.client.post(reverse('friendly_login'),
                     {'username': 'charles.xavier', 'password': 'equalRightsForAll'})
 
@@ -631,10 +631,10 @@ class TestTokenSearch(TestCase):
         import haystack
         haystack.connections.reload('default')
 
-        self.su = User.objects.create_superuser('super','','user')
+        self.su = get_user_model().objects.create_superuser('super','','user')
 
         self.ra = models.RegistrationAuthority.objects.create(name="Kelly Act")
-        self.registrar = User.objects.create_user('stryker','william.styker@weaponx.mil','mutantsMustDie')
+        self.registrar = get_user_model().objects.create_user('stryker','william.styker@weaponx.mil','mutantsMustDie')
         self.ra.giveRoleToUser('registrar',self.registrar)
         xmen = "wolverine professorX cyclops iceman angel beast phoenix storm nightcrawler"
         self.xmen_wg = models.Workgroup.objects.create(name="X Men")

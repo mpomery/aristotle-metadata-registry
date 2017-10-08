@@ -8,6 +8,20 @@
     <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle_search.less'|compile %}" />
     {% if request.is_ajax %}
         {{ form.media }}
+        {# Fixes to load and init scripts dynamically on bootstrap modals #}
+        <script type="text/javascript">
+        $(function() {
+            // Load autocomplete script with jquery for compatibility
+            $.ajax({
+              url: "{% static 'autocomplete_light/autocomplete.init.js' %}",
+              dataType: "script"
+            });
+            // Trigger DOMContentLoaded event
+            var DOMContentLoaded_event = document.createEvent("Event")
+            DOMContentLoaded_event.initEvent("DOMContentLoaded", true, true)
+            window.document.dispatchEvent(DOMContentLoaded_event);
+        });
+        </script>
     {% endif %}
 {% endblock %}
 
@@ -48,11 +62,11 @@
     </div>
     <div class="modal-footer">
         {% if request.is_ajax %}
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button accesskey="c" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         {% else %}
-            <a class="btn btn-default" href="{% url 'aristotle:item' item.id %}">Cancel</a>
+            <a accesskey="c" class="btn btn-default" href="{% url 'aristotle:item' item.id %}">Cancel</a>
         {% endif %}
-        <input type="submit" class="btn btn-primary" value="Save changes" />
+        <input accesskey="s" type="submit" class="btn btn-primary" value="Save changes" />
     </div>
 </form>
 {% endblock %}
