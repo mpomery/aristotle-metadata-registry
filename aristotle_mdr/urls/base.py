@@ -5,7 +5,7 @@ from django.conf.urls import include, url
 from django.contrib.auth import views
 from django.contrib import admin
 from django.views.generic.base import RedirectView
-from django.urls import reverse_lazy
+from django.core.urlresolvers import reverse_lazy
 
 from aristotle_mdr.views.user_pages import friendly_redirect_login
 
