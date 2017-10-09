@@ -16,15 +16,18 @@ from haystack.query import EmptySearchQuerySet, SearchQuerySet, SQ
 from bootstrap3_datetime.widgets import DateTimePicker
 
 import aristotle_mdr.models as MDR
-# from aristotle_mdr.widgets import (
-#     BootstrapDropdownSelectMultiple, BootstrapDropdownIntelligentDate,
-#     BootstrapDropdownSelect, BootstrapDateTimePicker
-# )
+from aristotle_mdr.widgets import (
+    BootstrapDropdownSelectMultiple,
+    BootstrapDropdownIntelligentDate,
+    BootstrapDropdownSelect,
+    BootstrapDateTimePicker
+)
 from django.forms.widgets import (
-    SelectMultiple as BootstrapDropdownSelectMultiple,
-    DateInput as BootstrapDropdownIntelligentDate,
-    Select as BootstrapDropdownSelect,
-    DateInput as BootstrapDateTimePicker
+    SelectMultiple
+    # SelectMultiple as BootstrapDropdownSelectMultiple,
+    # DateInput as BootstrapDropdownIntelligentDate,
+    # Select as BootstrapDropdownSelect,
+    # DateInput as BootstrapDateTimePicker
 )
 from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
 
@@ -287,12 +290,12 @@ class PermissionSearchForm(TokenSearchForm):
     mds = forms.DateField(
         required=False,
         label="Modified after date",
-        widget=BootstrapDateTimePicker()  # options=datePickerOptions)
+        widget=BootstrapDateTimePicker(options=datePickerOptions)
     )
     mde = forms.DateField(
         required=False,
         label="Modified before date",
-        widget=BootstrapDateTimePicker()  # options=datePickerOptions)
+        widget=BootstrapDateTimePicker(options=datePickerOptions)
     )
     cq=forms.ChoiceField(
         required=False,
@@ -303,12 +306,12 @@ class PermissionSearchForm(TokenSearchForm):
     cds = forms.DateField(
         required=False,
         label="Created after date",
-        widget=BootstrapDateTimePicker()  # options=datePickerOptions)
+        widget=BootstrapDateTimePicker(options=datePickerOptions)
     )
     cde = forms.DateField(
         required=False,
         label="Created before date",
-        widget=BootstrapDateTimePicker()  # options=datePickerOptions)
+        widget=BootstrapDateTimePicker(options=datePickerOptions)
     )
 
     # Use short singular names
@@ -523,10 +526,7 @@ class PermissionSearchForm(TokenSearchForm):
         if self.query_text:
             original_query = self.cleaned_data.get('q', "")
 
-            try:  # Python 2
-                from urllib import quote_plus
-            except:  # Python 3
-                from urllib.parse import quote_plus
+            from urllib.parse import quote_plus
 
             suggestions = []
             has_suggestions = False

@@ -21,14 +21,12 @@ Python
 ------
 Only the latest releases of Python are supported. New users are recommended to use Python 3.
 
-* Python 2.7
 * Python 3.5+
 
 Django
 ------
 
-* Django version 1.8 LTS
-* Django version 1.10
+* Django version 1.11 LTS
 
 
 Database support

@@ -13,11 +13,8 @@ setup_test_environment()
 from aristotle_mdr.utils import fetch_aristotle_settings, error_messages
 
 
-try:
-    from unittest.mock import patch
-except:
-    # Python2, Py2
-    from mock import patch
+from unittest.mock import patch
+
 
 class TestAristotleSettings(TestCase):
     

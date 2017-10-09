@@ -45,12 +45,12 @@ defaults:
         repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
       mariadb: '10.1'
 
-  - &main_test_script_py27
-      python: 2.7
-      <<: *main_test_script
-
   - &main_test_script_py35
       python: 3.5
+      <<: *main_test_script
+
+  - &main_test_script_py36
+      python: 3.6
       <<: *main_test_script
 
   - &test_accessibility_py35
@@ -70,30 +70,30 @@ jobs:
 
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=sqlite  SEARCH=elastic
-      <<: *main_test_script
+      <<: *main_test_script_py36
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic
-      <<: *main_test_script
+      <<: *main_test_script_py36
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh
-      <<: *main_test_script
+      <<: *main_test_script_py36
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=whoosh
-      <<: *main_test_script
+      <<: *main_test_script_py36
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=whoosh
-      <<: *main_test_script
+      <<: *main_test_script_py36
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic
-      <<: *main_test_script
+      <<: *main_test_script_py36
     
       # Possible failures:
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-      <<: *main_test_script
+      <<: *main_test_script_py36
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-      <<: *main_test_script
+      <<: *main_test_script_py36
 
   # Test Accessibility
     - <<: *test_accessibility_py35
