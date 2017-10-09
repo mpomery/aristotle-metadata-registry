@@ -27,6 +27,7 @@ class Migration(migrations.Migration):
             deps.append(
                 ('aristotle_multisite', '0001_initial'),
             )
+        return deps
 
     operations = [
         # This is needed as we modify ForeignKeys before they are made during the migration
