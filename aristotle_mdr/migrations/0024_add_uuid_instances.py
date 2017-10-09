@@ -14,10 +14,14 @@ class Migration(migrations.Migration):
     def dependencies(cls):
         deps = [
             ('aristotle_mdr', '0023_uuid_model'),
-            ('aristotle_mdr_links', '0005_switch_to_concept_relations'),
             ('aristotle_mdr_slots', '0004_switch_to_concept_relations'),
         ]
         from django.conf import settings
+
+        if "aristotle_mdr.contrib.links" in settings.INSTALLED_APPS:
+            deps.append(
+                ('aristotle_mdr_links', '0005_switch_to_concept_relations'),
+            )
 
         if "aristotle_multisite" in settings.INSTALLED_APPS:
             deps.append(

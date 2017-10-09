@@ -7,10 +7,10 @@ import aristotle_mdr.tests.utils as utils
 
 from django.core.exceptions import ImproperlyConfigured
 
-from django.test.utils import setup_test_environment
-setup_test_environment()
-
 from aristotle_mdr.utils import fetch_aristotle_settings, error_messages
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+setup_aristotle_test_environment()
 
 
 from unittest.mock import patch
