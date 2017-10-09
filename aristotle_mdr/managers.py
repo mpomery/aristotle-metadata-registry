@@ -9,7 +9,7 @@ from model_utils.managers import InheritanceManager, InheritanceQuerySet
 class UUIDManager(models.Manager):
     def create_uuid(self, instance):
         from aristotle_mdr.models import _concept
-        if type(instance) is _concept or issubclass(type(instance), _concept) :
+        if type(instance) is _concept or issubclass(type(instance), _concept):
             instance = instance.item
         if instance.uuid is not None:
             instance.uuid.app_label=instance._meta.app_label
