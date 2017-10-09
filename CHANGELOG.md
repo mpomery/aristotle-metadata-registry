@@ -17,6 +17,7 @@ Changelog
     - Fixed a bug where search results where showing HTML entities - see #707 (Thanks @rafen)
     - Workgroup users now properly informed when accessing a workgroup they arent a member of (Thanks @DeKan)
     - Footer is now sticky by default
+    - Metadata statistics pages now use browse pages links
     - **Configuration change:**
         - new options - ``ARISTOTLE_SETTINGS_STRICT_MODE``, if False errors in ARISTOTLE_SETTINGS will be logged and not prevent the app from working. Defaults to True.
         - ``BULK_ACTION`` option will no longer cause critical isuses if incorrectly configured. Errors can be logged instead
