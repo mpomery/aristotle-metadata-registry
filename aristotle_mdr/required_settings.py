@@ -85,6 +85,8 @@ INSTALLED_APPS = (
     'dal',
     'dal_select2',
 
+    'organizations',
+
     'haystack',
     'django.contrib.admin',
     'django.contrib.admindocs',
@@ -195,7 +197,9 @@ ARISTOTLE_SETTINGS = {
         # (fileType, menu, font-awesome-icon, module)
         # ('csv-vd', 'CSV list of values', 'fa-file-excel-o', 'aristotle_mdr', 'CSV downloads for value domain codelists'),
         'aristotle_mdr.downloader.CSVDownloader'
-    ]
+    ],
+    "USER_EMAIL_RESTRICTIONS": None,
+    "SIGNUP_OPTION": 'closed', # or 'closed'
 }
 
 CKEDITOR_CONFIGS = {
