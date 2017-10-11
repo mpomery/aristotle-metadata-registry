@@ -176,7 +176,7 @@ urlpatterns=[
     url(r'^accessibility/?$', TemplateView.as_view(template_name='aristotle_mdr/static/accessibility.html'), name="accessibility"),
 
     url(
-        r'^search/?',
+        r'^search/?$',
         search_view_factory(
             view_class=views.PermissionSearchView,
             template='search/search.html',
