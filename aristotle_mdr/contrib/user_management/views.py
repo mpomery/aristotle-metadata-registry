@@ -11,7 +11,7 @@ from organizations.backends import registration_backend
 
 from .org_backends import NewuserOnlyRegistrationBackend
 
-# from . import forms
+from . import forms
 
 class NewUserSignupView(FormView):
     """
@@ -19,8 +19,8 @@ class NewUserSignupView(FormView):
     It simply processes the form and then calls the specified registration
     backend.
     """
-    # form_class = forms.RegistrySignUpForm
-    template_name='nexus/signup.html'
+    form_class = forms.RegistrySignUpForm
+    template_name='aristotle_mdr/users_management/newuser/signup.html'
     # TODO get success from backend, because some backends may do something
     # else, like require verification
     backend = NewuserOnlyRegistrationBackend

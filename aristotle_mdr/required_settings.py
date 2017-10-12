@@ -78,6 +78,7 @@ INSTALLED_APPS = (
     'aristotle_mdr.contrib.slots',
     'aristotle_mdr.contrib.identifiers',
     'aristotle_mdr.contrib.browse',
+    'aristotle_mdr.contrib.user_management',
 
     'channels',
     'haystack_channels',
@@ -199,7 +200,9 @@ ARISTOTLE_SETTINGS = {
         'aristotle_mdr.downloader.CSVDownloader'
     ],
     "USER_EMAIL_RESTRICTIONS": None,
-    "SIGNUP_OPTION": 'closed', # or 'closed'
+    # "SIGNUP_OPTION": 'closed', # or 'closed'
+    "GROUPS_CAN_INVITE": 'closed', # or 'closed'
+    
 }
 
 CKEDITOR_CONFIGS = {
@@ -230,3 +233,5 @@ HAYSTACK_CONNECTIONS = {
 STATIC_PRECOMPILER_COMPILERS = (
     ('static_precompiler.compilers.LESS', {"executable": "lesscpy"}),
 )
+
+ORGS_SLUGFIELD = 'autoslug.fields.AutoSlugField'
