@@ -29,4 +29,3 @@ class RegistrySignUpForm(SignUpForm):
                 "A user with this email already exists."
             )
         return email
-TypeError: 'module' object is not iterable

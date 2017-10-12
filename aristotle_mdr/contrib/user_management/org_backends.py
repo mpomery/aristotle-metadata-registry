@@ -9,10 +9,10 @@ class NewuserOnlyRegistrationBackend(BaseBackend):
     """
     # NOTE this backend stands to be simplified further, as email verification
     # should be beyond the purview of this app
-    activation_subject = 'organizations/email/activation_subject.txt'
-    activation_body = 'organizations/email/activation_body.html'
-    reminder_subject = 'organizations/email/reminder_subject.txt'
-    reminder_body = 'organizations/email/reminder_body.html'
+    activation_subject = 'aristotle_mdr/users_management/newuser/email/activation_subject.txt'
+    activation_body = 'aristotle_mdr/users_management/newuser/email/activation_body.html'
+    reminder_subject = 'aristotle_mdr/users_management/newuser/email/reminder_subject.txt'
+    reminder_body = 'aristotle_mdr/users_management/newuser/email/reminder_body.html'
     form_class = UserRegistrationForm
 
     def get_success_url(self):
