@@ -24,8 +24,13 @@ DATABASES = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'aristotle-mdr-cache'
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'caches', 'aristotle-mdr-cache'),
+    },
+    'aristotle-mdr-invitations': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'caches', 'aristotle-mdr-invitations'),
+        'TIMEOUT': 60 * 60 * 24 * 7,  # sec * min * hours * days
     }
 }
 
@@ -85,8 +90,6 @@ INSTALLED_APPS = (
 
     'dal',
     'dal_select2',
-
-    'organizations',
 
     'haystack',
     'django.contrib.admin',
@@ -199,10 +202,13 @@ ARISTOTLE_SETTINGS = {
         # ('csv-vd', 'CSV list of values', 'fa-file-excel-o', 'aristotle_mdr', 'CSV downloads for value domain codelists'),
         'aristotle_mdr.downloader.CSVDownloader'
     ],
-    "USER_EMAIL_RESTRICTIONS": None,
+
+    # These settings aren't active yet.
+    # "USER_EMAIL_RESTRICTIONS": None,
+    "USER_VISIBILITY": ['owner', 'workgroup_manager', 'registation_authority_manager']
     # "SIGNUP_OPTION": 'closed', # or 'closed'
-    "GROUPS_CAN_INVITE": 'closed', # or 'closed'
-    
+    # "GROUPS_CAN_INVITE": 'closed', # or 'closed'
+
 }
 
 CKEDITOR_CONFIGS = {

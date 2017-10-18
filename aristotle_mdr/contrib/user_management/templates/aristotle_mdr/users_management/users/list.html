@@ -1,0 +1,73 @@
+{% extends "aristotle_mdr/user/userHome.html" %}
+
+{% block title %}Current members{% endblock %}
+{% block collapse-link%}<i class="fa fa-user fa-fw"></i> Current members</a>{% endblock %}
+{% block sidebar %}
+    {% include "aristotle_mdr/user/userSideBar.html" with activeTab='adminTools' %}
+{% endblock %}
+
+{% block page %}
+    <h1>Current members</h1>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+      <div class="row">
+
+  <div class="col-md-4 col-xs-8">
+    <div class="input-group">
+      <input type="text" class="form-control">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button">Go!</button>
+      </span>
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-6 -->
+
+    <div class="col-md-1 col-md-offset-7 col-xs-4">
+      <a class="btn btn-success pull-right" href="{% url 'aristotle-user:registry_invitations_create' %}">
+        <i class="fa fa-user-plus"></i> Invite member
+      </a>
+    </div>
+  </div>
+</div>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>User</th>
+        <th>Active</th>
+        <th>Teams</th>
+        <th>Role</th>
+    </tr>
+    </thead>
+{% for user in object_list %}
+<tbody>
+    <tr>
+        <td>
+          {% include "aristotle_mdr/users_management/helper/user_table_display.html" with user=user %}
+        </td>
+        <td>{{user.is_active}}</td>
+        {% with count=user.profile.workgroups.count %}
+        <td><small>{{count}} team{{ count|pluralize }}</small></td>
+        {% endwith %}
+        <td>
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Manage <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu pull-right">
+            <li><a href="#">View profile</a></li>
+            <li><a href="#">Change role</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="alert-danger">
+                <a href="{% url 'aristotle-user:deactivate_user' %}?deactivate_user={{user.pk}}">Remove from this registry</a>
+            </li>
+          </ul>
+        </div>
+        </td>
+    </tr>
+    </tbody>
+{% endfor %}
+</table>
+</div>
+
+{% endblock %}

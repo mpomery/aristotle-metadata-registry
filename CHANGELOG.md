@@ -18,11 +18,14 @@ Changelog
     - Workgroup users now properly informed when accessing a workgroup they arent a member of (Thanks @DeKan)
     - Footer is now sticky by default
     - Metadata statistics pages now use browse pages links
+    - Added a new user management section to the Aristotle Dashboard.
+    - **Permissions change** Permissions on who can see registry members has changed To support 
     - **Configuration change:**
         - new options - ``ARISTOTLE_SETTINGS_STRICT_MODE``, if False errors in ARISTOTLE_SETTINGS will be logged and not prevent the app from working. Defaults to True.
         - ``BULK_ACTION`` option will no longer cause critical isuses if incorrectly configured. Errors can be logged instead
         - ``CONTENT_EXTENSIONS`` option will no longer cause critical isuses if incorrectly configured. Errors can be logged instead
         - ``DOWNLOADERS`` option will not cause critical isuses if incorrectly configured. Errors can be logged instead
+        - ``USER_VISIBILITY`` option allows for broader visibility of users when creating groups, and gives managers workgroup and registration authority managers results based on partial matches. This can be set to "owners" only to revert to original functionality.
     - **Database migration:** Added concrete UUID model for more flexible lookups
     - **Breaking change:** Download options have been moved into the ``ARISTOTLE_SETTINGS``
         under the ``DOWNLOADERS`` key

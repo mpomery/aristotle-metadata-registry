@@ -285,6 +285,11 @@ class RegistrationAuthority(Organization):
     class Meta:
         verbose_name_plural = _("Registration Authorities")
 
+    roles = {
+        'registrar': _("Registrar"),
+        'manager': _("Manager")
+    }
+
     def get_absolute_url(self):
         return url_slugify_registration_authoritity(self)
 
@@ -398,6 +403,10 @@ class RegistrationAuthority(Organization):
             self.registrars.remove(user)
         if role == "manager":
             self.managers.remove(user)
+
+    @property
+    def members(self):
+        return (self.managers.all() | self.registrars.all()).distinct()
 
 
 @receiver(post_save, sender=RegistrationAuthority)

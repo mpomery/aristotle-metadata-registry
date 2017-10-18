@@ -1,79 +1,168 @@
-from organizations.backends.defaults import BaseBackend
+from braces.views import LoginRequiredMixin, PermissionRequiredMixin
+
+from django.conf.urls import url
+from django.contrib.auth import get_user_model
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect, render
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, FormView
+
+from organizations.backends.defaults import BaseBackend, InvitationBackend
 from organizations.backends.forms import UserRegistrationForm
 
+from . import forms
 
-class NewuserOnlyRegistrationBackend(BaseBackend):
+
+
+from django.conf import settings
+from django.contrib.auth import authenticate, login
+from django.core.mail import EmailMessage
+from django.template import loader
+from django.utils.translation import ugettext_lazy as _
+
+from django.http import Http404
+
+class AristotleInvitationBackend(InvitationBackend):
     """
     A backend for allowing new users to join the site by creating a new user
     associated with a new organization.
     """
-    # NOTE this backend stands to be simplified further, as email verification
-    # should be beyond the purview of this app
-    activation_subject = 'aristotle_mdr/users_management/newuser/email/activation_subject.txt'
-    activation_body = 'aristotle_mdr/users_management/newuser/email/activation_body.html'
-    reminder_subject = 'aristotle_mdr/users_management/newuser/email/reminder_subject.txt'
-    reminder_body = 'aristotle_mdr/users_management/newuser/email/reminder_body.html'
+
     form_class = UserRegistrationForm
 
     def get_success_url(self):
-        return reverse('registration_success')
+        return reverse('invitation_success')
 
     def get_urls(self):
         return [
-            url(r'^complete/$', view=self.success_view,
-                name="registration_success"),
-            url(r'^(?P<user_id>[\d]+)-(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
-                view=self.activate_view, name="registration_register"),
-            url(r'^$', view=self.create_view, name="registration_create"),
+            # url(r'^accept/(?P<token>[0-9A-Za-z\-]{1,50})/$',
+            url(r'^accept/(?P<token>.*)/$',
+                view=self.activate_view, name="registry_invitations_register"),
+            url(r'^complete$', view=self.invite_view(), name="registry_invitations_complete"),
+            url(r'^$', view=self.invite_view(), name="registry_invitations_create"),
         ]
 
-    def register_by_email(self, email, sender=None, request=None, **kwargs):
-        """
-        Returns a User object filled with dummy data and not active, and sends
-        an invitation email.
-        """
-        try:
-            user = self.user_model.objects.get(email=email)
-        except self.user_model.DoesNotExist:
-            user = self.user_model.objects.create(username=self.get_username(),
-                    email=email, password=self.user_model.objects.make_random_password())
-            user.is_active = False
-            user.save()
-        self.send_activation(user, sender, **kwargs)
-        return user
-
-    def send_activation(self, user, sender=None, **kwargs):
-        """
-        Invites a user to join the site
-        """
-        if user.is_active:
-            return False
-        token = self.get_token(user)
-        kwargs.update({'token': token})
-        self.email_message(user, self.activation_subject, self.activation_body, sender, **kwargs).send()
-
-    def create_view(self, request):
+    def invite_view(self):
         """
         Initiates the organization and user account creation process
         """
-        if request.user.is_authenticated():
-            return redirect("organization_add")
-        form = org_registration_form(self.org_model)(request.POST or None)
-        if form.is_valid():
-            try:
-                user = self.user_model.objects.get(email=form.cleaned_data['email'])
-            except self.user_model.DoesNotExist:
-                user = self.user_model.objects.create(username=self.get_username(),
-                        email=form.cleaned_data['email'],
-                        password=self.user_model.objects.make_random_password())
-                user.is_active = False
-                user.save()
-            else:
-                return redirect("organization_add")
-            organization = create_organization(user, form.cleaned_data['name'],
-                    form.cleaned_data['slug'], is_active=False)
-            return render(request, self.activation_success_template, {'user': user, 'organization': organization})
-        return render(request, self.registration_form_template, {'form': form})
+        return InviteView.as_view(backend=self)
 
     def success_view(self, request):
         return render(request, self.activation_success_template, {})
+
+    def activate_view(self, request, token):
+        """
+        View function that activates the given User by setting `is_active` to
+        true if the provided information is verified.
+        """
+        user = self.check_token(token)
+
+        form = self.get_form(data=request.POST or None, instance=user)
+        if form.is_valid():
+            form.instance.is_active = True
+            user = form.save()
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            self.activate_organizations(user)
+            user = authenticate(username=form.cleaned_data['username'],
+                    password=form.cleaned_data['password'])
+            login(request, user)
+            self.delete_token(token)
+            return redirect("/") #self.get_success_url())
+        return render(request, self.registration_form_template, {'form': form})
+
+
+    def invite_by_emails(self, emails, sender=None, request=None, **kwargs):
+        """Creates an inactive user with the information we know and then sends
+        an invitation email for that user to complete registration.
+        If your project uses email in a different way then you should make to
+        extend this method as it only checks the `email` attribute for Users.
+        """
+        User = get_user_model()
+        users = []
+        for email in emails:
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                # TODO break out user creation process
+                user = User.objects.create(username=email,
+                        email=email, password=get_user_model().objects.make_random_password())
+                user.is_active = False
+                user.save()
+            self.send_invitation(user, sender, **kwargs)
+            users.append(user)
+        return users
+
+    def _get_token(self, user, message, **kwargs):
+        """Returns a unique token for the given user"""
+        from django.core.cache import caches
+        import uuid
+        cache = caches['aristotle-mdr-invitations']
+        token = str(uuid.uuid4())
+        cache.set(token, message)
+        return token
+
+    def delete_token(self, token):
+        from django.core.cache import caches
+        cache = caches['aristotle-mdr-invitations']
+        cache.delete(token)
+
+class NewUserInvitationBackend(AristotleInvitationBackend):
+
+    notification_subject = 'aristotle_mdr/users_management/newuser/email/notification_subject.txt'
+    notification_body = 'aristotle_mdr/users_management/newuser/email/notification_body.html'
+    invitation_subject = 'aristotle_mdr/users_management/newuser/email/invitation_subject.txt'
+    invitation_body = 'aristotle_mdr/users_management/newuser/email/invitation_body.html'
+    reminder_subject = 'aristotle_mdr/users_management/newuser/email/reminder_subject.txt'
+    reminder_body = 'aristotle_mdr/users_management/newuser/email/reminder_body.html'
+
+    def get_token(self, user, **kwargs):
+        message = {'user_email':user.email, 'invited_to':"__registry__"}
+        return self._get_token(user, message)
+
+    def check_token(self, token):
+        from django.core.cache import caches
+        cache = caches['aristotle-mdr-invitations']
+        obj = cache.get(token)
+
+        if not obj or obj.get('invited_to') != "__registry__" or 'user_email' not in obj.keys():
+            raise Http404(_("Your invitation may have expired."))
+
+        try:
+            user = get_user_model().objects.get(email=obj.get('user_email'), is_active=False)
+        except get_user_model().DoesNotExist:
+            raise Http404(_("Your URL may have expired."))
+
+        return user
+
+
+class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+    form_class = forms.UserInvitationForm
+    template_name = "aristotle_mdr/users_management/invite_user_to_registry.html"
+    backend = None
+    success_url = "aristotle-user:owner_user_list"
+
+    permission_required = "aristotle_mdr.invite_users_to_registry"
+    raise_exception = True
+    redirect_unauthenticated_users = True
+
+
+    def get_form_kwargs(self):
+        kwargs = super(InviteView, self).get_form_kwargs()
+        kwargs.update({
+            "request": self.request
+        })
+        return kwargs
+
+    def form_valid(self, form):
+        """
+        If the form is valid, redirect to the supplied URL.
+        """
+        self.backend.invite_by_emails(form.emails)
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse(self.success_url)
+

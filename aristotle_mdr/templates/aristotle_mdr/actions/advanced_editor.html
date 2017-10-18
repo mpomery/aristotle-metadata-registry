@@ -8,21 +8,22 @@
     <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle_search.less'|compile %}" />
     {% if request.is_ajax %}
         {{ form.media }}
-        {# Fixes to load and init scripts dynamically on bootstrap modals #}
-        <script type="text/javascript">
-        $(function() {
-            // Load autocomplete script with jquery for compatibility
-            $.ajax({
-              url: "{% static 'autocomplete_light/autocomplete.init.js' %}",
-              dataType: "script"
-            });
-            // Trigger DOMContentLoaded event
-            var DOMContentLoaded_event = document.createEvent("Event")
-            DOMContentLoaded_event.initEvent("DOMContentLoaded", true, true)
-            window.document.dispatchEvent(DOMContentLoaded_event);
-        });
-        </script>
     {% endif %}
+{# Fixes to load and init scripts dynamically on bootstrap modals #}
+<script type="text/javascript">
+$(function() {
+    // Load autocomplete script with jquery for compatibility
+    $.ajax({
+      url: "{% static 'autocomplete_light/autocomplete.init.js' %}",
+      dataType: "script"
+    });
+    // Trigger DOMContentLoaded event
+    var DOMContentLoaded_event = document.createEvent("Event")
+    DOMContentLoaded_event.initEvent("DOMContentLoaded", true, true)
+    window.document.dispatchEvent(DOMContentLoaded_event);
+});
+</script>
+
 {% endblock %}
 
 {% block content %}

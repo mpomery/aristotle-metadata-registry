@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.defaultfilters import slugify
 
-from django.views.generic import CreateView, ListView, DetailView, UpdateView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, FormView
 
 from aristotle_mdr import models as MDR
 from aristotle_mdr import forms as MDRForms
@@ -53,13 +53,44 @@ def all_organizations(request):
 
 
 class CreateRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    model = MDR.RegistrationAuthority
     template_name = "aristotle_mdr/user/registration_authority/add.html"
     fields = ['name', 'definition']
     permission_required = "aristotle_mdr.add_registration_authority"
     raise_exception = True
     redirect_unauthenticated_users = True
 
+
+class AddUser(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+    model = MDR.RegistrationAuthority
+    template_name = "aristotle_mdr/user/registration_authority/add_user.html"
+    permission_required = "aristotle_mdr.change_registrationauthority_memberships"
+    raise_exception = True
+    redirect_unauthenticated_users = True
+    form_class = MDRForms.actions.AddRegistrationUserForm
+
+    def get_form_kwargs(self):
+        kwargs = super(AddUser, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
+
+    def dispatch(self, request, *args, **kwargs):
+        self.item = get_object_or_404(MDR.RegistrationAuthority, pk=self.kwargs.get('iid'))
+        return super(AddUser, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        """
+        Insert the single object into the context dict.
+        """
+        kwargs = super(AddUser, self).get_context_data(**kwargs)
+        kwargs.update({'item': self.item})
+        return kwargs
+
+    def form_valid(self, form):
+        user = form.cleaned_data['user']
+        for role in form.cleaned_data['roles']:
+            self.item.giveRoleToUser(role, user)
+
+        return redirect(reverse('aristotle:registrationauthority_manage', args=[self.item.id]))
 
 class ListRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = MDR.RegistrationAuthority

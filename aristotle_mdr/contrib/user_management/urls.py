@@ -1,8 +1,10 @@
 from django.conf.urls import url, include
-from aristotle_mdr.contrib.user_management import views
+from aristotle_mdr.contrib.user_management import views, org_backends
 
 
 urlpatterns = [
-    url(r'^accounts/signup', views.NewUserSignupView.as_view(), name="new_user_signup"),
-    url(r'^accounts/registry/invitations/', include(invitation_backend().get_urls())),
+    # url(r'^accounts/signup', views.NewUserSignupView.as_view(), name="new_user_signup"),
+    url(r'^account/registry/invitations/', include(org_backends.NewUserInvitationBackend().get_urls())),
+    url(r'^account/registry/users/$', views.RegistryOwnerUserList.as_view(), name="owner_user_list"),
+    url(r'^account/registry/users/deactivate/$', views.DeactivateRegistryUser.as_view(), name="deactivate_user"),
 ]

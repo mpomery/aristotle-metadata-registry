@@ -8,9 +8,13 @@ import aristotle_mdr.models as MDR
 from aristotle_mdr.forms.creation_wizards import UserAwareModelForm, UserAwareForm
 from aristotle_mdr.forms import ChangeStatusForm
 from bootstrap3_datetime.widgets import DateTimePicker
+from django.contrib.auth import get_user_model
+
+from aristotle_mdr.contrib.autocomplete import widgets
+from .utils import RegistrationAuthorityMixin
 
 
-class RequestReviewForm(UserAwareModelForm):
+class RequestReviewForm(RegistrationAuthorityMixin, UserAwareModelForm):
     registration_date = forms.DateField(
         required=False,
         label=_("Registration date"),
@@ -24,6 +28,13 @@ class RequestReviewForm(UserAwareModelForm):
         choices=[(0, _('No')), (1, _('Yes'))],
         label=_("Do you want to update the registration of associated items?")
     )
+
+    def __init__(self, *args, **kwargs):
+        # self.user = kwargs.pop('user')
+        super(RequestReviewForm, self).__init__(*args, **kwargs)
+        self.set_registration_authority_field(
+            field_name="registration_authority"
+        )
 
     class Meta:
         model = MDR.ReviewRequest
@@ -51,4 +62,19 @@ class RequestReviewAcceptForm(UserAwareForm):
         required=False,
         label=_("Reply to the original review request below."),
         widget=forms.Textarea
+    )
+
+
+class AddRegistrationUserForm(UserAwareForm):
+    roles = forms.MultipleChoiceField(
+        label=_("Registry roles"),
+        choices=sorted(MDR.RegistrationAuthority.roles.items()),
+        widget=forms.CheckboxSelectMultiple,
+        required=True
+    )
+    user = forms.ModelChoiceField(
+        label=_("Select user"),
+        queryset=get_user_model().objects.filter(is_active=True),
+        widget=widgets.UserAutocompleteSelect(),
+        initial=None,
     )

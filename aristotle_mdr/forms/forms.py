@@ -10,6 +10,8 @@ from aristotle_mdr.perms import user_can_edit, user_can_view
 from aristotle_mdr.forms.creation_wizards import UserAwareForm
 from aristotle_mdr.contrib.autocomplete import widgets
 
+from .utils import RegistrationAuthorityMixin
+
 
 class UserSelfEditForm(forms.Form):
     template = "aristotle_mdr/userEdit.html"
@@ -92,7 +94,7 @@ class SupersedeForm(forms.Form):
         return item
 
 
-class ChangeStatusForm(UserAwareForm):
+class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
     state = forms.ChoiceField(choices=MDR.STATES, widget=forms.RadioSelect)
     registrationDate = forms.DateField(
         required=False,
@@ -111,20 +113,17 @@ class ChangeStatusForm(UserAwareForm):
         label=_("Why is the status being changed for these items?"),
         widget=forms.Textarea
     )
+    registrationAuthorities = forms.MultipleChoiceField(
+        label="Registration Authorities",
+        choices=MDR.RegistrationAuthority.objects.none(),
+        widget=forms.CheckboxSelectMultiple
+    )
 
-    def add_registration_authority_field(self):
-        ras = [(ra.id, ra.name) for ra in self.user.profile.registrarAuthorities]
-        self.fields['registrationAuthorities']=forms.MultipleChoiceField(
-            label="Registration Authorities",
-            choices=ras,
-            widget=forms.CheckboxSelectMultiple
-        )
-
-    # Thanks to http://jacobian.org/writing/dynamic-form-generation/
     def __init__(self, *args, **kwargs):
-        # self.user = kwargs.pop('user')
         super(ChangeStatusForm, self).__init__(*args, **kwargs)
-        self.add_registration_authority_field()
+        self.set_registration_authority_field(
+            field_name="registrationAuthorities", qs=self.user.profile.registrarAuthorities
+        )
 
     def clean_cascadeRegistration(self):
         return self.cleaned_data['cascadeRegistration'] == "1"

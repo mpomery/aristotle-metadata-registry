@@ -1,5 +1,5 @@
 {% extends "aristotle_mdr/user/userHome.html" %}
-{% load i18n %}
+{% load i18n aristotle_tags %}
 
 {% block collapse-link %}
     <i class="fa fa-users fa-fw"></i> All Registration Authorities </a>
@@ -13,8 +13,67 @@
 <h1>{% block title %}{{ item.name }}{% endblock %}</h1>
 
     <section id="workgroups">
-        <a class="btn btn-default" href="{% url 'aristotle:registrationauthority_edit' item.pk %}">Edit</a>
-        
+        <div class="btn-group pull-right" role="group" aria-label="...">
+
+            <a class="btn btn-default" href="{% url 'aristotle:registrationauthority_edit' item.pk %}">Edit</a>
+            <a class="btn btn-primary" href="{{ item.get_absolute_url }}">View public page</a>
+        </div>
+
+        <h2>Description</h2>
+        <div>{{ item.definition|safe }}</div>
+    <h2>Members</h2>
+        <div class="btn-group pull-right" role="group" aria-label="...">
+            <a class="btn btn-success" href="{% url 'aristotle:registrationauthority_add_user' item.pk %}"
+            data-toggle="modal" data-target="#ra_page_modal">Invite a user</a>
+        </div>
+
+    <table class="table">
+        <thead>
+            <th>Member</th>
+            <th>Roles</th>
+            <th>Manage</th>
+        </thead>
+        <tbody>
+
+        {% for member in item.members.all %}
+        <td>
+            {% include "aristotle_mdr/users_management/helper/user_table_display.html" with user=member %}
+        </td>
+        <td>
+            {% comment %}
+            TODO: THIS IS SUPER INEFFICIENT AND USES 4 DATABASE CALLS BUT WORKS.
+            PROFILE AND FIX IN THE FUTURE.
+            {% endcomment %}
+            {% if member in item.managers.all %}
+            Manager
+            {% endif %}
+            {% if member in item.managers.all and member in item.registrars.all %}
+            ,
+            {% endif %}
+            {% if member in item.registrars.all %}
+            Registrar
+            {% endif %}
+        </td>
+        <td>
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Manage <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu pull-right">
+                <li><a href="#">Change role</a></li>
+                <li role="separator" class="divider"></li>
+                <li class="alert-danger">
+                    <a href="{#% url 'aristotle-user:remove_ra_user' %#}?deactivate_user={{user.pk}}">Remove from this group</a>
+                </li>
+              </ul>
+            </div>
+        </td>
+        {% empty %}
+        <td>No members</td>
+        {% endfor %}
+        </tbody>
+    </table>
+
     <p>
         The following list gives a description of the context of the 11179-6 status
         levels according to this Registration Authority.
@@ -51,16 +110,7 @@
         {% endfor %}
     </dl>
 
-    <h2>Managers</h2>
-    <ul>
-        { % for
-        
-    </ul>
-
-    <h2>Registrars</h2>
-    <ul>
-        
-    </ul>
-        
 </section>
+
+{% bootstrap_modal "ra_page_modal" size='lg' %}
 {% endblock %}
