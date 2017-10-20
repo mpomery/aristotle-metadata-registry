@@ -78,3 +78,12 @@ class AddRegistrationUserForm(UserAwareForm):
         widget=widgets.UserAutocompleteSelect(),
         initial=None,
     )
+
+
+class ChangeRegistrationUserRolesForm(UserAwareForm):
+    roles = forms.MultipleChoiceField(
+        label=_("Registry roles"),
+        choices=sorted(MDR.RegistrationAuthority.roles.items()),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
