@@ -52,6 +52,21 @@
             </td>
         </tr>
         {% endif %}
+        {% if perms.aristotle_mdr.can_create_metadata %}
+        <tr>
+            <td>
+            </td>
+            <td>Registry
+            </td>
+            <td>Creator
+            </td>
+            <td>You can create new metadata items in this registry.
+                Once saved you can edit your own metadata,
+                but if it has been endorsed by a Registration Authority or moved into a workgroup
+                you may be prevented from making further changes.
+            </td>
+        </tr>
+        {% endif %}
         {% for ra in request.user.registrar_in.all %}
         <tr>
             <td>{{ ra.name }}

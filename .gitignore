@@ -38,6 +38,7 @@ nosetests.xml
 
 # My stuff
 # no vim temporary files.
+.env
 *~
 .*.sw[mnop]
 *.db3
