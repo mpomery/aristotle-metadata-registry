@@ -187,7 +187,7 @@ class RemoveFavouriteForm(LoggedInBulkActionForm):
         return _('%(num_items)s items removed from favourites') % {'num_items': len(items)}
 
 
-class ChangeStateForm(RegistrationAuthorityMixin, ChangeStatusForm, BulkActionForm):
+class ChangeStateForm(ChangeStatusForm, BulkActionForm, RegistrationAuthorityMixin):
     confirm_page = "aristotle_mdr/actions/bulk_actions/change_status.html"
     classes="fa-university"
     action_text = _('Change registration status')
