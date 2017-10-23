@@ -14,7 +14,8 @@
 <h1>{% block title %}My Roles{% endblock %}</h1>
 
     <div>
-        <p>Below is a list of every group you are a member off, the roles you have and the actions you can perform in those groups.
+        <p>Below is a list of every group you are a member of, the roles you have
+            and the actions you can perform in those groups.
         </p>
     </div>
 
@@ -28,7 +29,7 @@
         <tbody>
         {% if requests.user.is_superuser %}
         <tr>
-            <td>
+            <td>-
             </td>
             <td>Registry
             </td>
@@ -41,7 +42,7 @@
         {% endif %}
         {% if perms.aristotle_mdr.is_registry_administrator %}
         <tr>
-            <td>
+            <td>-
             </td>
             <td>Registry
             </td>
@@ -54,7 +55,7 @@
         {% endif %}
         {% if perms.aristotle_mdr.can_create_metadata %}
         <tr>
-            <td>
+            <td>-
             </td>
             <td>Registry
             </td>

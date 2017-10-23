@@ -41,7 +41,7 @@ class DeactivateRegistryUser(LoginRequiredMixin, PermissionRequiredMixin, Templa
         deactivated_user = get_object_or_404(get_user_model(), pk=deactivated_user)
         deactivated_user.is_active = False
         deactivated_user.save()
-        return redirect(reverse("aristotle-user:owner_user_list"))
+        return redirect(reverse("aristotle-user:registry_user_list"))
 
     def get_context_data(self, **kwargs):
         data = super(DeactivateRegistryUser, self).get_context_data(**kwargs)

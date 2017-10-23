@@ -116,6 +116,9 @@ class NewUserInvitationBackend(AristotleInvitationBackend):
     invitation_body = 'aristotle_mdr/users_management/newuser/email/invitation_body.html'
     reminder_subject = 'aristotle_mdr/users_management/newuser/email/reminder_subject.txt'
     reminder_body = 'aristotle_mdr/users_management/newuser/email/reminder_body.html'
+    
+    registration_form_template = 'aristotle_mdr/users_management/newuser/register_form.html'
+    activation_success_template = 'aristotle_mdr/users_management/newuser/register_success.html'
 
     def get_token(self, user, **kwargs):
         message = {'user_email':user.email, 'invited_to':"__registry__"}
@@ -141,7 +144,7 @@ class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
     form_class = forms.UserInvitationForm
     template_name = "aristotle_mdr/users_management/invite_user_to_registry.html"
     backend = None
-    success_url = "aristotle-user:owner_user_list"
+    success_url = "aristotle-user:registry_user_list"
 
     permission_required = "aristotle_mdr.invite_users_to_registry"
     raise_exception = True

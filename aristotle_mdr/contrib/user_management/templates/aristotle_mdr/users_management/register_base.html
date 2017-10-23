@@ -1,0 +1,28 @@
+{% extends 'aristotle_mdr/base.html' %}
+{% load aristotle_tags static %}
+
+{% block title %}Signup to create a new registry{% endblock %}
+
+{% block extra_head_scripts %}
+{% endblock %}
+
+   {% block header %}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+	{% block page %}
+	<div class="col-lg-12">
+	    <div class="row">
+			<div class="col-md-4">
+			    {% block left_side %}{% endblock %}
+		    </div>
+			<div class="col-sm-12 col-md-8">
+			    {% block right_side %}{% endblock %}
+			</div>
+		</div>
+    </div>
+	{% endblock page %}
+</div>
+
+{% endblock %}
