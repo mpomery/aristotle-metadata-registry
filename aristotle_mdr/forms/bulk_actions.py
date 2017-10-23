@@ -22,6 +22,8 @@ from aristotle_mdr.forms.creation_wizards import UserAwareForm
 from aristotle_mdr.contrib.autocomplete import widgets
 from aristotle_mdr.utils import fetch_aristotle_settings, fetch_aristotle_downloaders
 
+from .utils import RegistrationAuthorityMixin
+
 
 class ForbiddenAllowedModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def __init__(self, *args, **kwargs):
@@ -185,7 +187,7 @@ class RemoveFavouriteForm(LoggedInBulkActionForm):
         return _('%(num_items)s items removed from favourites') % {'num_items': len(items)}
 
 
-class ChangeStateForm(ChangeStatusForm, BulkActionForm):
+class ChangeStateForm(RegistrationAuthorityMixin, ChangeStatusForm, BulkActionForm):
     confirm_page = "aristotle_mdr/actions/bulk_actions/change_status.html"
     classes="fa-university"
     action_text = _('Change registration status')
@@ -193,7 +195,7 @@ class ChangeStateForm(ChangeStatusForm, BulkActionForm):
 
     def __init__(self, *args, **kwargs):
         super(ChangeStateForm, self).__init__(*args, **kwargs)
-        self.add_registration_authority_field()
+        self.set_registration_authority_field()
 
     def make_changes(self):
         import reversion
