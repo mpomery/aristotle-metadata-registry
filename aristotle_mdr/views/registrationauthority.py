@@ -161,7 +161,7 @@ class ChangeUserRoles(LoginRequiredMixin, PermissionRequiredMixin, FormView):
     def get_form_kwargs(self):
         kwargs = super(ChangeUserRoles, self).get_form_kwargs()
         kwargs.update({'user': self.request.user})
-        initial = {'roles':[]}
+        initial = {'roles': []}
         if self.user_to_change in self.item.managers.all():
             initial['roles'].append('manager')
         if self.user_to_change in self.item.registrars.all():
@@ -181,7 +181,7 @@ class ChangeUserRoles(LoginRequiredMixin, PermissionRequiredMixin, FormView):
         kwargs = super(ChangeUserRoles, self).get_context_data(**kwargs)
         kwargs.update({'item': self.item})
         kwargs.update({'user_to_change': self.user_to_change})
-        
+
         return kwargs
 
     def form_valid(self, form):

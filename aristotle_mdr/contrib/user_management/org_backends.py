@@ -12,8 +12,6 @@ from organizations.backends.forms import UserRegistrationForm
 
 from . import forms
 
-
-
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.core.mail import EmailMessage
@@ -21,6 +19,7 @@ from django.template import loader
 from django.utils.translation import ugettext_lazy as _
 
 from django.http import Http404
+
 
 class AristotleInvitationBackend(InvitationBackend):
     """
@@ -65,13 +64,14 @@ class AristotleInvitationBackend(InvitationBackend):
             user.set_password(form.cleaned_data['password'])
             user.save()
             self.activate_organizations(user)
-            user = authenticate(username=form.cleaned_data['username'],
-                    password=form.cleaned_data['password'])
+            user = authenticate(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password']
+            )
             login(request, user)
             self.delete_token(token)
-            return redirect("/") #self.get_success_url())
+            return redirect("/")  # self.get_success_url())
         return render(request, self.registration_form_template, {'form': form})
-
 
     def invite_by_emails(self, emails, sender=None, request=None, **kwargs):
         """Creates an inactive user with the information we know and then sends
@@ -86,8 +86,11 @@ class AristotleInvitationBackend(InvitationBackend):
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
                 # TODO break out user creation process
-                user = User.objects.create(username=email,
-                        email=email, password=get_user_model().objects.make_random_password())
+                user = User.objects.create(
+                    username=email,
+                    email=email,
+                    password=get_user_model().objects.make_random_password()
+                )
                 user.is_active = False
                 user.save()
             self.send_invitation(user, sender, **kwargs)
@@ -108,6 +111,7 @@ class AristotleInvitationBackend(InvitationBackend):
         cache = caches['aristotle-mdr-invitations']
         cache.delete(token)
 
+
 class NewUserInvitationBackend(AristotleInvitationBackend):
 
     notification_subject = 'aristotle_mdr/users_management/newuser/email/notification_subject.txt'
@@ -116,12 +120,12 @@ class NewUserInvitationBackend(AristotleInvitationBackend):
     invitation_body = 'aristotle_mdr/users_management/newuser/email/invitation_body.html'
     reminder_subject = 'aristotle_mdr/users_management/newuser/email/reminder_subject.txt'
     reminder_body = 'aristotle_mdr/users_management/newuser/email/reminder_body.html'
-    
+
     registration_form_template = 'aristotle_mdr/users_management/newuser/register_form.html'
     activation_success_template = 'aristotle_mdr/users_management/newuser/register_success.html'
 
     def get_token(self, user, **kwargs):
-        message = {'user_email':user.email, 'invited_to':"__registry__"}
+        message = {'user_email': user.email, 'invited_to': "__registry__"}
         return self._get_token(user, message)
 
     def check_token(self, token):
@@ -150,7 +154,6 @@ class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
     raise_exception = True
     redirect_unauthenticated_users = True
 
-
     def get_form_kwargs(self):
         kwargs = super(InviteView, self).get_form_kwargs()
         kwargs.update({
@@ -168,4 +171,3 @@ class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 
     def get_success_url(self):
         return reverse(self.success_url)
-

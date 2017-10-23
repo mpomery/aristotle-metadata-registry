@@ -10,11 +10,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, TemplateView, DetailView, FormView
 
 
-from organizations.backends import registration_backend
-
-# from .org_backends import NewuserOnlyRegistrationBackend
-
 from . import forms
+
 
 class RegistryOwnerUserList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     template_name='aristotle_mdr/users_management/users/list.html'
@@ -34,7 +31,7 @@ class DeactivateRegistryUser(LoginRequiredMixin, PermissionRequiredMixin, Templa
     raise_exception = True
     redirect_unauthenticated_users = True
 
-    http_method_names = ['get','post']
+    http_method_names = ['get', 'post']
 
     def post(self, request, *args, **kwargs):
         deactivated_user = self.request.POST.get('deactivate_user')
