@@ -4,7 +4,7 @@
 
 {% block title %}Deactivate user {% firstof deactivate_user.get_full_name deactivate_user.email deactivate_user.username %}{% endblock %}
 {% block content %}
-<form method="post" action="{% url 'aristotle-user:deactivate_user' %}">{% csrf_token %}
+<form method="post" action="{% url 'aristotle-user:deactivate_user' deactivate_user.pk %}">{% csrf_token %}
     <div class="modal-header">
        <header class="modal-title">Deactivate user - {% firstof deactivate_user.get_full_name deactivate_user.email deactivate_user.username %}</header>
     </div>
@@ -31,7 +31,6 @@
       </p>
     </div>
     <div class="modal-footer">
-      <input type="hidden" name="deactivate_user" value="{{deactivate_user.pk}}">
         {% if request.is_ajax %}
             <button type="button" class="btn btn-default" data-dismiss="modal">Return to users</button>
         {% else %}

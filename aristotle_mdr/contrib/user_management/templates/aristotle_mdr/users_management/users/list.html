@@ -64,11 +64,11 @@
             <li role="separator" class="divider"></li>
             {% if user.is_active %}
             <li class="alert-danger">
-                <a href="{% url 'aristotle-user:deactivate_user' %}?deactivate_user={{user.pk}}">Deactivate this user</a>
+                <a href="{% url 'aristotle-user:deactivate_user' user.pk %}">Deactivate this user</a>
             </li>
             {% else %}
             <li class="alert-warning">
-                <a href="{% url 'aristotle-user:reactivate_user' %}?reactivate_user={{user.pk}}">Reactivate user account</a>
+                <a href="{% url 'aristotle-user:reactivate_user' user.pk %}">Reactivate user account</a>
             </li>
             {% endif %}
           </ul>
