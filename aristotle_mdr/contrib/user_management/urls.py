@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^account/registry/invitations/', include(org_backends.NewUserInvitationBackend().get_urls())),
     url(r'^account/registry/users/$', views.RegistryOwnerUserList.as_view(), name="registry_user_list"),
     url(r'^account/registry/users/deactivate/$', views.DeactivateRegistryUser.as_view(), name="deactivate_user"),
+    url(r'^account/registry/users/reactivate/$', views.ReactivateRegistryUser.as_view(), name="reactivate_user"),
 ]

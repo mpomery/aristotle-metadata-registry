@@ -14,12 +14,14 @@
       <div class="row">
 
   <div class="col-md-4 col-xs-8">
+    <form>
     <div class="input-group">
-      <input type="text" class="form-control">
+      <input name="q" type="text" value="{{request.GET.q}}" class="form-control">
       <span class="input-group-btn">
-        <button class="btn btn-default" type="button">Go!</button>
+        <button class="btn btn-default" type="submit">Search!</button>
       </span>
     </div><!-- /input-group -->
+    </form>
   </div><!-- /.col-lg-6 -->
 
     <div class="col-md-1 col-md-offset-7 col-xs-4">
@@ -55,12 +57,20 @@
             Manage <span class="caret"></span>
           </button>
           <ul class="dropdown-menu pull-right">
+            {% comment %}
             <li><a href="#">View profile</a></li>
+            {% endcomment %}
             <li><a href="#">Change role</a></li>
             <li role="separator" class="divider"></li>
+            {% if user.is_active %}
             <li class="alert-danger">
-                <a href="{% url 'aristotle-user:deactivate_user' %}?deactivate_user={{user.pk}}">Remove from this registry</a>
+                <a href="{% url 'aristotle-user:deactivate_user' %}?deactivate_user={{user.pk}}">Deactivate this user</a>
             </li>
+            {% else %}
+            <li class="alert-warning">
+                <a href="{% url 'aristotle-user:reactivate_user' %}?reactivate_user={{user.pk}}">Reactivate user account</a>
+            </li>
+            {% endif %}
           </ul>
         </div>
         </td>

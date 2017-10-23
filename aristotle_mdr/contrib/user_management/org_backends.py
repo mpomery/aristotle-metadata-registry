@@ -37,7 +37,7 @@ class AristotleInvitationBackend(InvitationBackend):
             # url(r'^accept/(?P<token>[0-9A-Za-z\-]{1,50})/$',
             url(r'^accept/(?P<token>.*)/$',
                 view=self.activate_view, name="registry_invitations_register"),
-            url(r'^complete$', view=self.invite_view(), name="registry_invitations_complete"),
+            # url(r'^complete$', view=self.invite_view(), name="registry_invitations_complete"),
             url(r'^$', view=self.invite_view(), name="registry_invitations_create"),
         ]
 

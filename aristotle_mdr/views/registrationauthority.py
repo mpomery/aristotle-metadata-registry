@@ -58,10 +58,10 @@ class CreateRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, C
     permission_required = "aristotle_mdr.add_registration_authority"
     raise_exception = True
     redirect_unauthenticated_users = True
+    model = MDR.RegistrationAuthority
 
 
 class AddUser(LoginRequiredMixin, PermissionRequiredMixin, FormView):
-    model = MDR.RegistrationAuthority
     template_name = "aristotle_mdr/user/registration_authority/add_user.html"
     permission_required = "aristotle_mdr.change_registrationauthority_memberships"
     raise_exception = True
