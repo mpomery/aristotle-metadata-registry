@@ -111,6 +111,7 @@ INSTALLED_APPS = (
     'reversion_compare',  # https://github.com/jedie/django-reversion-compare
 
     'notifications',
+    'organizations',
 )
 
 USE_L10N = True
