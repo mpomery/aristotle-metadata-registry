@@ -19,7 +19,7 @@ Changelog
     - Footer is now sticky by default
     - Metadata statistics pages now use browse pages links
     - Added a new user management section to the Aristotle Dashboard.
-    - **Permissions change** Permissions on who can see registry members has changed To support 
+    - **Permissions change** Permissions on who can see registry members has changed to support better collaboration between users. Workgroup managers and Registration Authority Managers are now assumed to be trusted users, and can now search for users to add to their respective groups.
     - **Configuration change:**
         - new options - ``ARISTOTLE_SETTINGS_STRICT_MODE``, if False errors in ARISTOTLE_SETTINGS will be logged and not prevent the app from working. Defaults to True.
         - ``BULK_ACTION`` option will no longer cause critical isuses if incorrectly configured. Errors can be logged instead

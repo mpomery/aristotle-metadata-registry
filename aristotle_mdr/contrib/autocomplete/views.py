@@ -117,7 +117,10 @@ class UserAutocomplete(GenericAutocomplete):
                 Q(first_name__icontains=self.q) | Q(last_name__icontains=self.q)
             )
         else:
-            qs = self.model.objects.all()
+            if self.request.user.is_superuser:
+                qs = self.model.objects.all()
+            else:
+                qs = self.model.objects.none()
 
         return qs
 
