@@ -195,7 +195,7 @@ class ChangeStateForm(ChangeStatusForm, BulkActionForm, RegistrationAuthorityMix
 
     def __init__(self, *args, **kwargs):
         super(ChangeStateForm, self).__init__(*args, **kwargs)
-        self.set_registration_authority_field()
+        # self.set_registration_authority_field()
 
     def make_changes(self):
         import reversion
