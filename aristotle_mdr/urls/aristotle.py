@@ -159,7 +159,7 @@ urlpatterns=[
     url(r'^registrationauthority/create/?$', views.registrationauthority.CreateRegistrationAuthority.as_view(), name='registrationauthority_create'),
     url(r'^registrationauthority/all/?$', views.registrationauthority.ListRegistrationAuthority.as_view(), name='registrationauthority_list'),
 
-    url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/details/$', views.registrationauthority.DetailsRegistrationAuthority.as_view(), name='registrationauthority_manage'),
+    url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/details/$', views.registrationauthority.DetailsRegistrationAuthority.as_view(), name='registrationauthority_details'),
     url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/members/$', views.registrationauthority.MembersRegistrationAuthority.as_view(), name='registrationauthority_members'),
     url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/edit', views.registrationauthority.EditRegistrationAuthority.as_view(), name='registrationauthority_edit'),
     url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/add_user/?$', views.registrationauthority.AddUser.as_view(), name='registrationauthority_add_user'),

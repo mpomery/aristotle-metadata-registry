@@ -11,7 +11,7 @@
 {% if not request.is_ajax %}
 <h1>
 Change user roles in
-<em><a href="{% url 'aristotle:registrationauthority_manage' item.id %}">{{item.name}}</a></em>
+<em><a href="{% url 'aristotle:registrationauthority_details' item.id %}">{{item.name}}</a></em>
 for user <em>"{% firstof user_to_change.get_full_name user_to_change.email user_to_change.username %}"</em>
 </h1>
 {% endif %}
@@ -44,7 +44,7 @@ for user <em>"{% firstof user_to_change.get_full_name user_to_change.email user_
         {% if request.is_ajax %}
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         {% else %}
-            <a class="btn btn-default" href="{% url 'aristotle:registrationauthority_manage' item.id %}">Cancel</a>
+            <a class="btn btn-default" href="{% url 'aristotle:registrationauthority_details' item.id %}">Cancel</a>
         {% endif %}
             <input type="submit" class="btn btn-primary" value="Change roles" />
     </div>

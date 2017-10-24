@@ -44,12 +44,12 @@ Showing {{ page.paginator.count }} results.
     <tr>
         <td>
             {% if manage %}
-            <a href="{% url 'aristotle:registrationauthority_manage' item.id %}">{{ item.name }}</a>
+            <a href="{% url 'aristotle:registrationauthority_details' item.id %}">{{ item.name }}</a>
             {% else %}
             <a href="{{ item.get_absolute_url }}">{{ item.name }}</a>
             {% endif %}
         </td>
-        <td>{{ item.definition|striptags|safe|truncatewords:50 }}</td>
+        <td>{{ item.definition|striptags|safe|truncatewords:50 }}</td> w
         <td>{{ item.user_count }}</td>
         {% if show_all %}
         {% endif %}

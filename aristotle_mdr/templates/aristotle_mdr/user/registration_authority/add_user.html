@@ -11,7 +11,7 @@
 {% if not request.is_ajax %}
 <h1>
 Add a new user to
-<a href="{% url 'aristotle:registrationauthority_manage' item.id %}">{{item.name}}</a>
+<a href="{% url 'aristotle:registrationauthority_details' item.id %}">{{item.name}}</a>
 </h1>
 {% endif %}
 <div class="modal-body">
@@ -48,7 +48,7 @@ Add a new user to
         {% if request.is_ajax %}
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         {% else %}
-            <a class="btn btn-default" href="{% url 'aristotle:registrationauthority_manage' item.id %}">Cancel</a>
+            <a class="btn btn-default" href="{% url 'aristotle:registrationauthority_details' item.id %}">Cancel</a>
         {% endif %}
             <input type="submit" class="btn btn-primary" value="Add member" />
     </div>

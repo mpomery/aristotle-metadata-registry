@@ -21,7 +21,7 @@
 
     <table class='table'>
         <thead>
-            <th>Group</th>
+            <th width="20%">Group</th>
             <th>Type</th>
             <th>Role</th>
             <th>Description</th>
@@ -70,7 +70,11 @@
         {% endif %}
         {% for ra in request.user.registrar_in.all %}
         <tr>
-            <td>{{ ra.name }}
+            <td>
+                <a href="{% url 'aristotle:registrationauthority_details' ra.pk %}">
+                {{ ra.name }}
+                </a>
+            </td>
             </td>
             <td>Registration Authority
             </td>
@@ -84,7 +88,10 @@
         {% endfor %}
         {% for ra in request.user.registrationauthority_manager_in.all %}
         <tr>
-            <td>{{ ra.name }}
+            <td>
+                <a href="{% url 'aristotle:registrationauthority_details' ra.pk %}">
+                {{ ra.name }}
+                </a>
             </td>
             <td>Registration Authority
             </td>
@@ -98,7 +105,10 @@
         {% endfor %}
         {% for wg in request.user.workgroup_manager_in.all %}
         <tr>
-            <td>{{ wg.name }}
+            <td>
+                <a href="{% url 'aristotle:workgroup' wg.pk %}">
+                {{ wg.name }}
+                </a>
             </td>
             <td>Workgroup
             </td>
@@ -112,7 +122,10 @@
         {% endfor %}
         {% for wg in request.user.steward_in.all %}
         <tr>
-            <td>{{ wg.name }}
+            <td>
+                <a href="{% url 'aristotle:workgroup' wg.pk %}">
+                {{ wg.name }}
+                </a>
             </td>
             <td>Workgroup
             </td>
@@ -126,7 +139,10 @@
         {% endfor %}
         {% for wg in request.user.submitter_in.all %}
         <tr>
-            <td>{{ wg.name }}
+            <td>
+                <a href="{% url 'aristotle:workgroup' wg.pk %}">
+                {{ wg.name }}
+                </a>
             </td>
             <td>Workgroup
             </td>
@@ -140,7 +156,10 @@
         {% endfor %}
         {% for wg in request.user.viewer_in.all %}
         <tr>
-            <td>{{ wg.name }}
+            <td>
+                <a href="{% url 'aristotle:workgroup' wg.pk %}">
+                {{ wg.name }}
+                </a>
             </td>
             <td>Workgroup
             </td>
