@@ -111,14 +111,14 @@ class UserAutocomplete(GenericAutocomplete):
             raise PermissionDenied
 
         if self.q:
-            qs = self.model.objects.filter(
+            qs = self.model.objects.filter(is_active=True).filter(
                 Q(username__icontains=self.q) |
                 Q(email__icontains=self.q) |
                 Q(first_name__icontains=self.q) | Q(last_name__icontains=self.q)
             )
         else:
             if self.request.user.is_superuser:
-                qs = self.model.objects.all()
+                qs = self.model.objects.filter(is_active=True)
             else:
                 qs = self.model.objects.none()
 

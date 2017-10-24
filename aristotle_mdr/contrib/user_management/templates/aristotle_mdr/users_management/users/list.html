@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block page %}
-    <h1>Current members</h1>
+    <h1>Current members of this Registry</h1>
 
 <div class="panel panel-default">
   <div class="panel-heading">
@@ -18,7 +18,7 @@
     <div class="input-group">
       <input name="q" type="text" value="{{request.GET.q}}" class="form-control">
       <span class="input-group-btn">
-        <button class="btn btn-default" type="submit">Search!</button>
+        <button class="btn btn-default" type="submit">Search</button>
       </span>
     </div><!-- /input-group -->
     </form>
@@ -80,4 +80,23 @@
 </table>
 </div>
 
+
+<header>About active and inactive users</header>
+<p>
+  To ensure users actions are retained for auditing purposes, user accounts are never
+  deleted from the registry. Instead their active status can be altered to either allow
+  or prevent them from authenticating against the system.
+  <br>
+  In this registry the following definitions and restrictions apply
+  <dl>
+    <dt>Active</dt>
+    <dd>An active user is able to log into the system, they can be added to workgroups, recieve notifications and create metadata.</dd>
+    <dt>Inactive</dt>
+    <dd>An inactive user is prevented from logging into the system,
+      and will not be able to interact with the system in a way that requires an account.
+      
+      They will be able to interact with the system like an unauthenticated user who can see the registry.
+    </dd>
+  </dl>
+</p>
 {% endblock %}

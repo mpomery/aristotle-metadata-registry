@@ -22,6 +22,11 @@ from aristotle_mdr.views.utils import (
     ObjectLevelPermissionRequiredMixin
 )
 
+import logging
+
+logger = logging.getLogger(__name__)
+logger.debug("Logging started for " + __name__)
+
 
 class WorkgroupContextMixin(object):
     workgroup = None
@@ -100,7 +105,7 @@ class ItemsView(LoginRequiredMixin, WorkgroupContextMixin, ListView):
 
 
 class MembersView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
-    template_name = 'aristotle_mdr/workgroupMembers.html'
+    template_name = 'aristotle_mdr/user/workgroups/members.html'
     model = MDR.Workgroup
     pk_url_kwarg = 'iid'
 
@@ -108,22 +113,6 @@ class MembersView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
         self.workgroup = super(MembersView, self).get_object(queryset)
         self.check_user_permission()
         return self.workgroup
-
-
-class RemoveRoleView(LoginRequiredMixin, WorkgroupContextMixin, RedirectView):
-    permanent = False
-    pattern_name = 'aristotle:workgroupMembers'
-
-    def get_redirect_url(self, *args, **kwargs):
-        iid = self.kwargs.get('iid')
-        role = self.kwargs.get('role')
-        userid = self.kwargs.get('userid')
-        self.workgroup = get_object_or_404(MDR.Workgroup, pk=iid)
-        self.check_manager_permission()
-        user = get_user_model().objects.filter(id=userid).first()
-        if user:
-            self.workgroup.removeRoleFromUser(role, user)
-        return super(RemoveRoleView, self).get_redirect_url(self.workgroup.pk)
 
 
 class ArchiveView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
@@ -231,3 +220,45 @@ class EditWorkgroup(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, Upda
 
     pk_url_kwarg = 'iid'
     context_object_name = "item"
+
+
+class ChangeUserRoles(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+    model = MDR.Workgroup
+    template_name = "aristotle_mdr/user/workgroups/change_role.html"
+    permission_required = "aristotle_mdr.change_workgroup"
+    raise_exception = True
+    redirect_unauthenticated_users = True
+    form_class = MDRForms.workgroups.ChangeWorkgroupUserRolesForm
+
+    def get_form_kwargs(self):
+        kwargs = super(ChangeUserRoles, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        initial = {'roles': []}
+        initial['roles'] = self.item.list_roles_for_user(self.user_to_change)
+
+        kwargs.update({'initial': initial})
+        return kwargs
+
+    def dispatch(self, request, *args, **kwargs):
+        self.item = get_object_or_404(MDR.Workgroup, pk=self.kwargs.get('iid'))
+        self.user_to_change = get_object_or_404(get_user_model(), pk=self.kwargs.get('user_pk'))
+        return super(ChangeUserRoles, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        """
+        Insert the single object into the context dict.
+        """
+        kwargs = super(ChangeUserRoles, self).get_context_data(**kwargs)
+        kwargs.update({'item': self.item})
+        kwargs.update({'user_to_change': self.user_to_change})
+
+        return kwargs
+
+    def form_valid(self, form):
+        for role in MDR.Workgroup.roles:
+            if role in form.cleaned_data['roles']:
+                self.item.giveRoleToUser(role, self.user_to_change)
+            else:
+                self.item.removeRoleFromUser(role, self.user_to_change)
+
+        return redirect(reverse('aristotle:workgroupMembers', args=[self.item.id]))

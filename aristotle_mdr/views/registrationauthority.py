@@ -90,7 +90,7 @@ class AddUser(LoginRequiredMixin, PermissionRequiredMixin, FormView):
         for role in form.cleaned_data['roles']:
             self.item.giveRoleToUser(role, user)
 
-        return redirect(reverse('aristotle:registrationauthority_manage', args=[self.item.id]))
+        return redirect(reverse('aristotle:registrationauthority_members', args=[self.item.id]))
 
 
 class ListRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -111,10 +111,21 @@ class ListRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, Lis
         return paginated_registration_authority_list(request, ras, self.template_name, context)
 
 
-class ManageRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class DetailsRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = MDR.RegistrationAuthority
-    template_name = "aristotle_mdr/user/registration_authority/manage.html"
-    permission_required = "aristotle_mdr.change_registrationauthority"
+    template_name = "aristotle_mdr/user/registration_authority/details.html"
+    permission_required = "aristotle_mdr.view_registrationauthority_details"
+    raise_exception = True
+    redirect_unauthenticated_users = True
+
+    pk_url_kwarg = 'iid'
+    context_object_name = "item"
+
+
+class MembersRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    model = MDR.RegistrationAuthority
+    template_name = "aristotle_mdr/user/registration_authority/members.html"
+    permission_required = "aristotle_mdr.view_registrationauthority_details"
     raise_exception = True
     redirect_unauthenticated_users = True
 
@@ -191,4 +202,4 @@ class ChangeUserRoles(LoginRequiredMixin, PermissionRequiredMixin, FormView):
             else:
                 self.item.removeRoleFromUser(role, self.user_to_change)
 
-        return redirect(reverse('aristotle:registrationauthority_manage', args=[self.item.id]))
+        return redirect(reverse('aristotle:registrationauthority_members', args=[self.item.id]))

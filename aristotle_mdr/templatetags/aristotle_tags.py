@@ -415,3 +415,8 @@ def visibility_text(item):
 def is_active_module(module_name):
     from aristotle_mdr.utils.utils import is_active_module
     return is_active_module(module_name)
+
+
+@register.filter
+def user_roles_for_group(group, user):
+    return group.list_roles_for_user(user)

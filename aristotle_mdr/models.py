@@ -211,6 +211,9 @@ class registryGroup(unmanagedObject):
     def help_name(self):
         return self._meta.model_name
 
+    def list_roles_for_user(self, user):
+        raise NotImplementedError
+
 
 class Organization(registryGroup):
     """
@@ -392,6 +395,14 @@ class RegistrationAuthority(Organization):
             until_date=until_date
         )
 
+    def list_roles_for_user(self, user):
+        roles = []
+        if user in self.managers.all():
+            roles.append("Manager")
+        if user in self.registrars.all():
+            roles.append("Registrar")
+        return roles
+
     def giveRoleToUser(self, role, user):
         if role == 'registrar':
             self.registrars.add(user)
@@ -486,6 +497,18 @@ class Workgroup(registryGroup):
     def classedItems(self):
         # Convenience class as we can't call functions in templates
         return self.items.select_subclasses()
+
+    def list_roles_for_user(self, user):
+        roles = []
+        if user in self.managers.all():
+            roles.append("manager")
+        if user in self.viewers.all():
+            roles.append("viewer")
+        if user in self.submitters.all():
+            roles.append("submitter")
+        if user in self.stewards.all():
+            roles.append("steward")
+        return roles
 
     def giveRoleToUser(self, role, user):
         if role == "manager":
