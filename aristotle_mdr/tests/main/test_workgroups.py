@@ -328,7 +328,7 @@ class WorkgroupMemberTests(utils.LoggedInViewPages,TestCase):
         self.login_viewer()
         response = self.client.get(reverse('aristotle:addWorkgroupMembers',args=[self.wg1.id]))
         self.assertEqual(response.status_code,403)
-        response = self.client.get(reverse('aristotle:removeWorkgroupRole',args=[self.wg1.id,'Viewer',self.newuser.pk]))
+        response = self.client.get(reverse('aristotle:workgroup_member_change_role',args=[self.wg1.id,self.newuser.pk]))
         self.assertEqual(response.status_code,403)
 
     def test_manager_can_add_or_remove_users(self):
@@ -363,12 +363,24 @@ class WorkgroupMemberTests(utils.LoggedInViewPages,TestCase):
         self.assertTrue(self.newuser in self.wg1.members.all())
         self.assertListEqual(list(self.newuser.profile.workgroups.all()),[self.wg1])
 
-        response = self.client.get(reverse('aristotle:removeWorkgroupRole',args=[self.wg1.id,'viewer',self.newuser.pk]))
+        response = self.client.get(reverse('aristotle:workgroup_member_change_role',args=[self.wg1.id,self.newuser.pk]))
+        self.assertEqual(response.status_code,200)
+
+        response = self.client.post(
+            reverse('aristotle:workgroup_member_change_role',args=[self.wg1.id,self.newuser.pk]),
+            {'roles': ['manager']}
+        )
         self.assertEqual(response.status_code,302)
         self.assertFalse(self.newuser in self.wg1.viewers.all())
-        response = self.client.get(reverse('aristotle:removeWorkgroupRole',args=[self.wg1.id,'viewer',self.newuser.pk]))
+        self.assertTrue(self.newuser in self.wg1.managers.all())
+        response = self.client.post(
+            reverse('aristotle:workgroup_member_change_role',args=[self.wg1.id,self.newuser.pk]),
+            {'roles': []}
+        )
         self.assertEqual(response.status_code,302)
         self.assertFalse(self.newuser in self.wg1.viewers.all())
+        self.assertFalse(self.newuser in self.wg1.managers.all())
+        self.assertFalse(self.newuser in self.wg1.members.all())
 
     def test_workgroup_members_can_view_pages(self):
         self.logout()

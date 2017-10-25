@@ -19,7 +19,8 @@ from aristotle_mdr.views.utils import (
     paginate_sort_opts,
     paginated_workgroup_list,
     workgroup_item_statuses,
-    ObjectLevelPermissionRequiredMixin
+    ObjectLevelPermissionRequiredMixin,
+    RoleChangeView
 )
 
 import logging
@@ -222,43 +223,13 @@ class EditWorkgroup(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, Upda
     context_object_name = "item"
 
 
-class ChangeUserRoles(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+class ChangeUserRoles(RoleChangeView):
     model = MDR.Workgroup
     template_name = "aristotle_mdr/user/workgroups/change_role.html"
     permission_required = "aristotle_mdr.change_workgroup"
-    raise_exception = True
-    redirect_unauthenticated_users = True
     form_class = MDRForms.workgroups.ChangeWorkgroupUserRolesForm
+    pk_url_kwarg = 'iid'
+    context_object_name = "item"
 
-    def get_form_kwargs(self):
-        kwargs = super(ChangeUserRoles, self).get_form_kwargs()
-        kwargs.update({'user': self.request.user})
-        initial = {'roles': []}
-        initial['roles'] = self.item.list_roles_for_user(self.user_to_change)
-
-        kwargs.update({'initial': initial})
-        return kwargs
-
-    def dispatch(self, request, *args, **kwargs):
-        self.item = get_object_or_404(MDR.Workgroup, pk=self.kwargs.get('iid'))
-        self.user_to_change = get_object_or_404(get_user_model(), pk=self.kwargs.get('user_pk'))
-        return super(ChangeUserRoles, self).dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        """
-        Insert the single object into the context dict.
-        """
-        kwargs = super(ChangeUserRoles, self).get_context_data(**kwargs)
-        kwargs.update({'item': self.item})
-        kwargs.update({'user_to_change': self.user_to_change})
-
-        return kwargs
-
-    def form_valid(self, form):
-        for role in MDR.Workgroup.roles:
-            if role in form.cleaned_data['roles']:
-                self.item.giveRoleToUser(role, self.user_to_change)
-            else:
-                self.item.removeRoleFromUser(role, self.user_to_change)
-
+    def get_success_url(self):
         return redirect(reverse('aristotle:workgroupMembers', args=[self.item.id]))

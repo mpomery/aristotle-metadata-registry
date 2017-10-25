@@ -1,13 +1,20 @@
-from braces.views import PermissionRequiredMixin
+from braces.views import LoginRequiredMixin, PermissionRequiredMixin
+
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.db.models import Count, Q
-from django.shortcuts import render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.functions import Lower
+
+from django.views.generic.detail import SingleObjectMixin, BaseDetailView
+from django.views.generic import (
+    CreateView, DetailView, FormView, ListView, RedirectView, UpdateView
+)
 
 
 paginate_sort_opts = {
@@ -246,3 +253,42 @@ class ObjectLevelPermissionRequiredMixin(PermissionRequiredMixin):
         else:
             has_permission = request.user.has_perm(self.get_permission_required(request))
         return has_permission
+
+
+class RoleChangeView(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, BaseDetailView, FormView):
+    raise_exception = True
+    redirect_unauthenticated_users = True
+    object_level_permissions = True
+
+    def dispatch(self, request, *args, **kwargs):
+        self.item = get_object_or_404(self.model, pk=self.kwargs.get('iid'))
+        self.user_to_change = get_object_or_404(get_user_model(), pk=self.kwargs.get('user_pk'))
+        return super(RoleChangeView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        """
+        Insert the single object into the context dict.
+        """
+        kwargs = super(RoleChangeView, self).get_context_data(**kwargs)
+        kwargs.update({'item': self.item})
+        kwargs.update({'user_to_change': self.user_to_change})
+
+        return kwargs
+
+    def get_form_kwargs(self):
+        kwargs = super(RoleChangeView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        initial = {'roles': []}
+        initial['roles'] = self.item.list_roles_for_user(self.user_to_change)
+
+        kwargs.update({'initial': initial})
+        return kwargs
+
+    def form_valid(self, form):
+        for role in self.model.roles:
+            if role in form.cleaned_data['roles']:
+                self.item.giveRoleToUser(role, self.user_to_change)
+            else:
+                self.item.removeRoleFromUser(role, self.user_to_change)
+
+        return self.get_success_url()

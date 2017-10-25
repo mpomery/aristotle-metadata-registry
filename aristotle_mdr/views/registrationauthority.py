@@ -17,7 +17,8 @@ from aristotle_mdr.views.utils import (
     paginated_list,
     paginated_workgroup_list,
     paginated_registration_authority_list,
-    ObjectLevelPermissionRequiredMixin
+    ObjectLevelPermissionRequiredMixin,
+    RoleChangeView
 )
 
 import logging
@@ -161,45 +162,13 @@ class EditRegistrationAuthority(LoginRequiredMixin, ObjectLevelPermissionRequire
     context_object_name = "item"
 
 
-class ChangeUserRoles(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+class ChangeUserRoles(RoleChangeView):
     model = MDR.RegistrationAuthority
     template_name = "aristotle_mdr/user/registration_authority/change_role.html"
     permission_required = "aristotle_mdr.change_registrationauthority_memberships"
-    raise_exception = True
-    redirect_unauthenticated_users = True
     form_class = MDRForms.actions.ChangeRegistrationUserRolesForm
+    pk_url_kwarg = 'iid'
+    context_object_name = "item"
 
-    def get_form_kwargs(self):
-        kwargs = super(ChangeUserRoles, self).get_form_kwargs()
-        kwargs.update({'user': self.request.user})
-        initial = {'roles': []}
-        if self.user_to_change in self.item.managers.all():
-            initial['roles'].append('manager')
-        if self.user_to_change in self.item.registrars.all():
-            initial['roles'].append('registrar')
-        kwargs.update({'initial': initial})
-        return kwargs
-
-    def dispatch(self, request, *args, **kwargs):
-        self.item = get_object_or_404(MDR.RegistrationAuthority, pk=self.kwargs.get('iid'))
-        self.user_to_change = get_object_or_404(get_user_model(), pk=self.kwargs.get('user_pk'))
-        return super(ChangeUserRoles, self).dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        """
-        Insert the single object into the context dict.
-        """
-        kwargs = super(ChangeUserRoles, self).get_context_data(**kwargs)
-        kwargs.update({'item': self.item})
-        kwargs.update({'user_to_change': self.user_to_change})
-
-        return kwargs
-
-    def form_valid(self, form):
-        for role in MDR.RegistrationAuthority.roles:
-            if role in form.cleaned_data['roles']:
-                self.item.giveRoleToUser(role, self.user_to_change)
-            else:
-                self.item.removeRoleFromUser(role, self.user_to_change)
-
+    def get_success_url(self):
         return redirect(reverse('aristotle:registrationauthority_members', args=[self.item.id]))

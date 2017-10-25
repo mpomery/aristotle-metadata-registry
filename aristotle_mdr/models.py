@@ -398,9 +398,9 @@ class RegistrationAuthority(Organization):
     def list_roles_for_user(self, user):
         roles = []
         if user in self.managers.all():
-            roles.append("Manager")
+            roles.append("manager")
         if user in self.registrars.all():
-            roles.append("Registrar")
+            roles.append("registrar")
         return roles
 
     def giveRoleToUser(self, role, user):
