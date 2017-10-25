@@ -2,12 +2,14 @@
 {% load compile_static i18n %}
 {% load aristotle_tags %}
 
-{% block title %}Deactivate user {% firstof deactivate_user.get_full_name deactivate_user.email deactivate_user.username %}{% endblock %}
+{% block title %}Remove user from workgroup {% firstof user_to_change.get_full_name user_to_change.email user_to_change.username %}{% endblock %}
 {% block content %}
 <form method="post" action="{% url 'aristotle:workgroup_member_remove' item.id user_to_change.pk %}">{% csrf_token %}
+    {% if not request.is_ajax %}
     <div class="modal-header">
-       <header class="modal-title">Deactivate user - {% firstof deactivate_user.get_full_name deactivate_user.email deactivate_user.username %}</header>
+       <header class="modal-title">Remove user from workgroup - {% firstof user_to_change.get_full_name user_to_change.email user_to_change.username %}</header>
     </div>
+    {% endif %}
     <div class="modal-body">
       <p>
         <strong>

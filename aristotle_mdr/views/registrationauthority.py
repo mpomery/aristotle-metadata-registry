@@ -18,7 +18,8 @@ from aristotle_mdr.views.utils import (
     paginated_workgroup_list,
     paginated_registration_authority_list,
     ObjectLevelPermissionRequiredMixin,
-    RoleChangeView
+    RoleChangeView,
+    MemberRemoveFromGroupView
 )
 
 import logging
@@ -167,6 +168,17 @@ class ChangeUserRoles(RoleChangeView):
     template_name = "aristotle_mdr/user/registration_authority/change_role.html"
     permission_required = "aristotle_mdr.change_registrationauthority_memberships"
     form_class = MDRForms.actions.ChangeRegistrationUserRolesForm
+    pk_url_kwarg = 'iid'
+    context_object_name = "item"
+
+    def get_success_url(self):
+        return redirect(reverse('aristotle:registrationauthority_members', args=[self.get_object().id]))
+
+
+class RemoveUser(MemberRemoveFromGroupView):
+    model = MDR.RegistrationAuthority
+    template_name = "aristotle_mdr/user/registration_authority/remove_member.html"
+    permission_required = "aristotle_mdr.change_registrationauthority_memberships"
     pk_url_kwarg = 'iid'
     context_object_name = "item"
 

@@ -54,15 +54,14 @@
               </button>
               <ul class="dropdown-menu pull-right">
                 <li>
-                    <a href="{% url 'aristotle:registrationauthority_change_user_roles' item.id  member.pk %}"
+                    <a href="{% url 'aristotle:registrationauthority_member_remove' item.id  member.pk %}"
                         data-toggle="modal" data-target="#ra_page_modal">Change role</a>
                 </li>
-                {% comment %}
                 <li role="separator" class="divider"></li>
                 <li class="alert-danger">
-                    <a href="{#% url 'aristotle-user:remove_ra_user' %#}?deactivate_user={{user.pk}}">Remove from this group</a>
+                    <a href="{% url 'aristotle:registrationauthority_member_remove' item.id  member.pk %}"
+                    data-toggle="modal" data-target="#ra_page_modal">Remove from this group</a>
                 </li>
-                {% endcomment %}
               </ul>
             </div>
         </td>

@@ -52,7 +52,8 @@
                 </li>
                 <li role="separator" class="divider"></li>
                 <li class="alert-danger">
-                    <a href="{% url 'aristotle:workgroup_member_remove' item.id  member.pk %}">Remove from this group</a>
+                    <a href="{% url 'aristotle:workgroup_member_remove' item.id  member.pk %}"
+                    data-toggle="modal" data-target="#wg_page_modal">Remove from this group</a>
                 </li>
               </ul>
             </div>
