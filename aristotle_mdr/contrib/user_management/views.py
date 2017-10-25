@@ -5,11 +5,10 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, reverse, redirect
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, TemplateView, DetailView, FormView
 from django.db.models import Q
-from django.core.urlresolvers import reverse
 
 from . import forms
 
@@ -24,7 +23,7 @@ class RegistryOwnerUserList(LoginRequiredMixin, PermissionRequiredMixin, ListVie
     def get_queryset(self):
         q = self.request.GET.get('q', None)
         queryset = get_user_model().objects.all().order_by(
-            '-is_active', 'first_name', 'last_name', 'email', 'username'
+            'is_active', 'first_name', 'last_name', 'email', 'username'
         )
         if q:
             queryset = queryset.filter(
@@ -46,7 +45,7 @@ class DeactivateRegistryUser(LoginRequiredMixin, PermissionRequiredMixin, Templa
     http_method_names = ['get', 'post']
 
     def post(self, request, *args, **kwargs):
-        deactivated_user = self.kwargs.get('user_pk')
+        deactivated_user = self.request.POST.get('deactivate_user')
         deactivated_user = get_object_or_404(get_user_model(), pk=deactivated_user)
         deactivated_user.is_active = False
         deactivated_user.save()
@@ -54,7 +53,7 @@ class DeactivateRegistryUser(LoginRequiredMixin, PermissionRequiredMixin, Templa
 
     def get_context_data(self, **kwargs):
         data = super(DeactivateRegistryUser, self).get_context_data(**kwargs)
-        deactivate_user = self.kwargs.get('user_pk')
+        deactivate_user = self.request.GET.get('deactivate_user')
         if not deactivate_user:
             raise Http404
 
@@ -74,7 +73,7 @@ class ReactivateRegistryUser(LoginRequiredMixin, PermissionRequiredMixin, Templa
     http_method_names = ['get', 'post']
 
     def post(self, request, *args, **kwargs):
-        reactivated_user = self.kwargs.get('user_pk')
+        reactivated_user = self.request.POST.get('reactivate_user')
         reactivated_user = get_object_or_404(get_user_model(), pk=reactivated_user)
         reactivated_user.is_active = True
         reactivated_user.save()
@@ -82,7 +81,7 @@ class ReactivateRegistryUser(LoginRequiredMixin, PermissionRequiredMixin, Templa
 
     def get_context_data(self, **kwargs):
         data = super(ReactivateRegistryUser, self).get_context_data(**kwargs)
-        reactivate_user = self.kwargs.get('user_pk')
+        reactivate_user = self.request.GET.get('reactivate_user')
         if not reactivate_user:
             raise Http404
 

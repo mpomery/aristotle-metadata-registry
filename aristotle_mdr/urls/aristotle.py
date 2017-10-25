@@ -80,11 +80,12 @@ urlpatterns=[
     url(r'^workgroup/(?P<iid>\d+)/members/?$', views.workgroups.MembersView.as_view(), name='workgroupMembers'),
     url(r'^workgroup/(?P<iid>\d+)/items/?$', views.workgroups.ItemsView.as_view(), name='workgroupItems'),
     url(r'^workgroup/(?P<iid>\d+)/leave/?$', views.workgroups.LeaveView.as_view(), name='workgroup_leave'),
-    url(r'^workgroup/addMembers/(?P<iid>\d+)$', views.workgroups.AddMembersView.as_view(), name='addWorkgroupMembers'),
+    url(r'^workgroup/(?P<iid>\d+)/add_member$', views.workgroups.AddMembersView.as_view(), name='addWorkgroupMembers'),
     url(r'^workgroup/(?P<iid>\d+)/change_roles/(?P<user_pk>\d+)/?$', views.workgroups.ChangeUserRoles.as_view(), name='workgroup_member_change_role'),
+    url(r'^workgroup/(?P<iid>\d+)/remove/(?P<user_pk>\d+)/?$', views.workgroups.RemoveUser.as_view(), name='workgroup_member_remove'),
     url(r'^workgroup/(?P<iid>\d+)/archive/?$', views.workgroups.ArchiveView.as_view(), name='archive_workgroup'),
     url(r'^workgroup/(?P<iid>\d+)/edit$', views.workgroups.EditWorkgroup.as_view(), name='workgroup_edit'),
-    url(r'^workgroup/create/?$', views.workgroups.CreateWorkgroup.as_view(), name='workgroup_create'),
+    url(r'^workgroups/create/?$', views.workgroups.CreateWorkgroup.as_view(), name='workgroup_create'),
     url(r'^workgroups/all/?$', views.workgroups.ListWorkgroup.as_view(), name='workgroup_list'),
 
 

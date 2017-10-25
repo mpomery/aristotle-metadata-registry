@@ -10,7 +10,6 @@ from django.views.generic import (
     CreateView, DetailView, FormView, ListView, RedirectView, UpdateView
 )
 
-
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.perms import user_in_workgroup, user_is_workgroup_manager
@@ -20,7 +19,8 @@ from aristotle_mdr.views.utils import (
     paginated_workgroup_list,
     workgroup_item_statuses,
     ObjectLevelPermissionRequiredMixin,
-    RoleChangeView
+    RoleChangeView,
+    MemberRemoveFromGroupView
 )
 
 import logging
@@ -232,4 +232,15 @@ class ChangeUserRoles(RoleChangeView):
     context_object_name = "item"
 
     def get_success_url(self):
-        return redirect(reverse('aristotle:workgroupMembers', args=[self.item.id]))
+        return redirect(reverse('aristotle:workgroupMembers', args=[self.get_object().id]))
+
+
+class RemoveUser(MemberRemoveFromGroupView):
+    model = MDR.Workgroup
+    template_name = "aristotle_mdr/user/workgroups/remove_member.html"
+    permission_required = "aristotle_mdr.change_workgroup"
+    pk_url_kwarg = 'iid'
+    context_object_name = "item"
+
+    def get_success_url(self):
+        return redirect(reverse('aristotle:workgroupMembers', args=[self.get_object().id]))

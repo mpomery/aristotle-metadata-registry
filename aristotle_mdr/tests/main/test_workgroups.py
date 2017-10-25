@@ -324,14 +324,16 @@ class WorkgroupMemberTests(utils.LoggedInViewPages,TestCase):
         response = self.client.get(self.wg1.get_absolute_url())
         self.assertEqual(response.status_code,403)
 
-    def test_viewer_cannot_add_or_remove_users(self):
+    def test_viewer_cannot_add_change_or_remove_users(self):
         self.login_viewer()
         response = self.client.get(reverse('aristotle:addWorkgroupMembers',args=[self.wg1.id]))
         self.assertEqual(response.status_code,403)
         response = self.client.get(reverse('aristotle:workgroup_member_change_role',args=[self.wg1.id,self.newuser.pk]))
         self.assertEqual(response.status_code,403)
+        response = self.client.get(reverse('aristotle:workgroup_member_remove',args=[self.wg1.id,self.newuser.pk]))
+        self.assertEqual(response.status_code,403)
 
-    def test_manager_can_add_or_remove_users(self):
+    def test_manager_can_add_or_change_users(self):
         self.login_manager()
         self.assertTrue(self.newuser in list(get_user_model().objects.all()))
 
@@ -381,6 +383,35 @@ class WorkgroupMemberTests(utils.LoggedInViewPages,TestCase):
         self.assertFalse(self.newuser in self.wg1.viewers.all())
         self.assertFalse(self.newuser in self.wg1.managers.all())
         self.assertFalse(self.newuser in self.wg1.members.all())
+
+
+    def test_manager_can_remove_users(self):
+        self.login_manager()
+        self.assertTrue(self.newuser in list(get_user_model().objects.all()))
+
+        response = self.client.post(
+            reverse('aristotle:addWorkgroupMembers', args=[self.wg1.id]),
+            {
+                'roles': ['viewer', 'manager'],
+                'users': [self.newuser.pk]
+            }
+        )
+        self.assertEqual(response.status_code,302)
+        self.assertTrue(self.newuser in self.wg1.members.all())
+        self.assertTrue(self.newuser in self.wg1.viewers.all())
+        self.assertTrue(self.newuser in self.wg1.managers.all())
+        self.assertListEqual(list(self.newuser.profile.workgroups.all()),[self.wg1])
+
+        response = self.client.post(
+            reverse('aristotle:workgroup_member_remove',args=[self.wg1.id,self.newuser.pk]),
+        )
+        self.assertEqual(response.status_code,302)
+        self.assertFalse(self.newuser in self.wg1.viewers.all())
+        self.assertFalse(self.newuser in self.wg1.managers.all())
+
+        response = self.client.get(
+            reverse('aristotle:workgroup_member_remove', args=[self.wg1.id,self.newuser.pk]),
+        )
 
     def test_workgroup_members_can_view_pages(self):
         self.logout()

@@ -171,4 +171,4 @@ class ChangeUserRoles(RoleChangeView):
     context_object_name = "item"
 
     def get_success_url(self):
-        return redirect(reverse('aristotle:registrationauthority_members', args=[self.item.id]))
+        return redirect(reverse('aristotle:registrationauthority_members', args=[self.get_object().id]))

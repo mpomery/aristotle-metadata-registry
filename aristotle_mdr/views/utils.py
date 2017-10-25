@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.functions import Lower
 
-from django.views.generic.detail import SingleObjectMixin, BaseDetailView
+from django.views.generic.detail import BaseDetailView
 from django.views.generic import (
     CreateView, DetailView, FormView, ListView, RedirectView, UpdateView
 )
@@ -255,31 +255,32 @@ class ObjectLevelPermissionRequiredMixin(PermissionRequiredMixin):
         return has_permission
 
 
-class RoleChangeView(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, BaseDetailView, FormView):
-    raise_exception = True
-    redirect_unauthenticated_users = True
-    object_level_permissions = True
+class GroupMemberMixin(object):
+    user_pk_kwarg = "user_pk"
 
-    def dispatch(self, request, *args, **kwargs):
-        self.item = get_object_or_404(self.model, pk=self.kwargs.get('iid'))
-        self.user_to_change = get_object_or_404(get_user_model(), pk=self.kwargs.get('user_pk'))
-        return super(RoleChangeView, self).dispatch(request, *args, **kwargs)
+    @property
+    def user_to_change(self):
+        return get_object_or_404(get_user_model(), pk=self.kwargs.get(self.user_pk_kwarg))
 
     def get_context_data(self, **kwargs):
         """
         Insert the single object into the context dict.
         """
-        kwargs = super(RoleChangeView, self).get_context_data(**kwargs)
-        kwargs.update({'item': self.item})
+        kwargs = super(GroupMemberMixin, self).get_context_data(**kwargs)
         kwargs.update({'user_to_change': self.user_to_change})
-
         return kwargs
+
+
+class RoleChangeView(GroupMemberMixin, LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, BaseDetailView, FormView):
+    raise_exception = True
+    redirect_unauthenticated_users = True
+    object_level_permissions = True
 
     def get_form_kwargs(self):
         kwargs = super(RoleChangeView, self).get_form_kwargs()
         kwargs.update({'user': self.request.user})
         initial = {'roles': []}
-        initial['roles'] = self.item.list_roles_for_user(self.user_to_change)
+        initial['roles'] = self.get_object().list_roles_for_user(self.user_to_change)
 
         kwargs.update({'initial': initial})
         return kwargs
@@ -287,8 +288,21 @@ class RoleChangeView(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, Bas
     def form_valid(self, form):
         for role in self.model.roles:
             if role in form.cleaned_data['roles']:
-                self.item.giveRoleToUser(role, self.user_to_change)
+                self.get_object().giveRoleToUser(role, self.user_to_change)
             else:
-                self.item.removeRoleFromUser(role, self.user_to_change)
+                self.get_object().removeRoleFromUser(role, self.user_to_change)
 
+        return self.get_success_url()
+
+
+class MemberRemoveFromGroupView(GroupMemberMixin, LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, DetailView):
+    raise_exception = True
+    redirect_unauthenticated_users = True
+    object_level_permissions = True
+
+    http_method_names = ['get', 'post']
+
+    def post(self, request, *args, **kwargs):
+        for role in self.get_object().list_roles_for_user(self.user_to_change):
+            self.get_object().removeRoleFromUser(role, self.user_to_change)
         return self.get_success_url()
