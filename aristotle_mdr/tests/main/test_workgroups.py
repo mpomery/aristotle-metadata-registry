@@ -92,10 +92,10 @@ class WorkgroupAnonTests(utils.LoggedInViewPages,TestCase):
             reverse('aristotle:addWorkgroupMembers',args=[self.wg1.id])
             )
 
-        response = self.client.get(reverse('aristotle:removeWorkgroupRole',args=[self.wg1.id,'Viewer',self.newuser.pk]))
+        response = self.client.get(reverse('aristotle:registrationauthority_member_remove',args=[self.wg1.id,self.newuser.pk]))
         self.assertRedirects(response,
             reverse("friendly_login",)+"?next="+
-            reverse('aristotle:removeWorkgroupRole',args=[self.wg1.id,'Viewer',self.newuser.pk])
+            reverse('aristotle:registrationauthority_member_remove',args=[self.wg1.id,self.newuser.pk])
             )
 
         response = self.client.post(
