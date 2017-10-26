@@ -62,7 +62,7 @@
                 {% if request.user.is_authenticated %}
                     {% if request.user.is_superuser or request.user.is_staff and item.workgroup in request.user.workgroups %}
                         <time title="{{ item.modified|date:'o-m-d H:i e' }}" datetime="{{ item.modified|date:'c' }}">
-                            <a href="{% historyLink item %}">{{item.modified|naturaltime}}</a>
+                            <a href="{% url 'aristotle:item_history' iid=item.id %}">{{item.modified|naturaltime}}</a>
                         </time>
                     {% elif item.workgroup in request.user.workgroups or item.submitter == request.user %}
                         <time title="{{ item.modified|date:'o-m-d H:i e' }}" datetime="{{ item.modified|date:'c' }}">

@@ -18,7 +18,10 @@ Changelog
     - Workgroup users now properly informed when accessing a workgroup they arent a member of (Thanks @DeKan)
     - Footer is now sticky by default
     - Metadata statistics pages now use browse pages links
-    - Added a new user management section to the Aristotle Dashboard.
+    - Added a new user management section to the Aristotle Dashboard
+    - Visual enhancements to item revision comparison page
+    - Added change stats and view history options to the action menu
+    - Removed link to django admin item history
     - **Permissions change** Permissions on who can see registry members has changed to support better collaboration between users. Workgroup managers and Registration Authority Managers are now assumed to be trusted users, and can now search for users to add to their respective groups.
     - **Configuration change:**
         - new options - ``ARISTOTLE_SETTINGS_STRICT_MODE``, if False errors in ARISTOTLE_SETTINGS will be logged and not prevent the app from working. Defaults to True.
