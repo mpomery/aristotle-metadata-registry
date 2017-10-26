@@ -298,11 +298,6 @@ class WorkgroupListTests(utils.LoggedInViewPages,TestCase):
 
 
 class WorkgroupMemberTests(utils.LoggedInViewPages,TestCase):
-    def setUp(self):
-        super(WorkgroupMemberTests, self).setUp()
-        self.newuser = get_user_model().objects.create_user('nathan','','noobie')
-        self.newuser.save()
-
     def test_userCanLeaveWorkgroup(self):
         self.login_viewer()
         response = self.client.get(self.wg1.get_absolute_url())
