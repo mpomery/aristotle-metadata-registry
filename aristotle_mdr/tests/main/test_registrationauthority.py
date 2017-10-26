@@ -202,6 +202,12 @@ class RAListTests(utils.LoggedInViewPages,TestCase):
 
 
 class RAManageTests(utils.LoggedInViewPages,TestCase):
+    def setUp(self):
+        super(RAManageTests, self).setUp()
+        self.empty_ra = models.RegistrationAuthority.objects.create(
+            name="Test RA", definition="No one is a member of this"
+        )
+
     def test_anon_cannot_view_details(self):
         self.logout()
         response = self.client.get(reverse('aristotle:registrationauthority_details', args=[self.ra.pk]))
@@ -232,3 +238,96 @@ class RAManageTests(utils.LoggedInViewPages,TestCase):
 
         response = self.client.get(reverse('aristotle:registrationauthority_details', args=[self.ra.pk]))
         self.assertEqual(response.status_code, 200)
+
+    def test_viewer_cannot_view_add_change_or_remove_users(self):
+        self.login_viewer()
+        response = self.client.get(reverse('aristotle:registrationauthority_members',args=[self.ra.id]))
+        self.assertEqual(response.status_code,403)
+        response = self.client.get(reverse('aristotle:registrationauthority_add_user',args=[self.ra.id]))
+        self.assertEqual(response.status_code,403)
+        response = self.client.get(reverse('aristotle:registrationauthority_change_user_roles',args=[self.ra.id,self.newuser.pk]))
+        self.assertEqual(response.status_code,403)
+        response = self.client.get(reverse('aristotle:registrationauthority_member_remove',args=[self.ra.id,self.newuser.pk]))
+        self.assertEqual(response.status_code,403)
+
+    def test_manager_can_add_or_change_users(self):
+        self.login_ramanager()
+        self.assertTrue(self.newuser in list(get_user_model().objects.all()))
+
+        response = self.client.get(reverse('aristotle:registrationauthority_add_user',args=[self.empty_ra.id]))
+        self.assertEqual(response.status_code,403)
+
+        response = self.client.get(reverse('aristotle:registrationauthority_add_user',args=[self.ra.id]))
+        self.assertEqual(response.status_code,200)
+        self.assertTrue(self.newuser.id in [u[0] for u in response.context['form'].fields['user'].choices])
+
+        self.assertListEqual(list(self.newuser.profile.workgroups.all()),[])
+        response = self.client.post(
+            reverse('aristotle:registrationauthority_add_user', args=[self.empty_ra.id]),
+            {
+                'roles':['registrar'],
+                'user': self.newuser.pk
+            }
+        )
+        self.assertEqual(response.status_code,403)
+        self.assertListEqual(list(self.newuser.profile.workgroups.all()),[])
+
+        response = self.client.post(
+            reverse('aristotle:registrationauthority_add_user', args=[self.ra.id]),
+            {
+                'roles': ['registrar'],
+                'user': self.newuser.pk
+            }
+        )
+        self.assertEqual(response.status_code,302)
+        self.assertTrue(self.newuser in self.ra.registrars.all())
+        self.assertTrue(self.newuser in self.ra.members.all())
+        self.assertListEqual(list(self.newuser.profile.registrarAuthorities.all()),[self.ra])
+
+        response = self.client.get(reverse('aristotle:registrationauthority_change_user_roles',args=[self.ra.id,self.newuser.pk]))
+        self.assertEqual(response.status_code,200)
+
+        response = self.client.post(
+            reverse('aristotle:registrationauthority_change_user_roles',args=[self.ra.id,self.newuser.pk]),
+            {'roles': ['manager']}
+        )
+        self.assertEqual(response.status_code,302)
+        self.assertFalse(self.newuser in self.ra.registrars.all())
+        self.assertTrue(self.newuser in self.ra.managers.all())
+        response = self.client.post(
+            reverse('aristotle:registrationauthority_change_user_roles',args=[self.ra.id,self.newuser.pk]),
+            {'roles': []}
+        )
+        self.assertEqual(response.status_code,302)
+        self.assertFalse(self.newuser in self.ra.registrars.all())
+        self.assertFalse(self.newuser in self.ra.managers.all())
+        self.assertFalse(self.newuser in self.ra.members.all())
+
+    def test_manager_can_remove_users(self):
+        self.login_ramanager()
+        self.assertTrue(self.newuser in list(get_user_model().objects.all()))
+
+        response = self.client.post(
+            reverse('aristotle:registrationauthority_add_user', args=[self.ra.id]),
+            {
+                'roles': ['registrar', 'manager'],
+                'user': self.newuser.pk
+            }
+        )
+        self.assertEqual(response.status_code,302)
+        self.assertTrue(self.newuser in self.ra.members.all())
+        self.assertTrue(self.newuser in self.ra.registrars.all())
+        self.assertTrue(self.newuser in self.ra.managers.all())
+        self.assertListEqual(list(self.newuser.profile.registrarAuthorities.all()),[self.ra])
+
+        response = self.client.post(
+            reverse('aristotle:registrationauthority_member_remove',args=[self.ra.id,self.newuser.pk]),
+        )
+        self.assertEqual(response.status_code,302)
+        self.assertFalse(self.newuser in self.ra.registrars.all())
+        self.assertFalse(self.newuser in self.ra.managers.all())
+
+        response = self.client.get(
+            reverse('aristotle:registrationauthority_member_remove', args=[self.ra.id,self.newuser.pk]),
+        )
+        self.assertEqual(response.status_code,404)

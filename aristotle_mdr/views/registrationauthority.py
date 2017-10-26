@@ -63,12 +63,16 @@ class CreateRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, C
     model = MDR.RegistrationAuthority
 
 
-class AddUser(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+class AddUser(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, DetailView, FormView):
     template_name = "aristotle_mdr/user/registration_authority/add_user.html"
     permission_required = "aristotle_mdr.change_registrationauthority_memberships"
     raise_exception = True
     redirect_unauthenticated_users = True
     form_class = MDRForms.actions.AddRegistrationUserForm
+
+    model = MDR.RegistrationAuthority
+    pk_url_kwarg = 'iid'
+    context_object_name = "item"
 
     def get_form_kwargs(self):
         kwargs = super(AddUser, self).get_form_kwargs()

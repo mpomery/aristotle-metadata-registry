@@ -483,6 +483,9 @@ class LoggedInViewPages(object):
         self.assertEqual(self.editor.profile.editable_workgroups.count(), 1)
         self.assertTrue(self.wg1 in self.editor.profile.editable_workgroups.all())
 
+        self.newuser = get_user_model().objects.create_user('nathan','','noobie')
+        self.newuser.save()
+
     def get_page(self, item):
         return url_slugify_concept(item)
 

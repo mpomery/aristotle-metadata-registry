@@ -6,10 +6,12 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.db.models import Count, Q
+from django.db.models.functions import Lower
+from django.http import Http404
 from django.shortcuts import redirect, render, get_object_or_404
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
-from django.db.models.functions import Lower
 
 from django.views.generic.detail import BaseDetailView
 from django.views.generic import (
@@ -258,9 +260,12 @@ class ObjectLevelPermissionRequiredMixin(PermissionRequiredMixin):
 class GroupMemberMixin(object):
     user_pk_kwarg = "user_pk"
 
-    @property
+    @cached_property
     def user_to_change(self):
-        return get_object_or_404(get_user_model(), pk=self.kwargs.get(self.user_pk_kwarg))
+        user = get_object_or_404(get_user_model(), pk=self.kwargs.get(self.user_pk_kwarg))
+        if user not in self.get_object().members.all():
+            raise Http404
+        return user
 
     def get_context_data(self, **kwargs):
         """
@@ -294,7 +299,7 @@ class RoleChangeView(GroupMemberMixin, LoginRequiredMixin, ObjectLevelPermission
 
         return self.get_success_url()
 
-
+ 
 class MemberRemoveFromGroupView(GroupMemberMixin, LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, DetailView):
     raise_exception = True
     redirect_unauthenticated_users = True

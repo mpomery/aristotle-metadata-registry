@@ -79,11 +79,6 @@ class WorkgroupMembership(TestCase):
         self.assertTrue(wg3 not in editable.all())
 
 class WorkgroupAnonTests(utils.LoggedInViewPages,TestCase):
-    def setUp(self):
-        super(WorkgroupAnonTests, self).setUp()
-        self.newuser = get_user_model().objects.create_user('nathan','','noobie')
-        self.newuser.save()
-
     def test_anon_cannot_add(self):
         self.logout()
         response = self.client.get(reverse('aristotle:addWorkgroupMembers',args=[self.wg1.id]))
@@ -383,7 +378,6 @@ class WorkgroupMemberTests(utils.LoggedInViewPages,TestCase):
         self.assertFalse(self.newuser in self.wg1.viewers.all())
         self.assertFalse(self.newuser in self.wg1.managers.all())
         self.assertFalse(self.newuser in self.wg1.members.all())
-
 
     def test_manager_can_remove_users(self):
         self.login_manager()
