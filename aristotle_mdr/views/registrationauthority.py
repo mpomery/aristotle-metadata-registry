@@ -63,7 +63,10 @@ class CreateRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, C
     model = MDR.RegistrationAuthority
 
 
-class AddUser(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, DetailView, FormView):
+class AddUser(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, UpdateView):
+    # TODO: Replace UpdateView with DetailView, FormView
+    # This is required for Django 1.8 only.
+
     template_name = "aristotle_mdr/user/registration_authority/add_user.html"
     permission_required = "aristotle_mdr.change_registrationauthority_memberships"
     raise_exception = True
@@ -77,6 +80,9 @@ class AddUser(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, DetailView
     def get_form_kwargs(self):
         kwargs = super(AddUser, self).get_form_kwargs()
         kwargs.update({'user': self.request.user})
+
+        # TODO: Not happy about this as its not an updateForm
+        kwargs.pop('instance')
         return kwargs
 
     def dispatch(self, request, *args, **kwargs):

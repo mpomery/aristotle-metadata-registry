@@ -259,6 +259,8 @@ class RAManageTests(utils.LoggedInViewPages,TestCase):
 
         response = self.client.get(reverse('aristotle:registrationauthority_add_user',args=[self.ra.id]))
         self.assertEqual(response.status_code,200)
+        import pprint
+        pprint.pprint(response.context.keys())
         self.assertTrue(self.newuser.id in [u[0] for u in response.context['form'].fields['user'].choices])
 
         self.assertListEqual(list(self.newuser.profile.workgroups.all()),[])
