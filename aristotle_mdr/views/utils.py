@@ -299,7 +299,7 @@ class RoleChangeView(GroupMemberMixin, LoginRequiredMixin, ObjectLevelPermission
 
         return self.get_success_url()
 
- 
+
 class MemberRemoveFromGroupView(GroupMemberMixin, LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, DetailView):
     raise_exception = True
     redirect_unauthenticated_users = True
