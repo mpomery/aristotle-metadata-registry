@@ -212,7 +212,8 @@ class registryGroup(unmanagedObject):
         return self._meta.model_name
 
     def list_roles_for_user(self, user):
-        raise NotImplementedError
+        # This should always be overridden
+        raise NotImplementedError  # pragma: no cover
 
 
 class Organization(registryGroup):

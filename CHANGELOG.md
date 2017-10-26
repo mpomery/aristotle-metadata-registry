@@ -37,6 +37,8 @@ Changelog
         and must be installed from github - https://github.com/aristotle-mdr/aristotle-pdf-downloads
     - **Breaking change:** Contrib URLs are no longer loaded automatically. Contrib apps now need 
         to have URLs loaded manually in a project urls.py
+    - **Breaking change:** Removed the ``clone`` and ``adminLink`` template tags, performing these actions via the django admin pages
+        will be deprecated in future versions
 
 - 1.5.7
     - Pinned bootstrap-timepicker-datepicker version
