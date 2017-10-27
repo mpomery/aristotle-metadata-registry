@@ -18,11 +18,17 @@ Changelog
     - Workgroup users now properly informed when accessing a workgroup they arent a member of (Thanks @DeKan)
     - Footer is now sticky by default
     - Metadata statistics pages now use browse pages links
+    - Added a new user management section to the Aristotle Dashboard
+    - Visual enhancements to item revision comparison page
+    - Added change stats and view history options to the action menu
+    - Removed link to django admin item history
+    - **Permissions change** Permissions on who can see registry members has changed to support better collaboration between users. Workgroup managers and Registration Authority Managers are now assumed to be trusted users, and can now search for users to add to their respective groups.
     - **Configuration change:**
         - new options - ``ARISTOTLE_SETTINGS_STRICT_MODE``, if False errors in ARISTOTLE_SETTINGS will be logged and not prevent the app from working. Defaults to True.
         - ``BULK_ACTION`` option will no longer cause critical isuses if incorrectly configured. Errors can be logged instead
         - ``CONTENT_EXTENSIONS`` option will no longer cause critical isuses if incorrectly configured. Errors can be logged instead
         - ``DOWNLOADERS`` option will not cause critical isuses if incorrectly configured. Errors can be logged instead
+        - ``USER_VISIBILITY`` option allows for broader visibility of users when creating groups, and gives managers workgroup and registration authority managers results based on partial matches. This can be set to "owners" only to revert to original functionality.
     - **Database migration:** Added concrete UUID model for more flexible lookups
     - **Breaking change:** Download options have been moved into the ``ARISTOTLE_SETTINGS``
         under the ``DOWNLOADERS`` key
@@ -31,6 +37,8 @@ Changelog
         and must be installed from github - https://github.com/aristotle-mdr/aristotle-pdf-downloads
     - **Breaking change:** Contrib URLs are no longer loaded automatically. Contrib apps now need 
         to have URLs loaded manually in a project urls.py
+    - **Breaking change:** Removed the ``clone`` and ``adminLink`` template tags, performing these actions via the django admin pages
+        will be deprecated in future versions
 
 - 1.5.7
     - Pinned bootstrap-timepicker-datepicker version

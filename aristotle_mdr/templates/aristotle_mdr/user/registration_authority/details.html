@@ -1,8 +1,8 @@
 {% extends "aristotle_mdr/user/userHome.html" %}
-{% load i18n %}
+{% load i18n aristotle_tags %}
 
 {% block collapse-link %}
-    <i class="fa fa-users fa-fw"></i> All Registration Authorities </a>
+    <i class="fa fa-university fa-fw"></i> {{ item.name }} - Details </a>
 {% endblock %}
 
 {% block sidebar %}
@@ -13,11 +13,19 @@
 <h1>{% block title %}{{ item.name }}{% endblock %}</h1>
 
     <section id="workgroups">
-        <a class="btn btn-default" href="{% url 'aristotle:registrationauthority_edit' item.pk %}">Edit</a>
-        
+        <div class="btn-group pull-right" role="group" aria-label="...">
+
+            <a class="btn btn-default" href="{% url 'aristotle:registrationauthority_edit' item.pk %}">Edit</a>
+            <a class="btn btn-default" href="{{ item.get_absolute_url }}">View public page</a>
+            <a class="btn btn-default" href="{% url 'aristotle:registrationauthority_members' item.pk %}">See members</a>
+        </div>
+
+    <header>Description</header>
+        <div class="well">{{ item.definition|safe }}</div>
+
+    <header>Status definitions</header>
     <p>
-        The following list gives a description of the context of the 11179-6 status
-        levels according to this Registration Authority.
+        Click a status name to search for all metadata with that registration status.
     </p>
     <dl class="status_definitions">
         {% for visiblity,descriptions in item.statusDescriptions %}
@@ -37,7 +45,9 @@
             <dd>
             <dl>
                 {% for val,state_name,text in descriptions %}
-                <dt id='state_{{ val }}'>{{ state_name }}</dt>
+                <dt id='state_{{ val }}'>
+                    <a href="{% url 'aristotle:search' %}?q=&ra={{item.id}}&state={{ val }}">{{ state_name }}</a>
+                </dt>
                 <dd>
                 {% if text %}
                     {{ text | linebreaks }}
@@ -51,16 +61,8 @@
         {% endfor %}
     </dl>
 
-    <h2>Managers</h2>
-    <ul>
-        { % for
-        
-    </ul>
 
-    <h2>Registrars</h2>
-    <ul>
-        
-    </ul>
-        
 </section>
+
+{% bootstrap_modal "ra_page_modal" size='lg' %}
 {% endblock %}

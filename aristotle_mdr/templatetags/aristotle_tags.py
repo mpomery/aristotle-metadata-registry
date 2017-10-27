@@ -262,28 +262,6 @@ def adminEdit(item):
 
 
 @register.simple_tag
-def clone(item):
-    """
-    A tag for easily generating the link to an admin page for "cloning" an item. For example::
-
-        <a href="{% clone item %}">Clone {{item.name}}</a>
-    """
-    app_name = item._meta.app_label
-    return reverse("admin:%s_%s_add" % (app_name, item._meta.model_name)) + "?clone=%s" % item.id
-
-
-@register.simple_tag
-def historyLink(item):
-    """
-    A tag for easily generating the link to an admin page for "cloning" an item. For example::
-
-        <a href="{% clone item %}">Clone {{item.name}}</a>
-    """
-    app_name = item._meta.app_label
-    return reverse("admin:%s_%s_history" % (app_name, item._meta.model_name), args=[item.id])
-
-
-@register.simple_tag
 def downloadMenu(item):
     """
     Returns the complete download menu for a partcular item. It accepts the id of
@@ -415,3 +393,8 @@ def visibility_text(item):
 def is_active_module(module_name):
     from aristotle_mdr.utils.utils import is_active_module
     return is_active_module(module_name)
+
+
+@register.filter
+def user_roles_for_group(group, user):
+    return group.list_roles_for_user(user)

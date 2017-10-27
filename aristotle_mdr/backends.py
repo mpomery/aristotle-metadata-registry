@@ -60,7 +60,12 @@ class AristotleBackend(ModelBackend):
             if perm_name == "delete_concept_from_admin":
                 return obj is None or perms.user_can_edit(user_obj, obj)
 
+        if perm == "aristotle_mdr.can_create_metadata":
+            return perms.user_is_editor(user_obj)
+
         if perm == "aristotle_mdr.view_workgroup":
+            return perms.user_in_workgroup(user_obj, obj)
+        if perm == "aristotle_mdr.can_leave_workgroup":
             return perms.user_in_workgroup(user_obj, obj)
         if perm == "aristotle_mdr.change_workgroup_memberships":
             return perms.user_is_workgroup_manager(user_obj, obj)
@@ -76,6 +81,11 @@ class AristotleBackend(ModelBackend):
         if perm == "aristotle_mdr.can_view_discussion_post":
             return perms.user_in_workgroup(user_obj, obj.workgroup)
 
+        if perm == "aristotle_mdr.view_registrationauthority_details":
+            return (
+                perms.user_is_registation_authority_manager(user_obj, obj) or
+                perms.user_is_registrar(user_obj, obj)
+            )
         if perm == "aristotle_mdr.change_registrationauthority":
             return perms.user_is_registation_authority_manager(user_obj, obj)
         if perm == "aristotle_mdr.change_registrationauthority_memberships":

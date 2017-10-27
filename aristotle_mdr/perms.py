@@ -215,4 +215,9 @@ def user_can_move_between_workgroups(user, workgroup_a, workgroup_b):
 
 
 def user_can_query_user_list(user):
-    return user.is_superuser or user.profile.is_workgroup_manager() or user.profile.is_registrar
+    user_visbility = fetch_aristotle_settings().get('USER_VISIBILITY', 'owner')
+    return (
+        user.has_perm("aristotle_mdr.is_registry_administrator") or
+        ('workgroup_manager' in user_visbility and user.profile.is_workgroup_manager()) or
+        ('registation_authority_manager' in user_visbility and user.profile.is_registrar)
+    )

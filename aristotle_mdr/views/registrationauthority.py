@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.defaultfilters import slugify
 
-from django.views.generic import CreateView, ListView, DetailView, UpdateView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, FormView
 
 from aristotle_mdr import models as MDR
 from aristotle_mdr import forms as MDRForms
@@ -17,7 +17,9 @@ from aristotle_mdr.views.utils import (
     paginated_list,
     paginated_workgroup_list,
     paginated_registration_authority_list,
-    ObjectLevelPermissionRequiredMixin
+    ObjectLevelPermissionRequiredMixin,
+    RoleChangeView,
+    MemberRemoveFromGroupView
 )
 
 import logging
@@ -53,12 +55,54 @@ def all_organizations(request):
 
 
 class CreateRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    model = MDR.RegistrationAuthority
     template_name = "aristotle_mdr/user/registration_authority/add.html"
     fields = ['name', 'definition']
     permission_required = "aristotle_mdr.add_registration_authority"
     raise_exception = True
     redirect_unauthenticated_users = True
+    model = MDR.RegistrationAuthority
+
+
+class AddUser(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, UpdateView):
+    # TODO: Replace UpdateView with DetailView, FormView
+    # This is required for Django 1.8 only.
+
+    template_name = "aristotle_mdr/user/registration_authority/add_user.html"
+    permission_required = "aristotle_mdr.change_registrationauthority_memberships"
+    raise_exception = True
+    redirect_unauthenticated_users = True
+    form_class = MDRForms.actions.AddRegistrationUserForm
+
+    model = MDR.RegistrationAuthority
+    pk_url_kwarg = 'iid'
+    context_object_name = "item"
+
+    def get_form_kwargs(self):
+        kwargs = super(AddUser, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+
+        # TODO: Not happy about this as its not an updateForm
+        kwargs.pop('instance')
+        return kwargs
+
+    def dispatch(self, request, *args, **kwargs):
+        self.item = get_object_or_404(MDR.RegistrationAuthority, pk=self.kwargs.get('iid'))
+        return super(AddUser, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        """
+        Insert the single object into the context dict.
+        """
+        kwargs = super(AddUser, self).get_context_data(**kwargs)
+        kwargs.update({'item': self.item})
+        return kwargs
+
+    def form_valid(self, form):
+        user = form.cleaned_data['user']
+        for role in form.cleaned_data['roles']:
+            self.item.giveRoleToUser(role, user)
+
+        return redirect(reverse('aristotle:registrationauthority_members', args=[self.item.id]))
 
 
 class ListRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -79,10 +123,21 @@ class ListRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, Lis
         return paginated_registration_authority_list(request, ras, self.template_name, context)
 
 
-class ManageRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class DetailsRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = MDR.RegistrationAuthority
-    template_name = "aristotle_mdr/user/registration_authority/manage.html"
-    permission_required = "aristotle_mdr.change_registrationauthority"
+    template_name = "aristotle_mdr/user/registration_authority/details.html"
+    permission_required = "aristotle_mdr.view_registrationauthority_details"
+    raise_exception = True
+    redirect_unauthenticated_users = True
+
+    pk_url_kwarg = 'iid'
+    context_object_name = "item"
+
+
+class MembersRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    model = MDR.RegistrationAuthority
+    template_name = "aristotle_mdr/user/registration_authority/members.html"
+    permission_required = "aristotle_mdr.view_registrationauthority_details"
     raise_exception = True
     redirect_unauthenticated_users = True
 
@@ -116,3 +171,26 @@ class EditRegistrationAuthority(LoginRequiredMixin, ObjectLevelPermissionRequire
 
     pk_url_kwarg = 'iid'
     context_object_name = "item"
+
+
+class ChangeUserRoles(RoleChangeView):
+    model = MDR.RegistrationAuthority
+    template_name = "aristotle_mdr/user/registration_authority/change_role.html"
+    permission_required = "aristotle_mdr.change_registrationauthority_memberships"
+    form_class = MDRForms.actions.ChangeRegistrationUserRolesForm
+    pk_url_kwarg = 'iid'
+    context_object_name = "item"
+
+    def get_success_url(self):
+        return redirect(reverse('aristotle:registrationauthority_members', args=[self.get_object().id]))
+
+
+class RemoveUser(MemberRemoveFromGroupView):
+    model = MDR.RegistrationAuthority
+    template_name = "aristotle_mdr/user/registration_authority/remove_member.html"
+    permission_required = "aristotle_mdr.change_registrationauthority_memberships"
+    pk_url_kwarg = 'iid'
+    context_object_name = "item"
+
+    def get_success_url(self):
+        return redirect(reverse('aristotle:registrationauthority_members', args=[self.get_object().id]))

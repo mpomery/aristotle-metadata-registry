@@ -10,7 +10,6 @@ from django.views.generic import (
     CreateView, DetailView, FormView, ListView, RedirectView, UpdateView
 )
 
-
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.perms import user_in_workgroup, user_is_workgroup_manager
@@ -19,40 +18,43 @@ from aristotle_mdr.views.utils import (
     paginate_sort_opts,
     paginated_workgroup_list,
     workgroup_item_statuses,
-    ObjectLevelPermissionRequiredMixin
+    ObjectLevelPermissionRequiredMixin,
+    RoleChangeView,
+    MemberRemoveFromGroupView
 )
+
+import logging
+
+logger = logging.getLogger(__name__)
+logger.debug("Logging started for " + __name__)
 
 
 class WorkgroupContextMixin(object):
-    workgroup = None
+    # workgroup = None
+    raise_exception = True
+    redirect_unauthenticated_users = True
+    object_level_permissions = True
+    model = MDR.Workgroup
+    pk_url_kwarg = 'iid'
+    slug_url_kwarg = 'name_slug'
 
     def get_context_data(self, **kwargs):
         # Get context from super-classes, because if may set value for workgroup
         context = super(WorkgroupContextMixin, self).get_context_data(**kwargs)
         context.update({
-            'item': self.workgroup,
-            'workgroup': self.workgroup,
-            'user_is_admin': user_is_workgroup_manager(self.request.user, self.workgroup),
+            'item': self.get_object(),
+            'workgroup': self.get_object(),
+            'user_is_admin': user_is_workgroup_manager(self.request.user, self.get_object()),
         })
         return context
 
-    def check_user_permission(self):
-        if not self.workgroup or not user_in_workgroup(self.request.user, self.workgroup):
-            raise PermissionDenied
 
-    def check_manager_permission(self):
-        if not self.workgroup or not user_is_workgroup_manager(self.request.user, self.workgroup):
-            raise PermissionDenied
-
-
-class WorkgroupView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
-    model = MDR.Workgroup
-    pk_url_kwarg = 'iid'
-    slug_url_kwarg = 'name_slug'
+class WorkgroupView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermissionRequiredMixin, DetailView):
+    permission_required = "aristotle_mdr.view_workgroup"
 
     def get(self, request, *args, **kwargs):
         self.object = self.workgroup = self.get_object()
-        self.check_user_permission()
+        # self.check_user_permission()
         slug = self.kwargs.get(self.slug_url_kwarg)
         if not slug or not slugify(self.object.name).startswith(slug):
             return redirect(self.object.get_absolute_url())
@@ -71,9 +73,13 @@ class WorkgroupView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
         return self.object and [self.object.template] or []
 
 
-class ItemsView(LoginRequiredMixin, WorkgroupContextMixin, ListView):
+class ItemsView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermissionRequiredMixin, ListView):
     template_name = "aristotle_mdr/workgroupItems.html"
     sort_by = None
+    permission_required = "aristotle_mdr.view_workgroup"
+
+    def get_object(self):
+        return self.model.objects.get(pk=self.kwargs.get(self.pk_url_kwarg))
 
     def get_paginate_by(self, queryset):
         return self.request.GET.get('pp', 20)
@@ -81,7 +87,6 @@ class ItemsView(LoginRequiredMixin, WorkgroupContextMixin, ListView):
     def get_context_data(self, **kwargs):
         kwargs.update({
             'sort': self.sort_by,
-            'select_all_list_queryset_filter': 'workgroup__pk=%s' % self.workgroup.pk
         })
         context = super(ItemsView, self).get_context_data(**kwargs)
         context['page'] = context.get('page_obj')  # dirty hack for current template
@@ -94,47 +99,19 @@ class ItemsView(LoginRequiredMixin, WorkgroupContextMixin, ListView):
             self.sort_by = "mod_desc"
 
         self.workgroup = get_object_or_404(MDR.Workgroup, pk=iid)
-        self.check_user_permission()
+        # self.check_user_permission()
         return MDR._concept.objects.filter(workgroup=iid).select_subclasses().order_by(
             *paginate_sort_opts.get(self.sort_by))
 
 
-class MembersView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
-    template_name = 'aristotle_mdr/workgroupMembers.html'
-    model = MDR.Workgroup
-    pk_url_kwarg = 'iid'
-
-    def get_object(self, queryset=None):
-        self.workgroup = super(MembersView, self).get_object(queryset)
-        self.check_user_permission()
-        return self.workgroup
+class MembersView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermissionRequiredMixin, DetailView):
+    template_name = 'aristotle_mdr/user/workgroups/members.html'
+    permission_required = "aristotle_mdr.view_workgroup"
 
 
-class RemoveRoleView(LoginRequiredMixin, WorkgroupContextMixin, RedirectView):
-    permanent = False
-    pattern_name = 'aristotle:workgroupMembers'
-
-    def get_redirect_url(self, *args, **kwargs):
-        iid = self.kwargs.get('iid')
-        role = self.kwargs.get('role')
-        userid = self.kwargs.get('userid')
-        self.workgroup = get_object_or_404(MDR.Workgroup, pk=iid)
-        self.check_manager_permission()
-        user = get_user_model().objects.filter(id=userid).first()
-        if user:
-            self.workgroup.removeRoleFromUser(role, user)
-        return super(RemoveRoleView, self).get_redirect_url(self.workgroup.pk)
-
-
-class ArchiveView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
-    model = MDR.Workgroup
-    pk_url_kwarg = 'iid'
+class ArchiveView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermissionRequiredMixin, DetailView):
     template_name = 'aristotle_mdr/actions/archive_workgroup.html'
-
-    def get_object(self, queryset=None):
-        self.workgroup = super(ArchiveView, self).get_object(queryset)
-        self.check_manager_permission()
-        return self.workgroup
+    permission_required = "aristotle_mdr.can_archive_workgroup"
 
     def post(self, request, *args, **kwargs):
         self.workgroup = self.get_object()
@@ -143,15 +120,19 @@ class ArchiveView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
         return HttpResponseRedirect(self.workgroup.get_absolute_url())
 
 
-class AddMembersView(LoginRequiredMixin, WorkgroupContextMixin, FormView):
+class AddMembersView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermissionRequiredMixin, UpdateView):
+    # TODO: Replace UpdateView with DetailView, FormView
+    # This is required for Django 1.8 only.
+
     template_name = 'aristotle_mdr/actions/addWorkgroupMember.html'
     form_class = MDRForms.workgroups.AddMembers
+    permission_required = "aristotle_mdr.change_workgroup"
 
-    def get_form(self, form_class=None):
-        iid = self.kwargs.get('iid')
-        self.workgroup = get_object_or_404(MDR.Workgroup, pk=iid)
-        self.check_manager_permission()
-        return super(AddMembersView, self).get_form(form_class)
+    def get_form_kwargs(self):
+        kwargs = super(AddMembersView, self).get_form_kwargs()
+        # TODO: Not happy about this as its not an updateForm
+        kwargs.pop('instance')
+        return kwargs
 
     def get_context_data(self, **kwargs):
         kwargs.update({
@@ -164,25 +145,19 @@ class AddMembersView(LoginRequiredMixin, WorkgroupContextMixin, FormView):
         roles = form.cleaned_data['roles']
         for user in users:
             for role in roles:
-                self.workgroup.giveRoleToUser(role, user)
-        return super(AddMembersView, self).form_valid(form)
+                self.get_object().giveRoleToUser(role, user)
+        return redirect(self.get_success_url())
 
     def get_initial(self):
         return {'roles': self.request.GET.getlist('role')}
 
     def get_success_url(self):
-        return reverse("aristotle:workgroupMembers", args=[self.workgroup.pk])
+        return reverse("aristotle:workgroupMembers", args=[self.get_object().pk])
 
 
-class LeaveView(LoginRequiredMixin, WorkgroupContextMixin, DetailView):
-    model = MDR.Workgroup
-    pk_url_kwarg = 'iid'
+class LeaveView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermissionRequiredMixin, DetailView):
     template_name = 'aristotle_mdr/actions/workgroup_leave.html'
-
-    def get_object(self, queryset=None):
-        self.workgroup = super(LeaveView, self).get_object(queryset)
-        self.check_user_permission()
-        return self.workgroup
+    permission_required = "aristotle_mdr.can_leave_workgroup"
 
     def post(self, request, *args, **kwargs):
         self.get_object().removeUser(request.user)
@@ -216,18 +191,36 @@ class ListWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         return paginated_workgroup_list(request, workgroups, self.template_name, context)
 
 
-class EditWorkgroup(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, UpdateView):
-    model = MDR.Workgroup
+class EditWorkgroup(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermissionRequiredMixin, UpdateView):
     template_name = "aristotle_mdr/user/workgroups/edit.html"
     permission_required = "aristotle_mdr.change_workgroup"
-    raise_exception = True
-    redirect_unauthenticated_users = True
-    object_level_permissions = True
 
     fields = [
         'name',
         'definition',
     ]
 
+    context_object_name = "item"
+
+
+class ChangeUserRoles(RoleChangeView):
+    model = MDR.Workgroup
+    template_name = "aristotle_mdr/user/workgroups/change_role.html"
+    permission_required = "aristotle_mdr.change_workgroup"
+    form_class = MDRForms.workgroups.ChangeWorkgroupUserRolesForm
     pk_url_kwarg = 'iid'
     context_object_name = "item"
+
+    def get_success_url(self):
+        return redirect(reverse('aristotle:workgroupMembers', args=[self.get_object().id]))
+
+
+class RemoveUser(MemberRemoveFromGroupView):
+    model = MDR.Workgroup
+    template_name = "aristotle_mdr/user/workgroups/remove_member.html"
+    permission_required = "aristotle_mdr.change_workgroup"
+    pk_url_kwarg = 'iid'
+    context_object_name = "item"
+
+    def get_success_url(self):
+        return redirect(reverse('aristotle:workgroupMembers', args=[self.get_object().id]))

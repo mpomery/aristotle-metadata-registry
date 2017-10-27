@@ -80,11 +80,12 @@ urlpatterns=[
     url(r'^workgroup/(?P<iid>\d+)/members/?$', views.workgroups.MembersView.as_view(), name='workgroupMembers'),
     url(r'^workgroup/(?P<iid>\d+)/items/?$', views.workgroups.ItemsView.as_view(), name='workgroupItems'),
     url(r'^workgroup/(?P<iid>\d+)/leave/?$', views.workgroups.LeaveView.as_view(), name='workgroup_leave'),
-    url(r'^workgroup/addMembers/(?P<iid>\d+)$', views.workgroups.AddMembersView.as_view(), name='addWorkgroupMembers'),
+    url(r'^workgroup/(?P<iid>\d+)/add_member$', views.workgroups.AddMembersView.as_view(), name='addWorkgroupMembers'),
+    url(r'^workgroup/(?P<iid>\d+)/change_roles/(?P<user_pk>\d+)/?$', views.workgroups.ChangeUserRoles.as_view(), name='workgroup_member_change_role'),
+    url(r'^workgroup/(?P<iid>\d+)/remove/(?P<user_pk>\d+)/?$', views.workgroups.RemoveUser.as_view(), name='workgroup_member_remove'),
     url(r'^workgroup/(?P<iid>\d+)/archive/?$', views.workgroups.ArchiveView.as_view(), name='archive_workgroup'),
-    url(r'^action/remove/WorkgroupRole/(?P<iid>\d+)/(?P<role>[A-Za-z\-]+)/(?P<userid>\d+)/?$', views.workgroups.RemoveRoleView.as_view(), name='removeWorkgroupRole'),
     url(r'^workgroup/(?P<iid>\d+)/edit$', views.workgroups.EditWorkgroup.as_view(), name='workgroup_edit'),
-    url(r'^workgroup/create/?$', views.workgroups.CreateWorkgroup.as_view(), name='workgroup_create'),
+    url(r'^workgroups/create/?$', views.workgroups.CreateWorkgroup.as_view(), name='workgroup_create'),
     url(r'^workgroups/all/?$', views.workgroups.ListWorkgroup.as_view(), name='workgroup_list'),
 
 
@@ -159,9 +160,14 @@ urlpatterns=[
     url(r'^registrationauthority/create/?$', views.registrationauthority.CreateRegistrationAuthority.as_view(), name='registrationauthority_create'),
     url(r'^registrationauthority/all/?$', views.registrationauthority.ListRegistrationAuthority.as_view(), name='registrationauthority_list'),
 
-    url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/manage$', views.registrationauthority.ManageRegistrationAuthority.as_view(), name='registrationauthority_manage'),
+    url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/details/$', views.registrationauthority.DetailsRegistrationAuthority.as_view(), name='registrationauthority_details'),
+    url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/members/$', views.registrationauthority.MembersRegistrationAuthority.as_view(), name='registrationauthority_members'),
     url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/edit', views.registrationauthority.EditRegistrationAuthority.as_view(), name='registrationauthority_edit'),
+    url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/add_user/?$', views.registrationauthority.AddUser.as_view(), name='registrationauthority_add_user'),
+    url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/change_roles/(?P<user_pk>.+)?/?$', views.registrationauthority.ChangeUserRoles.as_view(), name='registrationauthority_change_user_roles'),
+    url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/remove/(?P<user_pk>\d+)/?$', views.registrationauthority.RemoveUser.as_view(), name='registrationauthority_member_remove'),
     url(r'^organization/registrationauthority/(?P<iid>\d+)(?:\/(?P<name_slug>.+))?/?$', views.registrationauthority.registrationauthority, name='registrationAuthority'),
+
     url(r'^organization/(?P<iid>\d+)?(?:\/(?P<name_slug>.+))?/?$', views.registrationauthority.organization, name='organization'),
     url(r'^organizations/?$', views.registrationauthority.all_organizations, name='all_organizations'),
     url(r'^registrationauthorities/?$', views.registrationauthority.all_registration_authorities, name='all_registration_authorities'),
@@ -176,7 +182,7 @@ urlpatterns=[
     url(r'^accessibility/?$', TemplateView.as_view(template_name='aristotle_mdr/static/accessibility.html'), name="accessibility"),
 
     url(
-        r'^search/?',
+        r'^search/?$',
         search_view_factory(
             view_class=views.PermissionSearchView,
             template='search/search.html',

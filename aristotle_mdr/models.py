@@ -211,6 +211,10 @@ class registryGroup(unmanagedObject):
     def help_name(self):
         return self._meta.model_name
 
+    def list_roles_for_user(self, user):
+        # This should always be overridden
+        raise NotImplementedError  # pragma: no cover
+
 
 class Organization(registryGroup):
     """
@@ -284,6 +288,11 @@ class RegistrationAuthority(Organization):
 
     class Meta:
         verbose_name_plural = _("Registration Authorities")
+
+    roles = {
+        'registrar': _("Registrar"),
+        'manager': _("Manager")
+    }
 
     def get_absolute_url(self):
         return url_slugify_registration_authoritity(self)
@@ -387,6 +396,14 @@ class RegistrationAuthority(Organization):
             until_date=until_date
         )
 
+    def list_roles_for_user(self, user):
+        roles = []
+        if user in self.managers.all():
+            roles.append("manager")
+        if user in self.registrars.all():
+            roles.append("registrar")
+        return roles
+
     def giveRoleToUser(self, role, user):
         if role == 'registrar':
             self.registrars.add(user)
@@ -398,6 +415,10 @@ class RegistrationAuthority(Organization):
             self.registrars.remove(user)
         if role == "manager":
             self.managers.remove(user)
+
+    @property
+    def members(self):
+        return (self.managers.all() | self.registrars.all()).distinct()
 
 
 @receiver(post_save, sender=RegistrationAuthority)
@@ -477,6 +498,18 @@ class Workgroup(registryGroup):
     def classedItems(self):
         # Convenience class as we can't call functions in templates
         return self.items.select_subclasses()
+
+    def list_roles_for_user(self, user):
+        roles = []
+        if user in self.managers.all():
+            roles.append("manager")
+        if user in self.viewers.all():
+            roles.append("viewer")
+        if user in self.submitters.all():
+            roles.append("submitter")
+        if user in self.stewards.all():
+            roles.append("steward")
+        return roles
 
     def giveRoleToUser(self, role, user):
         if role == "manager":

@@ -80,6 +80,8 @@ setup(
         
         # Required for utils.cached_querysets
         'dill',
+        
+        'django-organizations',
 
     ],
 

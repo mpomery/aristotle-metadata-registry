@@ -204,6 +204,7 @@ error_messages = {
     "workgroup_changes_failed": "WORKGROUP_CHANGES settings for registry are invalid.",
     "dashboard_addons_failed": "DASHBOARD_ADDONS settings for registry are invalid.",
     "downloaders_failed": "DOWNLOADERS settings for registry are invalid.",
+    "user_email_restrictions_failed": "USER_EMAIL_RESTRICTIONS settings for registry are invalid.",
 }
 
 
@@ -232,6 +233,7 @@ def validate_aristotle_settings(aristotle_settings, strict_mode):
         ("CONTENT_EXTENSIONS", "content_extensions_failed"),
         ("DASHBOARD_ADDONS", "dashboard_addons_failed"),
         ("DOWNLOADERS", "downloaders_failed"),
+        # ("USER_EMAIL_RESTRICTIONS", "user_email_restrictions_failed")
     ]:
         try:
             check_settings=aristotle_settings.get(sub_setting, [])
