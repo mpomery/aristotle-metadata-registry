@@ -35,7 +35,7 @@
 {% if workgroup.archived %}
     <div class="alert alert-warning">
         {% trans 'This workgroup is archived.' %}
-        {% if request.user in workgroup.managers or request.user.is_superuser %}
+        {% if request.user in workgroup.managers.all or request.user.is_superuser %}
         <a data-toggle="modal" data-target="#archive_modal" class="btn btn-sm btn-default" href="{% url 'aristotle:archive_workgroup' workgroup.id %}">
             <i class="fa fa-folder-open"></i> {% trans 'Reactivate this workgroup' %}</a>
         {% endif %}
@@ -43,13 +43,13 @@
     {% else %}
     <div class="alert alert-success">
         {% trans 'This workgroup is active.' %}
-        {% if request.user in workgroup.managers or request.user.is_superuser %}
+        {% if request.user in workgroup.managers.all or request.user.is_superuser %}
         <a data-toggle="modal" data-target="#archive_modal" class="btn btn-sm btn-default" href="{% url 'aristotle:archive_workgroup' workgroup.id %}">
             <i class="fa fa-archive"></i> {% trans 'Archive this workgroup' %}</a>
         {% endif %}
     </div>
     {% endif %}
-    {% if request.user in workgroup.managers or request.user.is_superuser %}
+    {% if request.user in workgroup.managers.all or request.user.is_superuser %}
     <div id="archive_modal" class="modal fade">
       <div class="modal-dialog">
           <div class="modal-content">
