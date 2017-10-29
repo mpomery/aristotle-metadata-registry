@@ -1,12 +1,22 @@
+from braces.views import LoginRequiredMixin, PermissionRequiredMixin
+
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.db.models import Count, Q
-from django.shortcuts import render
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
 from django.db.models.functions import Lower
+from django.http import Http404
+from django.shortcuts import redirect, render, get_object_or_404
+from django.utils import timezone
+from django.utils.functional import cached_property
+from django.utils.translation import ugettext_lazy as _
+
+from django.views.generic.detail import BaseDetailView
+from django.views.generic import (
+    CreateView, DetailView, FormView, ListView, RedirectView, UpdateView
+)
 
 
 paginate_sort_opts = {
@@ -34,16 +44,17 @@ def paginated_list(request, items, template, extra_context={}):
 
     page = request.GET.get('page')
     try:
-        items = paginator.page(page)
+        paged_items = paginator.page(page)
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
-        items = paginator.page(1)
+        paged_items = paginator.page(1)
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
-        items = paginator.page(paginator.num_pages)
+        paged_items = paginator.page(paginator.num_pages)
     context = {
+        'object_list': items,
         'sort': sort_by,
-        'page': items,
+        'page': paged_items,
         }
     context.update(extra_context)
     return render(request, template, context)
@@ -124,21 +135,57 @@ def paginated_workgroup_list(request, workgroups, template, extra_context={}):
     return render(request, template, context)
 
 
-def get_concept_redirect_or_404(get_item_perm, request, iid, objtype=None):
-    if objtype is None:
-        from aristotle_mdr.models import _concept
-        objtype = _concept
+paginate_registration_authority_sort_opts = {
+    "name": "name",
+    "users": ("user_count", lambda qs: qs.annotate(user_count=Count('registrars') + Count('managers'))),
+}
 
-    from aristotle_mdr.contrib.redirect.exceptions import Redirect
 
-    item = get_item_perm(objtype, request.user, iid)
-    if not item:
-        if request.user.is_anonymous():
-            raise Redirect(reverse('friendly_login') + '?next=%s' % request.path)
-        else:
-            raise PermissionDenied
-    else:
-        return item
+@login_required
+def paginated_registration_authority_list(request, ras, template, extra_context={}):
+    sort_by=request.GET.get('sort', "name_desc")
+    try:
+        sorter, direction = sort_by.split('_')
+        if sorter not in paginate_registration_authority_sort_opts.keys():
+            sorter="name"
+            sort_by = "name_desc"
+        direction = {'asc': '', 'desc': '-'}.get(direction, '')
+    except:
+        sorter, direction = 'name', ''
+
+    opts = paginate_registration_authority_sort_opts.get(sorter)
+    qs = ras
+
+    try:
+        sort_field, extra = opts
+        qs = extra(qs)
+    except:
+        sort_field = opts
+
+    qs = qs.order_by(direction + sort_field)
+    qs = qs.annotate(user_count=Count('registrars') + Count('managers'))
+    paginator = Paginator(
+        qs,
+        request.GET.get('pp', 20)  # per page
+    )
+
+    page = request.GET.get('page')
+    try:
+        items = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        items = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        items = paginator.page(paginator.num_pages)
+    context = {
+        'sort': sort_by,
+        'page': items,
+        }
+    f = qs.first()
+
+    context.update(extra_context)
+    return render(request, template, context)
 
 
 def workgroup_item_statuses(workgroup):
@@ -175,3 +222,75 @@ def generate_visibility_matrix(user):
                 ra_matrix['states'][s] = "hidden"
         matrix[ra.id] = ra_matrix
     return matrix
+
+
+class ObjectLevelPermissionRequiredMixin(PermissionRequiredMixin):
+    def check_permissions(self, request):
+        """
+        Returns whether or not the user has permissions
+        """
+        perms = self.get_permission_required(request)
+        has_permission = False
+        if hasattr(self, 'object') and self.object is not None:
+            has_permission = request.user.has_perm(self.get_permission_required(request), self.object)
+        elif hasattr(self, 'get_object') and callable(self.get_object):
+            has_permission = request.user.has_perm(self.get_permission_required(request), self.get_object())
+        else:
+            has_permission = request.user.has_perm(self.get_permission_required(request))
+        return has_permission
+
+
+class GroupMemberMixin(object):
+    user_pk_kwarg = "user_pk"
+
+    @cached_property
+    def user_to_change(self):
+        user = get_object_or_404(get_user_model(), pk=self.kwargs.get(self.user_pk_kwarg))
+        if user not in self.get_object().members.all():
+            raise Http404
+        return user
+
+    def get_context_data(self, **kwargs):
+        """
+        Insert the single object into the context dict.
+        """
+        kwargs = super(GroupMemberMixin, self).get_context_data(**kwargs)
+        kwargs.update({'user_to_change': self.user_to_change})
+        return kwargs
+
+
+class RoleChangeView(GroupMemberMixin, LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, BaseDetailView, FormView):
+    raise_exception = True
+    redirect_unauthenticated_users = True
+    object_level_permissions = True
+
+    def get_form_kwargs(self):
+        kwargs = super(RoleChangeView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        initial = {'roles': []}
+        initial['roles'] = self.get_object().list_roles_for_user(self.user_to_change)
+
+        kwargs.update({'initial': initial})
+        return kwargs
+
+    def form_valid(self, form):
+        for role in self.model.roles:
+            if role in form.cleaned_data['roles']:
+                self.get_object().giveRoleToUser(role, self.user_to_change)
+            else:
+                self.get_object().removeRoleFromUser(role, self.user_to_change)
+
+        return self.get_success_url()
+
+
+class MemberRemoveFromGroupView(GroupMemberMixin, LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, DetailView):
+    raise_exception = True
+    redirect_unauthenticated_users = True
+    object_level_permissions = True
+
+    http_method_names = ['get', 'post']
+
+    def post(self, request, *args, **kwargs):
+        for role in self.get_object().list_roles_for_user(self.user_to_change):
+            self.get_object().removeRoleFromUser(role, self.user_to_change)
+        return self.get_success_url()

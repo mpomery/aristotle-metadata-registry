@@ -24,8 +24,13 @@ DATABASES = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'aristotle-mdr-cache'
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'caches', 'aristotle-mdr-cache'),
+    },
+    'aristotle-mdr-invitations': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'caches', 'aristotle-mdr-invitations'),
+        'TIMEOUT': 60 * 60 * 24 * 7,  # sec * min * hours * days
     }
 }
 
@@ -55,7 +60,16 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 SITE_ID=None
 
 # This gets called because of the DataElementConcept.property attribute.
-# Not sure how to resolve this one yet.
+# We can resolve this by explicitly adding the parent pointer field, to squash Error E006
+# But this will only work for Django 1.10 or above, so we wait until the 1.11 stream
+# See: https://code.djangoproject.com/ticket/28563
+# Archive: http://archive.is/Zpgru
+# _concept_ptr = models.OneToOneField(
+#     _concept,
+#     on_delete=models.CASCADE,
+#     parent_link=True,
+#     related_name='property_subclass',
+# )
 SILENCED_SYSTEM_CHECKS = ['models.E006']
 
 ALLOWED_HOSTS = []
@@ -69,6 +83,7 @@ INSTALLED_APPS = (
     'aristotle_mdr.contrib.slots',
     'aristotle_mdr.contrib.identifiers',
     'aristotle_mdr.contrib.browse',
+    'aristotle_mdr.contrib.user_management',
 
     'channels',
     'haystack_channels',
@@ -96,6 +111,7 @@ INSTALLED_APPS = (
     'reversion_compare',  # https://github.com/jedie/django-reversion-compare
 
     'notifications',
+    'organizations',
 )
 
 USE_L10N = True
@@ -130,7 +146,8 @@ STATICFILES_FINDERS = (
 )
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
-if DEBUG:
+if DEBUG:  # pragma: no cover
+    # Testing forces DEBUG=False, so this will never get tested
     STATIC_PRECOMPILER_CACHE_TIMEOUT = 1
     STATIC_PRECOMPILER_DISABLE_AUTO_COMPILE = False
 
@@ -144,6 +161,8 @@ ADD_REVERSION_ADMIN = True
 # We need this to make sure users can see all extensions.
 AUTHENTICATION_BACKENDS = ('aristotle_mdr.backends.AristotleBackend',)
 
+# ARISTOTLE_SETTINGS_STRICT_MODE = True
+
 ARISTOTLE_SETTINGS = {
     'SEPARATORS': {
         'DataElement': ', ',
@@ -156,14 +175,14 @@ ARISTOTLE_SETTINGS = {
     'CONTENT_EXTENSIONS': [],
     'PDF_PAGE_SIZE': 'A4',
     'WORKGROUP_CHANGES': [],  # ['admin'] # or manager or submitter,
-    'BULK_ACTIONS': {
-        'add_favourites': 'aristotle_mdr.forms.bulk_actions.AddFavouriteForm',
-        'remove_favourites': 'aristotle_mdr.forms.bulk_actions.RemoveFavouriteForm',
-        'change_state': 'aristotle_mdr.forms.bulk_actions.ChangeStateForm',
-        'move_workgroup': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
-        'request_review': 'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
-        'bulk_download': 'aristotle_mdr.forms.bulk_actions.BulkDownloadForm',
-    },
+    'BULK_ACTIONS': [
+        'aristotle_mdr.forms.bulk_actions.AddFavouriteForm',
+        'aristotle_mdr.forms.bulk_actions.RemoveFavouriteForm',
+        'aristotle_mdr.forms.bulk_actions.ChangeStateForm',
+        'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
+        'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
+        'aristotle_mdr.forms.bulk_actions.BulkDownloadForm',
+    ],
     'DASHBOARD_ADDONS': [],
     'METADATA_CREATION_WIZARDS': [
         {
@@ -178,13 +197,20 @@ ARISTOTLE_SETTINGS = {
             'class': 'aristotle_mdr.views.wizards.DataElementConceptWizard',
             'link': 'create/wizard/aristotle_mdr/dataelementconcept',
         }
-    ]
+    ],
+    "DOWNLOADERS": [
+        # (fileType, menu, font-awesome-icon, module)
+        # ('csv-vd', 'CSV list of values', 'fa-file-excel-o', 'aristotle_mdr', 'CSV downloads for value domain codelists'),
+        'aristotle_mdr.downloader.CSVDownloader'
+    ],
+
+    # These settings aren't active yet.
+    # "USER_EMAIL_RESTRICTIONS": None,
+    "USER_VISIBILITY": ['owner', 'workgroup_manager', 'registation_authority_manager']
+    # "SIGNUP_OPTION": 'closed', # or 'closed'
+    # "GROUPS_CAN_INVITE": 'closed', # or 'closed'
+
 }
-ARISTOTLE_DOWNLOADS = [
-    # (fileType, menu, font-awesome-icon, module)
-    ('pdf', 'PDF', 'fa-file-pdf-o', 'aristotle_mdr', 'Downloads for various content types in the PDF format'),
-    ('csv-vd', 'CSV list of values', 'fa-file-excel-o', 'aristotle_mdr', 'CSV downloads for value domain codelists'),
-]
 
 CKEDITOR_CONFIGS = {
     'default': {
@@ -214,3 +240,5 @@ HAYSTACK_CONNECTIONS = {
 STATIC_PRECOMPILER_COMPILERS = (
     ('static_precompiler.compilers.LESS', {"executable": "lesscpy"}),
 )
+
+ORGS_SLUGFIELD = 'autoslug.fields.AutoSlugField'

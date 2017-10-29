@@ -1,5 +1,5 @@
 {% load i18n %}
-{% load bootstrap3 %}
+{% load bootstrap3 static %}
 
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">
@@ -26,3 +26,18 @@
 {% block extra_head_scripts %}
 {{ form.media }}
 {% endblock %}
+
+{# Fixes to load and init scripts dynamically on bootstrap modals #}
+<script type="text/javascript">
+$(function() {
+    // Load autocomplete script with jquery for compatibility
+    $.ajax({
+      url: "{% static 'autocomplete_light/autocomplete.init.js' %}",
+      dataType: "script"
+    });
+    // Trigger DOMContentLoaded event
+    var DOMContentLoaded_event = document.createEvent("Event")
+    DOMContentLoaded_event.initEvent("DOMContentLoaded", true, true)
+    window.document.dispatchEvent(DOMContentLoaded_event);
+});
+</script>

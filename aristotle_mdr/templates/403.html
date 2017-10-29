@@ -1,8 +1,7 @@
-{% extends "aristotle_mdr/base.html" %}
+{% extends "4xx.html" %}
 
 {% block title %}Forbbiden{% endblock %}
-{% block content %}
-<h1 class="unauthorised">Forbbiden</h1>
+{% block page_error %}
 <p>
 The page you have requested is not
 {% if anon %}

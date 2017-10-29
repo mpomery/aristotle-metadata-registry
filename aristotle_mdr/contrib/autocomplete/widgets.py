@@ -45,18 +45,22 @@ class ConceptAutocompleteSelect(ConceptAutocompleteBase, ModelSelect2):
     pass
 
 
-class UserAutocompleteSelect(ModelSelect2):
-    url = 'aristotle-autocomplete:user'
-
-
-class UserAutocompleteSelectMultiple(ModelSelect2Multiple):
+class UserAutocompleteMixin(object):
     def __init__(self, *args, **kwargs):
         kwargs.update(
-            url=reverse_lazy('aristotle-autocomplete:user'),
-            # attrs={'data-html': 'true'}
+            url=reverse_lazy(self.url),
+            attrs={'data-html': 'true'}
         )
-        super(UserAutocompleteSelectMultiple, self).__init__(*args, **kwargs)
+        super(UserAutocompleteMixin, self).__init__(*args, **kwargs)
 
     def render_options(self, *args, **kwargs):
         """This prevents users from showing in a static HTML list"""
         return ""
+
+
+class UserAutocompleteSelect(UserAutocompleteMixin, ModelSelect2):
+    url = 'aristotle-autocomplete:user'
+
+
+class UserAutocompleteSelectMultiple(UserAutocompleteMixin, ModelSelect2Multiple):
+    url = 'aristotle-autocomplete:user'

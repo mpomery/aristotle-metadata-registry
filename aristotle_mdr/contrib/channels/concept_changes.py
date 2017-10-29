@@ -1,4 +1,5 @@
 from channels import Group
+from django.contrib.auth import get_user_model
 from aristotle_mdr import models as MDR
 from aristotle_mdr import messages
 from aristotle_mdr.contrib.channels.utils import safe_object
@@ -28,7 +29,7 @@ def concept_saved(message):
                 messages.workgroup_item_updated(recipient=user, obj=instance)
     try:
         # This will fail during first load, and if admins delete aristotle.
-        system = User.objects.get(username="aristotle")
+        system = get_user_model().objects.get(username="aristotle")
         for post in instance.relatedDiscussions.all():
             DiscussionComment.objects.create(
                 post=post,

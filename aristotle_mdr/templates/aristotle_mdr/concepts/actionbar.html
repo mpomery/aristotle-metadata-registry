@@ -21,9 +21,15 @@
         <li><a class="" href="{% url 'aristotle:clone_item' item.id %}">
             <i class="fa fa-fw fa-code-fork"></i> {% trans 'Clone this item'%}
         </a></li>
+        <li><a class="" href="{% url 'aristotle:item_history' item.id %}">
+            <i class="fa fa-fw fa-history"></i> {% trans 'View changes'%}
+        </a></li>
         <li class="divider"></li>
         <li><a class="" href="{% url 'aristotle:request_review' item.id %}" data-toggle="modal" data-target="#infobox_adv_edit">
             <i class="fa fa-fw fa-flag"></i> {% trans 'Submit for review'%}
+        </a></li>
+        <li><a class="" href="{% url 'aristotle:changeStatus' item.id %}" data-toggle="modal" data-target="#infobox_adv_edit">
+            <i class="fa fa-fw fa-university"></i> {% trans 'Change registration status'%}
         </a></li>
         {% comment %}
         <li><a class="" href="{% url 'aristotle:clone_item' item.id %}">
@@ -36,7 +42,7 @@
             <i class="fa fa-fw fa-sitemap"></i> {% trans 'Check component states'%}
         </a></li>
         {% endif %}
-        {% if 'aristotle_mdr.contrib.links'|is_installed_app %}
+        {% if 'aristotle_mdr.contrib.links'|is_active_module %}
             {% include "aristotle_mdr_links/actions/add_link_action.html" %}
         {% endif %}
       </ul>

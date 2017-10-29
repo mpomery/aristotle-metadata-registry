@@ -37,7 +37,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
     install_requires = [
-        "Django>=1.8,<1.9",
+        "Django>=1.8,<1.11,!=1.9.*",
         'six', # Setuptools > 36 doesn't install this by default
         'pytz',
         'pyyaml',
@@ -45,13 +45,15 @@ setup(
 
         'django-model-utils>=2.3.1',
         'django-notifications-hq>=1.0',
+        'django-braces',
         'docutils',
 
         #Search requirements
         'django-haystack>=2.6.0,<2.7.0',
 
         #Rich text editors
-        'django-ckeditor>=5.0.0',
+        'django-ckeditor>=5.3.0',
+        'pillow',
 
         # Revision control
         "django-reversion>=2.0,<2.1",
@@ -66,16 +68,20 @@ setup(
 
         'django-formtools',
 
-        'html5lib==1.0b10',
-        'xhtml2pdf>=0.2b1',
-        #'django-tastypie'
-
         # required for help, but thats required
         'django-autoslug',
         # for more 'real-time' notifications
         'channels',
         'django-haystack-channels',
         'asgi-redis',
+        
+        # This is only needed for Migration 0024 once this is squashed, remove this dependency
+        'sqlparse',
+        
+        # Required for utils.cached_querysets
+        'dill',
+        
+        'django-organizations',
 
     ],
 

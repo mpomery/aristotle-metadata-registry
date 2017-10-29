@@ -4,9 +4,9 @@ import sys
 
 if __name__ == "__main__":
     if 'test' in sys.argv:
-        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aristotle_mdr.tests.settings")
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aristotle_mdr.tests.settings.settings")
     elif 'schemamigration' in sys.argv:
-        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aristotle_mdr.tests.settings")
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aristotle_mdr.tests.settings.settings")
     else:
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aristotle_mdr.required_settings")
 
