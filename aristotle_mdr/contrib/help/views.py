@@ -8,6 +8,7 @@ from django.views.generic import ListView, TemplateView, DetailView
 
 from aristotle_mdr.contrib.help.models import ConceptHelp, HelpPage, HelpBase
 from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
+from django.db.models import Q
 
 
 class AppHelpViewer(DetailView):
@@ -23,14 +24,20 @@ class AllHelpView(ListView):
     template_name = "aristotle_mdr_help/all_help.html"
 
     def get_queryset(self):
-        return HelpPage.objects.filter(app_label__in=fetch_metadata_apps())
+        return HelpPage.objects.filter(
+            Q(app_label__in=fetch_metadata_apps()) |
+            Q(app_label__isnull=True)
+        )
 
 
 class AllConceptHelpView(ListView):
     template_name = "aristotle_mdr_help/all_concept_help.html"
 
     def get_queryset(self):
-        return ConceptHelp.objects.filter(app_label__in=fetch_metadata_apps())
+        return ConceptHelp.objects.filter(
+            Q(app_label__in=fetch_metadata_apps()) |
+            Q(app_label__isnull=True)
+        )
 
 
 class ConceptAppHelpView(ListView):

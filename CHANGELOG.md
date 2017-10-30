@@ -1,6 +1,6 @@
 Changelog
 
-- 1.6.0
+- 1.6.1
     - **Dependency note:** Version 1.6.0 will be the last minor version of Aristotle to support Python 2 and Django 1.8
       The next version of Aristotle will be version 2 and will require:
         - Python 3.5 or above
@@ -38,6 +38,11 @@ Changelog
         to have URLs loaded manually in a project urls.py
     - **Breaking change:** Removed the ``clone`` and ``adminLink`` template tags, performing these actions via the django admin pages
         will be deprecated in future versions
+    - Fixed regression where help pages with no app label were hidden in listings
+    - Fixed regression where help pages were not searchable
+
+- 1.6.0
+  - Unreleased due to UUID bug
 
 - 1.5.7
     - Pinned bootstrap-timepicker-datepicker version
