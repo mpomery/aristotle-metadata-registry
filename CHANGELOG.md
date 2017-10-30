@@ -29,7 +29,6 @@ Changelog
         - ``CONTENT_EXTENSIONS`` option will no longer cause critical isuses if incorrectly configured. Errors can be logged instead
         - ``DOWNLOADERS`` option will not cause critical isuses if incorrectly configured. Errors can be logged instead
         - ``USER_VISIBILITY`` option allows for broader visibility of users when creating groups, and gives managers workgroup and registration authority managers results based on partial matches. This can be set to "owners" only to revert to original functionality.
-    - **Database migration:** Added concrete UUID model for more flexible lookups
     - **Breaking change:** Download options have been moved into the ``ARISTOTLE_SETTINGS``
         under the ``DOWNLOADERS`` key
     - **Breaking change:** The Aristotle setting ``BULK_ACTION`` is now a list of python module strings. Update to 1.6.0 by removing keys and keeping the list of associated values
