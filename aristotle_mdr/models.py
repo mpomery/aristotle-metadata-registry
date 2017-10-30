@@ -75,30 +75,11 @@ VERY_RECENTLY_SECONDS = 15
 concept_visibility_updated = Signal(providing_args=["concept"])
 
 
-class UUID(models.Model):
-    objects = UUIDManager()
-    uuid = models.UUIDField(
-        help_text=_("Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries"),
-        unique=True, default=uuid.uuid1, editable=False, null=False,
-        primary_key=True
-    )
-    app_label = models.CharField(
-        max_length=256, null=False, editable=False,
-    )
-    model_name = models.CharField(
-        max_length=256, null=False, editable=False,
-    )
-
-    def __str__(self):
-        return str(self.uuid)
-
-
 @python_2_unicode_compatible  # Python 2
 class baseAristotleObject(TimeStampedModel):
-    uuid = models.OneToOneField(
-        UUID,
+    uuid = models.UUIDField(
         help_text=_("Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries"),
-        unique=True, editable=False, null=True, default=None,
+        unique=True, default=uuid.uuid1, editable=False, null=False
     )
     name = models.TextField(
         help_text=_("The primary name used for human identification purposes.")
@@ -158,13 +139,6 @@ class baseAristotleObject(TimeStampedModel):
     def meta(self):
         # I know what I'm doing, get out the way.
         return self._meta
-
-
-@receiver(pre_save)
-def force_add_uuid(sender, instance, **kwargs):
-    if not issubclass(sender, baseAristotleObject):
-        return
-    UUID.objects.create_uuid(instance)
 
 
 class unmanagedObject(baseAristotleObject):

@@ -69,7 +69,7 @@ class GenericConceptAutocomplete(GenericAutocomplete):
 
         if self.q:
             q = Q(name__icontains=self.q)
-            q |= Q(uuid__uuid__iexact=self.q)
+            q |= Q(uuid__iexact=self.q)
             if 'aristotle_mdr.contrib.identifiers' in settings.INSTALLED_APPS:
                 q |= Q(identifiers__identifier__iexact=self.q)
             try:
@@ -85,7 +85,7 @@ class GenericConceptAutocomplete(GenericAutocomplete):
         return [
             {
                 'id': self.get_result_value(result),
-                'uuid': str(result.uuid.uuid),
+                'uuid': str(result.uuid),
                 'title': self.get_result_title(result),
                 'text': self.get_result_text(result),
             } for result in context['object_list']

@@ -46,29 +46,3 @@ class BaseMigrations(object):
 
     def setUpBeforeMigration(self, apps):
         pass
-
-@unittest.skipIf(connection.vendor in ['microsoft', 'mssql'], "MSSQL Doesn't support temporarily disabling foreign key constraints")
-class TestUUIDMigration(BaseMigrations, TestCase):
-
-    migrate_from = '0022_switch_to_concept_relations'
-    migrate_to = '0024_add_uuid_instances'
-
-    def setUpBeforeMigration(self, apps):
-
-        DataElement = apps.get_model('aristotle_mdr', 'DataElement')
-        self.obj = DataElement.objects.create(
-            name = "Some data",
-            definition = "",
-        )
-        self.before_uuid = self.obj.uuid
-
-        self.before_pk = self.obj.pk
-
-    def test_tags_migrated(self):
-        DataElement = apps.get_model('aristotle_mdr', 'DataElement')
-        UUID = apps.get_model('aristotle_mdr', 'UUID')
-        
-        my_uuid = UUID.objects.get(uuid=self.before_uuid)
-        my_obj = DataElement.objects.get(pk=self.before_pk)
-
-        self.assertEqual(my_obj.uuid, my_uuid)
