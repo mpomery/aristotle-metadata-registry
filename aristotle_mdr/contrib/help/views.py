@@ -10,6 +10,7 @@ from aristotle_mdr.contrib.help.models import ConceptHelp, HelpPage, HelpBase
 from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
 from django.db.models import Q
 
+
 class AppHelpViewer(DetailView):
     def get_context_data(self, **kwargs):
         context = super(AppHelpViewer, self).get_context_data(**kwargs)
