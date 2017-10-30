@@ -79,7 +79,7 @@ concept_visibility_updated = Signal(providing_args=["concept"])
 class baseAristotleObject(TimeStampedModel):
     uuid = models.UUIDField(
         help_text=_("Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries"),
-        unique=True, editable=False, null=True,
+        unique=True, default=uuid.uuid1, editable=False, null=False
     )
     name = models.TextField(
         help_text=_("The primary name used for human identification purposes.")
