@@ -355,9 +355,10 @@ class PermissionSearchForm(TokenSearchForm):
         from haystack.forms import SearchForm, FacetedSearchForm, model_choices
 
         self.fields['ra'].choices = [(ra.id, ra.name) for ra in MDR.RegistrationAuthority.objects.all()]
+
         self.fields['models'].choices = [
             m for m in model_choices()
-            if m[0].split('.', 1)[0] in fetch_metadata_apps()
+            if m[0].split('.', 1)[0] in fetch_metadata_apps() + ['aristotle_mdr_help']
         ]
 
     def get_models(self):

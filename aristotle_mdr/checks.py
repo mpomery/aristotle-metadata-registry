@@ -12,7 +12,7 @@ def example_check(app_configs, **kwargs):
     if hasattr(settings, "ARISTOTLE_DOWNLOADS"):
         errors.append(
             Warning(
-                'ARISTOTLE_DOWNLOADS is no longer supported and will be deprecated in v1.6.1',
+                'ARISTOTLE_DOWNLOADS is no longer supported and will be deprecated in v1.6.2',
                 hint=(
                     'Move ARISTOTLE_DOWNLOADS to ARISTOTLE_SETTINGS.DOWNLOADERS '
                     'See http://docs.aristotlemetadata.com/en/master/installing/settings.html for more information'
