@@ -15,10 +15,14 @@ from . import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.core.mail import EmailMessage
-from django.template import loader
+from django.template import loader, Context
 from django.utils.translation import ugettext_lazy as _
 
 from django.http import Http404
+
+import logging
+logger = logging.getLogger(__name__)
+logger.debug("Logging started for " + __name__)
 
 
 class AristotleInvitationBackend(InvitationBackend):
@@ -93,7 +97,7 @@ class AristotleInvitationBackend(InvitationBackend):
                 )
                 user.is_active = False
                 user.save()
-            self.send_invitation(user, sender, **kwargs)
+            self.send_invitation(user, sender, request=request, **kwargs)
             users.append(user)
         return users
 
@@ -110,6 +114,45 @@ class AristotleInvitationBackend(InvitationBackend):
         from django.core.cache import caches
         cache = caches['aristotle-mdr-invitations']
         cache.delete(token)
+
+    def email_message(self, user, subject_template, body_template, request, sender=None, message_class=EmailMessage, **kwargs):
+        """
+        Returns an email message for a new user. This can be easily overriden.
+        For instance, to send an HTML message, use the EmailMultiAlternatives message_class
+        and attach the additional conent.
+        """
+
+        if sender:
+            import email.utils
+            from_email = "%s %s <%s>" % (
+                sender.first_name, sender.last_name,
+                email.utils.parseaddr(settings.DEFAULT_FROM_EMAIL)[1]
+            )
+            reply_to = "%s %s <%s>" % (sender.first_name, sender.last_name, sender.email)
+        else:
+            from_email = settings.DEFAULT_FROM_EMAIL
+            reply_to = from_email
+
+        headers = {'Reply-To': reply_to}
+        kwargs.update({'sender': sender, 'user': user})
+
+        subject = render(request, subject_template, kwargs)  # .strip()  # Remove stray newline characters
+        body = render(request, body_template, kwargs)
+        logger.critical("UserInvited: {email} invited to registry by {user}".format(email=user.email, user=request.user.username))
+        return message_class(subject, body, from_email, [user.email], headers=headers)
+
+    def send_invitation(self, user, sender=None, **kwargs):
+        """An intermediary function for sending an invitation email that
+        selects the templates, generating the token, and ensuring that the user
+        has not already joined the site.
+        """
+        if user.is_active:
+            return False
+        token = self.get_token(user)
+        kwargs.update({'token': token})
+        kwargs.update({'sender': sender})
+        self.email_message(user, self.invitation_subject, self.invitation_body, **kwargs).send()
+        return True
 
 
 class NewUserInvitationBackend(AristotleInvitationBackend):
@@ -165,7 +208,7 @@ class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
         """
         If the form is valid, redirect to the supplied URL.
         """
-        self.backend.invite_by_emails(form.emails)
+        self.backend.invite_by_emails(form.emails, request=self.request)
 
         return HttpResponseRedirect(self.get_success_url())
 
