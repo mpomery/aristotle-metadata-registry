@@ -24,20 +24,25 @@ class UserInvitationForm(FormRequestMixin, forms.Form):
 
     def clean_email_list(self):
         data = self.cleaned_data['email_list']
-        emails = [f.strip() for f in data.split('\n') if f.strip() != ""]
-        self.cleaned_data['email_list'] = "\n".join(emails)
+        emails = [e.strip() for e in data.split('\n')]
 
         email_suffixes = fetch_aristotle_settings().get('USER_EMAIL_RESTRICTIONS', [])
 
         errors = []
         for i, email in enumerate(emails):
+            if email.strip() == "":
+                continue
             try:
                 validate_email(email)
             except ValidationError:
                 errors.append(
-                    _("The email '%(email)s' on line %(line_no)d is not valid") % {"email": email, "line_no": i}
+                    _("The email '%(email)s' on line %(line_no)d is not valid") % {"email": email, "line_no": i+1}
                 )
 
         if errors:
             raise ValidationError(errors)
+
+        emails = [e.strip() for e in data.split('\n') if e != ""]
+        self.cleaned_data['email_list'] = "\n".join(emails)
+
         self.emails = emails

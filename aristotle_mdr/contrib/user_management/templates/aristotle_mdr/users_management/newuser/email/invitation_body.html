@@ -1,7 +1,7 @@
-You've been invited to join {{ organization|safe }} on {{ domain.name }} by {{ sender.get_full_name|safe }}.
+You've been invited to join the {{ config.SITE_NAME }} Metadata Registry.
 
-Follow this link to create your user account.
+Follow this link to create your account.
 
-http://{{ request.domain }}{% url "aristotle-user:registry_invitations_register" token %}
+ {{request.scheme}}://{{ request.META.HTTP_HOST }}{% url "aristotle-user:registry_invitations_register" token %}
 
 If you are unsure about this link please contact the sender.

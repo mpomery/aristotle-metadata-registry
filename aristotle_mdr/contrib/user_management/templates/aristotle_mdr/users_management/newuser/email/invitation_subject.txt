@@ -1,1 +1,3 @@
-{% spaceless %}You've been invited to a registry!{% endspaceless %}
+{% spaceless %}
+You've been invited to join the {{ config.SITE_NAME }} Metadata Registry.
+{% endspaceless %}
