@@ -138,7 +138,7 @@ class AristotleInvitationBackend(InvitationBackend):
 
         subject = render(request, subject_template, kwargs)  # .strip()  # Remove stray newline characters
         body = render(request, body_template, kwargs)
-        logger.critical("UserInvited: {email} invited to registry by {user}".format(email=user.email, user=request.user.username))
+        logger.info("UserInvited: {email} invited to registry by {user}".format(email=user.email, user=request.user.username))
         return message_class(subject, body, from_email, [user.email], headers=headers)
 
     def send_invitation(self, user, sender=None, **kwargs):

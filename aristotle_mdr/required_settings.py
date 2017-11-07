@@ -169,7 +169,7 @@ ARISTOTLE_SETTINGS = {
         'DataElementConcept': u'–'
     },
     'SITE_NAME': 'Default Site Name',  # 'The main title for the site.'
-    'SITE_BRAND': '/static/aristotle_mdr/images/aristotle_small.png',  # URL for the Site-wide logo
+    'SITE_BRAND': 'aristotle_mdr/images/aristotle_small.png',  # URL for the Site-wide logo
     'SITE_INTRO': 'Use Default Site Name to search for metadata...',  # 'Intro text use on the home page as a prompt for users.'
     'SITE_DESCRIPTION': 'About this site',  # 'The main title for the site.'
     'CONTENT_EXTENSIONS': [],
