@@ -205,7 +205,9 @@ class TokenSearchForm(FacetedSearchForm):
 
                     from django.contrib.contenttypes.models import ContentType
                     arg = arg.lower().replace('_', '').replace('-', '')
-                    mods = ContentType.objects.filter(app_label__in=fetch_metadata_apps()).all()
+                    app_labels = fetch_metadata_apps()
+                    app_labels.append('aristotle_mdr_help')
+                    mods = ContentType.objects.filter(app_label__in=app_labels).all()
                     for i in mods:
                         if hasattr(i.model_class(), 'get_verbose_name'):
                             model_short_code = "".join(
@@ -248,7 +250,9 @@ class TokenSearchForm(FacetedSearchForm):
             sqs = sqs.load_all()
 
         # Only show models that are in apps that are enabled
-        sqs = sqs.filter(django_ct_app_label__in=fetch_metadata_apps())
+        app_labels = fetch_metadata_apps()
+        app_labels.append('aristotle_mdr_help')
+        sqs = sqs.filter(django_ct_app_label__in=app_labels)
 
         return sqs
 

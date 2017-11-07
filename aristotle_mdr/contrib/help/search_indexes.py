@@ -6,11 +6,9 @@ from django.template import TemplateDoesNotExist
 from django.utils import timezone
 from aristotle_mdr.search_indexes import RESTRICTION
 
+from aristotle_mdr.search_indexes import baseObjectIndex
 
-class HelpObjectIndex(indexes.SearchIndex):
-    text = indexes.CharField(document=True, use_template=True)
-    modified = indexes.DateTimeField(model_attr='modified')
-    created = indexes.DateTimeField(model_attr='created')
+class HelpObjectIndex(baseObjectIndex):
     name = indexes.CharField(model_attr='title')
     facet_model_ct = indexes.IntegerField(faceted=True)
     is_public = indexes.BooleanField(model_attr='is_public')
