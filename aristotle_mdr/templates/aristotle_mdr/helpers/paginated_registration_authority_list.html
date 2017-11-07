@@ -49,7 +49,7 @@ Showing {{ page.paginator.count }} results.
             <a href="{{ item.get_absolute_url }}">{{ item.name }}</a>
             {% endif %}
         </td>
-        <td>{{ item.definition|striptags|safe|truncatewords:50 }}</td> w
+        <td>{{ item.definition|striptags|safe|truncatewords:50 }}</td>
         <td>{{ item.user_count }}</td>
         {% if show_all %}
         {% endif %}

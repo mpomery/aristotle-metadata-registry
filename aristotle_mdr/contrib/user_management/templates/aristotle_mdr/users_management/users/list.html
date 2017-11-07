@@ -33,16 +33,16 @@
 </div>
 
 <table class="table">
-    <thead>
+  <thead>
     <tr>
         <th>User</th>
         <th>Active</th>
         <th>Teams</th>
         <th>Role</th>
     </tr>
-    </thead>
+  </thead>
+  <tbody>
 {% for user in object_list %}
-<tbody>
     <tr>
         <td>
           {% include "aristotle_mdr/users_management/helper/user_table_display.html" with user=user %}
@@ -60,7 +60,7 @@
             {% comment %}
             <li><a href="#">View profile</a></li>
             {% endcomment %}
-            <li><a href="#">Change role</a></li>
+            <!-- li><a href="#">Change role</a></li -->
             <li role="separator" class="divider"></li>
             {% if user.is_active %}
             <li class="alert-danger">
@@ -75,8 +75,8 @@
         </div>
         </td>
     </tr>
-    </tbody>
 {% endfor %}
+  </tbody>
 </table>
 </div>
 

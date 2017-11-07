@@ -3,6 +3,8 @@ Changelog
 - 1.6.3
   - Fixed bug when registration form didn't show username errors
   - Improved how invitation emails are rendered
+  - Fix bug in registation authority list
+  - Removed dead link in user page, fixed user list generation #727
 
 - 1.6.2
   - Re-release of 1.6.1 due to upload error with PyPI 
