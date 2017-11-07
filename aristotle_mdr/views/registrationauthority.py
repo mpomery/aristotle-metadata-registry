@@ -63,7 +63,7 @@ class CreateRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, C
     model = MDR.RegistrationAuthority
 
     def get_success_url(self):
-        return reverse('aristotle:registrationauthority_details', kwargs={'iid':self.object.id})
+        return reverse('aristotle:registrationauthority_details', kwargs={'iid': self.object.id})
 
 
 class AddUser(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, UpdateView):

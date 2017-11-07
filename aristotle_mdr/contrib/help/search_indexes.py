@@ -8,6 +8,7 @@ from aristotle_mdr.search_indexes import RESTRICTION
 
 from aristotle_mdr.search_indexes import baseObjectIndex
 
+
 class HelpObjectIndex(baseObjectIndex):
     name = indexes.CharField(model_attr='title')
     facet_model_ct = indexes.IntegerField(faceted=True)

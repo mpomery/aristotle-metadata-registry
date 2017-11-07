@@ -36,7 +36,7 @@ class UserInvitationForm(FormRequestMixin, forms.Form):
                 validate_email(email)
             except ValidationError:
                 errors.append(
-                    _("The email '%(email)s' on line %(line_no)d is not valid") % {"email": email, "line_no": i+1}
+                    _("The email '%(email)s' on line %(line_no)d is not valid") % {"email": email, "line_no": i + 1}
                 )
 
         if errors:
