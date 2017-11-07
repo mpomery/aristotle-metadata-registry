@@ -1,5 +1,12 @@
 Changelog
 
+- 1.6.3
+  - Fixed bug when registration form didn't show username errors
+  - Improved how invitation emails are rendered
+
+- 1.6.2
+  - Re-release of 1.6.1 due to upload error with PyPI 
+
 - 1.6.1
     - **Dependency note:** Version 1.6.0 will be the last minor version of Aristotle to support Python 2 and Django 1.8
       The next version of Aristotle will be version 2 and will require:
