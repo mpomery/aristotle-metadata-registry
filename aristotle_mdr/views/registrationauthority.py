@@ -62,6 +62,9 @@ class CreateRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, C
     redirect_unauthenticated_users = True
     model = MDR.RegistrationAuthority
 
+    def get_success_url(self):
+        return reverse('aristotle:registrationauthority_details', kwargs={'iid': self.object.id})
+
 
 class AddUser(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, UpdateView):
     # TODO: Replace UpdateView with DetailView, FormView
