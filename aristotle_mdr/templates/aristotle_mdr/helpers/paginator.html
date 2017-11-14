@@ -8,7 +8,9 @@
             <li><a accesskey="p" href="?{% paginator_get request page.previous_page_number %}">&laquo; Previous</a></li>
         {% endif %}
         {% for p in page.paginator.page_range %}
-            <li><a href="?{% paginator_get request p %}">{{ p }}</a></li>
+            <li {% if p == page.number %}class="active"{%endif %}
+            ><a href="?{% paginator_get request p %}">{{ p }}</a>
+            </li>
         {% endfor %}
         {% if page.has_next %}
             <li><a accesskey="n" href="?{% paginator_get request page.next_page_number %}">Next &raquo;</a></li>
