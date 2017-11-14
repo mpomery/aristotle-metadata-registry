@@ -250,6 +250,8 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(self.item1.current_statuses().first().registrationAuthority == self.ra)
         self.assertTrue(self.item2.current_statuses().first().registrationAuthority == self.ra)
 
+        self.assertNotContains(response, "Some items failed")
+
     def test_bulk_status_change_on_forbidden_items(self):
         self.login_registrar()
         review = models.ReviewRequest.objects.create(
