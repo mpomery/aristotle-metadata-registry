@@ -1,5 +1,12 @@
 Changelog
 
+- 1.6.4
+  - Fixed error when bulk endorsing content #728
+  - Fixed spelling error on 403 page
+  - Fixed regression where items with no workgroup couldn't be bulk moved to a workgroup #734
+  - Fixed bug where "add user" link wouldn't work in workgroup member pages #731
+  - Fixed display of paginator bar for small page numbers #714
+
 - 1.6.3
   - Fixed bug when registration form didn't show username errors
   - Improved how invitation emails are rendered
