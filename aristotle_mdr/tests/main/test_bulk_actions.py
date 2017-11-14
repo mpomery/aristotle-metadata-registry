@@ -238,7 +238,8 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
                 'cascadeRegistration': 0,
                 'registrationAuthorities': [self.ra.id],
                 'confirmed': 'confirmed',
-            }
+            },
+            follow=True
         )
         self.assertTrue(self.item1.is_registered)
         self.assertTrue(self.item2.is_registered)
