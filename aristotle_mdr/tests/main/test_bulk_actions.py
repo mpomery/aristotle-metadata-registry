@@ -20,6 +20,7 @@ class BulkActionsTest(utils.LoggedInViewPages):
         self.item2 = models.ObjectClass.objects.create(name="OC2", definition="OC2 definition", workgroup=self.wg1)
         self.item3 = models.ObjectClass.objects.create(name="OC3", definition="OC3 definition", workgroup=self.wg1)
         self.item4 = models.Property.objects.create(name="Prop4", definition="Prop4 definition", workgroup=self.wg2)
+        self.item5 = models.Property.objects.create(name="Prop5", definition="Prop5 definition", workgroup=None, submitter=self.editor)
 
 
 class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
@@ -156,6 +157,33 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(self.item1.concept in self.wg1.items.all())
         self.assertTrue(self.item2.concept in self.wg1.items.all())
         self.assertTrue(self.item4.concept in self.wg1.items.all())
+
+        self.assertNotContains(response, "Some items failed, they had the id&#39;s")
+
+    @override_settings(ARISTOTLE_SETTINGS=dict(settings.ARISTOTLE_SETTINGS, WORKGROUP_CHANGES=['submitter']))
+    def test_bulk_change_workgroup_for_editor__where_no_workgroup(self):
+        self.new_workgroup = models.Workgroup.objects.create(name="new workgroup")
+        self.new_workgroup.submitters.add(self.editor)
+        self.login_editor()
+        
+        self.assertTrue(self.item1.concept not in self.new_workgroup.items.all())
+        self.assertTrue(self.item2.concept not in self.new_workgroup.items.all())
+        self.assertTrue(self.item5.concept not in self.new_workgroup.items.all())
+
+        response = self.client.post(
+            reverse('aristotle:bulk_action'),
+            {
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
+                'items': [self.item1.id, self.item2.id, self.item5.id],
+                'workgroup': [self.new_workgroup.id],
+                "confirmed": True
+            },
+            follow=True
+        )
+
+        self.assertTrue(self.item1.concept in self.new_workgroup.items.all())
+        self.assertTrue(self.item2.concept in self.new_workgroup.items.all())
+        self.assertTrue(self.item5.concept in self.new_workgroup.items.all())
 
         self.assertNotContains(response, "Some items failed, they had the id&#39;s")
 

@@ -358,10 +358,14 @@ class ChangeWorkgroupForm(BulkActionForm):
         with transaction.atomic(), reversion.revisions.create_revision():
             reversion.revisions.set_user(self.user)
             for item in items:
-                can_move = move_from_checks.get(item.workgroup.pk, None)
-                if can_move is None:
-                    can_move = user_can_remove_from_workgroup(self.user, item.workgroup)
-                    move_from_checks[item.workgroup.pk] = can_move
+                if item.workgroup:
+                    can_move = move_from_checks.get(item.workgroup.pk, None)
+                    if can_move is None:
+                        can_move = user_can_remove_from_workgroup(self.user, item.workgroup)
+                        move_from_checks[item.workgroup.pk] = can_move
+                else:
+                    # There is no workgroup, the user can move their own item
+                    can_move = True
 
                 if not can_move:
                     failed.append(item)
