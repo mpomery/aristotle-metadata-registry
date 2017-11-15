@@ -215,6 +215,7 @@ def subclassed_clone_modelform(set_model):
 def subclassed_wizard_2_Results(set_model):
     class MyForm(Concept_2_Results):
         class Meta(Concept_2_Results.Meta):
+            exclude = set_model.edit_page_excludes
             model = set_model
             fields = '__all__'
     return MyForm
