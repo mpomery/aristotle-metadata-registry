@@ -7,6 +7,7 @@ Changelog
   - Fixed bug where "add user" link wouldn't work in workgroup member pages #731
   - Fixed display of paginator bar for small page numbers #714
   - Removed un-editable fields from creation wizards
+  - Corrected spelling error in DE and DEC wizards
 
 - 1.6.3
   - Fixed bug when registration form didn't show username errors
