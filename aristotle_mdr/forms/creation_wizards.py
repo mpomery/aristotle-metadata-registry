@@ -257,7 +257,11 @@ class DEC_OCP_Results(UserAwareForm):
         super(DEC_OCP_Results, self).__init__(*args, **kwargs)
 
         if oc_similar:
-            oc_options = [(oc.object.id, oc) for oc in oc_similar]
+            oc_options = [
+                (oc.object.id, oc)
+                for oc in oc_similar
+                if oc.object
+            ]
             oc_options.append(("X", "None of the above meet my needs"))
             self.fields['oc_options'] = forms.ChoiceField(
                 label="Similar Object Classes",
@@ -265,7 +269,11 @@ class DEC_OCP_Results(UserAwareForm):
                 widget=forms.RadioSelect()
             )
         if pr_similar:
-            pr_options = [(pr.object.id, pr) for pr in pr_similar]
+            pr_options = [
+                (pr.object.id, pr)
+                for pr in pr_similar
+                if pr.object
+            ]
             pr_options.append(("X", "None of the above meet my needs"))
             self.fields['pr_options'] = forms.ChoiceField(
                 label="Similar Properties",
@@ -334,7 +342,11 @@ class DE_OCPVD_Results(DEC_OCP_Results):
         super(DE_OCPVD_Results, self).__init__(*args, **kwargs)
 
         if vd_similar:
-            vd_options = [(vd.object.id, vd) for vd in vd_similar]
+            vd_options = [
+                (vd.object.id, vd)
+                for vd in vd_similar
+                if vd.object
+            ]
             vd_options.append(("X", "None of the above meet my needs"))
             self.fields['vd_options'] = forms.ChoiceField(
                 label="Similar Value Domains",
