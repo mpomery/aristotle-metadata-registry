@@ -1,5 +1,10 @@
 Changelog
 
+- 1.6.5
+  - Fixed regression where private methods showed up in creation wizards
+  - Fixed error with wizards fialing if search engine is stale, #736
+  - Fixed many-to-many fields not saving when creating items, #732
+
 - 1.6.4
   - Fixed error when bulk endorsing content #728
   - Fixed spelling error on 403 page
