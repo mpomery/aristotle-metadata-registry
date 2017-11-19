@@ -5,6 +5,7 @@ Changelog
   - Fixed error with wizards fialing if search engine is stale, #736
   - Fixed many-to-many fields not saving when creating items, #732
   - Gave Aristotle links a unified namespace (`aristotle_mdr_links`)
+  - Creation list now displays apps in alphabetical order, #740
 
 - 1.6.4
   - Fixed error when bulk endorsing content #728

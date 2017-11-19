@@ -58,7 +58,7 @@
         <a href="{% url 'admin:index' %}">{% trans 'Management interface' %}</a>.
     {% endif %}
 </p>
-{% for app,app_models in models.items %}
+{% for app_models in models %}
 <h3>{{ app_models.app }}</h3>
     <table class="table">
         <thead>
