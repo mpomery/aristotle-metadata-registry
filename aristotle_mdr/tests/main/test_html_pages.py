@@ -489,10 +489,14 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         updated_item = utils.model_to_dict(response.context['item'])
         updated_name = updated_item['name'] + " cloned with no WG!"
         updated_item['name'] = updated_name
-        updated_item['workgroup'] = None
+        updated_item['workgroup'] = '' # no workgroup this time
         response = self.client.post(reverse('aristotle:clone_item',args=[self.item1.id]), updated_item)
+
+        self.assertTrue(response.status_code == 302) # make sure its saved ok
         most_recent = self.itemType.objects.order_by('-created').first()
-        self.assertTrue(most_recent.workgroup is None)
+
+        self.assertTrue('cloned with no WG' in most_recent.name)
+        self.assertTrue(most_recent.workgroup == None)
         self.assertTrue(perms.user_can_view(self.editor, most_recent))
 
         self.assertRedirects(response,url_slugify_concept(most_recent))
@@ -500,7 +504,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
 
         # Make sure the right item was save and our original hasn't been altered.
         self.item1 = self.itemType.objects.get(id=self.item1.id) # Stupid cache
-        self.assertTrue('cloned' not in self.item1.name)
+        self.assertTrue('cloned with no WG' not in self.item1.name)
 
     def test_viewer_cannot_view_supersede_page(self):
         self.login_viewer()
