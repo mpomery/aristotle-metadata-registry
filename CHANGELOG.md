@@ -6,6 +6,8 @@ Changelog
   - Fixed many-to-many fields not saving when creating items, #732
   - Gave Aristotle links a unified namespace (`aristotle_mdr_links`)
   - Creation list now displays apps in alphabetical order, #740
+  - Cloned items now save the submitter, preventing forbidden page errors
+  - Cloning an item now only required view permissions, not edit permissions
 
 - 1.6.4
   - Fixed error when bulk endorsing content #728

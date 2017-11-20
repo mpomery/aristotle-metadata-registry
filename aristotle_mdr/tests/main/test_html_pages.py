@@ -441,10 +441,15 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(reverse('aristotle:clone_item',args=[self.item2.id]))
         self.assertEqual(response.status_code,302)
 
-    def test_viewer_cannot_view_clone_page(self):
+    def test_viewer_can_view_clone_page(self):
         self.login_viewer()
+        # Viewer can clone an item they can see
+        self.assertTrue(perms.user_can_view(self.viewer, self.item1))
         response = self.client.get(reverse('aristotle:clone_item',args=[self.item1.id]))
-        self.assertEqual(response.status_code,403)
+        self.assertEqual(response.status_code,200)
+        
+        # Viewer can't clone an item they can't see
+        self.assertFalse(perms.user_can_view(self.viewer, self.item2))
         response = self.client.get(reverse('aristotle:clone_item',args=[self.item2.id]))
         self.assertEqual(response.status_code,403)
 
@@ -466,6 +471,29 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         updated_item['name'] = updated_name
         response = self.client.post(reverse('aristotle:clone_item',args=[self.item1.id]), updated_item)
         most_recent = self.itemType.objects.order_by('-created').first()
+        self.assertTrue(perms.user_can_view(self.editor, most_recent))
+
+        self.assertRedirects(response,url_slugify_concept(most_recent))
+        self.assertEqual(most_recent.name,updated_name)
+
+        # Make sure the right item was save and our original hasn't been altered.
+        self.item1 = self.itemType.objects.get(id=self.item1.id) # Stupid cache
+        self.assertTrue('cloned' not in self.item1.name)
+
+    def test_submitter_can_save_via_clone_page_with_no_workgroup(self):
+        self.login_editor()
+        import time
+        time.sleep(2) # delays so there is a definite time difference between the first item and the clone on very fast test machines
+        response = self.client.get(reverse('aristotle:clone_item',args=[self.item1.id]))
+        self.assertEqual(response.status_code,200)
+        updated_item = utils.model_to_dict(response.context['item'])
+        updated_name = updated_item['name'] + " cloned with no WG!"
+        updated_item['name'] = updated_name
+        updated_item['workgroup'] = None
+        response = self.client.post(reverse('aristotle:clone_item',args=[self.item1.id]), updated_item)
+        most_recent = self.itemType.objects.order_by('-created').first()
+        self.assertTrue(most_recent.workgroup is None)
+        self.assertTrue(perms.user_can_view(self.editor, most_recent))
 
         self.assertRedirects(response,url_slugify_concept(most_recent))
         self.assertEqual(most_recent.name,updated_name)
