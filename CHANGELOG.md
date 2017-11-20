@@ -8,6 +8,7 @@ Changelog
   - Creation list now displays apps in alphabetical order, #740
   - Cloned items now save the submitter, preventing forbidden page errors for submitters if there is no workgroup attached
   - Cloning an item now only required view permissions, not edit permissions
+  - Fixed dashboard sidebar display in Internet Explorer 11
 
 - 1.6.4
   - Fixed error when bulk endorsing content #728

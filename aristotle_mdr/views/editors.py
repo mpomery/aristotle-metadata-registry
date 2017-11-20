@@ -191,7 +191,6 @@ class CloneItemView(PermissionFormView):
                 raise PermissionDenied
         return super(PermissionFormView, self).dispatch(request, *args, **kwargs)
 
-
     def get_form_class(self):
         return MDRForms.wizards.subclassed_clone_modelform(self.model)
 
