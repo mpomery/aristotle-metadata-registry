@@ -178,6 +178,19 @@ class CloneItemView(PermissionFormView):
         self.item = self.item_to_clone
         return super(CloneItemView, self).dispatch(request, *args, **kwargs)
 
+    def dispatch(self, request, *args, **kwargs):
+        self.item_to_clone = get_object_or_404(
+            MDR._concept, pk=self.kwargs['iid']
+        ).item
+        self.item = self.item_to_clone
+        self.model = self.item.__class__
+        if not user_can_view(self.request.user, self.item):
+            if request.user.is_anonymous():
+                return redirect(reverse('friendly_login') + '?next=%s' % request.path)
+            else:
+                raise PermissionDenied
+        return super(PermissionFormView, self).dispatch(request, *args, **kwargs)
+
     def get_form_class(self):
         return MDRForms.wizards.subclassed_clone_modelform(self.model)
 
@@ -193,7 +206,9 @@ class CloneItemView(PermissionFormView):
 
         if form.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
-                new_clone = form.save()
+                new_clone = form.save(commit=False)
+                new_clone.submitter = self.request.user
+                new_clone.save()
                 reversion.revisions.set_user(self.request.user)
                 reversion.revisions.set_comment("Cloned from %s (id: %s)" % (self.item_to_clone.name, str(self.item_to_clone.pk)))
                 return HttpResponseRedirect(url_slugify_concept(new_clone))

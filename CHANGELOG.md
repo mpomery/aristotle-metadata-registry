@@ -1,5 +1,15 @@
 Changelog
 
+- 1.6.5
+  - Fixed regression where private methods showed up in creation wizards
+  - Fixed error with wizards fialing if search engine is stale, #736
+  - Fixed many-to-many fields not saving when creating items, #732
+  - Gave Aristotle links a unified namespace (`aristotle_mdr_links`)
+  - Creation list now displays apps in alphabetical order, #740
+  - Cloned items now save the submitter, preventing forbidden page errors for submitters if there is no workgroup attached
+  - Cloning an item now only required view permissions, not edit permissions
+  - Fixed dashboard sidebar display in Internet Explorer 11
+
 - 1.6.4
   - Fixed error when bulk endorsing content #728
   - Fixed spelling error on 403 page

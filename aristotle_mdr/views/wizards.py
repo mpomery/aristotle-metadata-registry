@@ -158,6 +158,7 @@ class ConceptWizard(PermissionWizard):
             if saved_item is not None:
                 saved_item.submitter = self.request.user
                 saved_item.save()
+                form.save_m2m()
         return HttpResponseRedirect(url_slugify_concept(saved_item))
 
     def find_duplicates(self):

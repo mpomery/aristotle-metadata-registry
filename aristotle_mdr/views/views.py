@@ -198,7 +198,7 @@ def create_list(request):
     return render(
         request, "aristotle_mdr/create/create_list.html",
         {
-            'models': out,
+            'models': sorted(out.values(), key=lambda x: x['app']),
             'wizards': wizards
         }
     )
