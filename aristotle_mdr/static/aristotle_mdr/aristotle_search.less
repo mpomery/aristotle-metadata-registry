@@ -44,7 +44,8 @@ li.dropdown-menu-form,li.dropdown-menu-date, .sort-order-box {
         display:inline-block;
         width:160px;
     }
-    li {
+    ul.dropdown-menu {
+    &>li {
         display:block;
         width:200px;
 
@@ -78,7 +79,7 @@ li.dropdown-menu-form,li.dropdown-menu-date, .sort-order-box {
             cursor: pointer;
             display: table;
         }
-        /* toggle font awsome icon*/
+        /* toggle font awesome icon*/
         [type="checkbox"]:checked + label:before {
           content: "\f046";
         }
@@ -92,6 +93,7 @@ li.dropdown-menu-form,li.dropdown-menu-date, .sort-order-box {
         [type="radio"]:not(:checked) + label:before {
           content: "\f1db";
         }
+    }
     }
 }
 

@@ -8,7 +8,6 @@ from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView

@@ -273,8 +273,8 @@ def downloadMenu(item):
         {% downloadMenu item %}
     """
     from django.template.loader import get_template
-    from django.template import Context
     downloadOpts = fetch_aristotle_downloaders()
+
     from aristotle_mdr.utils import get_download_template_path_for_item
     from aristotle_mdr.utils.downloads import get_download_module
 
@@ -302,10 +302,10 @@ def downloadMenu(item):
                 except template.TemplateDoesNotExist:
                     pass  # This is ok.
                 except:
-                    raise  # pass  # Something very bad has happened in the template.
+                    pass  # Something very bad has happened in the template.
     return get_template(
         "aristotle_mdr/helpers/downloadMenu.html").render(
-        Context({'item': item, 'download_options': downloadsForItem, })
+        {'item': item, 'download_options': downloadsForItem, }
     )
 
 
@@ -313,12 +313,11 @@ def downloadMenu(item):
 def extra_content(extension, item, user):
     try:
         from django.template.loader import get_template
-        from django.template import Context
         s = item._meta.object_name
         s = s[0].lower() + s[1:]
 
         return get_template(extension + "/extra_content/" + s + ".html").render(
-            Context({'item': item, 'user': user})
+            {'item': item, 'user': user}
         )
     except template.TemplateDoesNotExist:
         # there is no extra content for this item, and thats ok.

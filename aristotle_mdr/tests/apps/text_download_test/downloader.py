@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.template import Context
 from django.template.loader import get_template, select_template
 
 from aristotle_mdr.utils import get_download_template_path_for_item
@@ -40,10 +39,10 @@ class TestTextDownloader(DownloaderBase):
                 template = select_template([
                     get_download_template_path_for_item(item, cls.download_type, subpath="inline"),
                 ])
-                context = Context({
+                context = {
                     'item': item,
                     'request': request,
-                })
+                }
                 out.append(template.render(context))
     
         return HttpResponse("\n\n".join(out), content_type='text/plain')

@@ -6,7 +6,6 @@ from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.template.loader import get_template
-from django.template import Context
 from django.utils import six
 
 from aristotle_mdr import models, perms
@@ -43,6 +42,7 @@ class GenericAutocomplete(autocomplete.Select2QuerySetView):
         """Return the label of a result."""
 
         template = get_template(self.template_name)
+        # context = {"result": result, 'request': self.request}
         context = Context({"result": result, 'request': self.request})
         return template.render(context)
 
