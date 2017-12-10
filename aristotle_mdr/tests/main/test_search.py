@@ -4,7 +4,7 @@ import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test.utils import override_settings
 
@@ -31,7 +31,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         self.ra = models.RegistrationAuthority.objects.create(name="Kelly Act")
         self.ra1 = models.RegistrationAuthority.objects.create(name="Superhuman Registration Act") # Anti-registration!
-        self.registrar = User.objects.create_user('stryker','william.styker@weaponx.mil','mutantsMustDie')
+        self.registrar = get_user_model().objects.create_user('stryker','william.styker@weaponx.mil','mutantsMustDie')
         self.ra.giveRoleToUser('registrar',self.registrar)
         self.assertTrue(perms.user_is_registrar(self.registrar,self.ra))
         xmen = "professorX cyclops iceman angel beast phoenix wolverine storm nightcrawler"
@@ -195,7 +195,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
     def test_workgroup_member_search(self):
         self.logout()
-        self.viewer = User.objects.create_user('charles.xavier','charles@schoolforgiftedyoungsters.edu','equalRightsForAll')
+        self.viewer = get_user_model().objects.create_user('charles.xavier','charles@schoolforgiftedyoungsters.edu','equalRightsForAll')
         self.weaponx_wg = models.Workgroup.objects.create(name="WeaponX")
 
         response = self.client.post(reverse('friendly_login'),
@@ -217,8 +217,8 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertFalse(dp.is_public())
 
         # Charles isn't a viewer of X-men yet, so no results.
-        from aristotle_mdr.forms.search import PermissionSearchQuerySet
-        psqs = PermissionSearchQuerySet()
+        from aristotle_mdr.forms.search import get_permission_sqs
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('deadpool').apply_permission_checks(self.viewer)
         self.assertEqual(len(psqs),0)
         #response = self.client.get(reverse('aristotle:search')+"?q=deadpool")
@@ -229,7 +229,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertFalse(perms.user_can_view(self.viewer,dp))
 
         # Deadpool isn't an Xman yet, still no results.
-        psqs = PermissionSearchQuerySet()
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('deadpool').apply_permission_checks(self.viewer)
         self.assertDelayedEqual(len(psqs),0)
 
@@ -239,7 +239,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         dp = models.ObjectClass.objects.get(pk=dp.pk) # Un-cache
 
         # Charles is a viewer, Deadpool is in X-men, should have results now.
-        psqs = PermissionSearchQuerySet()
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('deadpool').apply_permission_checks(self.viewer)
         self.assertDelayedEqual(len(psqs),1)
 
@@ -250,7 +250,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         # Take away Charles viewing rights and no results again.
         self.xmen_wg.removeRoleFromUser('viewer',self.viewer)
-        psqs = PermissionSearchQuerySet()
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('deadpool').apply_permission_checks(self.viewer)
         self.assertDelayedEqual(len(psqs),0)
 
@@ -259,7 +259,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
     def test_workgroup_member_search_has_valid_facets(self):
         self.logout()
-        self.viewer = User.objects.create_user('charles.xavier','charles@schoolforgiftedyoungsters.edu','equalRightsForAll')
+        self.viewer = get_user_model().objects.create_user('charles.xavier','charles@schoolforgiftedyoungsters.edu','equalRightsForAll')
         response = self.client.post(reverse('friendly_login'),
                     {'username': 'charles.xavier', 'password': 'equalRightsForAll'})
 
@@ -488,7 +488,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         self.login_superuser()
 
-        from aristotle_mdr.forms.search import PermissionSearchQuerySet
+        from aristotle_mdr.forms.search import get_permission_sqs
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
         
         objs = response.context['page'].object_list
@@ -502,7 +502,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         # Confirm spaces are included in the facet
         self.assertTrue(dec.name in [v[0] for v in dict(extra_facets)['data_element_concept']['values']])
 
-        psqs = PermissionSearchQuerySet()
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('pokemon').apply_permission_checks(self.su)
         self.assertDelayedEqual(len(psqs),3)
 
@@ -547,7 +547,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         self.login_superuser()
 
-        from aristotle_mdr.forms.search import PermissionSearchQuerySet
+        from aristotle_mdr.forms.search import get_permission_sqs
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
         
         objs = response.context['page'].object_list
@@ -558,6 +558,65 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         objs = response.context['page'].object_list
         self.assertDelayedEqual(len(objs),1)
         self.assertTrue(objs[0].object.pk,de.pk)
+
+    def test_values_in_conceptual_domain_search(self):
+        # For bug #676
+        from aristotle_mdr.forms.search import get_permission_sqs
+        PSQS = get_permission_sqs()
+        psqs = PSQS.auto_query('flight').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),0)
+        psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),0)
+
+        cd = models.ConceptualDomain.objects.create(
+                name="Mutation",
+                definition="List of mutations",
+            )
+        for i, power in enumerate(['flight', 'healing', 'invisiblilty']):
+            models.ValueMeaning.objects.create(
+                name=power, definition=power, order=i,
+                conceptual_domain=cd
+            )
+
+        psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),1)
+        self.assertEqual(psqs[0].object.pk, cd.pk)
+        psqs = PSQS.auto_query('flight').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),1)
+        self.assertEqual(psqs[0].object.pk, cd.pk)
+
+    def test_values_in_value_domain_search(self):
+        # For bug #676
+        from aristotle_mdr.forms.search import get_permission_sqs
+        PSQS = get_permission_sqs()
+        psqs = PSQS.auto_query('flight').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),0)
+        psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),0)
+        psqs = PSQS.auto_query('FLT').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),0)
+
+        # with reversion.create_revision():
+        vd = models.ValueDomain.objects.create(
+                name="Mutation",
+                definition="Coded list of mutations",
+            )
+        for i, data in enumerate([("FLT", 'flight'), ("HEAL", 'healing'), ("INVIS", 'invisiblilty')]):
+            code, power = data
+            models.PermissibleValue.objects.create(
+                value=code, meaning=power, order=i,
+                valueDomain=vd
+            )
+
+        psqs = PSQS.auto_query('mutations').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),1)
+        self.assertEqual(psqs[0].object.pk, vd.pk)
+        psqs = PSQS.auto_query('flight').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),1)
+        self.assertEqual(psqs[0].object.pk, vd.pk)
+        psqs = PSQS.auto_query('FLT').apply_permission_checks(self.su)
+        self.assertEqual(len(psqs),1)
+        self.assertEqual(psqs[0].object.pk, vd.pk)
 
 
 class TestTokenSearch(TestCase):
@@ -572,10 +631,10 @@ class TestTokenSearch(TestCase):
         import haystack
         haystack.connections.reload('default')
 
-        self.su = User.objects.create_superuser('super','','user')
+        self.su = get_user_model().objects.create_superuser('super','','user')
 
         self.ra = models.RegistrationAuthority.objects.create(name="Kelly Act")
-        self.registrar = User.objects.create_user('stryker','william.styker@weaponx.mil','mutantsMustDie')
+        self.registrar = get_user_model().objects.create_user('stryker','william.styker@weaponx.mil','mutantsMustDie')
         self.ra.giveRoleToUser('registrar',self.registrar)
         xmen = "wolverine professorX cyclops iceman angel beast phoenix storm nightcrawler"
         self.xmen_wg = models.Workgroup.objects.create(name="X Men")

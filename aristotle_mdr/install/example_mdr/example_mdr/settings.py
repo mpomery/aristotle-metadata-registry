@@ -21,7 +21,8 @@ from aristotle_mdr.required_settings import *
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 FIXTURES_DIRS = [os.path.join(BASE_DIR, 'fixtures')]
-STATIC_ROOT =os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+ALLOWED_HOSTS = ["*"]
 
 # If you are using the Aristotle Glossary, uncomment the command below to enable
 # the glossary insertion button in the rich text editor
@@ -36,8 +37,6 @@ SECRET_KEY = 'Change-this-key-as-soon-as-you-can'
 DEBUG = True
 
 TEMPLATE_DEBUG = True
-
-ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -99,23 +98,24 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 ARISTOTLE_SETTINGS.update({
-    'SITE_NAME': 'Aristotle-MDR Demo Server', # 'The main title for the site.'
+    'SITE_NAME': 'Example Metadata Registry', # 'The main title for the site.'
     'SITE_BRAND': '/static/aristotle_mdr/images/aristotle_small.png', # URL for the Site-wide logo
     'SITE_INTRO': 'Use Default Site Name to search for metadata...', # 'Intro text use on the home page as a prompt for users.'
     'SITE_DESCRIPTION': 'About this site', # 'The main title for the site.'
     'CONTENT_EXTENSIONS' : [ #Extensions that add additional object types for search/display.
             #!aristotle_dse! 'aristotle_dse',
             #!aristotle_glossary! 'aristotle_glossary',
-        ]
-    })
+        ],
+    "DOWNLOADERS": [
+        ('pdf', 'PDF', 'fa-file-pdf-o', 'aristotle_pdf', 'Downloads for various content types in the PDF format'),
+        ('csv-vd', 'CSV list of values', 'fa-file-excel-o', 'aristotle_mdr', 'CSV downloads for value domain codelists'),
+        ##!aristotle_ddi_utils!    ('ddi3.2','DDI 3.2','fa-file-code-o','aristotle_ddi_utils'),
+    ],
+})
 # Specified the agency to use when outputing items in the DDI XML format.
 #!aristotle_ddi_utils!ARISTOTLE_DDI_AGENCY = "demo.ddi.aristotle_mdr"
 
 # This option gives a site the ability to register the different download options available for the site
 # This invoked in templates using the aristotle template tag "downloadMenu"
-ARISTOTLE_DOWNLOADS = ARISTOTLE_DOWNLOADS + [
-##!aristotle_ddi_utils!    ('ddi3.2','DDI 3.2','fa-file-code-o','aristotle_ddi_utils'),
-    ]
 
 #
-GRAPPELLI_ADMIN_TITLE = "Comet admin interface"

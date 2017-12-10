@@ -2,14 +2,15 @@ from django.conf import settings
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.test import TestCase, override_settings, modify_settings
-from django.contrib.auth.models import User
+from django.test.utils import setup_test_environment
+from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 import datetime
 
 from reversion import revisions as reversion
 
 from aristotle_mdr.contrib.self_publish import models as pub
-from aristotle_mdr.forms.search import PermissionSearchQuerySet
+from aristotle_mdr.forms.search import get_permission_sqs
 from aristotle_mdr.models import ObjectClass, Workgroup
 from aristotle_mdr.tests import utils
 from aristotle_mdr.utils import setup_aristotle_test_environment
@@ -29,7 +30,7 @@ setup_aristotle_test_environment()
 class TestSelfPublishing(utils.LoggedInViewPages, TestCase):
     def setUp(self):
         super(TestSelfPublishing, self).setUp()
-        self.submitting_user = User.objects.create_user(
+        self.submitting_user = get_user_model().objects.create_user(
             username="self-publisher",
             email="self@publisher.net",
             password="self-publisher")
@@ -51,7 +52,7 @@ class TestSelfPublishing(utils.LoggedInViewPages, TestCase):
         self.item = ObjectClass.objects.get(pk=self.item.pk)
         self.assertFalse(self.item._is_public)
 
-        psqs = PermissionSearchQuerySet()
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('published').apply_permission_checks()
 
         self.assertEqual(len(psqs), 0)
@@ -68,7 +69,7 @@ class TestSelfPublishing(utils.LoggedInViewPages, TestCase):
         self.item = ObjectClass.objects.get(pk=self.item.pk)
         self.assertTrue(self.item._is_public)
 
-        psqs = PermissionSearchQuerySet()
+        psqs = get_permission_sqs()
         psqs = psqs.auto_query('published').apply_permission_checks()
         self.assertEqual(len(psqs), 1)
 

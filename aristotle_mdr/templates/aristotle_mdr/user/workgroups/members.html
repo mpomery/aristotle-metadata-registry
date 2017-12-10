@@ -1,0 +1,113 @@
+{% extends "aristotle_mdr/workgroup.html" %}
+{% load aristotle_tags i18n %}
+{% url 'aristotle:item' item.id %}
+{% block title %}{{ workgroup.name }} {% trans 'members' %}{% endblock %}
+{% block page %}
+<h1>{{ workgroup.name }} members</h1>
+<div class="panel panel-default">
+  <div class="panel-heading">
+      <div class="row">
+
+    <div class="col-md-1 col-md-offset-11 col-xs-4 col-xs-offset-8 ">
+        <div class="btn-group pull-right" role="group" >
+            <a class="btn btn-success" href="{% url 'aristotle:addWorkgroupMembers' item.pk %}"
+                data-toggle="modal" data-target="#wg_page_modal">Add a user</a>
+        </div>
+    </div>
+
+      </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <th>Member</th>
+            <th>Roles</th>
+            <th>Manage</th>
+        </thead>
+        <tbody>
+
+        {% for member in item.members.all %}
+        <tr>
+        <td>
+            {% include "aristotle_mdr/users_management/helper/user_table_display.html" with user=member %}
+        </td>
+        <td>
+            {% comment %}
+            TODO: THIS IS SUPER INEFFICIENT AND USES NUMEROUS DATABASE CALLS BUT WORKS.
+            PROFILE AND FIX IN THE FUTURE.
+            {% endcomment %}
+            {{ item|user_roles_for_group:member|join:", " }}
+        </td>
+        <td>
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-cog"></i>
+                <span class="sr-only">Manage permissions for {{ member }}</span>
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu pull-right">
+                <li>
+                    <a href="{% url 'aristotle:workgroup_member_change_role' item.id  member.pk %}"
+                        data-toggle="modal" data-target="#wg_page_modal">Change roles</a>
+                </li>
+                <li role="separator" class="divider"></li>
+                <li class="alert-danger">
+                    <a href="{% url 'aristotle:workgroup_member_remove' item.id  member.pk %}"
+                    data-toggle="modal" data-target="#wg_page_modal">Remove from this group</a>
+                </li>
+              </ul>
+            </div>
+        </td>
+        </tr>
+        {% empty %}
+        <tr>
+        <td>No members</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<header>About workgroup roles:</header>
+
+<p>
+    Above is a list of members in this workgroup, every person listed on this page can view content in
+    this workgroup. Additional permissions are listed with each group.
+    Permissions only apply to specific workgroup, so a user may be a manager in one group but
+    an editor in another.<br>
+    All members of a workgroup can participate in workgroup conversations.
+    <br>
+    <strong>Note: permissions are non-hierarchical, so to get all permissions a member may need
+        to be in multiple groups.
+    </strong>
+</p>
+
+<p>
+<dl>
+<dt>Managers</dt>
+<dd>
+Workgroup managers can add and remove users from a workgroup, delete workgroup
+conversations and retire a workgroup. They can also create metadata and edit metadata
+<em>that has been not progressed to a locked state</em>.
+</dd>
+<dt>Stewards</dt>
+<dd>
+Stewards are trusted editors that can create and edit content that has been
+progressed to a locked state {#, but cannot edit content that is public . They also have the permissions of submitters #}.</p>
+</dd>
+<dt>Submitters</dt>
+<dd>
+Submitters can edit content that has not been progressed by a registrar to a locked state.
+They can view all content in a workgroup and can set the flag that an item is ready for review by a registrar.
+</p>
+</dd>
+<dt>Viewers</dt>
+<dd>
+Viewers are only able to view content in a workgroup. They may also participate in workgroup conversations.
+</p>
+</dd>
+</dl>
+</p>
+
+{% bootstrap_modal "wg_page_modal" %}
+
+{% endblock %}

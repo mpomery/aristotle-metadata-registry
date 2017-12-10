@@ -1,0 +1,56 @@
+{% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
+
+{% block extra_head_scripts %}
+    {{ form.media }}
+{% endblock %}
+
+{% block title %}Add members to {{ item.name }}{% endblock %}
+{% block content %}
+<form method="post" action="{% url 'aristotle:registrationauthority_add_user' item.id %}">
+{% csrf_token %}
+{% if not request.is_ajax %}
+<h1>
+Add a new user to
+<a href="{% url 'aristotle:registrationauthority_details' item.id %}">{{item.name}}</a>
+</h1>
+{% endif %}
+<div class="modal-body">
+    <p class="modal-help">
+    Select a user, then select the roles you roles you which to grant them.
+    <br>
+    You <em>must</em> select at least one role, and can select multiple.
+    <br>
+    A <strong>manager</strong> has the ability to edit all details of this Registration Authority
+    <br>
+    A <strong>registrar</strong> has the ability to endorse metadata, and can respond to review requests.
+    </p>
+    <section>
+
+    <div>
+        <div>
+            {{ form.user.label }}
+            {{ form.user }}
+            {{ form.user.errors }}
+        </div>
+        <div>
+            {{ form.roles.label }}{{ form.roles }}
+            {{ form.roles.errors }}
+        </div>
+    </div>
+
+
+    {% block save %}
+    {% endblock %}
+
+    </section>
+    </div>
+    <div class="modal-footer">
+        {% if request.is_ajax %}
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        {% else %}
+            <a class="btn btn-default" href="{% url 'aristotle:registrationauthority_details' item.id %}">Cancel</a>
+        {% endif %}
+            <input type="submit" class="btn btn-primary" value="Add member" />
+    </div>
+</form>
+{% endblock %}

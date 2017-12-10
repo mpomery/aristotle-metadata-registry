@@ -1,6 +1,9 @@
 # Lets run on the new infrastructure
 sudo: false
 
+# We're having issues on the default Trusty setup, lets wait for now
+dist: precise
+
 language: python
 python:
   - "3.5"
@@ -14,13 +17,22 @@ defaults:
     before_script:
     # Make a MariaDB database
     # Fix wierdness with MariaDB on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0  
-      - if [[ $DB == mariadb ]]; then mysql -e 'create database aristotle_test_db;' -u root ; fi
-      - if [[ $DB == mariadb ]]; then mysql -e 'SET GLOBAL wait_timeout = 36000;' ; fi
-      - if [[ $DB == mariadb ]]; then mysql -e 'SET GLOBAL max_allowed_packet = 134209536;' ; fi
+      - if [[ $DB == mariadb ]]; then ./aristotle_mdr/tests/bin/prep_mysql.sh ; fi
       - if [[ $SEARCH == elasticsearch ]]; then sleep 10; fi
     # Make a posgres database
-      - if [[ $DB == postgres ]]; then psql -c 'create database aristotle_test_db;' -U postgres; fi
-    script: tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
+      - if [[ $DB == postgres* ]]; then ./aristotle_mdr/tests/bin/prep_psql.sh; fi
+
+    script:
+      - |
+        case "$DB" in
+          mariadb) export DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db;;
+         postgres) export DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db;;
+           sqlite) export DATABASE_URL=sqlite:///./db.db;;
+                *) export DATABASE_URL=sqlite:///./db.db;;
+        esac
+        echo "Running script with DATABASE_URL="$DATABASE_URL
+        echo "Running script with DB="$DB
+        tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
     services:
       - postgresql
       - redis-server
@@ -36,6 +48,15 @@ defaults:
         repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
       mariadb: '10.1'
 
+  - &main_test_script_py35
+      python: 3.5
+      <<: *main_test_script_py35
+
+  - &test_accessibility_py35
+    stage: accessibility
+    python: 3.5
+    script: tox -e ally-$ALLY --skip-missing-interpreters
+
 jobs:
 
   include:
@@ -48,38 +69,39 @@ jobs:
 
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=sqlite  SEARCH=elastic
-      <<: *main_test_script
+      <<: *main_test_script_py35
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic
-      <<: *main_test_script
+      <<: *main_test_script_py35
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh
-      <<: *main_test_script
+      <<: *main_test_script_py35
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=whoosh
-      <<: *main_test_script
+      <<: *main_test_script_py35
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=whoosh
-      <<: *main_test_script
+      <<: *main_test_script_py35
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic
-      <<: *main_test_script
+      <<: *main_test_script_py35
     
       # Possible failures:
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-      <<: *main_test_script
+      <<: *main_test_script_py35
     - stage: testing
       env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-      <<: *main_test_script
+      <<: *main_test_script_py35
 
 
-    - stage: accessibility
-      script: tox -e ally-metadata_item --skip-missing-interpreters
-    - stage: accessibility
-      script: tox -e ally-metadata_action --skip-missing-interpreters
-    - stage: accessibility
-      script: tox -e ally-static --skip-missing-interpreters
+  # Test Accessibility
+    - <<: *test_accessibility_py35
+      env: ALLY=metadata_item
+    - <<: *test_accessibility_py35
+      env: ALLY=metadata_action
+    - <<: *test_accessibility_py35
+      env: ALLY=static
 
 
   allow_failures:

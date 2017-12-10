@@ -67,7 +67,7 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="advSearch">
                 <ul class="nav navbar-nav">
-                    <li class="dropdown dropdown-menu-form">
+                    <li class="dropdown dropdown-menu-form" data-help-name='item type'>
                         <a href="#" class="dropdown-toggle"
                         data-toggle="dropdown">
                             <i class="fa fa-puzzle-piece fa-fw"></i>
@@ -75,7 +75,7 @@
                         </a>
                         {{ form.models }}
                     </li>
-                    <li class="dropdown dropdown-menu-form">
+                    <li class="dropdown dropdown-menu-form" data-help-name='status'>
                         <a href="#" class="dropdown-toggle"
                         data-toggle="dropdown">
                             <i class="fa fa-unlock-alt fa-fw"></i>
@@ -83,7 +83,7 @@
                         </a>
                         {{ form.state }}
                     </li>
-                    <li class="dropdown dropdown-menu-form">
+                    <li class="dropdown dropdown-menu-form" data-help-name='authority'>
                         <a href="#" class="dropdown-toggle"
                         data-toggle="dropdown">
                             <i class="fa fa-university fa-fw"></i>
@@ -91,7 +91,7 @@
                         </a>
                         {{ form.ra }}
                     </li>
-                    <li class="dropdown dropdown-menu-date">
+                    <li class="dropdown dropdown-menu-date" data-help-name='modified'>
                         <a href="#" class="dropdown-toggle"
                         data-toggle="dropdown">
                             <i class="fa fa-calendar fa-fw"></i>
@@ -111,7 +111,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="dropdown dropdown-menu-date">
+                    <li class="dropdown dropdown-menu-date" data-help-name='created'>
                         <a href="#" class="dropdown-toggle"
                         data-toggle="dropdown">
                             <i class="fa fa-calendar fa-fw"></i>
@@ -131,7 +131,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li class='pull-right'>
+                    <li class='pull-right' data-help-name='sort-order'>
                         <div class="btn-group pull-right">
                             <div class="btn-group sort-order-box">
                                 <button type="button" class="btn btn-default dropdown-toggle "
@@ -434,6 +434,6 @@
         </p>
         </div>
     {% endif %}
-
+</div>
 {% bootstrap_modal 'search_concept_help' %}
 {% endblock %}

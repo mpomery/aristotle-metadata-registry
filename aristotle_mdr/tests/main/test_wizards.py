@@ -181,6 +181,56 @@ class ValueDomainWizardPage(ConceptWizardPage,TestCase):
 #class DataElementWizardPage(ConceptWizardPage,TestCase):
 #    model=models.DataElement
 
+
+class DataElementDerivationWizardPage(ConceptWizardPage,TestCase):
+    model=models.DataElementDerivation
+
+    def derivation_m2m_concepts_save_during_create(self):
+        self.de1 = models.DataElement.objects.create(name='DE1 - visible',definition="my definition",workgroup=self.wg1)
+        self.de2 = models.DataElement.objects.create(name='DE2 - not visible',definition="my definition",workgroup=self.wg2)
+        self.login_editor()
+        
+        item_name = "My New DED Test Item"
+
+        step_1_data = {
+            self.wizard_form_name+'-current_step': 'initial',
+            'initial-name':item_name,
+        }
+        response = self.client.post(self.wizard_url, step_1_data)
+        wizard = response.context['wizard']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(wizard['steps'].current, 'results')
+
+        step_2_data = {
+            self.wizard_form_name+'-current_step': 'results',
+            'initial-name':item_name,
+            'results-name':item_name,
+            'results-definition':"Test Definition",
+            'results-inputs': [self.de1.pk, self.de2.pk],
+            'results-derives': [self.de1.pk]
+        }
+
+        response = self.client.post(self.wizard_url, step_2_data)
+        self.assertEqual(response.status_code, 200)
+        wizard = response.context['wizard']
+        self.assertTrue('inputs' in wizard['form'].errors.keys())
+
+        # must submit a definition at this step. With the right workgroup
+        step_2_data.update({
+            'results-inputs': [self.de1.pk]
+        })
+        response = self.client.post(self.wizard_url, step_2_data)
+        self.assertEqual(response.status_code, 302)
+
+        self.assertTrue(self.model.objects.filter(name=item_name).exists())
+        self.assertEqual(self.model.objects.filter(name=item_name).count(),1)
+        item = self.model.objects.filter(name=item_name).first()
+        self.assertRedirects(response,url_slugify_concept(item))
+        self.assertTrue(self.de1 in item.inputs.all())
+        self.assertTrue(self.de2 not in item.inputs.all())
+        self.assertTrue(self.de1 in item.derives.all())
+
+
 class DataElementConceptWizardPage(ConceptWizardPage,TestCase):
     wizard_url_name="createDataElementConcept"
     wizard_form_name="data_element_concept_wizard"

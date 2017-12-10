@@ -20,6 +20,9 @@ from aristotle_mdr.perms import (
 )
 from aristotle_mdr.forms.creation_wizards import UserAwareForm
 from aristotle_mdr.contrib.autocomplete import widgets
+from aristotle_mdr.utils import fetch_aristotle_settings, fetch_aristotle_downloaders
+
+from .utils import RegistrationAuthorityMixin
 
 
 class ForbiddenAllowedModelMultipleChoiceField(forms.ModelMultipleChoiceField):
@@ -121,16 +124,14 @@ class BulkActionForm(UserAwareForm):
     def items_to_change(self):
         if bool(self.cleaned_data.get('all_in_queryset', False)):
             filters = {}
-            for v in self.cleaned_data.get('qs', "").split(','):
-                if 'user' in v:
-                    # if the queryset even contains a user, cut it right off
-                    # otherwise, it could leak data if people tried to alter the query value
-                    k = v.split('user', 1)[0] + 'user'
-                    v = self.user
-                else:
-                    k, v = v.split('=', 1)
-                filters.update({k: v})
-            items = self.queryset.filter(**filters).visible(self.user)
+            from aristotle_mdr.utils.cached_querysets import get_queryset_from_uuid
+            items = get_queryset_from_uuid(self.cleaned_data.get('qs', ""), MDR._concept)
+
+            _slice = {"low": items.query.low_mark, "high": items.query.high_mark}
+            items.query.low_mark = 0
+            items.query.high_mark = None
+            items = items.filter(**filters).visible(self.user)
+            items.query.set_limits(**_slice)
         else:
             items = self.cleaned_data.get('items')
         return items
@@ -186,7 +187,7 @@ class RemoveFavouriteForm(LoggedInBulkActionForm):
         return _('%(num_items)s items removed from favourites') % {'num_items': len(items)}
 
 
-class ChangeStateForm(ChangeStatusForm, BulkActionForm):
+class ChangeStateForm(ChangeStatusForm, BulkActionForm, RegistrationAuthorityMixin):
     confirm_page = "aristotle_mdr/actions/bulk_actions/change_status.html"
     classes="fa-university"
     action_text = _('Change registration status')
@@ -194,7 +195,7 @@ class ChangeStateForm(ChangeStatusForm, BulkActionForm):
 
     def __init__(self, *args, **kwargs):
         super(ChangeStateForm, self).__init__(*args, **kwargs)
-        self.add_registration_authority_field()
+        # self.set_registration_authority_field()
 
     def make_changes(self):
         import reversion
@@ -234,14 +235,22 @@ class ChangeStateForm(ChangeStatusForm, BulkActionForm):
             failed = list(set(failed))
             success = list(set(success))
             bad_items = sorted([str(i.id) for i in failed])
-            message = _(
-                "%(num_items)s items registered in %(num_ra)s registration authorities. \n"
-                "Some items failed, they had the id's: %(bad_ids)s"
-            ) % {
-                'num_items': len(items),
-                'num_ra': len(ras),
-                'bad_ids': ",".join(bad_items)
-            }
+            if not bad_items:
+                message = _(
+                    "%(num_items)s items registered in %(num_ra)s registration authorities'. \n"
+                ) % {
+                    'num_ra': len(ras),
+                    'num_items': len(success),
+                }
+            else:
+                message = _(
+                    "%(num_items)s items registered in %(num_ra)s registration authorities. \n"
+                    "Some items failed, they had the id's: %(bad_ids)s"
+                ) % {
+                    'num_items': len(items),
+                    'num_ra': len(ras),
+                    'bad_ids': ",".join(bad_items)
+                }
             reversion.revisions.set_comment(changeDetails + "\n\n" + message)
             return message
 
@@ -357,10 +366,14 @@ class ChangeWorkgroupForm(BulkActionForm):
         with transaction.atomic(), reversion.revisions.create_revision():
             reversion.revisions.set_user(self.user)
             for item in items:
-                can_move = move_from_checks.get(item.workgroup.pk, None)
-                if can_move is None:
-                    can_move = user_can_remove_from_workgroup(self.user, item.workgroup)
-                    move_from_checks[item.workgroup.pk] = can_move
+                if item.workgroup:
+                    can_move = move_from_checks.get(item.workgroup.pk, None)
+                    if can_move is None:
+                        can_move = user_can_remove_from_workgroup(self.user, item.workgroup)
+                        move_from_checks[item.workgroup.pk] = can_move
+                else:
+                    # There is no workgroup, the user can move their own item
+                    can_move = True
 
                 if not can_move:
                     failed.append(item)
@@ -423,9 +436,19 @@ class BulkDownloadForm(DownloadActionForm):
         # widget=forms.Textarea
     )
     download_type = forms.ChoiceField(
-        choices=[(setting[0], setting[1]) for setting in getattr(settings, 'ARISTOTLE_DOWNLOADS', [])],
+        choices=[],
         widget=forms.RadioSelect
     )
+
+    def __init__(self, *args, **kwargs):
+        super(BulkDownloadForm, self).__init__(*args, **kwargs)
+        self.fields['download_type'] = forms.ChoiceField(
+            choices=[
+                (d_type.download_type, d_type.label)
+                for d_type in fetch_aristotle_downloaders()
+            ],
+            widget=forms.RadioSelect
+        )
 
     def make_changes(self):
         self.download_type = self.cleaned_data['download_type']

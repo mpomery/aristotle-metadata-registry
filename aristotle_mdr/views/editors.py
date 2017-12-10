@@ -18,7 +18,10 @@ from django.utils.decorators import method_decorator
 import reversion
 
 from aristotle_mdr.perms import user_can_view, user_can_edit, user_can_change_status
-from aristotle_mdr.utils import cache_per_item_user, concept_to_clone_dict, concept_to_dict, construct_change_message, url_slugify_concept
+from aristotle_mdr.utils import (
+    cache_per_item_user, concept_to_clone_dict, concept_to_dict,
+    construct_change_message, url_slugify_concept, is_active_module
+)
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 
@@ -64,8 +67,8 @@ class EditItemView(PermissionFormView):
 
     def __init__(self, *args, **kwargs):
         super(EditItemView, self).__init__(*args, **kwargs)
-        self.slots_active = 'aristotle_mdr.contrib.slots' in settings.INSTALLED_APPS
-        self.identifiers_active = 'aristotle_mdr.contrib.identifiers' in settings.INSTALLED_APPS
+        self.slots_active = is_active_module('aristotle_mdr.contrib.slots')
+        self.identifiers_active = is_active_module('aristotle_mdr.contrib.identifiers')
 
     def get_form_class(self):
         return MDRForms.wizards.subclassed_edit_modelform(self.model)
@@ -175,6 +178,19 @@ class CloneItemView(PermissionFormView):
         self.item = self.item_to_clone
         return super(CloneItemView, self).dispatch(request, *args, **kwargs)
 
+    def dispatch(self, request, *args, **kwargs):
+        self.item_to_clone = get_object_or_404(
+            MDR._concept, pk=self.kwargs['iid']
+        ).item
+        self.item = self.item_to_clone
+        self.model = self.item.__class__
+        if not user_can_view(self.request.user, self.item):
+            if request.user.is_anonymous():
+                return redirect(reverse('friendly_login') + '?next=%s' % request.path)
+            else:
+                raise PermissionDenied
+        return super(PermissionFormView, self).dispatch(request, *args, **kwargs)
+
     def get_form_class(self):
         return MDRForms.wizards.subclassed_clone_modelform(self.model)
 
@@ -190,7 +206,9 @@ class CloneItemView(PermissionFormView):
 
         if form.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
-                new_clone = form.save()
+                new_clone = form.save(commit=False)
+                new_clone.submitter = self.request.user
+                new_clone.save()
                 reversion.revisions.set_user(self.request.user)
                 reversion.revisions.set_comment("Cloned from %s (id: %s)" % (self.item_to_clone.name, str(self.item_to_clone.pk)))
                 return HttpResponseRedirect(url_slugify_concept(new_clone))

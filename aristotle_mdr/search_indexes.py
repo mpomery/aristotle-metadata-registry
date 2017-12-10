@@ -3,7 +3,7 @@ import haystack.indexes as indexes
 
 import aristotle_mdr.models as models
 from django.db.models import Q
-from django.template import TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, loader
 from django.utils import timezone
 
 import logging
@@ -29,11 +29,9 @@ class ConceptFallbackCharField(indexes.CharField):
         try:
             return super(ConceptFallbackCharField, self).prepare_template(obj)
         except TemplateDoesNotExist:
-
             logger.debug("No search template found for %s, using untyped fallback." % obj)
-
-            self.template_name = "search/indexes/aristotle_mdr/untyped_concept_text.txt"
-            return super(ConceptFallbackCharField, self).prepare_template(obj)
+            t = loader.select_template(["search/indexes/aristotle_mdr/untyped_concept_text.txt"])
+            return t.render({'object': obj})
 
 
 class baseObjectIndex(indexes.SearchIndex):
@@ -41,7 +39,14 @@ class baseObjectIndex(indexes.SearchIndex):
     modified = indexes.DateTimeField(model_attr='modified')
     created = indexes.DateTimeField(model_attr='created')
     name = indexes.CharField(model_attr='name', boost=1)
+    django_ct_app_label = indexes.CharField()
+    # django_ct_model_name = indexes.CharField()
     # access = indexes.MultiValueField()
+
+    def prepare_django_ct_app_label(self, obj):
+        return obj._meta.app_label
+    # def prepare_django_ct_model_name(self, obj):
+    #     return obj.is_public()
 
     def get_model(self):
         raise NotImplementedError  # pragma: no cover -- This should always be overridden

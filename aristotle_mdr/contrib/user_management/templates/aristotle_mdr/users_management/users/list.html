@@ -1,0 +1,102 @@
+{% extends "aristotle_mdr/user/userHome.html" %}
+
+{% block title %}Current members{% endblock %}
+{% block collapse-link%}<i class="fa fa-user fa-fw"></i> Current members</a>{% endblock %}
+{% block sidebar %}
+    {% include "aristotle_mdr/user/userSideBar.html" with activeTab='adminTools' %}
+{% endblock %}
+
+{% block page %}
+    <h1>Current members of this Registry</h1>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+      <div class="row">
+
+  <div class="col-md-4 col-xs-8">
+    <form>
+    <div class="input-group">
+      <input name="q" type="text" value="{{request.GET.q}}" class="form-control">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="submit">Search</button>
+      </span>
+    </div><!-- /input-group -->
+    </form>
+  </div><!-- /.col-lg-6 -->
+
+    <div class="col-md-1 col-md-offset-7 col-xs-4">
+      <a class="btn btn-success pull-right" href="{% url 'aristotle-user:registry_invitations_create' %}">
+        <i class="fa fa-user-plus"></i> Invite member
+      </a>
+    </div>
+  </div>
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+        <th>User</th>
+        <th>Active</th>
+        <th>Teams</th>
+        <th>Role</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for user in object_list %}
+    <tr>
+        <td>
+          {% include "aristotle_mdr/users_management/helper/user_table_display.html" with user=user %}
+        </td>
+        <td>{{user.is_active}}</td>
+        {% with count=user.profile.workgroups.count %}
+        <td><small>{{count}} team{{ count|pluralize }}</small></td>
+        {% endwith %}
+        <td>
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Manage <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu pull-right">
+            {% comment %}
+            <li><a href="#">View profile</a></li>
+            {% endcomment %}
+            <!-- li><a href="#">Change role</a></li -->
+            <li role="separator" class="divider"></li>
+            {% if user.is_active %}
+            <li class="alert-danger">
+                <a href="{% url 'aristotle-user:deactivate_user' user.pk %}">Deactivate this user</a>
+            </li>
+            {% else %}
+            <li class="alert-warning">
+                <a href="{% url 'aristotle-user:reactivate_user' user.pk %}">Reactivate user account</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+        </td>
+    </tr>
+{% endfor %}
+  </tbody>
+</table>
+</div>
+
+
+<header>About active and inactive users</header>
+<p>
+  To ensure users actions are retained for auditing purposes, user accounts are never
+  deleted from the registry. Instead their active status can be altered to either allow
+  or prevent them from authenticating against the system.
+  <br>
+  In this registry the following definitions and restrictions apply
+  <dl>
+    <dt>Active</dt>
+    <dd>An active user is able to log into the system, they can be added to workgroups, recieve notifications and create metadata.</dd>
+    <dt>Inactive</dt>
+    <dd>An inactive user is prevented from logging into the system,
+      and will not be able to interact with the system in a way that requires an account.
+      
+      They will be able to interact with the system like an unauthenticated user who can see the registry.
+    </dd>
+  </dl>
+</p>
+{% endblock %}
