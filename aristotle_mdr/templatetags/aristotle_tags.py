@@ -14,15 +14,16 @@ Available tags and filters
 --------------------------
 """
 from django import template
-from django.conf import settings
-from django.core.urlresolvers import reverse, resolve
-from django.template.defaultfilters import slugify
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import mark_safe
 
 from aristotle_mdr import perms
 import aristotle_mdr.models as MDR
-from aristotle_mdr.utils import fetch_metadata_apps, fetch_aristotle_settings, fetch_aristotle_downloaders
+from aristotle_mdr.utils import (
+    fetch_metadata_apps,
+    fetch_aristotle_downloaders
+)
 
 register = template.Library()
 
@@ -276,15 +277,12 @@ def downloadMenu(item):
     downloadOpts = fetch_aristotle_downloaders()
 
     from aristotle_mdr.utils import get_download_template_path_for_item
-    from aristotle_mdr.utils.downloads import get_download_module
 
     downloadsForItem = []
     app_label = item._meta.app_label
     model_name = item._meta.model_name
     for d in downloadOpts:
         download_type = d.download_type
-        # module_name = d[3]
-        # downloader = get_download_module(module_name)
         item_register = d.metadata_register
 
         if type(item_register) is not str:
@@ -302,6 +300,7 @@ def downloadMenu(item):
                 except template.TemplateDoesNotExist:
                     pass  # This is ok.
                 except:
+                    # TODO: Should probably do something with this error
                     pass  # Something very bad has happened in the template.
     return get_template(
         "aristotle_mdr/helpers/downloadMenu.html").render(
@@ -344,7 +343,6 @@ def doc(item, field=None):
     If 2, returns the help_text for the field on the given model in the specified app.
     """
 
-    from django.contrib.contenttypes.models import ContentType
     from aristotle_mdr.utils.doc_parse import parse_rst, parse_docstring
 
     ct = item

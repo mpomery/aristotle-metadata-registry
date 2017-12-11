@@ -100,6 +100,8 @@ def time_delta(delta):  # pragma: no cover
         t = datetime.date.today()
         return datetime.date(day=1, month=t.month, year=(t.year - 1))
     return None
+
+
 DELTA = {
     QUICK_DATES.hour: datetime.timedelta(hours=1),
     QUICK_DATES.today: datetime.timedelta(days=1),
@@ -265,6 +267,7 @@ class TokenSearchForm(FacetedSearchForm):
 
     def no_query_found(self):
         return EmptyPermissionSearchQuerySet()
+
 
 datePickerOptions = {
     "format": "YYYY-MM-DD",

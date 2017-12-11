@@ -12,11 +12,8 @@ Include the aristotle search template tags in every template that uses them, lik
 
 """
 from django import template
-from django.core.urlresolvers import reverse, resolve
-from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 
-from aristotle_mdr import perms
 import aristotle_mdr.models as MDR
 import logging
 

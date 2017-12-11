@@ -129,7 +129,7 @@ class EditItemView(PermissionFormView):
 
     def get_identifier_formset(self):
         from aristotle_mdr.contrib.identifiers.models import ScopedIdentifier
-        from django.forms.models import inlineformset_factory
+
         return inlineformset_factory(
             MDR._concept, ScopedIdentifier,
             can_delete=True,
@@ -172,24 +172,9 @@ class CloneItemView(PermissionFormView):
     template_name = "aristotle_mdr/create/clone_item.html"
 
     def dispatch(self, request, *args, **kwargs):
-        self.item_to_clone = get_object_or_404(
-            MDR._concept, pk=self.kwargs['iid']
-        ).item
-        self.item = self.item_to_clone
-        return super(CloneItemView, self).dispatch(request, *args, **kwargs)
-
-    def dispatch(self, request, *args, **kwargs):
-        self.item_to_clone = get_object_or_404(
-            MDR._concept, pk=self.kwargs['iid']
-        ).item
-        self.item = self.item_to_clone
-        self.model = self.item.__class__
-        if not user_can_view(self.request.user, self.item):
-            if request.user.is_anonymous():
-                return redirect(reverse('friendly_login') + '?next=%s' % request.path)
-            else:
-                raise PermissionDenied
-        return super(PermissionFormView, self).dispatch(request, *args, **kwargs)
+        dispatch = super().dispatch(request, *args, **kwargs)
+        self.item_to_clone = self.item
+        return dispatch
 
     def get_form_class(self):
         return MDRForms.wizards.subclassed_clone_modelform(self.model)

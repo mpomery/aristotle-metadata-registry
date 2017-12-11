@@ -253,6 +253,8 @@ class DeleteComment(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, Comm
     redirect_unauthenticated_users = True
 
     def get_success_url(self):
+        # TODO: How does this work, is it even tested?
+        from django.utils.functional import lazy
         success_url = lazy(reverse, self)('aristotle:discussionsPost', args=self.kwargs['cid'])
         return success_url
 

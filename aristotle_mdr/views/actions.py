@@ -1,26 +1,20 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied, ImproperlyConfigured
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render, redirect, get_object_or_404
-from django.template import TemplateDoesNotExist
-from django.template.defaultfilters import slugify
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, DetailView
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
-import datetime
 import json
 
 import reversion
 
 from aristotle_mdr import perms
-from aristotle_mdr.utils import cache_per_item_user, concept_to_dict, construct_change_message, url_slugify_concept
-from aristotle_mdr import forms as MDRForms
-from aristotle_mdr import exceptions as registry_exceptions
 from aristotle_mdr import models as MDR
 from aristotle_mdr.forms import actions
 from aristotle_mdr.views.utils import generate_visibility_matrix

@@ -948,6 +948,8 @@ class Status(TimeStampedModel):
 
 def recache_concept_states(sender, instance, *args, **kwargs):
     instance.concept.recache_states()
+
+
 post_save.connect(recache_concept_states, sender=Status)
 post_delete.connect(recache_concept_states, sender=Status)
 
@@ -1411,6 +1413,8 @@ class PossumProfile(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         profile, created = PossumProfile.objects.get_or_create(user=instance)
+
+
 post_save.connect(create_user_profile, sender=settings.AUTH_USER_MODEL)
 
 

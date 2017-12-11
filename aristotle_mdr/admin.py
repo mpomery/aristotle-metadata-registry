@@ -263,6 +263,7 @@ class RegistrationAuthorityAdmin(admin.ModelAdmin):
             {'fields': ['notprogressed', 'incomplete', 'candidate', 'recorded', 'qualified', 'standard', 'preferred', 'superseded', 'retired']}),
     ]
 
+
 admin.site.register(MDR.Organization, OrganizationAdmin)
 admin.site.register(MDR.RegistrationAuthority, RegistrationAuthorityAdmin)
 admin.site.register(MDR.Workgroup, WorkgroupAdmin)

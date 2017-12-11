@@ -39,5 +39,3 @@ class RegistrationAuthoritySelect(forms.Select):
             return mark_safe(rendered + hidden_input_with_value)
         else:
             return super().render(name, value, **kwargs)
-
-    

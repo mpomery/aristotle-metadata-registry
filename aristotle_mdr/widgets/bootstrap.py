@@ -74,7 +74,7 @@ class BootstrapDateTimePicker(DateTimeInput):
         self.div_attrs = div_attrs and div_attrs.copy() or {}
         self.icon_attrs = icon_attrs and icon_attrs.copy() or {}
         self.picker_id = self.div_attrs.get('id') or None
-        if options == False:  # datetimepicker will not be initalized when options is False
+        if options is False:  # datetimepicker will not be initalized when options is False
             self.options = False
         else:
             self.options = options and options.copy() or {}
@@ -106,8 +106,7 @@ class BootstrapDateTimePicker(DateTimeInput):
             input_attrs['value'] = force_text(self._format_value(value))
 
         if not self.picker_id:
-             self.picker_id = (input_attrs.get('id', '') +
-                               '_pickers').replace(' ', '_')
+            self.picker_id = (input_attrs.get('id', '') + '_pickers').replace(' ', '_')
         self.div_attrs['id'] = self.picker_id
 
         context['div_attrs'] = flatatt({key: conditional_escape(val) for key, val in self.div_attrs.items()})

@@ -95,4 +95,5 @@ class LinkEnd(TimeStampedModel):  # 9.1.2.7
                 _('A link ends role relation must be from the set of roles on the links relation')
             )
 
+
 pre_save.connect(pre_save_clean, sender=LinkEnd)

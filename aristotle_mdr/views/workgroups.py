@@ -1,20 +1,18 @@
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.auth import get_user_model
-from django.core.exceptions import PermissionDenied
+# from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
 from django.template.defaultfilters import slugify
 from django.views.generic import (
-    CreateView, DetailView, FormView, ListView, RedirectView, UpdateView
+    CreateView, DetailView, ListView, UpdateView
 )
 
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
-from aristotle_mdr.perms import user_in_workgroup, user_is_workgroup_manager
+from aristotle_mdr.perms import user_is_workgroup_manager
 from aristotle_mdr.views.utils import (
-    paginated_list,
     paginate_sort_opts,
     paginated_workgroup_list,
     workgroup_item_statuses,
