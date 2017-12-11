@@ -1,5 +1,5 @@
 from django import template
-from django.core.urlresolvers import reverse, resolve
+from django.urls import reverse, resolve
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 

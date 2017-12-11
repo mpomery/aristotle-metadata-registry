@@ -1,5 +1,5 @@
 from dal.autocomplete import ModelSelect2Multiple, ModelSelect2
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 
 
 class ConceptAutocompleteBase(object):
