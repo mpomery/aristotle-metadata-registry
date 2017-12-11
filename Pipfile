@@ -1,0 +1,51 @@
+[[source]]
+
+verify_ssl = true
+name = "pypi"
+url = "https://pypi.python.org/simple"
+
+
+[packages]
+
+django = ">1.11,<2.0"
+pytz = "*"
+pyyaml = "*"
+lesscpy = "*"
+django-haystack = ">=2.6.0,<2.7.0"
+django-ckeditor = ">=5.3.0"
+pillow = "*"
+django-reversion = ">=2.0,<2.1"
+django-reversion-compare = "~=0.8"
+diff-match-patch = "*"
+django-static-precompiler = "*"
+django-autocomplete-light = ">=3.0.0"
+"django-bootstrap3" = "*"
+django-formtools = ">=2.0"
+django-autoslug = "*"
+channels = "*"
+asgi-redis = "*"
+dill = "*"
+django-organizations = "*"
+django-model-utils = "==3.0.0"
+django-notifications-hq = ">=1.0"
+django-braces = "*"
+docutils = "*"
+django-haystack-channels = "==0.0.1b"
+
+
+[dev-packages]
+coverage = "*"
+whoosh = "*"
+python-decouple = "*"
+dj-database-url = "*"
+
+
+[requires]
+
+python_version = "3.4"
+
+
+[[source]]
+
+verify_ssl = true
+url = "https://pypi.python.org/simple/"

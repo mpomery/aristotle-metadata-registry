@@ -13,10 +13,8 @@ from haystack.constants import DEFAULT_ALIAS
 from haystack.forms import SearchForm, FacetedSearchForm
 from haystack.query import EmptySearchQuerySet, SearchQuerySet, SQ
 
-from bootstrap3_datetime.widgets import DateTimePicker
-
 import aristotle_mdr.models as MDR
-from aristotle_mdr.widgets import (
+from aristotle_mdr.widgets.bootstrap import (
     BootstrapDropdownSelectMultiple,
     BootstrapDropdownIntelligentDate,
     BootstrapDropdownSelect,

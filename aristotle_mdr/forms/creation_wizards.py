@@ -11,8 +11,7 @@ from aristotle_mdr.perms import user_can_move_between_workgroups, user_can_move_
 from aristotle_mdr.contrib.autocomplete import widgets
 
 from dal import autocomplete
-from bootstrap3_datetime.widgets import DateTimePicker
-from aristotle_mdr.widgets import BootstrapDateTimePicker
+from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 
 
 class UserAwareForm(forms.Form):

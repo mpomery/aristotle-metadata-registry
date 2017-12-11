@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 
 import aristotle_mdr.models as MDR
-import aristotle_mdr.widgets as widgets
+import aristotle_mdr.widgets.widgets as widgets
 from aristotle_mdr.contrib.autocomplete.widgets import ConceptAutocompleteSelectMultiple
 from aristotle_mdr.perms import user_can_edit
 from aristotle_mdr.utils import concept_to_clone_dict
