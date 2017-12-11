@@ -1,6 +1,6 @@
 from django import template
 from django.conf import settings
-from django.core.urlresolvers import reverse, resolve
+from django.urls import reverse, resolve
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import mark_safe

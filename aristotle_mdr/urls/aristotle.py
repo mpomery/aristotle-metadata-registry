@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 
 from haystack.views import search_view_factory
 

@@ -1,6 +1,6 @@
 from django import template
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse, resolve
+from django.urls import reverse, resolve, reverse_lazy
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 
@@ -48,7 +48,6 @@ def make_relink(text, app_label=None):
     )
 
     def make_concept_link(match):
-        from django.core.urlresolvers import reverse_lazy
         app = app_label
         try:
             flags = match.group(2) or ""
