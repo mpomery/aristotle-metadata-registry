@@ -34,11 +34,13 @@ django-haystack-channels = "==0.0.1b"
 
 
 [dev-packages]
+
 coverage = "*"
 whoosh = "*"
 python-decouple = "*"
 dj-database-url = "*"
-flake8 = "*"
+"flake8" = "*"
+
 
 [requires]
 

@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from bootstrap3_datetime.widgets import DateTimePicker
+from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 
 import aristotle_mdr.models as MDR
 from aristotle_mdr.perms import user_can_edit, user_can_view
@@ -97,7 +97,7 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
     registrationDate = forms.DateField(
         required=False,
         label=_("Registration date"),
-        widget=DateTimePicker(options={"format": "YYYY-MM-DD"}),
+        widget=BootstrapDateTimePicker(options={"format": "YYYY-MM-DD"}),
         initial=timezone.now()
     )
     cascadeRegistration = forms.ChoiceField(

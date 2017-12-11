@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from bootstrap3_datetime.widgets import DateTimePicker
+from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 
 import aristotle_mdr.models as MDR
 from aristotle_mdr.forms import ChangeStatusForm
@@ -272,7 +272,7 @@ class RequestReviewForm(LoggedInBulkActionForm):
     registration_date = forms.DateField(
         required=False,
         label=_("Registration date"),
-        widget=DateTimePicker(options={"format": "YYYY-MM-DD"}),
+        widget=BootstrapDateTimePicker(options={"format": "YYYY-MM-DD"}),
         initial=timezone.now()
     )
     state = forms.ChoiceField(choices=MDR.STATES, widget=forms.RadioSelect)
