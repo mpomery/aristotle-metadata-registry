@@ -10,7 +10,6 @@ from django.db.models.signals import pre_save
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import python_2_unicode_compatible  # Python 2
 
 from model_utils.models import TimeStampedModel
 
@@ -32,7 +31,6 @@ class Relation(MDR.concept):  # 9.1.2.4
     ]
 
 
-@python_2_unicode_compatible  # Python 2
 class RelationRole(MDR.aristotleComponent):  # 9.1.2.5
     name = models.TextField(
         help_text=_("The primary name used for human identification purposes.")

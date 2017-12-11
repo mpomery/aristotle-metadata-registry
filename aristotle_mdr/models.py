@@ -1,7 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
@@ -18,8 +14,6 @@ from model_utils.models import TimeStampedModel
 from model_utils import Choices, FieldTracker
 from aristotle_mdr.contrib.channels.utils import fire
 import uuid
-
-from django.utils.encoding import python_2_unicode_compatible  # Python 2
 
 import reversion  # import revisions
 
@@ -75,7 +69,6 @@ VERY_RECENTLY_SECONDS = 15
 concept_visibility_updated = Signal(providing_args=["concept"])
 
 
-@python_2_unicode_compatible  # Python 2
 class baseAristotleObject(TimeStampedModel):
     uuid = models.UUIDField(
         help_text=_("Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries"),
@@ -855,7 +848,6 @@ class ReviewRequestManager(models.Manager):
             return getattr(self.__class__, attr, *args)
 
 
-@python_2_unicode_compatible  # Python 2
 class ReviewRequest(TimeStampedModel):
     objects = ReviewRequestManager()
     concepts = models.ManyToManyField(_concept, related_name="review_requests")
@@ -900,7 +892,6 @@ class ReviewRequest(TimeStampedModel):
         )
 
 
-@python_2_unicode_compatible  # Python 2
 class Status(TimeStampedModel):
     """
     8.1.2.6 - Registration_State class
@@ -1034,7 +1025,6 @@ class ConceptualDomain(concept):
     ]
 
 
-@python_2_unicode_compatible  # Python 2
 class ValueMeaning(aristotleComponent):
     """
     Value_Meaning is a class each instance of which models a value meaning (3.2.141),
@@ -1143,7 +1133,6 @@ class ValueDomain(concept):
         return self.supplementaryvalue_set.all()
 
 
-@python_2_unicode_compatible  # Python 2
 class AbstractValue(aristotleComponent):
     """
     Implementation note: Not the best name, but there will be times to

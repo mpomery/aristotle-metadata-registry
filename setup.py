@@ -22,7 +22,7 @@ setup(
     author='Samuel Spencer',
     author_email='sam@aristotlemetadata.com',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
 
         'Environment :: Web Environment',
         'Framework :: Django',
@@ -32,7 +32,8 @@ setup(
 
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],

@@ -1,7 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
-
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from notifications.signals import notify

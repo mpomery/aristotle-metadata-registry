@@ -12,7 +12,6 @@ from django.conf.global_settings import LANGUAGES
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import python_2_unicode_compatible  # Python 2
 
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
@@ -21,7 +20,6 @@ from aristotle_mdr import models as MDR
 from aristotle_mdr.fields import ConceptForeignKey
 
 
-@python_2_unicode_compatible  # Python 2
 class Slot(TimeStampedModel):
     # on save confirm the concept and model are correct, otherwise reject
     # on save confirm the cardinality

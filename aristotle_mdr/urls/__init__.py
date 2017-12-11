@@ -16,6 +16,6 @@ urlpatterns = [
 # This is only for dev work, so we can skip it.
 if settings.DEBUG:  # pragma: no cover
     from django.conf.urls.static import static
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDiA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 handler403 = 'aristotle_mdr.views.unauthorised'
