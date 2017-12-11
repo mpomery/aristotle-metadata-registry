@@ -19,7 +19,7 @@ setup_aristotle_test_environment()
 class ComparatorTester(utils.LoggedInViewPages):
 
     def setUp(self):
-        super(ComparatorTester, self).setUp()
+        super().setUp()
         self.ra = models.RegistrationAuthority.objects.create(name="Test RA")
         self.wg = models.Workgroup.objects.create(name="Setup WG")
         self.item1 = self.itemType.objects.create(name="Item with a name", workgroup=self.wg)
@@ -102,7 +102,7 @@ class ValueDomainComparatorTester(ComparatorTester, TestCase):
     itemType=models.ValueDomain
 
     def setUp(self):
-        super(ValueDomainComparatorTester, self).setUp()
+        super().setUp()
 
         for i in range(4):
             models.PermissibleValue.objects.create(

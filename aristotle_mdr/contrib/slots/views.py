@@ -15,7 +15,7 @@ class SimilarSlotsView(ListView):
     model = _concept
 
     def get_context_data(self, *args, **kwargs):
-        context = super(SimilarSlotsView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context.update({'slot_name': self.kwargs['slot_name']})
         context.update({'value': self.request.GET.get('value', None)})
         return context

@@ -49,7 +49,7 @@ class ConceptHistoryCompareView(HistoryCompareDetailView):
     template_name = "aristotle_mdr/actions/concept_history_compare.html"
 
     def get_object(self, queryset=None):
-        item = super(ConceptHistoryCompareView, self).get_object(queryset)
+        item = super().get_object(queryset)
         if not user_can_view(self.request.user, item):
             raise PermissionDenied
         self.model = item.item.__class__  # Get the subclassed object
@@ -57,7 +57,7 @@ class ConceptHistoryCompareView(HistoryCompareDetailView):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        return super(ConceptHistoryCompareView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
 
 def get_if_user_can_view(objtype, user, iid):
@@ -361,7 +361,7 @@ def extensions(request):
 
 class PermissionSearchView(FacetedSearchView):
     def build_form(self):
-        form = super(self.__class__, self).build_form()
+        form = super().build_form()
         form.request = self.request
         form.request.GET = self.clean_facets(self.request)
         return form

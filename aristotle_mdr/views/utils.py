@@ -254,7 +254,7 @@ class GroupMemberMixin(object):
         """
         Insert the single object into the context dict.
         """
-        kwargs = super(GroupMemberMixin, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs.update({'user_to_change': self.user_to_change})
         return kwargs
 
@@ -265,7 +265,7 @@ class RoleChangeView(GroupMemberMixin, LoginRequiredMixin, ObjectLevelPermission
     object_level_permissions = True
 
     def get_form_kwargs(self):
-        kwargs = super(RoleChangeView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({'user': self.request.user})
         initial = {'roles': []}
         initial['roles'] = self.get_object().list_roles_for_user(self.user_to_change)

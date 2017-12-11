@@ -13,7 +13,7 @@ from django.db.models import Q
 
 class AppHelpViewer(DetailView):
     def get_context_data(self, **kwargs):
-        context = super(AppHelpViewer, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         if self.object.app_label:
             self.app = self.object.app_label
             context['app'] = apps.get_app_config(self.app)
@@ -44,7 +44,7 @@ class ConceptAppHelpView(ListView):
     template_name = "aristotle_mdr_help/app_concept_help.html"
 
     def get_context_data(self, **kwargs):
-        context = super(ConceptAppHelpView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['app'] = apps.get_app_config(self.kwargs['app'])
         if self.kwargs['app'] not in fetch_metadata_apps():
             raise Http404
@@ -72,7 +72,7 @@ class ConceptHelpView(AppHelpViewer):
         return get_object_or_404(ConceptHelp, app_label=app, concept_type=model)
 
     def get_context_data(self, **kwargs):
-        context = super(ConceptHelpView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
 
         model = self.kwargs['model']
 

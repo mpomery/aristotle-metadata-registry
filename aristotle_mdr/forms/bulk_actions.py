@@ -28,7 +28,7 @@ from .utils import RegistrationAuthorityMixin
 class ForbiddenAllowedModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def __init__(self, *args, **kwargs):
         self.validate_queryset = kwargs.pop('validate_queryset')
-        super(ForbiddenAllowedModelMultipleChoiceField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _check_values(self, value):
         """
@@ -109,7 +109,7 @@ class BulkActionForm(UserAwareForm):
         else:
             queryset = MDR._concept.objects.public()
 
-        super(BulkActionForm, self).__init__(form, *args, **kwargs)
+        super().__init__(form, *args, **kwargs)
 
         self.fields['items'] = ForbiddenAllowedModelMultipleChoiceField(
             label=self.items_label,
@@ -194,7 +194,7 @@ class ChangeStateForm(ChangeStatusForm, BulkActionForm, RegistrationAuthorityMix
     items_label = "These are the items that will be registered. Add or remove additional items with the autocomplete box."
 
     def __init__(self, *args, **kwargs):
-        super(ChangeStateForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # self.set_registration_authority_field()
 
     def make_changes(self):
@@ -287,7 +287,7 @@ class RequestReviewForm(LoggedInBulkActionForm):
     )
 
     def __init__(self, *args, **kwargs):
-        super(RequestReviewForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def make_changes(self):
         import reversion
@@ -336,7 +336,7 @@ class ChangeWorkgroupForm(BulkActionForm):
     items_label="These are the items that will be moved between workgroups. Add or remove additional items with the autocomplete box."
 
     def __init__(self, *args, **kwargs):
-        super(ChangeWorkgroupForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         wgs = [(wg.id, wg.name) for wg in self.user.profile.workgroups]
         self.fields['workgroup']=forms.ModelChoiceField(
@@ -441,7 +441,7 @@ class BulkDownloadForm(DownloadActionForm):
     )
 
     def __init__(self, *args, **kwargs):
-        super(BulkDownloadForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['download_type'] = forms.ChoiceField(
             choices=[
                 (d_type.download_type, d_type.label)
@@ -454,4 +454,4 @@ class BulkDownloadForm(DownloadActionForm):
         self.download_type = self.cleaned_data['download_type']
         self.title = self.cleaned_data['title']
         items = self.cleaned_data['items']
-        super(BulkDownloadForm, self).make_changes()
+        super().make_changes()

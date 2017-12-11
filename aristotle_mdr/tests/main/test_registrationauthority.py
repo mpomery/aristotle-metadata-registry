@@ -204,7 +204,7 @@ class RAListTests(utils.LoggedInViewPages,TestCase):
 
 class RAManageTests(utils.LoggedInViewPages,TestCase):
     def setUp(self):
-        super(RAManageTests, self).setUp()
+        super().setUp()
         self.empty_ra = models.RegistrationAuthority.objects.create(
             name="Test RA", definition="No one is a member of this"
         )

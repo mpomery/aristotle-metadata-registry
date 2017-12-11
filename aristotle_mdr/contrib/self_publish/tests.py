@@ -30,7 +30,7 @@ setup_aristotle_test_environment()
 )
 class TestSelfPublishing(utils.LoggedInViewPages, TestCase):
     def setUp(self):
-        super(TestSelfPublishing, self).setUp()
+        super().setUp()
         self.submitting_user = get_user_model().objects.create_user(
             username="self-publisher",
             email="self@publisher.net",

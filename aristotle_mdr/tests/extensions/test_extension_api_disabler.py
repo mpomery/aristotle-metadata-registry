@@ -19,7 +19,7 @@ from django.conf import settings
 
 class ConfigDisableCheckTests(utils.LoggedInViewPages, TestCase):
     def setUp(self):
-        super(ConfigDisableCheckTests, self).setUp()
+        super().setUp()
         self.item = Question.objects.create(
             name="Test Question Title",
             definition="Some unique string"

@@ -73,7 +73,7 @@ class PostingAndCommentingAtObjectLevel(TestCase):
 
 class WorkgroupMembersCanMakePostsAndComments(utils.LoggedInViewPages,TestCase):
     def setUp(self):
-        super(WorkgroupMembersCanMakePostsAndComments, self).setUp()
+        super().setUp()
         self.viewer2 = get_user_model().objects.create_user('viewer2','','viewer') # not in any workgroup
         self.viewer3 = get_user_model().objects.create_user('viewer3','','viewer') # not in our "primary testing workgroup" (self.wg1)
         self.wg1.giveRoleToUser('viewer',self.viewer3)
@@ -431,7 +431,7 @@ class WorkgroupMembersCanMakePostsAndComments(utils.LoggedInViewPages,TestCase):
 
 class ViewDiscussionPostPage(utils.LoggedInViewPages,TestCase):
     def setUp(self):
-        super(ViewDiscussionPostPage, self).setUp()
+        super().setUp()
         self.viewer2 = get_user_model().objects.create_user('viewer2','','viewer') # not in any workgroup
         self.viewer3 = get_user_model().objects.create_user('viewer3','','viewer') # not in our "primary testing workgroup" (self.wg1)
         self.wg2.giveRoleToUser('viewer',self.viewer3)

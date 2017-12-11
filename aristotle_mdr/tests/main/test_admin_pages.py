@@ -17,7 +17,7 @@ setup_aristotle_test_environment()
 
 class AdminPage(utils.LoggedInViewPages,TestCase):
     def setUp(self):
-        super(AdminPage, self).setUp()
+        super().setUp()
 
     def test_workgroup_list(self):
         new_editor = get_user_model().objects.create_user('new_eddie','','editor')
@@ -152,7 +152,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
     form_defaults = {}
     create_defaults = {}
     def setUp(self,instant_create=True):
-        super(AdminPageForConcept, self).setUp()
+        super().setUp()
         if instant_create:
             self.create_items()
 
@@ -529,7 +529,7 @@ class DataTypeAdminPage(AdminPageForConcept,TestCase):
 class DataElementDerivationAdminPage(AdminPageForConcept,TestCase):
     itemType=models.DataElementDerivation
     def setUp(self):
-        super(DataElementDerivationAdminPage, self).setUp(instant_create=False)
+        super().setUp(instant_create=False)
         from reversion import revisions as reversion
         with reversion.create_revision():
             self.ded_wg = models.Workgroup.objects.create(name="Derived WG")

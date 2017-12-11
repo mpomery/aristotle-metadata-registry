@@ -38,7 +38,7 @@ class WorkgroupContextMixin(object):
 
     def get_context_data(self, **kwargs):
         # Get context from super-classes, because if may set value for workgroup
-        context = super(WorkgroupContextMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update({
             'item': self.get_object(),
             'workgroup': self.get_object(),
@@ -65,7 +65,7 @@ class WorkgroupView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermis
             'recent': MDR._concept.objects.filter(
                 workgroup=self.object).select_subclasses().order_by('-modified')[:5]
         })
-        return super(WorkgroupView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_template_names(self):
         return self.object and [self.object.template] or []
@@ -86,7 +86,7 @@ class ItemsView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermission
         kwargs.update({
             'sort': self.sort_by,
         })
-        context = super(ItemsView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['page'] = context.get('page_obj')  # dirty hack for current template
         return context
 
@@ -127,7 +127,7 @@ class AddMembersView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermi
     permission_required = "aristotle_mdr.change_workgroup"
 
     def get_form_kwargs(self):
-        kwargs = super(AddMembersView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         # TODO: Not happy about this as its not an updateForm
         kwargs.pop('instance')
         return kwargs
@@ -136,7 +136,7 @@ class AddMembersView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermi
         kwargs.update({
             'role': self.request.GET.get('role')
         })
-        return super(AddMembersView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         users = form.cleaned_data['users']
@@ -179,7 +179,7 @@ class ListWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     redirect_unauthenticated_users = True
 
     def dispatch(self, request, *args, **kwargs):
-        super(ListWorkgroup, self).dispatch(request, *args, **kwargs)
+        super().dispatch(request, *args, **kwargs)
         workgroups = MDR.Workgroup.objects.all()
 
         text_filter = request.GET.get('filter', "")

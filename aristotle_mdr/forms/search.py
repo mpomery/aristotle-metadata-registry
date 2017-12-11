@@ -364,7 +364,7 @@ class PermissionSearchForm(TokenSearchForm):
             kwargs['searchqueryset'] = get_permission_sqs()
         if not issubclass(type(kwargs['searchqueryset']), PermissionSearchQuerySet):
             raise ImproperlyConfigured("Aristotle Search Queryset connection must be a subclass of PermissionSearchQuerySet")
-        super(PermissionSearchForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         from haystack.forms import SearchForm, FacetedSearchForm, model_choices
 
@@ -395,7 +395,7 @@ class PermissionSearchForm(TokenSearchForm):
 
     def search(self, repeat_search=False):
         # First, store the SearchQuerySet received from other processing.
-        sqs = super(PermissionSearchForm, self).search()
+        sqs = super().search()
         if not self.token_models and self.get_models():
             sqs = sqs.models(*self.get_models())
         self.repeat_search = repeat_search

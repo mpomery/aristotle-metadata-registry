@@ -25,7 +25,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
     @reversion.create_revision()
     def setUp(self):
-        super(TestSearch, self).setUp()
+        super().setUp()
         import haystack
         haystack.connections.reload('default')
 
@@ -627,7 +627,7 @@ class TestTokenSearch(TestCase):
     def setUp(self):
         # These are really terrible Object Classes, but I was bored and needed to spice things up.
         # Technically, the Object Class would be "Mutant"
-        super(TestTokenSearch, self).setUp()
+        super().setUp()
         import haystack
         haystack.connections.reload('default')
 

@@ -22,7 +22,7 @@ setup_aristotle_test_environment()
 class TestNotifications(utils.LoggedInViewPages, TestCase):
     defaults = {}
     def setUp(self):
-        super(TestNotifications, self).setUp()
+        super().setUp()
 
         self.item1 = models.ObjectClass.objects.create(
             name="Test Item 1 (visible to tested viewers)",

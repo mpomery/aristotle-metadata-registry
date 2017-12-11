@@ -37,7 +37,7 @@ class ConceptWizard_TestInvalidUrls(utils.LoggedInViewPages,TestCase):
         call_command('clear_index', interactive=False, verbosity=0)
 
     def setUp(self):
-        super(ConceptWizard_TestInvalidUrls, self).setUp()
+        super().setUp()
         import haystack
         haystack.connections.reload('default')
 
@@ -68,7 +68,7 @@ class ConceptWizardPage(utils.LoggedInViewPages):
         call_command('clear_index', interactive=False, verbosity=0)
 
     def setUp(self):
-        super(ConceptWizardPage, self).setUp()
+        super().setUp()
         import haystack
         haystack.connections.reload('default')
 

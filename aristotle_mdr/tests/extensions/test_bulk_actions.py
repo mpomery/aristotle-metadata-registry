@@ -13,7 +13,7 @@ setup_aristotle_test_environment()
 
 class TestBulkActions(BulkActionsTest, TestCase):
     def setUp(self):
-        super(TestBulkActions, self).setUp()
+        super().setUp()
         self.item = ObjectClass.objects.create(
             name="Test Object",
             workgroup=self.wg1,

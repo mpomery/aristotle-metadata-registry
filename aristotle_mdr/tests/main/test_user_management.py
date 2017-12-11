@@ -13,7 +13,7 @@ setup_test_environment()
 
 class UserManagementPages(utils.LoggedInViewPages, TestCase):
     def setUp(self):
-        super(UserManagementPages, self).setUp()
+        super().setUp()
 
     def test_user_cannot_view_userlist(self):
         self.login_viewer()

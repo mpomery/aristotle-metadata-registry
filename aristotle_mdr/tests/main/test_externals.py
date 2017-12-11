@@ -20,7 +20,7 @@ we need them.
 
 class AristotleAutocompletes(utils.LoggedInViewPages, TestCase):
     def setUp(self):
-        super(AristotleAutocompletes, self).setUp()
+        super().setUp()
 
         # There would be too many tests to test every item type against every other
         # But they all have identical logic, so one test should suffice

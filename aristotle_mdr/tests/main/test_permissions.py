@@ -46,20 +46,20 @@ class SuperuserPermissions(TestCase):
 
 class UnitOfMeasureVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(UnitOfMeasureVisibility, self).setUp()
+        super().setUp()
         self.item = models.UnitOfMeasure.objects.create(name="Test UOM",workgroup=self.wg)
 
 class ObjectClassVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(ObjectClassVisibility, self).setUp()
+        super().setUp()
         self.item = models.ObjectClass.objects.create(name="Test OC",workgroup=self.wg)
 class PropertyVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(PropertyVisibility, self).setUp()
+        super().setUp()
         self.item = models.Property.objects.create(name="Test P",workgroup=self.wg)
 class ValueDomainVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(ValueDomainVisibility, self).setUp()
+        super().setUp()
         self.item = models.ValueDomain.objects.create(
             name="Test VD",
             workgroup=self.wg,
@@ -69,21 +69,21 @@ class ValueDomainVisibility(utils.ManagedObjectVisibility,TestCase):
         )
 class DataElementConceptVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(DataElementConceptVisibility, self).setUp()
+        super().setUp()
         self.item = models.DataElementConcept.objects.create(
             name="Test DEC",
             workgroup=self.wg,
         )
 class DataElementVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(DataElementVisibility, self).setUp()
+        super().setUp()
         self.item = models.DataElement.objects.create(
             name="Test DE",
             workgroup=self.wg,
         )
 class DataTypeVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(DataTypeVisibility, self).setUp()
+        super().setUp()
         self.item = models.DataType.objects.create(
             name="Test DT",
             workgroup=self.wg,

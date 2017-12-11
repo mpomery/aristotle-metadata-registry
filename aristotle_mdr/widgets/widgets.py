@@ -13,7 +13,7 @@ class NameSuggestInput(TextInput):
     def __init__(self, *args, **kwargs):
         self.suggest_fields = kwargs.pop('name_suggest_fields')
         self.separator = kwargs.pop('separator', '-')
-        super(NameSuggestInput, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def render(self, name, value, attrs=None):
         out = super().render(name, value, attrs)

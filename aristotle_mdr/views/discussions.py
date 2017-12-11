@@ -22,7 +22,7 @@ class All(LoginRequiredMixin, TemplateView):
     template_name = "aristotle_mdr/discussions/all.html"
 
     def get_context_data(self, **kwargs):
-        context = super(All, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['discussions'] = self.request.user.profile.discussions
 
         return context
@@ -36,7 +36,7 @@ class Workgroup(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, Template
     redirect_unauthenticated_users = True
 
     def get(self, request, *args, **kwargs):
-        context = super(Workgroup, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         wg = get_object_or_404(MDR.Workgroup, pk=self.kwargs['wgid'])
 
         if not perms.user_in_workgroup(request.user, wg):
@@ -119,7 +119,7 @@ class Post(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, PostMixin, Te
     redirect_unauthenticated_users = True
 
     def get(self, request, *args, **kwargs):
-        context = super(Post, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
 
         post = self.get_object()
 

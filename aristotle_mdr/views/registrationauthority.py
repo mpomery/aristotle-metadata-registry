@@ -81,7 +81,7 @@ class AddUser(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, UpdateView
     context_object_name = "item"
 
     def get_form_kwargs(self):
-        kwargs = super(AddUser, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({'user': self.request.user})
 
         # TODO: Not happy about this as its not an updateForm
@@ -90,13 +90,13 @@ class AddUser(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, UpdateView
 
     def dispatch(self, request, *args, **kwargs):
         self.item = get_object_or_404(MDR.RegistrationAuthority, pk=self.kwargs.get('iid'))
-        return super(AddUser, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """
         Insert the single object into the context dict.
         """
-        kwargs = super(AddUser, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs.update({'item': self.item})
         return kwargs
 
@@ -116,7 +116,7 @@ class ListRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, Lis
     redirect_unauthenticated_users = True
 
     def dispatch(self, request, *args, **kwargs):
-        super(ListRegistrationAuthority, self).dispatch(request, *args, **kwargs)
+        super().dispatch(request, *args, **kwargs)
         ras = MDR.RegistrationAuthority.objects.all()
 
         text_filter = request.GET.get('filter', "")

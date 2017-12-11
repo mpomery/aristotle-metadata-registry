@@ -35,7 +35,7 @@ class BulkAction(FormView):
                 )
             else:
                 raise PermissionDenied
-        return super(BulkAction, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     def get_action(self):
         actions = get_bulk_actions()

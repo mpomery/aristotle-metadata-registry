@@ -72,7 +72,7 @@ class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):
 
 class TestSlotsBulkAction(BulkActionsTest, TestCase):
     def setUp(self, *args, **kwargs):
-        super(TestSlotsBulkAction, self).setUp(*args, **kwargs)
+        super().setUp(*args, **kwargs)
         self.item5 = ObjectClass.objects.create(name="OC5", definition="OC5 definition", workgroup=self.wg2)
         self.slot_name = 'my_name'
         self.slot_type = 'bulk_insert'

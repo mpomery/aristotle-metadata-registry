@@ -266,11 +266,11 @@ class ReviewDetailsView(DetailView):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        return super(ReviewDetailsView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         # Call the base implementation first to get a context
-        context = super(ReviewDetailsView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['next'] = self.request.GET.get('next', reverse('aristotle:userReadyForReview'))
         return context
 
@@ -284,7 +284,7 @@ class CreatedItemsListView(ListView):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        return super(CreatedItemsListView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     def get_queryset(self, *args, **kwargs):
         return MDR._concept.objects.filter(
@@ -298,7 +298,7 @@ class CreatedItemsListView(ListView):
 
     def get_context_data(self, *args, **kwargs):
         # Call the base implementation first to get a context
-        context = super(CreatedItemsListView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['sort'] = self.request.GET.get('sort', 'name_asc')
         return context
 

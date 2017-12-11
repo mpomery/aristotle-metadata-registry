@@ -31,7 +31,7 @@ class TestExtensionListVisibility(TestCase):
 
 class QuestionVisibility(utils.ManagedObjectVisibility, TestCase):
     def setUp(self):
-        super(QuestionVisibility, self).setUp()
+        super().setUp()
         self.item = Question.objects.create(
             name="Test Question",
             workgroup=self.wg,
@@ -61,7 +61,7 @@ class QuestionViewPage(LoggedInViewExtensionConceptPages, TestCase):
 
 class QuestionnaireVisibility(utils.ManagedObjectVisibility, TestCase):
     def setUp(self):
-        super(QuestionnaireVisibility, self).setUp()
+        super().setUp()
         self.item = Questionnaire.objects.create(
             name="Test Question",
             workgroup=self.wg,

@@ -38,7 +38,7 @@ class RelationAdminPage(AdminPageForConcept, TestCase):
 
 class LinkTestBase(utils.LoggedInViewPages):
     def setUp(self, *args, **kwargs):
-        super(LinkTestBase, self).setUp(*args, **kwargs)
+        super().setUp(*args, **kwargs)
         self.item1 = ObjectClass.objects.create(
             name="Test Item 1 (visible to tested viewers)",
             definition="my definition",

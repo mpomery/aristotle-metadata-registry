@@ -104,4 +104,4 @@ class ConceptHelp(HelpBase):
         if not self.app_label:
             raise ValidationError('ConceptHelp must have an app')
         self.title = _("Help for concept type %s") % self.get_model()._meta.verbose_name
-        super(ConceptHelp, self).save()
+        super().save()

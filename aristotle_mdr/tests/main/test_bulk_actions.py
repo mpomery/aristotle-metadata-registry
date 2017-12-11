@@ -17,7 +17,7 @@ setup_aristotle_test_environment()
 
 class BulkActionsTest(utils.LoggedInViewPages):
     def setUp(self):
-        super(BulkActionsTest, self).setUp()
+        super().setUp()
 
         # There would be too many tests to test every item type against every other
         # But they all have identical logic, so one test should suffice

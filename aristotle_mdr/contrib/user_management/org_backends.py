@@ -198,7 +198,7 @@ class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
     redirect_unauthenticated_users = True
 
     def get_form_kwargs(self):
-        kwargs = super(InviteView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({
             "request": self.request
         })

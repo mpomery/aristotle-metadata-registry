@@ -39,7 +39,7 @@ class SupersededProperty(TestCase):
 
 class SupersedePage(utils.LoggedInViewPages, TestCase):
     def setUp(self):
-        super(SupersedePage, self).setUp()
+        super().setUp()
 
         # There would be too many tests to test every item type against every other
         # But they all have identical logic, so one test should suffice
@@ -98,7 +98,7 @@ class SupersedePage(utils.LoggedInViewPages, TestCase):
 
 class DeprecatePage(utils.LoggedInViewPages, TestCase):
     def setUp(self):
-        super(DeprecatePage, self).setUp()
+        super().setUp()
 
         # There would be too many tests to test every item type against every other
         # But they all have identical logic, so one test should suffice

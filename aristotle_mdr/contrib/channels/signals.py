@@ -12,7 +12,7 @@ from haystack_channels.signals import ChannelsRealTimeAsyncSignalProcessor
 
 class AristotleChannelsSignalProcessor(ChannelsRealTimeAsyncSignalProcessor):
     def setup(self):
-        super(AristotleChannelsSignalProcessor, self).setup()
+        super().setup()
 
         from aristotle_mdr.models import ReviewRequest, concept_visibility_updated
 
@@ -25,7 +25,7 @@ class AristotleChannelsSignalProcessor(ChannelsRealTimeAsyncSignalProcessor):
         post_save.disconnect(self.handle_concept_save, sender=_concept)
         # post_revision_commit.disconnect(self.handle_concept_revision)
         pre_delete.disconnect(self.handle_concept_delete, sender=_concept)
-        super(AristotleSignalProcessor, self).teardown()
+        super().teardown()
 
     def handle_concept_recache(self, concept, **kwargs):
         from aristotle_mdr.models import _concept

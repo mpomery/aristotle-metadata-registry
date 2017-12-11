@@ -53,7 +53,7 @@ class DeactivateRegistryUser(LoginRequiredMixin, PermissionRequiredMixin, Templa
         return redirect(reverse("aristotle-user:registry_user_list"))
 
     def get_context_data(self, **kwargs):
-        data = super(DeactivateRegistryUser, self).get_context_data(**kwargs)
+        data = super().get_context_data(**kwargs)
         deactivate_user = self.kwargs.get('user_pk')
         if not deactivate_user:
             raise Http404
@@ -81,7 +81,7 @@ class ReactivateRegistryUser(LoginRequiredMixin, PermissionRequiredMixin, Templa
         return redirect(reverse("aristotle-user:registry_user_list"))
 
     def get_context_data(self, **kwargs):
-        data = super(ReactivateRegistryUser, self).get_context_data(**kwargs)
+        data = super().get_context_data(**kwargs)
         reactivate_user = self.kwargs.get('user_pk')
         if not reactivate_user:
             raise Http404

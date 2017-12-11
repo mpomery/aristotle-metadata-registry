@@ -29,12 +29,12 @@ class ItemSubpageView(object):
 
     def dispatch(self, *args, **kwargs):
         self.item = self.get_item()
-        return super(ItemSubpageView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
 
 class ItemSubpageFormView(ItemSubpageView, FormView):
     def get_context_data(self, *args, **kwargs):
-        kwargs = super(ItemSubpageFormView, self).get_context_data(*args, **kwargs)
+        kwargs = super().get_context_data(*args, **kwargs)
         kwargs['item'] = self.get_item()
         return kwargs
 
@@ -44,13 +44,13 @@ class SubmitForReviewView(ItemSubpageFormView):
     template_name = "aristotle_mdr/actions/request_review.html"
 
     def get_context_data(self, *args, **kwargs):
-        kwargs = super(SubmitForReviewView, self).get_context_data(*args, **kwargs)
+        kwargs = super().get_context_data(*args, **kwargs)
         kwargs['reviews'] = self.get_item().review_requests.filter(status=MDR.REVIEW_STATES.submitted).all()
         kwargs['status_matrix'] = json.dumps(generate_visibility_matrix(self.request.user))
         return kwargs
 
     def get_form_kwargs(self):
-        kwargs = super(SubmitForReviewView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
 
@@ -80,19 +80,19 @@ class ReviewActionMixin(object):
             raise PermissionDenied
         if review.status != MDR.REVIEW_STATES.submitted:
             return HttpResponseRedirect(reverse('aristotle_mdr:userReviewDetails', args=[review.pk]))
-        return super(ReviewActionMixin, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     def get_review(self):
         self.review = get_object_or_404(MDR.ReviewRequest, pk=self.kwargs['review_id'])
         return self.review
 
     def get_context_data(self, *args, **kwargs):
-        kwargs = super(ReviewActionMixin, self).get_context_data(*args, **kwargs)
+        kwargs = super().get_context_data(*args, **kwargs)
         kwargs['review'] = self.get_review()
         return kwargs
 
     def get_form_kwargs(self):
-        kwargs = super(ReviewActionMixin, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
 
@@ -109,10 +109,10 @@ class ReviewCancelView(ReviewActionMixin, FormView):
         if review.status != MDR.REVIEW_STATES.submitted:
             return HttpResponseRedirect(reverse('aristotle_mdr:userReviewDetails', args=[review.pk]))
 
-        return super(ReviewCancelView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     def get_form_kwargs(self):
-        kwargs = super(ReviewCancelView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs['instance'] = self.get_review()
         return kwargs
 
@@ -135,7 +135,7 @@ class ReviewRejectView(ReviewActionMixin, FormView):
     template_name = "aristotle_mdr/user/user_request_reject.html"
 
     def get_form_kwargs(self):
-        kwargs = super(ReviewRejectView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs['instance'] = self.get_review()
         return kwargs
 
@@ -159,7 +159,7 @@ class ReviewAcceptView(ReviewActionMixin, FormView):
     template_name = "aristotle_mdr/user/user_request_accept.html"
 
     def get_context_data(self, *args, **kwargs):
-        kwargs = super(ReviewAcceptView, self).get_context_data(*args, **kwargs)
+        kwargs = super().get_context_data(*args, **kwargs)
         kwargs['status_matrix'] = json.dumps(generate_visibility_matrix(self.request.user))
         return kwargs
 
@@ -250,10 +250,10 @@ class CheckCascadedStates(ItemSubpageView, DetailView):
         self.item = self.get_item()
         if not self.item.item.registry_cascade_items:
             raise Http404
-        return super(CheckCascadedStates, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
-        kwargs = super(CheckCascadedStates, self).get_context_data(*args, **kwargs)
+        kwargs = super().get_context_data(*args, **kwargs)
 
         state_matrix = [
             # (item,[(states_ordered_alphabetically_by_ra_as_per_parent_item,state_of_parent_with_same_ra)],[extra statuses] )

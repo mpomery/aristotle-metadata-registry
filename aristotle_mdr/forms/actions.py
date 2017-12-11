@@ -31,7 +31,7 @@ class RequestReviewForm(RegistrationAuthorityMixin, UserAwareModelForm):
 
     def __init__(self, *args, **kwargs):
         # self.user = kwargs.pop('user')
-        super(RequestReviewForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.set_registration_authority_field(
             field_name="registration_authority"
         )

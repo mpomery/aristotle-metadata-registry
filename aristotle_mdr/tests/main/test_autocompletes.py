@@ -74,7 +74,7 @@ class LoggedInConceptAutocompletes(utils.LoggedInViewPages, TestCase):
 
 class LoggedInUserAutocompletes(utils.LoggedInViewPages, TestCase):
     def setUp(self, *args, **kwargs):
-        super(LoggedInUserAutocompletes, self).setUp(*args, **kwargs)
+        super().setUp(*args, **kwargs)
         before_count = get_user_model().objects.all().count()
         self.dwarves = ["Doc","Grumpy","Happy","Sleepy","Bashful","Sneezy","Dopey"]
 

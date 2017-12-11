@@ -41,7 +41,7 @@ class StatusInline(admin.TabularInline):
     has permission to change the status of objects.
     """
     def get_queryset(self, request):
-        qs = super(StatusInline, self).get_queryset(request)
+        qs = super().get_queryset(request)
         if not request.user.is_superuser:
             qs = qs.filter(registrationAuthority__in=request.user.registrar_in.all())
         return qs
@@ -49,17 +49,17 @@ class StatusInline(admin.TabularInline):
     def has_change_permission(self, request, obj=None):
         if obj is not None:
             return perms.user_can_change_status(request.user, obj)
-        return super(StatusInline, self).has_change_permission(request, obj=None)
+        return super().has_change_permission(request, obj=None)
 
     def has_add_permission(self, request):
         if perms.user_is_registrar(request.user):
             return True
-        return super(StatusInline, self).has_add_permission(request)
+        return super().has_add_permission(request)
 
 
 class WorkgroupFilter(RelatedFieldListFilter):
     def __init__(self, field, request, *args, **kwargs):
-        super(WorkgroupFilter, self).__init__(field, request, *args, **kwargs)
+        super().__init__(field, request, *args, **kwargs)
         if not request.user.is_superuser:
             self.lookup_choices = [(w.id, w) for w in request.user.profile.workgroups.all()]
 
@@ -75,7 +75,7 @@ class WorkgroupAdmin(CompareVersionAdmin):
     search_fields = ('name', 'definition')
 
     def get_queryset(self, request):
-        qs = super(WorkgroupAdmin, self).get_queryset(request)
+        qs = super().get_queryset(request)
         if request.user.is_superuser:
             return qs
         else:
@@ -97,7 +97,7 @@ class WorkgroupAdmin(CompareVersionAdmin):
         elif perms.user_can_edit(request.user, obj):
             return True
         else:
-            return super(WorkgroupAdmin, self).has_change_permission(request, obj=None)
+            return super().has_change_permission(request, obj=None)
 
 
 class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
@@ -129,7 +129,7 @@ class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         # Thanks: http://stackoverflow.com/questions/6321916
         # Thanks: http://stackoverflow.com/questions/2683689
-        conceptForm = super(ConceptAdmin, self).get_form(request, obj, **kwargs)
+        conceptForm = super().get_form(request, obj, **kwargs)
 
         class ModelFormMetaClass(conceptForm):
             def __new__(cls, *args, **kwargs):
@@ -158,7 +158,7 @@ class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
             return request.user.has_perm("aristotle_mdr.delete_concept_from_admin", obj)
 
     def get_queryset(self, request):
-        queryset = super(ConceptAdmin, self).get_queryset(request)
+        queryset = super().get_queryset(request)
         if not request.user.is_superuser:
             if not self.has_change_permission(request):
                 queryset = queryset.none()
@@ -170,13 +170,13 @@ class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
     # Implementing this would be nice:
     #      http://www.szotten.com/david/custom-redirects-in-the-django-admin.html
     def response_add(self, request, obj, post_url_continue=None):
-        response = super(ConceptAdmin, self).response_add(request, obj)
+        response = super().response_add(request, obj)
         if '_save' in request.POST and post_url_continue is None:
             response['location'] = reverse("aristotle:item", args=(obj.id,))
         return response
 
     def response_change(self, request, obj, post_url_continue=None):
-        response = super(ConceptAdmin, self).response_change(request, obj)
+        response = super().response_change(request, obj)
         if '_save' in request.POST and post_url_continue is None:
             response['location'] = reverse("aristotle:item", args=(obj.id,))
         return response
@@ -296,7 +296,7 @@ class AristotleUserAdmin(UserAdmin):
     list_display = ['username', 'first_name', 'last_name', 'time_since_login', 'date_joined']
 
     def save_formset(self, request, form, formset, change):
-        super(AristotleUserAdmin, self).save_formset(request, form, formset, change)
+        super().save_formset(request, form, formset, change)
         for f in formset.forms:
             f.save_memberships(user=form.instance)
 

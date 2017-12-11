@@ -38,7 +38,7 @@ def CUSTOM_MERGE_SMALL(writer, segments):
 class WriterWithFasterSpellingUpdate(AsyncWriter):
     def __init__(self, spelling_storage, spelling_checker, spelling_fields,
                  index, delay=0.25, writerargs=None):
-        super(WriterWithFasterSpellingUpdate, self).__init__(
+        super().__init__(
             index, delay, writerargs
         )
         self.spelling_storage = spelling_storage
@@ -49,7 +49,7 @@ class WriterWithFasterSpellingUpdate(AsyncWriter):
         # remove every word previously found in the document from the
         # spelling index
         from haystack.constants import ID
-        super(WriterWithFasterSpellingUpdate, self).update_document(**doc)
+        super().update_document(**doc)
         document_schema = self.index.schema
         for fieldname in self.spelling_fields:
             field = document_schema[fieldname]
@@ -68,7 +68,7 @@ class CustomWhooshBackend(original_backend.WhooshSearchBackend):
     silently_fail = False
 
     def setup(self):
-        super(CustomWhooshBackend, self).setup()
+        super().setup()
         self.spelling_fields = (self.content_field_name, 'job_title')
 
     def get_writer(self, index):
@@ -78,7 +78,7 @@ class CustomWhooshBackend(original_backend.WhooshSearchBackend):
     """
     def update(self, index, iterable, commit=True):
         import pdb; pdb.set_trace();
-        super(CustomWhooshBackend, self).update(index, iterable, commit)
+        super().update(index, iterable, commit)
     """
 
     def update_spelling(self):
@@ -109,7 +109,7 @@ class CustomWhooshBackend(original_backend.WhooshSearchBackend):
         # import logging
         # logger = logging.getLogger(__name__)
         # logger.debug(query_string)
-        return super(CustomWhooshBackend, self).search(
+        return super().search(
             query_string, sort_by,
             start_offset, end_offset, fields, highlight, facets, date_facets,
             query_facets, narrow_queries, spelling_query, within, dwithin,
@@ -121,7 +121,7 @@ class CustomWhooshBackend(original_backend.WhooshSearchBackend):
         if not self.setup_complete:
             self.setup()
         # import pdb; pdb.set_trace()
-        return super(CustomWhooshBackend, self).create_spelling_suggestion(query_string)
+        return super().create_spelling_suggestion(query_string)
 
     def _process_results(self, raw_page, highlight=False, query_string='',
                          spelling_query=None, result_class=None):
@@ -336,7 +336,7 @@ class FixedWhooshSearchBackend(CustomWhooshBackend):
 
     def _process_results(self, raw_page, highlight=False, query_string='',
                          spelling_query=None, result_class=None, facets=None):
-        results = super(FixedWhooshSearchBackend, self)._process_results(
+        results = super()._process_results(
             raw_page, highlight, query_string, spelling_query, result_class
         )
         if facets is not None:

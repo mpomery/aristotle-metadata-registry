@@ -38,7 +38,7 @@ class TestWebPageAccessibilityBase(utils.LoggedInViewPages):
     @classmethod
     @override_settings(STATIC_ROOT = STATICPATH)
     def setUpClass(self):
-        super(TestWebPageAccessibilityBase, self).setUpClass()
+        super().setUpClass()
         self.ra = models.RegistrationAuthority.objects.create(name="Test RA")
         self.wg = models.Workgroup.objects.create(name="Test WG 1")
         self.oc = models.ObjectClass.objects.create(name="Test OC 1")
@@ -68,7 +68,7 @@ class TestWebPageAccessibilityBase(utils.LoggedInViewPages):
             ["rm", TMP_STATICPATH, '-rf'],
             stdout=subprocess.PIPE
         )
-        super(TestWebPageAccessibilityBase, cls).tearDownClass()
+        super().tearDownClass()
 
     def pages_tester(self, pages, media_types=MEDIA_TYPES):
         self.login_superuser()

@@ -45,17 +45,17 @@ class PermissionFormView(FormView):
                 return redirect(reverse('friendly_login') + '?next=%s' % request.path)
             else:
                 raise PermissionDenied
-        return super(PermissionFormView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
-        kwargs = super(PermissionFormView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({
             'user': self.request.user,
         })
         return kwargs
 
     def get_context_data(self, *args, **kwargs):
-        context = super(PermissionFormView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context.update({'model': self.model._meta.model_name,
                         'app_label': self.model._meta.app_label,
                         'item': self.item})
@@ -66,7 +66,7 @@ class EditItemView(PermissionFormView):
     template_name = "aristotle_mdr/actions/advanced_editor.html"
 
     def __init__(self, *args, **kwargs):
-        super(EditItemView, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.slots_active = is_active_module('aristotle_mdr.contrib.slots')
         self.identifiers_active = is_active_module('aristotle_mdr.contrib.identifiers')
 
@@ -74,7 +74,7 @@ class EditItemView(PermissionFormView):
         return MDRForms.wizards.subclassed_edit_modelform(self.model)
 
     def get_form_kwargs(self):
-        kwargs = super(EditItemView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({
             'instance': self.item,
         })
@@ -146,7 +146,7 @@ class EditItemView(PermissionFormView):
 
     def get_context_data(self, *args, **kwargs):
         from aristotle_mdr.contrib.slots.models import Slot
-        context = super(EditItemView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         if self.slots_active and kwargs.get('slots_FormSet', None):
             context['slots_FormSet'] = kwargs['slots_FormSet']
         else:
@@ -180,7 +180,7 @@ class CloneItemView(PermissionFormView):
         return MDRForms.wizards.subclassed_clone_modelform(self.model)
 
     def get_form_kwargs(self):
-        kwargs = super(CloneItemView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({
             'initial': concept_to_clone_dict(self.item_to_clone)
         })

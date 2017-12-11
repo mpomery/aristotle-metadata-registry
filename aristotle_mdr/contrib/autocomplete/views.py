@@ -21,7 +21,7 @@ class GenericAutocomplete(autocomplete.Select2QuerySetView):
             self.model = get_object_or_404(
                 ContentType, app_label=kwargs['app_name'], model=kwargs['model_name']
             ).model_class()
-        return super(GenericAutocomplete, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
@@ -98,7 +98,7 @@ class UserAutocomplete(GenericAutocomplete):
     template_name = "aristotle_mdr/actions/autocompleteUser.html"
 
     def dispatch(self, request, *args, **kwargs):
-        return super(UserAutocomplete, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         self.model = get_user_model()

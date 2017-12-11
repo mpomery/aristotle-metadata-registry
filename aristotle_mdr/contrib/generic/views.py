@@ -56,10 +56,10 @@ class GenericWithItemURLView(View):
                 return redirect(reverse('friendly_login') + '?next=%s' % request.path)
             else:
                 raise PermissionDenied
-        return super(GenericWithItemURLView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
-        context = super(GenericWithItemURLView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['item'] = self.item
         context['submit_url'] = self.request.get_full_path()
         return context
@@ -81,7 +81,7 @@ class GenericAlterManyToSomethingFormView(GenericWithItemURLFormView):
     form_submit_text = _('Save')
 
     def get_context_data(self, *args, **kwargs):
-        context = super(GenericAlterManyToSomethingFormView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['model_to_add'] = self.model_to_add
         context['model_base'] = self.model_base
         context['item'] = self.item
@@ -118,7 +118,7 @@ class GenericAlterForeignKey(GenericAlterManyToSomethingFormView):
     form = None
 
     def get_context_data(self, *args, **kwargs):
-        context = super(GenericAlterForeignKey, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['form_add_another_text'] = self.form_submit_text or _('Add another')
         form = self.form or self.get_form()(instance=self.item)
         context['form'] = form
@@ -140,7 +140,7 @@ class GenericAlterForeignKey(GenericAlterManyToSomethingFormView):
                 }
 
             def __init__(self, *args, **kwargs):
-                super(FKOnlyForm, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self.fields[model_base_field].queryset = qs
 
         return FKOnlyForm
@@ -189,7 +189,7 @@ class GenericAlterManyToManyView(GenericAlterManyToSomethingFormView):
     template_name = "aristotle_mdr/generic/actions/alter_many_to_many.html"
 
     def get_context_data(self, *args, **kwargs):
-        context = super(GenericAlterManyToManyView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         return context
 
     def get_form_class(self):
@@ -259,7 +259,7 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
     formset = None
 
     def get_context_data(self, *args, **kwargs):
-        context = super(GenericAlterOneToManyView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['form_add_another_text'] = self.form_add_another_text or _('Add another')
         num_items = getattr(self.item, self.model_base_field).count()
         context['formset'] = self.formset or self.get_formset()(
@@ -346,7 +346,7 @@ class ConfirmDeleteView(GenericWithItemURLView, TemplateView):
     warning_text = _("You are about to delete something, confirm below, or click cancel to return to the item.")
 
     def get_context_data(self, *args, **kwargs):
-        context = super(ConfirmDeleteView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['form_title'] = self.form_title or _('Add child item')
         context['form_delete_button_text'] = self.form_delete_button_text
         context['warning_text'] = self.get_warning_text()

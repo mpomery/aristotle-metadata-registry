@@ -15,7 +15,7 @@ setup_aristotle_test_environment()
 
 class UserHomePages(utils.LoggedInViewPages, TestCase):
     def setUp(self):
-        super(UserHomePages, self).setUp()
+        super().setUp()
 
     def check_generic_pages(self):
         response = self.client.get(reverse('aristotle:userHome',))
@@ -227,7 +227,7 @@ class UserHomePages(utils.LoggedInViewPages, TestCase):
 
 class UserDashRecentItems(utils.LoggedInViewPages, TestCase):
     def setUp(self):
-        super(UserDashRecentItems, self).setUp()
+        super().setUp()
         import haystack
         haystack.connections.reload('default')
 
