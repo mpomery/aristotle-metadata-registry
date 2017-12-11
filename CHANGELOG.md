@@ -1,5 +1,12 @@
 Changelog
 
+- 2.0.0
+    - **Dependency notes:**
+      - Dropped support for Python 3.4 and below, and Django 1.10 and below
+      - Dropped requirements for `django-bootstrap3-datetimepicker-2`
+      - Dependancies are now defined using `Pipfile` instead of `setup.py` and `requirements.txt`
+    - Speed improvements on search pages - Fixed #715
+
 - 1.6.5
   - Fixed regression where private methods showed up in creation wizards
   - Fixed error with wizards fialing if search engine is stale, #736
