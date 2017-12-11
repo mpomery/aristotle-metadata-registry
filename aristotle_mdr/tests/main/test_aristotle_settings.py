@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, override_settings
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms

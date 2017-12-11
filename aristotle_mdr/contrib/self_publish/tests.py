@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.management import call_command
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, override_settings, modify_settings
 from django.test.utils import setup_test_environment
 from django.contrib.auth import get_user_model

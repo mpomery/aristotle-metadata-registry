@@ -3,7 +3,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import transaction
 from django.forms.models import modelformset_factory
 from django.http import HttpResponse, Http404, HttpResponseRedirect

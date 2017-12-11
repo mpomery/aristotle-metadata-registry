@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.utils import timezone
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.management import call_command
 
 import aristotle_mdr.models as models

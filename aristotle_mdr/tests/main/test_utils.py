@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core.management import call_command
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 import aristotle_mdr.tests.utils as utils
 from aristotle_mdr import models

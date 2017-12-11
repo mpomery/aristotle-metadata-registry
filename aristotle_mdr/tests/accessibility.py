@@ -4,7 +4,7 @@ import sys
 import tempfile
 from django.test import TestCase, override_settings
 from django.core.management import call_command
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms

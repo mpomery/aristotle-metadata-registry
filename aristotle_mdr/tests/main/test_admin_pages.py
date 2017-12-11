@@ -1,6 +1,6 @@
 from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.forms import model_to_dict
 from django.test import TestCase
 

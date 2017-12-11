@@ -3,7 +3,7 @@ from django.test import TestCase
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test.utils import override_settings

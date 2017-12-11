@@ -2,7 +2,7 @@ from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 
 from django.conf.urls import url
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, FormView

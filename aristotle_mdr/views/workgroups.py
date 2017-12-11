@@ -1,6 +1,6 @@
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 # from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404

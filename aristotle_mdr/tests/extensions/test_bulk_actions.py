@@ -2,7 +2,7 @@ from django.test import TestCase
 
 import aristotle_mdr.tests.utils as utils
 from aristotle_mdr.models import ObjectClass, Workgroup
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from aristotle_mdr.tests.main.test_bulk_actions import BulkActionsTest
 from aristotle_mdr import models
