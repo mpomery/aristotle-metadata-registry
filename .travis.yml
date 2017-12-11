@@ -59,9 +59,11 @@ jobs:
 
   include:
     - stage: stylecheck
+      python: 3.6
       script: tox -e flake8 --skip-missing-interpreters
 
     - stage: documentation
+      python: 3.6
       script: tox -e docs --skip-missing-interpreters
     
 
