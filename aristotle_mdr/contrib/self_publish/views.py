@@ -9,7 +9,7 @@ from aristotle_mdr.contrib.self_publish.forms import MetadataPublishForm
 from aristotle_mdr.contrib.self_publish.models import PublicationRecord
 
 
-def is_submitter_or_super():
+def is_submitter_or_super(user, item):
     return user.is_superuser or user == item.submitter
 
 
