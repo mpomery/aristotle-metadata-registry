@@ -38,6 +38,8 @@ class AristotleBackend(ModelBackend):
         perm_parts = perm_name.split("_")
         if len(perm_parts) == 2:
             model = apps.get_model(app_label, perm_parts[1])
+        elif obj is not None:
+            model = type(obj)
         else:
             model = int
 
