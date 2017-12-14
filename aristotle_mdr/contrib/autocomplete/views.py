@@ -42,8 +42,7 @@ class GenericAutocomplete(autocomplete.Select2QuerySetView):
         """Return the label of a result."""
 
         template = get_template(self.template_name)
-        # context = {"result": result, 'request': self.request}
-        context = Context({"result": result, 'request': self.request})
+        context = {"result": result, 'request': self.request}
         return template.render(context)
 
     def get_results(self, context):
