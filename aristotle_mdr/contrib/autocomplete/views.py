@@ -138,7 +138,7 @@ class UserAutocomplete(GenericAutocomplete):
                 field = "%s<b><u>%s</u></b>%s" % (field[:index], field[index:offset], field[offset:])
 
             result.highlight[f] = field
-        context = Context({"result": result, 'request': self.request})
+        context = {"result": result, 'request': self.request}
         return template.render(context)
 
     def get_result_title(self, result):
