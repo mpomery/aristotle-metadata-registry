@@ -13,7 +13,7 @@ TEMPLATES[0]['DIRS'] = [
     os.path.join(BASE, 'tests/apps/bulk_actions_test/templates')
 ]
 
-SECRET_KEY = 'inara+vtkprm7@0(fsc$+grbz9-s+tmo9d)e#k(9uf8m281&$7xhdkjr'
+SECRET_KEY = 'inara+oscar+vtkprm7@0(fsc$+grbz9-s+tmo9d)e#k(9uf8m281&$7xhdkjr'
 
 MEDIA_ROOT = os.path.join(BASE, "media")
 MEDIA_URL = '/media/'
@@ -43,7 +43,7 @@ if skip_migrations:  # pragma: no cover
             return True
     
         def __getitem__(self, item):
-            return "notmigrations"
+            return None
     
     MIGRATION_MODULES = DisableMigrations()
 
@@ -107,7 +107,7 @@ ARISTOTLE_SETTINGS['BULK_ACTIONS'] = ARISTOTLE_SETTINGS['BULK_ACTIONS'] + [
 ROOT_URLCONF = 'extension_test.urls'
 
 # disable
-__LOGGING__ = {
+LOGGING = {
     'version': 1,
     'formatters': {
         'verbose': {

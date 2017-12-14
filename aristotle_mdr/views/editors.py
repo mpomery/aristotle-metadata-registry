@@ -11,7 +11,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template import TemplateDoesNotExist
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import FormView
+from django.views.generic import (
+    CreateView, DetailView, ListView, UpdateView, FormView
+)
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 
@@ -25,34 +27,25 @@ from aristotle_mdr.utils import (
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 
+from aristotle_mdr.views.utils import ObjectLevelPermissionRequiredMixin
+
 import logging
 
 logger = logging.getLogger(__name__)
 logger.debug("Logging started for " + __name__)
 
 
-class PermissionFormView(FormView):
-    item = None
+class ConceptEditFormView(ObjectLevelPermissionRequiredMixin):
+    raise_exception = True
+    redirect_unauthenticated_users = True
+    object_level_permissions = True
+    model = MDR._concept
+    pk_url_kwarg = 'iid'
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.item:
-            self.item = get_object_or_404(
-                MDR._concept, pk=self.kwargs['iid']
-            ).item
+        self.item = super().get_object().item
         self.model = self.item.__class__
-        if not user_can_edit(self.request.user, self.item):
-            if request.user.is_anonymous():
-                return redirect(reverse('friendly_login') + '?next=%s' % request.path)
-            else:
-                raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({
-            'user': self.request.user,
-        })
-        return kwargs
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -62,8 +55,9 @@ class PermissionFormView(FormView):
         return context
 
 
-class EditItemView(PermissionFormView):
+class EditItemView(ConceptEditFormView, UpdateView):
     template_name = "aristotle_mdr/actions/advanced_editor.html"
+    permission_required = "aristotle_mdr.user_can_edit"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -76,6 +70,7 @@ class EditItemView(PermissionFormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
+            'user': self.request.user,
             'instance': self.item,
         })
         return kwargs
@@ -83,6 +78,7 @@ class EditItemView(PermissionFormView):
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         slot_formset = None
+        self.object = self.item
 
         if form.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
@@ -168,13 +164,9 @@ class EditItemView(PermissionFormView):
         return context
 
 
-class CloneItemView(PermissionFormView):
+class CloneItemView(ConceptEditFormView, DetailView, CreateView):
     template_name = "aristotle_mdr/create/clone_item.html"
-
-    def dispatch(self, request, *args, **kwargs):
-        dispatch = super().dispatch(request, *args, **kwargs)
-        self.item_to_clone = self.item
-        return dispatch
+    permission_required = "aristotle_mdr.user_can_view"
 
     def get_form_class(self):
         return MDRForms.wizards.subclassed_clone_modelform(self.model)
@@ -182,7 +174,8 @@ class CloneItemView(PermissionFormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
-            'initial': concept_to_clone_dict(self.item_to_clone)
+            'user': self.request.user,
+            'initial': concept_to_clone_dict(self.item)
         })
         return kwargs
 
@@ -195,7 +188,7 @@ class CloneItemView(PermissionFormView):
                 new_clone.submitter = self.request.user
                 new_clone.save()
                 reversion.revisions.set_user(self.request.user)
-                reversion.revisions.set_comment("Cloned from %s (id: %s)" % (self.item_to_clone.name, str(self.item_to_clone.pk)))
+                reversion.revisions.set_comment("Cloned from %s (id: %s)" % (self.item.name, str(self.item.pk)))
                 return HttpResponseRedirect(url_slugify_concept(new_clone))
         else:
             return self.form_invalid(form)
