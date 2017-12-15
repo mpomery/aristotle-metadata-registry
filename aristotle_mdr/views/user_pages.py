@@ -28,9 +28,6 @@ def friendly_redirect_login(request):
     else:
         return login(request)
 
-from silk.profiling.profiler import silk_profile
-@login_required
-@silk_profile(name='Dashboard')
 def home(request):
     from reversion.models import Revision
     # recent = Revision.objects.filter(user=request.user)
