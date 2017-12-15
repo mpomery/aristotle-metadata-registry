@@ -7,7 +7,7 @@ url = "https://pypi.python.org/simple"
 
 [packages]
 
-django = '~=1.11.8'
+django = "~=1.11.8"
 pytz = "*"
 pyyaml = "*"
 lesscpy = "*"
@@ -35,14 +35,16 @@ django-haystack-channels = "==0.0.1b"
 
 [dev-packages]
 
-django = '~=1.11.8'
+django = "~=1.11.8"
 coverage = "*"
 whoosh = "*"
 python-decouple = "*"
 dj-database-url = "*"
 "flake8" = "*"
-django_tools = "*"
+django-tools = "*"
 mock = "*"
+wcag-zoo = "*"
+django-silk = "*"
 
 
 [requires]

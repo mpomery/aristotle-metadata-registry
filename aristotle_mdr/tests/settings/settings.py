@@ -1,5 +1,6 @@
 import os
 import sys
+import tempfile
 import dj_database_url
 from aristotle_mdr.required_settings import *
 
@@ -14,6 +15,13 @@ TEMPLATES[0]['DIRS'] = [
 ]
 
 SECRET_KEY = 'inara+oscar+vtkprm7@0(fsc$+grbz9-s+tmo9d)e#k(9uf8m281&$7xhdkjr'
+
+# We set this up so we can point wcag_zoo in the right place
+BASE_STATICPATH = tempfile.mkdtemp(suffix='_staticfiles')
+
+STATIC_ROOT = BASE_STATICPATH+STATIC_URL
+if not os.path.exists(STATIC_ROOT):
+    os.makedirs(STATIC_ROOT)
 
 MEDIA_ROOT = os.path.join(BASE, "media")
 MEDIA_URL = '/media/'

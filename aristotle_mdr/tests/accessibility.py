@@ -1,7 +1,9 @@
+import copy
 import os
 import sys
 import tempfile
 from django.test import TestCase, override_settings
+from django.conf import settings
 from django.core.management import call_command
 from django.urls import reverse
 
@@ -18,11 +20,6 @@ from aristotle_mdr.utils import setup_aristotle_test_environment
 setup_aristotle_test_environment()
 
 
-TMP_STATICPATH = tempfile.mkdtemp(suffix='static')
-STATICPATH = TMP_STATICPATH+'/static'
-if not os.path.exists(STATICPATH):
-    os.makedirs(STATICPATH)
-
 MEDIA_TYPES = [
     [],
     #['(max-device-width: 480px)'],
@@ -35,7 +32,6 @@ MEDIA_TYPES = [
 class TestWebPageAccessibilityBase(utils.LoggedInViewPages):
 
     @classmethod
-    @override_settings(STATIC_ROOT = STATICPATH)
     def setUpClass(self):
         super().setUpClass()
         self.ra = models.RegistrationAuthority.objects.create(name="Test RA")
@@ -47,31 +43,24 @@ class TestWebPageAccessibilityBase(utils.LoggedInViewPages):
         self.cd = models.ConceptualDomain.objects.create(name="Test CD 1")
         self.de = models.DataElement.objects.create(name="Test DE 1", dataElementConcept=self.dec, valueDomain=self.vd)
 
+        call_command('compilestatic', interactive=False, verbosity=0)
         call_command('collectstatic', interactive=False, verbosity=0)
         
         process = subprocess.Popen(
-            ["ls", STATICPATH],
+            ["ls", settings.STATIC_ROOT],
             stdout=subprocess.PIPE
         )
         dir_listing = process.communicate()[0].decode('utf-8')
         # Verify the static files are in the right place.
-        # self.assertTrue('admin' in dir_listing)
-        # self.assertTrue('aristotle_mdr' in dir_listing)
+        assert('admin' in dir_listing)
+        assert('aristotle_mdr' in dir_listing)
+        assert('COMPILED' in dir_listing)
         print("All setup")
-
-    @classmethod
-    def tearDownClass(cls):
-        
-        # Maximum effort!
-        process = subprocess.Popen(
-            ["rm", TMP_STATICPATH, '-rf'],
-            stdout=subprocess.PIPE
-        )
-        super().tearDownClass()
 
     def pages_tester(self, pages, media_types=MEDIA_TYPES):
         self.login_superuser()
         failures = 0
+        total_results = []
         for url in pages:
             print()
             print("Testing url for WCAG compliance [%s] " % url, end="", flush=True, file=sys.stderr)
@@ -81,10 +70,9 @@ class TestWebPageAccessibilityBase(utils.LoggedInViewPages):
             self.assertTrue(response.status_code == 200)
             html = response.content
 
-            total_results = []
             for media in media_types:
                 results = parade.Parade(
-                    level='AA', staticpath=TMP_STATICPATH,
+                    level='AA', staticpath=settings.BASE_STATICPATH,
                     skip_these_classes=['sr-only'],
                     ignore_hidden = True,
                     media_types = media
@@ -97,11 +85,13 @@ class TestWebPageAccessibilityBase(utils.LoggedInViewPages):
                     pp.pprint(results['failures'])
                     pp.pprint(results['warnings'])
                     print("%s failures!!" % len(results['failures']) )
+                    failures += len(results['failures'])
                 else:
                     print('+', end="", flush=True, file=sys.stderr)
 
         for results in total_results:
-            self.assertTrue(len(results['failures']) == 0)            
+            self.assertTrue(len(results['failures']) == 0)
+        self.assertTrue(failures == 0)
 
 
 class TestStaticPageAccessibility(TestWebPageAccessibilityBase, TestCase):
