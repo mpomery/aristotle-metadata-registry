@@ -28,6 +28,7 @@ def friendly_redirect_login(request):
     else:
         return login(request)
 
+
 def home(request):
     from reversion.models import Revision
     # recent = Revision.objects.filter(user=request.user)
