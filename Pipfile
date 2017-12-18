@@ -43,7 +43,7 @@ dj-database-url = "*"
 "flake8" = "*"
 django-tools = "*"
 mock = "*"
-wcag-zoo = "~0.2.4"
+wcag-zoo = "~=0.2.4"
 django-silk = "*"
 
 
