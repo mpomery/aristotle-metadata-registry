@@ -31,6 +31,7 @@ django-notifications-hq = "~=1.0"
 django-braces = "*"
 docutils = "*"
 django-haystack-channels = "==0.0.1b"
+dj-database-url = {editable = true, ref = "master", git = "https://github.com/kennethreitz/dj-database-url"}
 
 
 [dev-packages]

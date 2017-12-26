@@ -6,6 +6,7 @@ Changelog
       - Dropped requirements for `django-bootstrap3-datetimepicker-2`
       - Dependancies are now defined using `Pipfile` instead of `setup.py` and `requirements.txt`
     - Fixed WCAG testing and corrected some minor accessibility issues - #697
+    - Minor tweak to dash board - 'recent workgroups' panel no longer exists, 'recent favourites' is no above 'recent actions'
 
 - 1.6.5
   - Fixed regression where private methods showed up in creation wizards
