@@ -36,8 +36,8 @@ else:
     ci_runner = "Tox"
 
 skip_migrations = (
-    "ARISTOTLE_DEV_SKIP_MIGRATIONS" in os.environ or
-    os.environ.get('DATABASE_URL', "").startswith('mssql')
+    "ARISTOTLE_DEV_SKIP_MIGRATIONS" in os.environ # or
+    # os.environ.get('DATABASE_URL', "").startswith('mssql')
 )
 
 
