@@ -43,5 +43,5 @@ Consider using an alternative like MariaDB if you need MySQL-like support.
 Search index support
 --------------------
 
-* Elasticsearch 2.4+ (Only tested on Linux)
+* Elasticsearch 5.0+ (Only tested on Linux)
 * Whoosh (Linux and Windows)

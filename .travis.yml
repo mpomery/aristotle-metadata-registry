@@ -1,6 +1,5 @@
-# Lets run on the new infrastructure
-
-# We're having issues on the default Trusty setup, lets wait for now
+# We're having issues on the default Trusty setup
+# The container based test infrastucture is too slow, so we need VMs
 sudo: required 
 dist: trusty
 
@@ -38,10 +37,9 @@ defaults:
       - mariadb
     addons:
       apt:
-        sources:
-          - elasticsearch-2.x
         packages:
           - elasticsearch
+          - libmariadbclient-dev
       code_climate:
         repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
       mariadb: '10.1'
