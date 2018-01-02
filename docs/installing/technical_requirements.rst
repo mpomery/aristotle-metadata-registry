@@ -11,7 +11,7 @@ continuous integration systems as "supported infrastucture".
 Operating system support
 ------------------------
 
-* Ubuntu Linux (Trusty Tahr) 14.04 LTS (verification courtesy of Travis-CI)
+* Ubuntu Linux (Precise Pangolin) 12.04 LTS (verification courtesy of Travis-CI)
 * Windows Server 2016 (verification courtesy of Appveyor)
 
 Travis-CI does not yet have containerised support for the Ubuntu 14.04 or 16.04

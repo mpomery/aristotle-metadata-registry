@@ -1,7 +1,8 @@
-# We're having issues on the default Trusty setup
-# The container based test infrastucture is too slow, so we need VMs
-sudo: required 
-dist: trusty
+# Lets run on the new infrastructure
+sudo: false
+
+# We're having issues on the default Trusty setup, lets wait for now
+dist: precise
 
 language: python
 
@@ -37,9 +38,10 @@ defaults:
       - mariadb
     addons:
       apt:
+        sources:
+          - elasticsearch-5.x
         packages:
           - elasticsearch
-          - libmariadbclient-dev
       code_climate:
         repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
       mariadb: '10.1'
@@ -85,12 +87,12 @@ jobs:
       <<: *main_test_script_py36
     
       # Possible failures:
-    - stage: testing
-      env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-      <<: *main_test_script_py36
-    - stage: testing
-      env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-      <<: *main_test_script_py36
+    # - stage: testing
+    #   env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
+    #   <<: *main_test_script_py36
+    # - stage: testing
+    #   env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
+    #   <<: *main_test_script_py36
 
   # Test Accessibility
     - <<: *test_accessibility_py36
@@ -113,9 +115,9 @@ jobs:
           distributions: sdist bdist_wheel
           repo: aristotle-mdr/aristotle-metadata-registry
 
-  allow_failures:
-    - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-    - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
+  # allow_failures:
+    # - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
+    # - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
 
 
 after_success:

@@ -9,6 +9,7 @@ Changelog
     - Minor tweak to dash board - 'recent workgroups' panel no longer exists, 'recent favourites' is no above 'recent actions'
     - Darkend Bootstrap "brand-danger" variable by 10% to improve contrast
     - Speed improvements on search pages - #715
+    - Dropped official support for Elasticsearch, below version 5
 
 - 1.6.5
   - Fixed regression where private methods showed up in creation wizards
