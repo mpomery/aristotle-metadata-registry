@@ -40,7 +40,7 @@ django = "~=1.11.8"
 coverage = "*"
 whoosh = "*"
 python-decouple = "*"
-dj-database-url = "*"
+dj-database-url = {editable = true, ref = "master", git = "https://github.com/kennethreitz/dj-database-url"}
 "flake8" = "*"
 django-tools = "*"
 mock = "*"
