@@ -27,7 +27,7 @@ registered_indexes = []
 class ConceptFallbackCharField(indexes.CharField):
     def prepare_template(self, obj):
         try:
-            return super(ConceptFallbackCharField, self).prepare_template(obj)
+            return super().prepare_template(obj)
         except TemplateDoesNotExist:
             logger.debug("No search template found for %s, using untyped fallback." % obj)
             t = loader.select_template(["search/indexes/aristotle_mdr/untyped_concept_text.txt"])

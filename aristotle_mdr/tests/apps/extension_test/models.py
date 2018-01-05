@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 # Start of the question model
 
 import aristotle_mdr

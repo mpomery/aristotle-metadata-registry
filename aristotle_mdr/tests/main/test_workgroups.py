@@ -1,13 +1,15 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 from django.core.exceptions import PermissionDenied
 
-from django.test.utils import setup_test_environment
-setup_test_environment()
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+
+setup_aristotle_test_environment()
 
 # This is for testing permissions around workgroup mangement.
 

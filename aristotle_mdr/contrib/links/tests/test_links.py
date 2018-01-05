@@ -1,18 +1,17 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, override_settings, modify_settings
-from django.test.utils import setup_test_environment
 
 from aristotle_mdr.contrib.links import models, perms
 from aristotle_mdr.models import Workgroup, ObjectClass, STATES
 from aristotle_mdr.tests import utils
+from aristotle_mdr.utils import setup_aristotle_test_environment
 
 from aristotle_mdr.tests.main.test_admin_pages import AdminPageForConcept
 from aristotle_mdr.tests.main.test_html_pages import LoggedInViewConceptPages
 
-
-setup_test_environment()
+setup_aristotle_test_environment()
 
 
 def setUpModule():
@@ -39,7 +38,7 @@ class RelationAdminPage(AdminPageForConcept, TestCase):
 
 class LinkTestBase(utils.LoggedInViewPages):
     def setUp(self, *args, **kwargs):
-        super(LinkTestBase, self).setUp(*args, **kwargs)
+        super().setUp(*args, **kwargs)
         self.item1 = ObjectClass.objects.create(
             name="Test Item 1 (visible to tested viewers)",
             definition="my definition",

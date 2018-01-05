@@ -1,14 +1,14 @@
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import transaction
 from django.forms import HiddenInput
 from django.utils import timezone
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from bootstrap3_datetime.widgets import DateTimePicker
+from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 
 import aristotle_mdr.models as MDR
 from aristotle_mdr.forms import ChangeStatusForm
@@ -28,7 +28,7 @@ from .utils import RegistrationAuthorityMixin
 class ForbiddenAllowedModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def __init__(self, *args, **kwargs):
         self.validate_queryset = kwargs.pop('validate_queryset')
-        super(ForbiddenAllowedModelMultipleChoiceField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _check_values(self, value):
         """
@@ -109,7 +109,7 @@ class BulkActionForm(UserAwareForm):
         else:
             queryset = MDR._concept.objects.public()
 
-        super(BulkActionForm, self).__init__(form, *args, **kwargs)
+        super().__init__(form, *args, **kwargs)
 
         self.fields['items'] = ForbiddenAllowedModelMultipleChoiceField(
             label=self.items_label,
@@ -194,7 +194,7 @@ class ChangeStateForm(ChangeStatusForm, BulkActionForm, RegistrationAuthorityMix
     items_label = "These are the items that will be registered. Add or remove additional items with the autocomplete box."
 
     def __init__(self, *args, **kwargs):
-        super(ChangeStateForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # self.set_registration_authority_field()
 
     def make_changes(self):
@@ -272,7 +272,7 @@ class RequestReviewForm(LoggedInBulkActionForm):
     registration_date = forms.DateField(
         required=False,
         label=_("Registration date"),
-        widget=DateTimePicker(options={"format": "YYYY-MM-DD"}),
+        widget=BootstrapDateTimePicker(options={"format": "YYYY-MM-DD"}),
         initial=timezone.now()
     )
     state = forms.ChoiceField(choices=MDR.STATES, widget=forms.RadioSelect)
@@ -287,7 +287,7 @@ class RequestReviewForm(LoggedInBulkActionForm):
     )
 
     def __init__(self, *args, **kwargs):
-        super(RequestReviewForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def make_changes(self):
         import reversion
@@ -336,7 +336,7 @@ class ChangeWorkgroupForm(BulkActionForm):
     items_label="These are the items that will be moved between workgroups. Add or remove additional items with the autocomplete box."
 
     def __init__(self, *args, **kwargs):
-        super(ChangeWorkgroupForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         wgs = [(wg.id, wg.name) for wg in self.user.profile.workgroups]
         self.fields['workgroup']=forms.ModelChoiceField(
@@ -441,7 +441,7 @@ class BulkDownloadForm(DownloadActionForm):
     )
 
     def __init__(self, *args, **kwargs):
-        super(BulkDownloadForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['download_type'] = forms.ChoiceField(
             choices=[
                 (d_type.download_type, d_type.label)
@@ -454,4 +454,4 @@ class BulkDownloadForm(DownloadActionForm):
         self.download_type = self.cleaned_data['download_type']
         self.title = self.cleaned_data['title']
         items = self.cleaned_data['items']
-        super(BulkDownloadForm, self).make_changes()
+        super().make_changes()

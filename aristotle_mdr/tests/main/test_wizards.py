@@ -1,14 +1,17 @@
 from django.test import TestCase
 from django.utils import timezone
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.management import call_command
 
 import aristotle_mdr.models as models
 import aristotle_mdr.tests.utils as utils
 from aristotle_mdr.utils import url_slugify_concept
 
-from django.test.utils import setup_test_environment
-setup_test_environment()
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+
+setup_aristotle_test_environment()
+
 
 class CreateListPageTests(utils.LoggedInViewPages,TestCase):
     def test_create_list_active(self):
@@ -34,7 +37,7 @@ class ConceptWizard_TestInvalidUrls(utils.LoggedInViewPages,TestCase):
         call_command('clear_index', interactive=False, verbosity=0)
 
     def setUp(self):
-        super(ConceptWizard_TestInvalidUrls, self).setUp()
+        super().setUp()
         import haystack
         haystack.connections.reload('default')
 
@@ -65,7 +68,7 @@ class ConceptWizardPage(utils.LoggedInViewPages):
         call_command('clear_index', interactive=False, verbosity=0)
 
     def setUp(self):
-        super(ConceptWizardPage, self).setUp()
+        super().setUp()
         import haystack
         haystack.connections.reload('default')
 

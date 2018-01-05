@@ -19,7 +19,7 @@
                 </a>
                 <a class="col-md-4 btn btn-default" href="{% url 'aristotle:userWorkgroups' %}">
                     <i class="fa fa-2x fa-users"></i><br>
-                    View my teams
+                    View my workgroups
                 </a>
                 <a class="col-md-4 btn btn-default" href="{% url 'aristotle:userEdit' %}">
                     <i class="fa fa-2x fa-user"></i><br>
@@ -29,7 +29,8 @@
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <i class="fa fa-envelope fa-fw"></i> <a class="panel-title" href="{% url 'aristotle:userInbox' %}">Recent Notifications</a>
+                    <i class="fa fa-envelope fa-fw"></i>
+                    <span class="panel-title" href="{% url 'aristotle:userInbox' %}">Recent Notifications</span>
                 </div>
                     <ul class="list-group">
                     {% for item in user.notifications.unread|slice:':5' %}
@@ -41,11 +42,17 @@
                         <li class="list-group-item"> No unread notifications </li>
                     {% endfor %}
                     </ul>
-                    <div class="panel-footer"><a href="{% url 'aristotle:userInbox' %}">See all notifications...</a></div>
+                    <div class="panel-footer"><a href="{% url 'aristotle:userInbox' %}">See more</a></div>
             </div>
+        </section>
+
+        <section class="col-md-4">
+
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <i class="fa fa-bookmark fa-fw"></i> <a class="panel-title" href="{% url 'aristotle:userFavourites' %}">Recently Favourited Items</a>
+                    <i class="fa fa-bookmark fa-fw"></i>
+                    <span class="panel-title">Recent Favourites</span>
+                    <a href="{% url 'aristotle:userFavourites' %}">See more</a>
                 </div>
 
                 <div class="list-group">
@@ -59,28 +66,16 @@
                         <a class="list-group-item"> No favourites </a>
                     {% endfor %}
                 </div>
-                <div class="panel-footer"><a href="{% url 'aristotle:userFavourites' %}">See all my favourites...</a></div>
             </div>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <i class="fa fa-users fa-fw"></i> Recent Workgroups
-                </div>
-                <ul class="list-group">
-                {% for item in user.profile.myWorkgroups.all %}
-                  <li class="list-group-item" ><a href="{% url 'aristotle:workgroup' item.id %}/">{{ item }}</a>
-                    </li>
-                {% empty %}
-                    <li class="list-group-item"> No workgroups </li>
-                {% endfor %}
-                </ul>
-                <div class="panel-footer"><a href="{% url 'aristotle:userWorkgroups' %}">See all my workgroups...</a></div>
-            </div>
-        </section>
 
-        <section class="col-md-4">
+
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <i class="fa fa-history fa-fw"></i> My Recent Actions
+                    <span class="panel-title" href="{% url 'aristotle:userRecentItems' %}">
+                        <i class="fa fa-history fa-fw"></i> Recent Actions
+                    </span>
+                    <a href="{% url 'aristotle:userRecentItems' %}">See more
+                    </a>
                 </div>
                 <ul class="list-group">
                 {% for revision in recent %}
@@ -99,7 +94,6 @@
                     <li class="list-group-item"> No recent items </li>
                 {% endfor %}
                 </ul>
-                <div class="panel-footer"><a href="{% url 'aristotle:userRecentItems' %}">See all recent items...</a></div>
             </div>
         </section>
     </div>

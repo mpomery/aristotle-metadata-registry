@@ -2,7 +2,7 @@ from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 
 from django.conf.urls import url
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, FormView
@@ -198,7 +198,7 @@ class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
     redirect_unauthenticated_users = True
 
     def get_form_kwargs(self):
-        kwargs = super(InviteView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({
             "request": self.request
         })

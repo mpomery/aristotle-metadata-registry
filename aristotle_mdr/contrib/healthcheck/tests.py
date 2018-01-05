@@ -2,13 +2,13 @@ import mock
 from django.db import DatabaseError
 from django.test import Client
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 from django.test import override_settings
-from django.test.utils import setup_test_environment
 from aristotle_mdr.tests.utils import get_json_from_response
+from aristotle_mdr.utils import setup_aristotle_test_environment
 
-setup_test_environment()
+setup_aristotle_test_environment()
 
 cursor_wrapper = mock.Mock()
 cursor_wrapper.side_effect = DatabaseError

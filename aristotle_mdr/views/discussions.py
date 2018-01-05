@@ -1,7 +1,7 @@
 from django.contrib import messages
 
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
@@ -22,7 +22,7 @@ class All(LoginRequiredMixin, TemplateView):
     template_name = "aristotle_mdr/discussions/all.html"
 
     def get_context_data(self, **kwargs):
-        context = super(All, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['discussions'] = self.request.user.profile.discussions
 
         return context
@@ -36,7 +36,7 @@ class Workgroup(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, Template
     redirect_unauthenticated_users = True
 
     def get(self, request, *args, **kwargs):
-        context = super(Workgroup, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         wg = get_object_or_404(MDR.Workgroup, pk=self.kwargs['wgid'])
 
         if not perms.user_in_workgroup(request.user, wg):
@@ -119,7 +119,7 @@ class Post(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, PostMixin, Te
     redirect_unauthenticated_users = True
 
     def get(self, request, *args, **kwargs):
-        context = super(Post, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
 
         post = self.get_object()
 
@@ -253,6 +253,8 @@ class DeleteComment(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, Comm
     redirect_unauthenticated_users = True
 
     def get_success_url(self):
+        # TODO: How does this work, is it even tested?
+        from django.utils.functional import lazy
         success_url = lazy(reverse, self)('aristotle:discussionsPost', args=self.kwargs['cid'])
         return success_url
 

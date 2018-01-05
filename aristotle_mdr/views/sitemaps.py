@@ -1,4 +1,3 @@
-from __future__ import division
 from django.shortcuts import render
 from aristotle_mdr import models as MDR
 

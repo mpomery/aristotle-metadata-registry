@@ -6,7 +6,6 @@ from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.template.loader import get_template
-from django.template import Context
 from django.utils import six
 
 from aristotle_mdr import models, perms
@@ -22,7 +21,7 @@ class GenericAutocomplete(autocomplete.Select2QuerySetView):
             self.model = get_object_or_404(
                 ContentType, app_label=kwargs['app_name'], model=kwargs['model_name']
             ).model_class()
-        return super(GenericAutocomplete, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
@@ -43,7 +42,7 @@ class GenericAutocomplete(autocomplete.Select2QuerySetView):
         """Return the label of a result."""
 
         template = get_template(self.template_name)
-        context = Context({"result": result, 'request': self.request})
+        context = {"result": result, 'request': self.request}
         return template.render(context)
 
     def get_results(self, context):
@@ -98,7 +97,7 @@ class UserAutocomplete(GenericAutocomplete):
     template_name = "aristotle_mdr/actions/autocompleteUser.html"
 
     def dispatch(self, request, *args, **kwargs):
-        return super(UserAutocomplete, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         self.model = get_user_model()
@@ -139,7 +138,7 @@ class UserAutocomplete(GenericAutocomplete):
                 field = "%s<b><u>%s</u></b>%s" % (field[:index], field[index:offset], field[offset:])
 
             result.highlight[f] = field
-        context = Context({"result": result, 'request': self.request})
+        context = {"result": result, 'request': self.request}
         return template.render(context)
 
     def get_result_title(self, result):

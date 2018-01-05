@@ -1,7 +1,7 @@
 Technical requirements
 ======================
 
-The Aristotle Metadata Registry is built on the django framework which supports a wide range of
+The Aristotle Metadata Registry is built on the Django framework which supports a wide range of
 operating systems and databases. While Aristotle-MDR should support most of these
 only a small set of configurations have been thoroughly tested on the
 `Travis-CI <https://travis-ci.org/aristotle-mdr/aristotle-metadata-registry/>`_
@@ -11,7 +11,7 @@ continuous integration systems as "supported infrastucture".
 Operating system support
 ------------------------
 
-* Ubuntu Linux 12.04 LTS (verification courtesy of Travis-CI)
+* Ubuntu Linux (Precise Pangolin) 12.04 LTS (verification courtesy of Travis-CI)
 * Windows Server 2016 (verification courtesy of Appveyor)
 
 Travis-CI does not yet have containerised support for the Ubuntu 14.04 or 16.04
@@ -19,16 +19,14 @@ long-term support releases.
 
 Python
 ------
-Only the latest releases of Python are supported. New users are recommended to use Python 3.
+Only the latest releases of Python are supported. New users are recommended to use Python 3.5 or above.
 
-* Python 2.7
 * Python 3.5+
 
 Django
 ------
 
-* Django version 1.8 LTS
-* Django version 1.10
+* Django version 1.11 LTS
 
 
 Database support
@@ -45,5 +43,5 @@ Consider using an alternative like MariaDB if you need MySQL-like support.
 Search index support
 --------------------
 
-* Elasticsearch 2.4+ (Only tested on Linux)
+* Elasticsearch 2.0+ (Only tested on Linux)
 * Whoosh (Linux and Windows)

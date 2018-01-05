@@ -13,12 +13,19 @@ from haystack.constants import DEFAULT_ALIAS
 from haystack.forms import SearchForm, FacetedSearchForm
 from haystack.query import EmptySearchQuerySet, SearchQuerySet, SQ
 
-from bootstrap3_datetime.widgets import DateTimePicker
-
 import aristotle_mdr.models as MDR
-from aristotle_mdr.widgets import (
-    BootstrapDropdownSelectMultiple, BootstrapDropdownIntelligentDate,
-    BootstrapDropdownSelect, BootstrapDateTimePicker
+from aristotle_mdr.widgets.bootstrap import (
+    BootstrapDropdownSelectMultiple,
+    BootstrapDropdownIntelligentDate,
+    BootstrapDropdownSelect,
+    BootstrapDateTimePicker
+)
+from django.forms.widgets import (
+    SelectMultiple
+    # SelectMultiple as BootstrapDropdownSelectMultiple,
+    # DateInput as BootstrapDropdownIntelligentDate,
+    # Select as BootstrapDropdownSelect,
+    # DateInput as BootstrapDateTimePicker
 )
 from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
 
@@ -93,6 +100,8 @@ def time_delta(delta):  # pragma: no cover
         t = datetime.date.today()
         return datetime.date(day=1, month=t.month, year=(t.year - 1))
     return None
+
+
 DELTA = {
     QUICK_DATES.hour: datetime.timedelta(hours=1),
     QUICK_DATES.today: datetime.timedelta(days=1),
@@ -259,6 +268,7 @@ class TokenSearchForm(FacetedSearchForm):
     def no_query_found(self):
         return EmptyPermissionSearchQuerySet()
 
+
 datePickerOptions = {
     "format": "YYYY-MM-DD",
     # "pickTime": False,
@@ -354,7 +364,7 @@ class PermissionSearchForm(TokenSearchForm):
             kwargs['searchqueryset'] = get_permission_sqs()
         if not issubclass(type(kwargs['searchqueryset']), PermissionSearchQuerySet):
             raise ImproperlyConfigured("Aristotle Search Queryset connection must be a subclass of PermissionSearchQuerySet")
-        super(PermissionSearchForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         from haystack.forms import SearchForm, FacetedSearchForm, model_choices
 
@@ -385,7 +395,7 @@ class PermissionSearchForm(TokenSearchForm):
 
     def search(self, repeat_search=False):
         # First, store the SearchQuerySet received from other processing.
-        sqs = super(PermissionSearchForm, self).search()
+        sqs = super().search()
         if not self.token_models and self.get_models():
             sqs = sqs.models(*self.get_models())
         self.repeat_search = repeat_search
@@ -522,10 +532,7 @@ class PermissionSearchForm(TokenSearchForm):
         if self.query_text:
             original_query = self.cleaned_data.get('q', "")
 
-            try:  # Python 2
-                from urllib import quote_plus
-            except:  # Python 3
-                from urllib.parse import quote_plus
+            from urllib.parse import quote_plus
 
             suggestions = []
             has_suggestions = False

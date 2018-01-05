@@ -1,5 +1,6 @@
 import os
 import sys
+import tempfile
 import dj_database_url
 from aristotle_mdr.required_settings import *
 
@@ -13,7 +14,14 @@ TEMPLATES[0]['DIRS'] = [
     os.path.join(BASE, 'tests/apps/bulk_actions_test/templates')
 ]
 
-SECRET_KEY = 'inara+vtkprm7@0(fsc$+grbz9-s+tmo9d)e#k(9uf8m281&$7xhdkjr'
+SECRET_KEY = 'inara+oscar+vtkprm7@0(fsc$+grbz9-s+tmo9d)e#k(9uf8m281&$7xhdkjr'
+
+# We set this up so we can point wcag_zoo in the right place
+BASE_STATICPATH = tempfile.mkdtemp(suffix='_staticfiles')
+
+STATIC_ROOT = BASE_STATICPATH+STATIC_URL
+if not os.path.exists(STATIC_ROOT):
+    os.makedirs(STATIC_ROOT)
 
 MEDIA_ROOT = os.path.join(BASE, "media")
 MEDIA_URL = '/media/'
@@ -28,8 +36,8 @@ else:
     ci_runner = "Tox"
 
 skip_migrations = (
-    "ARISTOTLE_DEV_SKIP_MIGRATIONS" in os.environ or
-    os.environ.get('DATABASE_URL', "").startswith('mssql')
+    "ARISTOTLE_DEV_SKIP_MIGRATIONS" in os.environ # or
+    # os.environ.get('DATABASE_URL', "").startswith('mssql')
 )
 
 
@@ -43,7 +51,7 @@ if skip_migrations:  # pragma: no cover
             return True
     
         def __getitem__(self, item):
-            return "notmigrations"
+            return None
     
     MIGRATION_MODULES = DisableMigrations()
 
@@ -107,7 +115,7 @@ ARISTOTLE_SETTINGS['BULK_ACTIONS'] = ARISTOTLE_SETTINGS['BULK_ACTIONS'] + [
 ROOT_URLCONF = 'extension_test.urls'
 
 # disable
-__LOGGING__ = {
+LOGGING = {
     'version': 1,
     'formatters': {
         'verbose': {

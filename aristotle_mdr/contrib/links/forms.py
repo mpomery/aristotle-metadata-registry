@@ -11,7 +11,7 @@ from aristotle_mdr.contrib.autocomplete import widgets
 class LinkEndEditorBase(UserAwareForm, forms.Form):
     def __init__(self, roles, *args, **kwargs):
         self.roles = roles
-        super(LinkEndEditorBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         for role in self.roles:
             if role.multiplicity == 1:
                 self.fields['role_' + str(role.pk)] = forms.ModelChoiceField(
@@ -27,7 +27,7 @@ class LinkEndEditorBase(UserAwareForm, forms.Form):
                 )
 
     def clean(self, *args, **kwargs):
-        cleaned_data = super(LinkEndEditorBase, self).clean(*args, **kwargs)
+        cleaned_data = super().clean(*args, **kwargs)
         for role in self.roles:
             field_name = 'role_' + str(role.pk)
             d = cleaned_data.get(field_name)
@@ -38,7 +38,7 @@ class LinkEndEditorBase(UserAwareForm, forms.Form):
 
 class LinkEndEditor(LinkEndEditorBase):
     def __init__(self, link, roles, *args, **kwargs):
-        super(LinkEndEditor, self).__init__(roles, *args, **kwargs)
+        super().__init__(roles, *args, **kwargs)
         for role in self.roles:
             if role.multiplicity == 1:
                 self.fields['role_' + str(role.pk)].initial = MDR._concept.objects.get(
@@ -57,7 +57,7 @@ class AddLink_SelectRelation_1(UserAwareForm, forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        super(AddLink_SelectRelation_1, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['relation'].queryset = Relation.objects.all().visible(self.user)
 
 

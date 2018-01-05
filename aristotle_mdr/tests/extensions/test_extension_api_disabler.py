@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 import aristotle_mdr.tests.utils as utils
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.template import TemplateDoesNotExist
 from aristotle_mdr.tests.main.test_html_pages import LoggedInViewConceptPages
 from aristotle_mdr.tests.main.test_admin_pages import AdminPageForConcept
@@ -19,7 +19,7 @@ from django.conf import settings
 
 class ConfigDisableCheckTests(utils.LoggedInViewPages, TestCase):
     def setUp(self):
-        super(ConfigDisableCheckTests, self).setUp()
+        super().setUp()
         self.item = Question.objects.create(
             name="Test Question Title",
             definition="Some unique string"

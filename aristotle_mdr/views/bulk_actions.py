@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import TemplateDoesNotExist
@@ -35,7 +35,7 @@ class BulkAction(FormView):
                 )
             else:
                 raise PermissionDenied
-        return super(BulkAction, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     def get_action(self):
         actions = get_bulk_actions()

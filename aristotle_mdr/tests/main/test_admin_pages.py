@@ -1,21 +1,23 @@
 from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.forms import model_to_dict
 from django.test import TestCase
-from django.test.utils import setup_test_environment
 
 import datetime
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
+from aristotle_mdr.utils import setup_aristotle_test_environment
 
-setup_test_environment()
+
+setup_aristotle_test_environment()
+
 
 class AdminPage(utils.LoggedInViewPages,TestCase):
     def setUp(self):
-        super(AdminPage, self).setUp()
+        super().setUp()
 
     def test_workgroup_list(self):
         new_editor = get_user_model().objects.create_user('new_eddie','','editor')
@@ -150,7 +152,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
     form_defaults = {}
     create_defaults = {}
     def setUp(self,instant_create=True):
-        super(AdminPageForConcept, self).setUp()
+        super().setUp()
         if instant_create:
             self.create_items()
 
@@ -235,6 +237,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
             )
         self.assertRedirects(response,reverse("admin:%s_%s_changelist"%(self.itemType._meta.app_label,self.itemType._meta.model_name)))
         self.assertEqual(self.wg1.items.count(),before_count-1)
+        self.assertFalse(self.itemType.objects.filter(pk=self.item1.pk).exists())
 
         self.item1 = self.itemType.objects.create(name="OC1",workgroup=self.wg1, **self.create_defaults)
         self.assertEqual(self.wg1.items.count(),1)
@@ -257,32 +260,63 @@ class AdminPageForConcept(utils.LoggedInViewPages):
         self.assertFalse(perms.user_can_edit(self.editor,self.item1))
 
         before_count = self.wg1.items.count()
-        response = self.client.get(reverse("admin:%s_%s_delete"%(self.itemType._meta.app_label,self.itemType._meta.model_name),args=[self.item1.pk]))
-        self.assertResponseStatusCodeEqual(response,404)
+        response = self.client.get(
+            reverse(
+                "admin:%s_%s_delete"%(self.itemType._meta.app_label,self.itemType._meta.model_name),
+                args=[self.item1.pk]
+            ),
+            follow=True
+        )
+        # In django 1.11, if you can't view an item you are redirected to the admin index page
+        self.assertRedirects(response, reverse("admin:index"))
+        self.assertContains(response, "Perhaps it was deleted?")
+
+        self.assertTrue(self.itemType.objects.filter(pk=self.item1.pk).exists())
 
         self.assertEqual(self.wg1.items.count(),before_count)
         response = self.client.post(
-            reverse("admin:%s_%s_delete"%(self.itemType._meta.app_label,self.itemType._meta.model_name),args=[self.item1.pk]),
-            {'post':'yes'}
-            )
-        self.assertResponseStatusCodeEqual(response,404)
+            reverse(
+                "admin:%s_%s_delete"%(self.itemType._meta.app_label,self.itemType._meta.model_name),
+                args=[self.item1.pk]
+            ),
+            {'post':'yes'},
+            follow=True
+        )
+        # In django 1.11, if you can't view an item you are redirected to the admin index page
+        self.assertRedirects(response, reverse("admin:index"))
+        self.assertContains(response, "Perhaps it was deleted?")
         self.assertEqual(self.wg1.items.count(),before_count)
+        self.assertTrue(self.itemType.objects.filter(pk=self.item1.pk).exists())
 
     def test_editor_deleting_forbidden_item(self):
         self.login_editor()
         self.item2 = self.itemType.objects.create(name="OC2",workgroup=self.wg2, **self.create_defaults)
 
         before_count = self.wg2.items.count()
-        response = self.client.get(reverse("admin:%s_%s_delete"%(self.itemType._meta.app_label,self.itemType._meta.model_name),args=[self.item2.pk]))
-        self.assertResponseStatusCodeEqual(response,404)
+        response = self.client.get(
+            reverse(
+                "admin:%s_%s_delete"%(self.itemType._meta.app_label,self.itemType._meta.model_name),
+                args=[self.item2.pk]
+            ),
+            follow=True
+        )
+        # In django 1.11, if you can't view an item you are redirected to the admin index page
+        self.assertRedirects(response, reverse("admin:index"))
+        self.assertContains(response, "Perhaps it was deleted?")
         self.assertEqual(self.wg2.items.count(),before_count)
 
         before_count = self.wg2.items.count()
         response = self.client.post(
-            reverse("admin:%s_%s_delete"%(self.itemType._meta.app_label,self.itemType._meta.model_name),args=[self.item2.pk]),
-            {'post':'yes'}
-            )
-        self.assertResponseStatusCodeEqual(response,404)
+            reverse(
+                "admin:%s_%s_delete"%(self.itemType._meta.app_label,self.itemType._meta.model_name),
+                args=[self.item2.pk]
+            ),
+            {'post':'yes'},
+            follow=True
+        )
+        # In django 1.11, if you can't view an item you are redirected to the admin index page
+        self.assertRedirects(response, reverse("admin:index"))
+        self.assertContains(response, "Perhaps it was deleted?")
         self.assertEqual(self.wg2.items.count(),before_count)
 
     def test_editor_change_item(self):
@@ -527,7 +561,7 @@ class DataTypeAdminPage(AdminPageForConcept,TestCase):
 class DataElementDerivationAdminPage(AdminPageForConcept,TestCase):
     itemType=models.DataElementDerivation
     def setUp(self):
-        super(DataElementDerivationAdminPage, self).setUp(instant_create=False)
+        super().setUp(instant_create=False)
         from reversion import revisions as reversion
         with reversion.create_revision():
             self.ded_wg = models.Workgroup.objects.create(name="Derived WG")

@@ -1,20 +1,18 @@
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.auth import get_user_model
-from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+# from django.contrib.auth import get_user_model
+from django.urls import reverse
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
 from django.template.defaultfilters import slugify
 from django.views.generic import (
-    CreateView, DetailView, FormView, ListView, RedirectView, UpdateView
+    CreateView, DetailView, ListView, UpdateView
 )
 
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
-from aristotle_mdr.perms import user_in_workgroup, user_is_workgroup_manager
+from aristotle_mdr.perms import user_is_workgroup_manager
 from aristotle_mdr.views.utils import (
-    paginated_list,
     paginate_sort_opts,
     paginated_workgroup_list,
     workgroup_item_statuses,
@@ -40,7 +38,7 @@ class WorkgroupContextMixin(object):
 
     def get_context_data(self, **kwargs):
         # Get context from super-classes, because if may set value for workgroup
-        context = super(WorkgroupContextMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update({
             'item': self.get_object(),
             'workgroup': self.get_object(),
@@ -67,7 +65,7 @@ class WorkgroupView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermis
             'recent': MDR._concept.objects.filter(
                 workgroup=self.object).select_subclasses().order_by('-modified')[:5]
         })
-        return super(WorkgroupView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_template_names(self):
         return self.object and [self.object.template] or []
@@ -88,7 +86,7 @@ class ItemsView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermission
         kwargs.update({
             'sort': self.sort_by,
         })
-        context = super(ItemsView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['page'] = context.get('page_obj')  # dirty hack for current template
         return context
 
@@ -129,7 +127,7 @@ class AddMembersView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermi
     permission_required = "aristotle_mdr.change_workgroup"
 
     def get_form_kwargs(self):
-        kwargs = super(AddMembersView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         # TODO: Not happy about this as its not an updateForm
         kwargs.pop('instance')
         return kwargs
@@ -138,7 +136,7 @@ class AddMembersView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermi
         kwargs.update({
             'role': self.request.GET.get('role')
         })
-        return super(AddMembersView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         users = form.cleaned_data['users']
@@ -181,7 +179,7 @@ class ListWorkgroup(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     redirect_unauthenticated_users = True
 
     def dispatch(self, request, *args, **kwargs):
-        super(ListWorkgroup, self).dispatch(request, *args, **kwargs)
+        super().dispatch(request, *args, **kwargs)
         workgroups = MDR.Workgroup.objects.all()
 
         text_filter = request.GET.get('filter', "")

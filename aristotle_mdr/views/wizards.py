@@ -5,7 +5,7 @@ from aristotle_mdr.utils import url_slugify_concept
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.contenttypes.models import ContentType
@@ -67,13 +67,13 @@ class PermissionWizard(SessionWizardView):
         if not user_is_editor(request.user):
             raise PermissionDenied
 
-        return super(PermissionWizard, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_template_names(self):
         return [self.templates[self.steps.current]]
 
     def get_form_kwargs(self, step):
-        kwargs = super(PermissionWizard, self).get_form_kwargs(step)
+        kwargs = super().get_form_kwargs(step)
         kwargs.update({'user': self.request.user})
         return kwargs
 
@@ -83,7 +83,7 @@ class PermissionWizard(SessionWizardView):
         return None
 
     def get_context_data(self, form, **kwargs):
-        context = super(PermissionWizard, self).get_context_data(form=form, **kwargs)
+        context = super().get_context_data(form=form, **kwargs)
         context.update({
             'model': self.model._meta.model_name,
             'app_label': self.model._meta.app_label,
@@ -118,10 +118,10 @@ class ConceptWizard(PermissionWizard):
                 'check_similar': similar or duplicates
             })
             return MDRForms.wizards.subclassed_wizard_2_Results(self.model)(**kwargs)
-        return super(ConceptWizard, self).get_form(step, data, files)
+        return super().get_form(step, data, files)
 
     def get_context_data(self, form, **kwargs):
-        context = super(ConceptWizard, self).get_context_data(form=form, **kwargs)
+        context = super().get_context_data(form=form, **kwargs)
 
         if self.steps.current == 'initial':
             context['step_title'] = _('Search for existing content')
@@ -282,7 +282,7 @@ class MultiStepAristotleWizard(PermissionWizard):
         return fd
 
     def get_form_initial(self, step):
-        initial = super(MultiStepAristotleWizard, self).get_form_initial(step)
+        initial = super().get_form_initial(step)
         if step is None:  # pragma: no cover
             step = self.steps.current
         if step == "make_oc":
@@ -379,7 +379,7 @@ class DataElementConceptWizard(MultiStepAristotleWizard):
         # determine the step if not given
         if step is None:  # pragma: no cover
             step = self.steps.current
-        kwargs = super(DataElementConceptWizard, self).get_form_kwargs(step)
+        kwargs = super().get_form_kwargs(step)
 
         if step == 'component_results':
             ocp = self.get_cleaned_data_for_step('component_search')
@@ -407,7 +407,7 @@ class DataElementConceptWizard(MultiStepAristotleWizard):
         return kwargs
 
     def get_context_data(self, form, **kwargs):
-        context = super(DataElementConceptWizard, self).get_context_data(form=form, **kwargs)
+        context = super().get_context_data(form=form, **kwargs)
 
         context.update({
             'component_search': {'percent_complete': 20, 'step_title': _('Search for components')},
@@ -625,7 +625,7 @@ class DataElementWizard(MultiStepAristotleWizard):
 
     def get_form_kwargs(self, step):
         # determine the step if not given
-        kwargs = super(DataElementWizard, self).get_form_kwargs(step)
+        kwargs = super().get_form_kwargs(step)
         if step is None:  # pragma: no cover
             step = self.steps.current
 
@@ -665,7 +665,7 @@ class DataElementWizard(MultiStepAristotleWizard):
         return kwargs
 
     def get_context_data(self, form, **kwargs):
-        context = super(DataElementWizard, self).get_context_data(form=form, **kwargs)
+        context = super().get_context_data(form=form, **kwargs)
         context.update({
             'template_name': 'aristotle_mdr/create/dec_template_wrapper.html',
             'next_button_text': _("Next")
@@ -757,7 +757,7 @@ class DataElementWizard(MultiStepAristotleWizard):
         return context
 
     def get_form_initial(self, step):
-        initial = super(DataElementWizard, self).get_form_initial(step)
+        initial = super().get_form_initial(step)
         if step is None:  # pragma: no cover
             step = self.steps.current
         if step == "make_vd":

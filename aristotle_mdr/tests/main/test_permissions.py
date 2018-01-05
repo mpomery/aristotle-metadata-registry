@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from django.test.utils import setup_test_environment
 
 import datetime
 
@@ -8,7 +7,11 @@ import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 from aristotle_mdr.tests import utils
 
-setup_test_environment()
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+
+setup_aristotle_test_environment()
+
 
 class SuperuserPermissions(TestCase):
     # All of the below are called with None as a Superuser, by definition *must* be able to edit, view and managed everything. Since a is_superuser chcek is cheap is should be called first, so calling with None checks that there is no other database calls going on.
@@ -43,20 +46,20 @@ class SuperuserPermissions(TestCase):
 
 class UnitOfMeasureVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(UnitOfMeasureVisibility, self).setUp()
+        super().setUp()
         self.item = models.UnitOfMeasure.objects.create(name="Test UOM",workgroup=self.wg)
 
 class ObjectClassVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(ObjectClassVisibility, self).setUp()
+        super().setUp()
         self.item = models.ObjectClass.objects.create(name="Test OC",workgroup=self.wg)
 class PropertyVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(PropertyVisibility, self).setUp()
+        super().setUp()
         self.item = models.Property.objects.create(name="Test P",workgroup=self.wg)
 class ValueDomainVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(ValueDomainVisibility, self).setUp()
+        super().setUp()
         self.item = models.ValueDomain.objects.create(
             name="Test VD",
             workgroup=self.wg,
@@ -66,21 +69,21 @@ class ValueDomainVisibility(utils.ManagedObjectVisibility,TestCase):
         )
 class DataElementConceptVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(DataElementConceptVisibility, self).setUp()
+        super().setUp()
         self.item = models.DataElementConcept.objects.create(
             name="Test DEC",
             workgroup=self.wg,
         )
 class DataElementVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(DataElementVisibility, self).setUp()
+        super().setUp()
         self.item = models.DataElement.objects.create(
             name="Test DE",
             workgroup=self.wg,
         )
 class DataTypeVisibility(utils.ManagedObjectVisibility,TestCase):
     def setUp(self):
-        super(DataTypeVisibility, self).setUp()
+        super().setUp()
         self.item = models.DataType.objects.create(
             name="Test DT",
             workgroup=self.wg,

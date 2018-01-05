@@ -4,11 +4,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView
@@ -50,7 +49,7 @@ class ConceptHistoryCompareView(HistoryCompareDetailView):
     template_name = "aristotle_mdr/actions/concept_history_compare.html"
 
     def get_object(self, queryset=None):
-        item = super(ConceptHistoryCompareView, self).get_object(queryset)
+        item = super().get_object(queryset)
         if not user_can_view(self.request.user, item):
             raise PermissionDenied
         self.model = item.item.__class__  # Get the subclassed object
@@ -58,7 +57,7 @@ class ConceptHistoryCompareView(HistoryCompareDetailView):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        return super(ConceptHistoryCompareView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
 
 def get_if_user_can_view(objtype, user, iid):
@@ -362,7 +361,7 @@ def extensions(request):
 
 class PermissionSearchView(FacetedSearchView):
     def build_form(self):
-        form = super(self.__class__, self).build_form()
+        form = super().build_form()
         form.request = self.request
         form.request.GET = self.clean_facets(self.request)
         return form

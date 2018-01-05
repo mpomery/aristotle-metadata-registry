@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from .views import *
 from . import wizards
 from . import user_pages

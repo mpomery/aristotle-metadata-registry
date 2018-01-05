@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, override_settings
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
@@ -7,17 +7,14 @@ import aristotle_mdr.tests.utils as utils
 
 from django.core.exceptions import ImproperlyConfigured
 
-from django.test.utils import setup_test_environment
-setup_test_environment()
-
 from aristotle_mdr.utils import fetch_aristotle_settings, error_messages
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+setup_aristotle_test_environment()
 
 
-try:
-    from unittest.mock import patch
-except:
-    # Python2, Py2
-    from mock import patch
+from unittest.mock import patch
+
 
 class TestAristotleSettings(TestCase):
     

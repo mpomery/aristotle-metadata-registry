@@ -2,7 +2,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import transaction
 from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, get_object_or_404
@@ -30,10 +30,10 @@ class EditLinkFormView(FormView):
             return redirect(reverse('friendly_login') + '?next=%s' % request.path)
         if not perms.user_can_change_link(request.user, self.link):
             raise PermissionDenied
-        return super(EditLinkFormView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
-        kwargs = super(EditLinkFormView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({
             'link': self.link,
             'roles': self.link.relation.relationrole_set.all(),
@@ -42,7 +42,7 @@ class EditLinkFormView(FormView):
         return kwargs
 
     def get_context_data(self, *args, **kwargs):
-        context = super(EditLinkFormView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context.update(
             {
                 'roles': self.link.relation.relationrole_set.all(),
@@ -105,7 +105,7 @@ class AddLinkWizard(SessionWizardView):
             return redirect(reverse('friendly_login') + '?next=%s' % request.path)
         if not request.user.has_perm('aristotle_mdr_links.add_link'):
             raise PermissionDenied
-        return super(AddLinkWizard, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_template_names(self):
         return self.template_names[int(self.steps.current)]
@@ -115,7 +115,7 @@ class AddLinkWizard(SessionWizardView):
         return self.relation.relationrole_set.order_by('ordinal', 'name')
 
     def get_form_kwargs(self, step):
-        kwargs = super(AddLinkWizard, self).get_form_kwargs(step)
+        kwargs = super().get_form_kwargs(step)
         if int(step) == 0:
             kwargs.update({
                 'user': self.request.user
@@ -138,7 +138,7 @@ class AddLinkWizard(SessionWizardView):
         return role_concepts
 
     def get_context_data(self, *args, **kwargs):
-        context = super(AddLinkWizard, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         if int(self.steps.current) == 1:
             context.update({'roles': self.get_roles()})
         if int(self.steps.current) == 2:

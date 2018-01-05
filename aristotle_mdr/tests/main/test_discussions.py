@@ -4,10 +4,13 @@ import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
-from django.test.utils import setup_test_environment
-setup_test_environment()
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+
+setup_aristotle_test_environment()
+
 
 class PostingAndCommentingAtObjectLevel(TestCase):
 
@@ -70,7 +73,7 @@ class PostingAndCommentingAtObjectLevel(TestCase):
 
 class WorkgroupMembersCanMakePostsAndComments(utils.LoggedInViewPages,TestCase):
     def setUp(self):
-        super(WorkgroupMembersCanMakePostsAndComments, self).setUp()
+        super().setUp()
         self.viewer2 = get_user_model().objects.create_user('viewer2','','viewer') # not in any workgroup
         self.viewer3 = get_user_model().objects.create_user('viewer3','','viewer') # not in our "primary testing workgroup" (self.wg1)
         self.wg1.giveRoleToUser('viewer',self.viewer3)
@@ -428,7 +431,7 @@ class WorkgroupMembersCanMakePostsAndComments(utils.LoggedInViewPages,TestCase):
 
 class ViewDiscussionPostPage(utils.LoggedInViewPages,TestCase):
     def setUp(self):
-        super(ViewDiscussionPostPage, self).setUp()
+        super().setUp()
         self.viewer2 = get_user_model().objects.create_user('viewer2','','viewer') # not in any workgroup
         self.viewer3 = get_user_model().objects.create_user('viewer3','','viewer') # not in our "primary testing workgroup" (self.wg1)
         self.wg2.giveRoleToUser('viewer',self.viewer3)

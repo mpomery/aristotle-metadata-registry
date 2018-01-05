@@ -1,11 +1,7 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.signals import post_save, m2m_changed, post_delete, pre_save
@@ -18,8 +14,6 @@ from model_utils.models import TimeStampedModel
 from model_utils import Choices, FieldTracker
 from aristotle_mdr.contrib.channels.utils import fire
 import uuid
-
-from django.utils.encoding import python_2_unicode_compatible  # Python 2
 
 import reversion  # import revisions
 
@@ -75,7 +69,6 @@ VERY_RECENTLY_SECONDS = 15
 concept_visibility_updated = Signal(providing_args=["concept"])
 
 
-@python_2_unicode_compatible  # Python 2
 class baseAristotleObject(TimeStampedModel):
     uuid = models.UUIDField(
         help_text=_("Universally-unique Identifier. Uses UUID1 as this improves uniqueness and tracking between registries"),
@@ -855,7 +848,6 @@ class ReviewRequestManager(models.Manager):
             return getattr(self.__class__, attr, *args)
 
 
-@python_2_unicode_compatible  # Python 2
 class ReviewRequest(TimeStampedModel):
     objects = ReviewRequestManager()
     concepts = models.ManyToManyField(_concept, related_name="review_requests")
@@ -900,7 +892,6 @@ class ReviewRequest(TimeStampedModel):
         )
 
 
-@python_2_unicode_compatible  # Python 2
 class Status(TimeStampedModel):
     """
     8.1.2.6 - Registration_State class
@@ -948,6 +939,8 @@ class Status(TimeStampedModel):
 
 def recache_concept_states(sender, instance, *args, **kwargs):
     instance.concept.recache_states()
+
+
 post_save.connect(recache_concept_states, sender=Status)
 post_delete.connect(recache_concept_states, sender=Status)
 
@@ -1032,7 +1025,6 @@ class ConceptualDomain(concept):
     ]
 
 
-@python_2_unicode_compatible  # Python 2
 class ValueMeaning(aristotleComponent):
     """
     Value_Meaning is a class each instance of which models a value meaning (3.2.141),
@@ -1141,7 +1133,6 @@ class ValueDomain(concept):
         return self.supplementaryvalue_set.all()
 
 
-@python_2_unicode_compatible  # Python 2
 class AbstractValue(aristotleComponent):
     """
     Implementation note: Not the best name, but there will be times to
@@ -1411,6 +1402,8 @@ class PossumProfile(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         profile, created = PossumProfile.objects.get_or_create(user=instance)
+
+
 post_save.connect(create_user_profile, sender=settings.AUTH_USER_MODEL)
 
 

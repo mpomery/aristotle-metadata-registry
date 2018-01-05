@@ -6,7 +6,7 @@ from aristotle_mdr import models as MDR
 class FormRequestMixin(object):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request')
-        super(FormRequestMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class RegistrationAuthorityMixin(object):

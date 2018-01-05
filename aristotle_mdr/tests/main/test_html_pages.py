@@ -1,7 +1,6 @@
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, override_settings
-from django.test.utils import setup_test_environment
 from django.utils import timezone
 
 import aristotle_mdr.models as models
@@ -11,10 +10,14 @@ from aristotle_mdr.forms.creation_wizards import (
     WorkgroupVerificationMixin,
     CheckIfModifiedMixin
 )
-
-setup_test_environment()
 from aristotle_mdr.tests import utils
 import datetime
+
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+
+setup_aristotle_test_environment()
+
 
 class AnonymousUserViewingThePages(TestCase):
     def test_homepage(self):
@@ -59,7 +62,7 @@ def setUpModule():
 class LoggedInViewConceptPages(utils.LoggedInViewPages):
     defaults = {}
     def setUp(self):
-        super(LoggedInViewConceptPages, self).setUp()
+        super().setUp()
 
         self.item1 = self.itemType.objects.create(
             name="Test Item 1 (visible to tested viewers)",
@@ -990,7 +993,7 @@ class ValueDomainViewPage(LoggedInViewConceptPages, TestCase):
     url_name='valueDomain'
     itemType=models.ValueDomain
     def setUp(self):
-        super(ValueDomainViewPage, self).setUp()
+        super().setUp()
 
         for i in range(4):
             models.PermissibleValue.objects.create(
@@ -1145,7 +1148,7 @@ class DataElementConceptViewPage(LoggedInViewConceptPages, TestCase):
     run_cascade_tests = True
 
     def setUp(self, *args, **kwargs):
-        super(DataElementConceptViewPage, self).setUp(*args, **kwargs)
+        super().setUp(*args, **kwargs)
         self.oc = models.ObjectClass.objects.create(
             name="sub item OC",
             workgroup=self.item1.workgroup,
@@ -1364,7 +1367,7 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
 class LoggedInViewUnmanagedPages(utils.LoggedInViewPages):
     defaults = {}
     def setUp(self):
-        super(LoggedInViewUnmanagedPages, self).setUp()
+        super().setUp()
         self.item1 = self.itemType.objects.create(name="OC1",**self.defaults)
 
     def get_page(self,item):
@@ -1387,7 +1390,7 @@ class MeasureViewPage(LoggedInViewUnmanagedPages, TestCase):
     itemType=models.Measure
 
     def setUp(self):
-        super(MeasureViewPage, self).setUp()
+        super().setUp()
 
         self.item2 = models.UnitOfMeasure.objects.create(name="OC1",workgroup=self.wg1,measure=self.item1,**self.defaults)
 
@@ -1396,7 +1399,7 @@ class RegistrationAuthorityViewPage(LoggedInViewUnmanagedPages, TestCase):
     itemType=models.RegistrationAuthority
 
     def setUp(self):
-        super(RegistrationAuthorityViewPage, self).setUp()
+        super().setUp()
 
         self.item2 = models.DataElement.objects.create(name="OC1",workgroup=self.wg1,**self.defaults)
 
@@ -1420,7 +1423,7 @@ class OrganizationViewPage(LoggedInViewUnmanagedPages, TestCase):
     itemType=models.Organization
 
     def setUp(self):
-        super(OrganizationViewPage, self).setUp()
+        super().setUp()
 
     def get_page(self,item):
         return item.get_absolute_url()

@@ -14,15 +14,16 @@ Available tags and filters
 --------------------------
 """
 from django import template
-from django.conf import settings
-from django.core.urlresolvers import reverse, resolve
-from django.template.defaultfilters import slugify
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import mark_safe
 
 from aristotle_mdr import perms
 import aristotle_mdr.models as MDR
-from aristotle_mdr.utils import fetch_metadata_apps, fetch_aristotle_settings, fetch_aristotle_downloaders
+from aristotle_mdr.utils import (
+    fetch_metadata_apps,
+    fetch_aristotle_downloaders
+)
 
 register = template.Library()
 
@@ -244,9 +245,6 @@ def zws(string):
         <h1>{% zws item.name %}</h1>
 
     """
-    import sys  # Python 2
-    if sys.version_info[0] == 2:
-        string = string.encode('utf-8', 'xmlcharrefreplace')
     return string.replace("—", "&shy;—")
 
 
@@ -273,18 +271,15 @@ def downloadMenu(item):
         {% downloadMenu item %}
     """
     from django.template.loader import get_template
-    from django.template import Context
     downloadOpts = fetch_aristotle_downloaders()
+
     from aristotle_mdr.utils import get_download_template_path_for_item
-    from aristotle_mdr.utils.downloads import get_download_module
 
     downloadsForItem = []
     app_label = item._meta.app_label
     model_name = item._meta.model_name
     for d in downloadOpts:
         download_type = d.download_type
-        # module_name = d[3]
-        # downloader = get_download_module(module_name)
         item_register = d.metadata_register
 
         if type(item_register) is not str:
@@ -302,10 +297,11 @@ def downloadMenu(item):
                 except template.TemplateDoesNotExist:
                     pass  # This is ok.
                 except:
-                    raise  # pass  # Something very bad has happened in the template.
+                    # TODO: Should probably do something with this error
+                    pass  # Something very bad has happened in the template.
     return get_template(
         "aristotle_mdr/helpers/downloadMenu.html").render(
-        Context({'item': item, 'download_options': downloadsForItem, })
+        {'item': item, 'download_options': downloadsForItem, }
     )
 
 
@@ -313,12 +309,11 @@ def downloadMenu(item):
 def extra_content(extension, item, user):
     try:
         from django.template.loader import get_template
-        from django.template import Context
         s = item._meta.object_name
         s = s[0].lower() + s[1:]
 
         return get_template(extension + "/extra_content/" + s + ".html").render(
-            Context({'item': item, 'user': user})
+            {'item': item, 'user': user}
         )
     except template.TemplateDoesNotExist:
         # there is no extra content for this item, and thats ok.
@@ -345,7 +340,6 @@ def doc(item, field=None):
     If 2, returns the help_text for the field on the given model in the specified app.
     """
 
-    from django.contrib.contenttypes.models import ContentType
     from aristotle_mdr.utils.doc_parse import parse_rst, parse_docstring
 
     ct = item

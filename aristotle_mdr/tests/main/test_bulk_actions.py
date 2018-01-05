@@ -1,18 +1,23 @@
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.test import TestCase, override_settings
+from django.urls import reverse
+from django.test import TestCase
+from django.test.utils import override_settings
+
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 
 import datetime
 
-from django.test.utils import setup_test_environment
-setup_test_environment()
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+
+setup_aristotle_test_environment()
+
 
 class BulkActionsTest(utils.LoggedInViewPages):
     def setUp(self):
-        super(BulkActionsTest, self).setUp()
+        super().setUp()
 
         # There would be too many tests to test every item type against every other
         # But they all have identical logic, so one test should suffice

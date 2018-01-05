@@ -5,8 +5,8 @@
  */
 
 /*!
- * Generated using the Bootstrap Customizer (http://getbootstrap.com/customize/?id=a91bf91c4abe8063f6946e598a2ac09b)
- * Config saved to config.json and https://gist.github.com/a91bf91c4abe8063f6946e598a2ac09b
+ * Generated using the Bootstrap Customizer (https://getbootstrap.com/docs/3.3/customize/?id=c6ba98df66553a3fb0f86b21de07207d)
+ * Config saved to config.json and https://gist.github.com/c6ba98df66553a3fb0f86b21de07207d
  */
 /*!
  * Bootstrap v3.3.7 (http://getbootstrap.com)
@@ -3349,26 +3349,26 @@ fieldset[disabled] .btn-warning.focus {
 }
 .btn-danger {
   color: #ffffff;
-  background-color: #d9534f;
-  border-color: #d43f3a;
+  background-color: #c03a36;
+  border-color: #ac3430;
 }
 .btn-danger:focus,
 .btn-danger.focus {
   color: #ffffff;
-  background-color: #c9302c;
-  border-color: #761c19;
+  background-color: #982e2b;
+  border-color: #491614;
 }
 .btn-danger:hover {
   color: #ffffff;
-  background-color: #c9302c;
-  border-color: #ac2925;
+  background-color: #982e2b;
+  border-color: #7c2623;
 }
 .btn-danger:active,
 .btn-danger.active,
 .open > .dropdown-toggle.btn-danger {
   color: #ffffff;
-  background-color: #c9302c;
-  border-color: #ac2925;
+  background-color: #982e2b;
+  border-color: #7c2623;
 }
 .btn-danger:active:hover,
 .btn-danger.active:hover,
@@ -3380,8 +3380,8 @@ fieldset[disabled] .btn-warning.focus {
 .btn-danger.active.focus,
 .open > .dropdown-toggle.btn-danger.focus {
   color: #ffffff;
-  background-color: #ac2925;
-  border-color: #761c19;
+  background-color: #7c2623;
+  border-color: #491614;
 }
 .btn-danger:active,
 .btn-danger.active,
@@ -3397,11 +3397,11 @@ fieldset[disabled] .btn-danger:focus,
 .btn-danger.disabled.focus,
 .btn-danger[disabled].focus,
 fieldset[disabled] .btn-danger.focus {
-  background-color: #d9534f;
-  border-color: #d43f3a;
+  background-color: #c03a36;
+  border-color: #ac3430;
 }
 .btn-danger .badge {
-  color: #d9534f;
+  color: #c03a36;
   background-color: #ffffff;
 }
 .btn-link {
@@ -4909,11 +4909,11 @@ a.label:focus {
   background-color: #ec971f;
 }
 .label-danger {
-  background-color: #d9534f;
+  background-color: #c03a36;
 }
 .label-danger[href]:hover,
 .label-danger[href]:focus {
-  background-color: #c9302c;
+  background-color: #982e2b;
 }
 .badge {
   display: inline-block;
@@ -5192,7 +5192,7 @@ a.thumbnail.active {
   background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
 }
 .progress-bar-danger {
-  background-color: #d9534f;
+  background-color: #c03a36;
 }
 .progress-striped .progress-bar-danger {
   background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);

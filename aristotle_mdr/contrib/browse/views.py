@@ -15,7 +15,7 @@ class BrowseApps(TemplateView):
     ordering = 'app_label'
 
     def get_context_data(self, *args, **kwargs):
-        context = super(BrowseApps, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
 
         aristotle_apps = fetch_metadata_apps()
         out = {}
@@ -40,7 +40,7 @@ class BrowseApps(TemplateView):
 class AppBrowser(ListView):
     def get_context_data(self, *args, **kwargs):
         # Call the base implementation first to get a context
-        context = super(AppBrowser, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         if self.kwargs['app'] not in fetch_metadata_apps():
             raise Http404
         context['app_label'] = self.kwargs['app']
@@ -79,7 +79,7 @@ class BrowseConcepts(AppBrowser):
         return self._model
 
     def get_queryset(self, *args, **kwargs):
-        queryset = super(BrowseConcepts, self).get_queryset(*args, **kwargs)
+        queryset = super().get_queryset(*args, **kwargs)
 
         # Regular queryset filter
         for f in self.request.GET.getlist('f'):
@@ -127,7 +127,7 @@ class BrowseConcepts(AppBrowser):
 
     def get_context_data(self, *args, **kwargs):
         # Call the base implementation first to get a context
-        context = super(BrowseConcepts, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['model'] = self.model
         context['model_name'] = self.model._meta.model_name
         context['sort'] = self.order
@@ -135,7 +135,7 @@ class BrowseConcepts(AppBrowser):
 
     def get_template_names(self):
         app_label = self.kwargs['app']
-        names = super(BrowseConcepts, self).get_template_names()
+        names = super().get_template_names()
         names.append('aristotle_mdr_browse/list.html')
         names.insert(0, 'aristotle_mdr_browse/%s/%s_list.html' % (app_label, self.model._meta.model_name))
         return names

@@ -2,18 +2,18 @@ from django.test import TestCase
 
 import aristotle_mdr.tests.utils as utils
 from aristotle_mdr.models import ObjectClass, Workgroup
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from aristotle_mdr.tests.main.test_bulk_actions import BulkActionsTest
 from aristotle_mdr import models
+from aristotle_mdr.utils import setup_aristotle_test_environment
 
-from django.test.utils import setup_test_environment
-setup_test_environment()
+setup_aristotle_test_environment()
 
 
 class TestBulkActions(BulkActionsTest, TestCase):
     def setUp(self):
-        super(TestBulkActions, self).setUp()
+        super().setUp()
         self.item = ObjectClass.objects.create(
             name="Test Object",
             workgroup=self.wg1,

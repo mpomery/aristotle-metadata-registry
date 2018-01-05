@@ -1,9 +1,10 @@
 from django.conf import settings
 from django.core.management import call_command
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, override_settings, modify_settings
 from django.test.utils import setup_test_environment
 from django.contrib.auth import get_user_model
+
 from django.utils.timezone import now
 import datetime
 
@@ -13,7 +14,9 @@ from aristotle_mdr.contrib.self_publish import models as pub
 from aristotle_mdr.forms.search import get_permission_sqs
 from aristotle_mdr.models import ObjectClass, Workgroup
 from aristotle_mdr.tests import utils
-setup_test_environment()
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+setup_aristotle_test_environment()
 
 
 @override_settings(
@@ -27,7 +30,7 @@ setup_test_environment()
 )
 class TestSelfPublishing(utils.LoggedInViewPages, TestCase):
     def setUp(self):
-        super(TestSelfPublishing, self).setUp()
+        super().setUp()
         self.submitting_user = get_user_model().objects.create_user(
             username="self-publisher",
             email="self@publisher.net",

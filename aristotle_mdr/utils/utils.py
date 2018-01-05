@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import model_to_dict
@@ -272,3 +272,15 @@ def fetch_aristotle_downloaders():
         import_string(dtype)
         for dtype in fetch_aristotle_settings().get('DOWNLOADERS', [])
     ]
+
+
+def setup_aristotle_test_environment():
+    from django.test.utils import setup_test_environment
+    try:
+        setup_test_environment()
+    except RuntimeError as err:
+        if "setup_test_environment() was already called" in err.args[0]:
+            # The environment is setup, its all good.
+            pass
+        else:
+            raise

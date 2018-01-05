@@ -1,5 +1,5 @@
 from dal.autocomplete import ModelSelect2Multiple, ModelSelect2
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 
 
 class ConceptAutocompleteBase(object):
@@ -34,7 +34,7 @@ class ConceptAutocompleteBase(object):
             url=url,
             attrs={'data-html': 'true'}
         )
-        super(ConceptAutocompleteBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class ConceptAutocompleteSelectMultiple(ConceptAutocompleteBase, ModelSelect2Multiple):
@@ -51,7 +51,7 @@ class UserAutocompleteMixin(object):
             url=reverse_lazy(self.url),
             attrs={'data-html': 'true'}
         )
-        super(UserAutocompleteMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def render_options(self, *args, **kwargs):
         """This prevents users from showing in a static HTML list"""

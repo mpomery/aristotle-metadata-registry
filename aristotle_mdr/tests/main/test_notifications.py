@@ -1,8 +1,7 @@
 from django import VERSION as django_version
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, override_settings
-from django.test.utils import setup_test_environment
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 
@@ -11,14 +10,19 @@ import aristotle_mdr.perms as perms
 from aristotle_mdr.utils import url_slugify_concept
 from aristotle_mdr.forms.creation_wizards import WorkgroupVerificationMixin,CheckIfModifiedMixin
 
-setup_test_environment()
 from aristotle_mdr.tests import utils
 import datetime
+
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+
+setup_aristotle_test_environment()
+
 
 class TestNotifications(utils.LoggedInViewPages, TestCase):
     defaults = {}
     def setUp(self):
-        super(TestNotifications, self).setUp()
+        super().setUp()
 
         self.item1 = models.ObjectClass.objects.create(
             name="Test Item 1 (visible to tested viewers)",

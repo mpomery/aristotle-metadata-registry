@@ -91,10 +91,13 @@ class ConceptQuerySet(MetadataItemQuerySet):
         # User can edit everything they've made thats not locked
         q |= Q(submitter=user, _is_locked=False)
 
-        if user.submitter_in.exists() or user.steward_in.exists():
-            if user.submitter_in.exists():
+        is_submitter = user.submitter_in.exists()
+        is_steward = user.steward_in.exists()
+
+        if is_submitter or is_steward:
+            if is_submitter:
                 q |= Q(_is_locked=False, workgroup__submitters__profile__user=user)
-            if user.steward_in.exists():
+            if is_steward:
                 q |= Q(workgroup__stewards__profile__user=user)
         return self.filter(q)
 

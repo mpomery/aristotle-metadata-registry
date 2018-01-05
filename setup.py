@@ -22,7 +22,7 @@ setup(
     author='Samuel Spencer',
     author_email='sam@aristotlemetadata.com',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
 
         'Environment :: Web Environment',
         'Framework :: Django',
@@ -32,12 +32,13 @@ setup(
 
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
     install_requires = [
-        "Django>=1.8,<1.11,!=1.9.*",
+        "Django>=1.11.1,<2.0",
         'six', # Setuptools > 36 doesn't install this by default
         'pytz',
         'pyyaml',
@@ -64,9 +65,9 @@ setup(
         'django-static-precompiler',
         'django-autocomplete-light>=3.0.0',
         'django-bootstrap3',
-        'django-bootstrap3-datetimepicker-2<2.5.0',
+        'django-bootstrap3-datetimepicker-2>=2.5.0',
 
-        'django-formtools',
+        'django-formtools>=2.0',
 
         # required for help, but thats required
         'django-autoslug',

@@ -1,16 +1,18 @@
 from django.test import TestCase
 
 import aristotle_mdr.tests.utils as utils
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.template import TemplateDoesNotExist
+
 from aristotle_mdr.tests.main.test_html_pages import LoggedInViewConceptPages
 from aristotle_mdr.tests.main.test_admin_pages import AdminPageForConcept
 from django.test.utils import override_settings
 
 from extension_test.models import Question, Questionnaire
 
-from django.test.utils import setup_test_environment
-setup_test_environment()
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+setup_aristotle_test_environment()
 
 
 class TestExtensionListVisibility(TestCase):
@@ -29,7 +31,7 @@ class TestExtensionListVisibility(TestCase):
 
 class QuestionVisibility(utils.ManagedObjectVisibility, TestCase):
     def setUp(self):
-        super(QuestionVisibility, self).setUp()
+        super().setUp()
         self.item = Question.objects.create(
             name="Test Question",
             workgroup=self.wg,
@@ -59,7 +61,7 @@ class QuestionViewPage(LoggedInViewExtensionConceptPages, TestCase):
 
 class QuestionnaireVisibility(utils.ManagedObjectVisibility, TestCase):
     def setUp(self):
-        super(QuestionnaireVisibility, self).setUp()
+        super().setUp()
         self.item = Questionnaire.objects.create(
             name="Test Question",
             workgroup=self.wg,

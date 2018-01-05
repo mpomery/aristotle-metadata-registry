@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.template import Context, Template
 from django.test import TestCase
 
@@ -6,16 +6,14 @@ import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 
-from django.test.utils import setup_test_environment
-
 from django.core.exceptions import FieldDoesNotExist
-try:
-    from django.template import TemplateSyntaxError  # Django1.8 only
-except:
-    from django.template.exceptions import TemplateSyntaxError  # Django1.9 only
+from django.template.exceptions import TemplateSyntaxError
 
 # Execute in a test environment.
-setup_test_environment()
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+setup_aristotle_test_environment()
+
 
 preamble = "{% load aristotle_tags %}"
 

@@ -1,9 +1,7 @@
-from __future__ import division
-
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from bootstrap3_datetime.widgets import DateTimePicker
+from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 
 import aristotle_mdr.models as MDR
 from aristotle_mdr.perms import user_can_edit, user_can_view
@@ -34,7 +32,7 @@ class DeprecateForm(forms.Form):
         self.item = kwargs.pop('item')
         self.qs = kwargs.pop('qs')
         self.user = kwargs.pop('user')
-        super(DeprecateForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.fields['olderItems'] = forms.ModelMultipleChoiceField(
             queryset=self.qs,
@@ -70,7 +68,7 @@ class SupersedeForm(forms.Form):
         self.item = kwargs.pop('item')
         self.qs = kwargs.pop('qs')
         self.user = kwargs.pop('user')
-        super(SupersedeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.fields['newerItem']=forms.ModelChoiceField(
             queryset=self.qs,
@@ -99,7 +97,7 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
     registrationDate = forms.DateField(
         required=False,
         label=_("Registration date"),
-        widget=DateTimePicker(options={"format": "YYYY-MM-DD"}),
+        widget=BootstrapDateTimePicker(options={"format": "YYYY-MM-DD"}),
         initial=timezone.now()
     )
     cascadeRegistration = forms.ChoiceField(
@@ -120,7 +118,7 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
     )
 
     def __init__(self, *args, **kwargs):
-        super(ChangeStatusForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.set_registration_authority_field(
             field_name="registrationAuthorities", qs=self.user.profile.registrarAuthorities
         )
@@ -143,7 +141,7 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
 # Thanks http://stackoverflow.com/questions/6958708/grappelli-to-hide-sortable-field-in-inline-sortable-django-admin
 class PermissibleValueForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(PermissibleValueForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = MDR.PermissibleValue
@@ -169,7 +167,7 @@ class CompareConceptsForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         self.qs = kwargs.pop('qs').visible(self.user)
-        super(CompareConceptsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.fields['item_a'] = forms.ModelChoiceField(
             queryset=self.qs,

@@ -11,8 +11,7 @@ from aristotle_mdr.perms import user_can_move_between_workgroups, user_can_move_
 from aristotle_mdr.contrib.autocomplete import widgets
 
 from dal import autocomplete
-from bootstrap3_datetime.widgets import DateTimePicker
-from aristotle_mdr.widgets import BootstrapDateTimePicker
+from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 
 
 class UserAwareForm(forms.Form):
@@ -25,7 +24,7 @@ class UserAwareForm(forms.Form):
             self.user = self.request.user
         else:
             raise NoUserGivenForUserForm("The class inheriting from UserAwareForm was not called with a user or request parameter")
-        super(UserAwareForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class UserAwareModelForm(UserAwareForm, forms.ModelForm):  # , autocomplete_light.ModelForm):
@@ -86,7 +85,7 @@ class CheckIfModifiedMixin(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         # Tricky... http://www.avilpage.com/2015/03/django-form-gotchas-dynamic-initial.html
-        super(CheckIfModifiedMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.initial['last_fetched'] = timezone.now()
         self.fields['last_fetched'].initial = timezone.now()
 
@@ -113,7 +112,7 @@ class ConceptForm(WorkgroupVerificationMixin, UserAwareModelForm):
     def __init__(self, *args, **kwargs):
         # TODO: Have tis throw a 'no user' error
         first_load = kwargs.pop('first_load', None)
-        super(ConceptForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         for f in self.fields:
             if hasattr(self.fields[f], 'queryset'):
@@ -233,7 +232,7 @@ class Concept_2_Results(ConceptForm):
 
     def __init__(self, *args, **kwargs):
         self.check_similar = kwargs.pop('check_similar', True)
-        super(Concept_2_Results, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['workgroup'].queryset = self.user.profile.editable_workgroups
         self.fields['workgroup'].initial = self.user.profile.activeWorkgroup
         self.fields['name'].widget = forms.widgets.TextInput()
@@ -257,7 +256,7 @@ class DEC_OCP_Search(UserAwareForm):
 
 class DEC_OCP_Results(UserAwareForm):
     def __init__(self, oc_similar=None, pr_similar=None, oc_duplicate=None, pr_duplicate=None, *args, **kwargs):
-        super(DEC_OCP_Results, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if oc_similar:
             oc_options = [
@@ -342,7 +341,7 @@ class DE_OCPVD_Search(UserAwareForm):
 
 class DE_OCPVD_Results(DEC_OCP_Results):
     def __init__(self, vd_similar=None, vd_duplicate=None, *args, **kwargs):
-        super(DE_OCPVD_Results, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if vd_similar:
             vd_options = [
@@ -373,7 +372,7 @@ class DE_OCPVD_Results(DEC_OCP_Results):
 class DE_Find_DEC_Results(UserAwareForm):
     def __init__(self, *args, **kwargs):
         dec_similar = kwargs.pop('dec_similar')
-        super(DE_Find_DEC_Results, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if dec_similar:
             dec_options = [(dec.id, dec) for dec in dec_similar]
             dec_options.append(("X", "None of the above meet my needs"))

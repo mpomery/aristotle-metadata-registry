@@ -17,7 +17,7 @@ class NewPostForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
-        super(NewPostForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['workgroup'].queryset = self.user.profile.myWorkgroups
 
     def clean_relatedItems(self):

@@ -1,5 +1,15 @@
 Changelog
 
+- 2.0.0
+    - **Dependency notes:**
+      - Dropped support for Python 3.4 and below, and Django 1.10 and below
+      - Dropped requirements for `django-bootstrap3-datetimepicker-2`
+      - Dependancies are now defined using `Pipfile` instead of `setup.py` and `requirements.txt`
+    - Fixed WCAG testing and corrected some minor accessibility issues - #697
+    - Minor tweak to dash board - 'recent workgroups' panel no longer exists, 'recent favourites' is no above 'recent actions'
+    - Darkend Bootstrap "brand-danger" variable by 10% to improve contrast
+    - Speed improvements on search pages - #715
+
 - 1.6.5
   - Fixed regression where private methods showed up in creation wizards
   - Fixed error with wizards fialing if search engine is stale, #736

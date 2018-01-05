@@ -70,7 +70,13 @@ SITE_ID=None
 #     parent_link=True,
 #     related_name='property_subclass',
 # )
-SILENCED_SYSTEM_CHECKS = ['models.E006']
+
+# Not sure how to resolve these yet.
+
+SILENCED_SYSTEM_CHECKS = [
+    'models.E006',  # This gets called because of the DataElementConcept.property attribute.
+    'models.E023',  # This gets called because we named a model with an underscore
+]
 
 ALLOWED_HOSTS = []
 
@@ -106,7 +112,6 @@ INSTALLED_APPS = (
 
     'static_precompiler',
     'bootstrap3',
-    'bootstrap3_datetime',
     'reversion',  # https://github.com/etianen/django-reversion
     'reversion_compare',  # https://github.com/jedie/django-reversion-compare
 

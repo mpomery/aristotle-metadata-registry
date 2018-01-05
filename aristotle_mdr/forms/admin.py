@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 
 import aristotle_mdr.models as MDR
-import aristotle_mdr.widgets as widgets
+import aristotle_mdr.widgets.widgets as widgets
 from aristotle_mdr.contrib.autocomplete.widgets import ConceptAutocompleteSelectMultiple
 from aristotle_mdr.perms import user_can_edit
 from aristotle_mdr.utils import concept_to_clone_dict
@@ -31,7 +31,7 @@ class AristotleProfileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
-        super(AristotleProfileForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         # if self.instance and self.instance.user.count() == 1: # and self.instance.user.exists():
         try:
@@ -80,7 +80,7 @@ class AdminConceptForm(ConceptForm, WorkgroupVerificationMixin):
             item_to_clone = MDR._concept.objects.filter(id=clone).first().item
             kwargs['initial'] = concept_to_clone_dict(item_to_clone)
 
-        super(AdminConceptForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.instance and not clone:
             self.itemtype = self.instance.__class__
             self.fields['deprecated'] = forms.ModelMultipleChoiceField(
@@ -97,7 +97,7 @@ class AdminConceptForm(ConceptForm, WorkgroupVerificationMixin):
         # self.fields['workgroup'].initial = self.request.user.profile.activeWorkgroup
 
     def save(self, *args, **kwargs):
-        instance = super(AdminConceptForm, self).save(*args, **kwargs)
+        instance = super().save(*args, **kwargs)
         for i in instance.supersedes.all():
             if user_can_edit(self.request.user, i) and i not in self.cleaned_data['deprecated']:
                 instance.supersedes.remove(i)

@@ -56,7 +56,6 @@ def register_queryset(qs):
     from django.db.models.query import QuerySet
     assert(issubclass(type(qs), QuerySet))
 
-    from django.db.models.fields import Field
     copyreg.pickle(Field, pickle_abstract_field)
     # Monkey patching is tragically required here
     # https://github.com/django/django/pull/7280

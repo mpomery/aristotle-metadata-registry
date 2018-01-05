@@ -17,7 +17,7 @@ class AristotleBackend(ModelBackend):
         extensions = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
         if app_label in extensions + ["aristotle_mdr"]:
             return perms.user_is_editor(user_obj)
-        return super(AristotleBackend, self).has_module_perms(user_obj, app_label)
+        return super().has_module_perms(user_obj, app_label)
 
     def has_perm(self, user_obj, perm, obj=None):
 
@@ -38,6 +38,8 @@ class AristotleBackend(ModelBackend):
         perm_parts = perm_name.split("_")
         if len(perm_parts) == 2:
             model = apps.get_model(app_label, perm_parts[1])
+        elif obj is not None:
+            model = type(obj)
         else:
             model = int
 
@@ -95,4 +97,4 @@ class AristotleBackend(ModelBackend):
         if perm == "aristotle_mdr_links.add_link":
             return link_perms.user_can_make_link(user_obj)
 
-        return super(AristotleBackend, self).has_perm(user_obj, perm, obj)
+        return super().has_perm(user_obj, perm, obj)

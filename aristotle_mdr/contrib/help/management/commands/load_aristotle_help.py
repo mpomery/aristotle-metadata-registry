@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 """
 This is literally forked from djangos own loaddata, expect it saves the
 object not the serialisation.

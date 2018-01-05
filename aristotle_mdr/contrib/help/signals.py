@@ -9,4 +9,4 @@ class AristotleHelpSignalProcessor(AristotleSignalProcessor):
         from aristotle_mdr.contrib.help.models import HelpPage, ConceptHelp
         post_save.connect(self.handle_save, sender=HelpPage)
         post_save.connect(self.handle_save, sender=ConceptHelp)
-        super(AristotleHelpSignalProcessor, self).setup()
+        super().setup()

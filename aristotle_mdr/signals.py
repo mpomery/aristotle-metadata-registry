@@ -25,14 +25,14 @@ class AristotleSignalProcessor(signals.BaseSignalProcessor):
         post_save.connect(self.update_visibility_review_request, sender=ReviewRequest)
         m2m_changed.connect(self.update_visibility_review_request, sender=ReviewRequest.concepts.through)
         concept_visibility_updated.connect(self.handle_concept_recache)
-        super(AristotleSignalProcessor, self).setup()
+        super().setup()
 
     def teardown(self):  # pragma: no cover
         from aristotle_mdr.models import _concept
         post_save.disconnect(self.handle_concept_save, sender=_concept)
         # post_revision_commit.disconnect(self.handle_concept_revision)
         pre_delete.disconnect(self.handle_concept_delete, sender=_concept)
-        super(AristotleSignalProcessor, self).teardown()
+        super().teardown()
 
     def handle_concept_recache(self, concept, **kwargs):
         from aristotle_mdr.models import _concept

@@ -3,7 +3,7 @@ import datetime
 import random
 import string
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
@@ -578,12 +578,13 @@ class LoggedInViewPages(object):
                 self.assertEqual(response.status_code, code)
             except AssertionError as e:  # pragma: no cover
                 # Needs no coverage as the test should pass to be successful
-                if 'adminform' in response.context:
-                    print(response.context['adminform'].form.errors.as_text())
-                elif 'form' in response.context and 'errors' in response.context['form']:
-                    print(response.context['form'].form.errors.as_text())
-                elif 'errors' in response.context:
-                    print(response.context['errors'])
+                if response.context:
+                    if 'adminform' in response.context:
+                        print(response.context['adminform'].form.errors.as_text())
+                    elif 'form' in response.context and 'errors' in response.context['form']:
+                        print(response.context['form'].form.errors.as_text())
+                    elif 'errors' in response.context:
+                        print(response.context['errors'])
                 print(e)
                 raise
 

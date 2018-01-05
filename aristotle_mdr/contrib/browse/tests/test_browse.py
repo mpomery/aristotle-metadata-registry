@@ -1,24 +1,25 @@
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, override_settings, modify_settings
-from django.test.utils import setup_test_environment
 from django.utils import timezone
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 from aristotle_mdr.utils import url_slugify_concept
 from aristotle_mdr.forms.creation_wizards import WorkgroupVerificationMixin,CheckIfModifiedMixin
+from aristotle_mdr.utils import setup_aristotle_test_environment
 
-setup_test_environment()
 from aristotle_mdr.tests import utils
 import datetime
+
+setup_aristotle_test_environment()
 
 
 class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
     defaults = {}
 
     def setUp(self):
-        super(LoggedInViewConceptBrowsePages, self).setUp()
+        super().setUp()
 
         self.item1 = self.itemType.objects.create(name="Test Item 1 (visible to tested viewers)",definition="my definition",workgroup=self.wg1,**self.defaults)
         self.item2 = self.itemType.objects.create(name="Test Item 2 (NOT visible to tested viewers)",definition="my definition",workgroup=self.wg2,**self.defaults)

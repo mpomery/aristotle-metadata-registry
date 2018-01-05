@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import transaction
 from django.forms import ValidationError, ModelForm
 from django.forms.models import modelformset_factory, inlineformset_factory
@@ -11,7 +11,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template import TemplateDoesNotExist
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import FormView
+from django.views.generic import (
+    CreateView, DetailView, ListView, UpdateView, FormView
+)
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 
@@ -25,48 +27,40 @@ from aristotle_mdr.utils import (
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 
+from aristotle_mdr.views.utils import ObjectLevelPermissionRequiredMixin
+
 import logging
 
 logger = logging.getLogger(__name__)
 logger.debug("Logging started for " + __name__)
 
 
-class PermissionFormView(FormView):
-    item = None
+class ConceptEditFormView(ObjectLevelPermissionRequiredMixin):
+    raise_exception = True
+    redirect_unauthenticated_users = True
+    object_level_permissions = True
+    model = MDR._concept
+    pk_url_kwarg = 'iid'
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.item:
-            self.item = get_object_or_404(
-                MDR._concept, pk=self.kwargs['iid']
-            ).item
+        self.item = super().get_object().item
         self.model = self.item.__class__
-        if not user_can_edit(self.request.user, self.item):
-            if request.user.is_anonymous():
-                return redirect(reverse('friendly_login') + '?next=%s' % request.path)
-            else:
-                raise PermissionDenied
-        return super(PermissionFormView, self).dispatch(request, *args, **kwargs)
-
-    def get_form_kwargs(self):
-        kwargs = super(PermissionFormView, self).get_form_kwargs()
-        kwargs.update({
-            'user': self.request.user,
-        })
-        return kwargs
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
-        context = super(PermissionFormView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context.update({'model': self.model._meta.model_name,
                         'app_label': self.model._meta.app_label,
                         'item': self.item})
         return context
 
 
-class EditItemView(PermissionFormView):
+class EditItemView(ConceptEditFormView, UpdateView):
     template_name = "aristotle_mdr/actions/advanced_editor.html"
+    permission_required = "aristotle_mdr.user_can_edit"
 
     def __init__(self, *args, **kwargs):
-        super(EditItemView, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.slots_active = is_active_module('aristotle_mdr.contrib.slots')
         self.identifiers_active = is_active_module('aristotle_mdr.contrib.identifiers')
 
@@ -74,8 +68,9 @@ class EditItemView(PermissionFormView):
         return MDRForms.wizards.subclassed_edit_modelform(self.model)
 
     def get_form_kwargs(self):
-        kwargs = super(EditItemView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({
+            'user': self.request.user,
             'instance': self.item,
         })
         return kwargs
@@ -83,6 +78,7 @@ class EditItemView(PermissionFormView):
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         slot_formset = None
+        self.object = self.item
 
         if form.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
@@ -129,7 +125,7 @@ class EditItemView(PermissionFormView):
 
     def get_identifier_formset(self):
         from aristotle_mdr.contrib.identifiers.models import ScopedIdentifier
-        from django.forms.models import inlineformset_factory
+
         return inlineformset_factory(
             MDR._concept, ScopedIdentifier,
             can_delete=True,
@@ -146,7 +142,7 @@ class EditItemView(PermissionFormView):
 
     def get_context_data(self, *args, **kwargs):
         from aristotle_mdr.contrib.slots.models import Slot
-        context = super(EditItemView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         if self.slots_active and kwargs.get('slots_FormSet', None):
             context['slots_FormSet'] = kwargs['slots_FormSet']
         else:
@@ -168,36 +164,18 @@ class EditItemView(PermissionFormView):
         return context
 
 
-class CloneItemView(PermissionFormView):
+class CloneItemView(ConceptEditFormView, DetailView, CreateView):
     template_name = "aristotle_mdr/create/clone_item.html"
-
-    def dispatch(self, request, *args, **kwargs):
-        self.item_to_clone = get_object_or_404(
-            MDR._concept, pk=self.kwargs['iid']
-        ).item
-        self.item = self.item_to_clone
-        return super(CloneItemView, self).dispatch(request, *args, **kwargs)
-
-    def dispatch(self, request, *args, **kwargs):
-        self.item_to_clone = get_object_or_404(
-            MDR._concept, pk=self.kwargs['iid']
-        ).item
-        self.item = self.item_to_clone
-        self.model = self.item.__class__
-        if not user_can_view(self.request.user, self.item):
-            if request.user.is_anonymous():
-                return redirect(reverse('friendly_login') + '?next=%s' % request.path)
-            else:
-                raise PermissionDenied
-        return super(PermissionFormView, self).dispatch(request, *args, **kwargs)
+    permission_required = "aristotle_mdr.user_can_view"
 
     def get_form_class(self):
         return MDRForms.wizards.subclassed_clone_modelform(self.model)
 
     def get_form_kwargs(self):
-        kwargs = super(CloneItemView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({
-            'initial': concept_to_clone_dict(self.item_to_clone)
+            'user': self.request.user,
+            'initial': concept_to_clone_dict(self.item)
         })
         return kwargs
 
@@ -210,7 +188,7 @@ class CloneItemView(PermissionFormView):
                 new_clone.submitter = self.request.user
                 new_clone.save()
                 reversion.revisions.set_user(self.request.user)
-                reversion.revisions.set_comment("Cloned from %s (id: %s)" % (self.item_to_clone.name, str(self.item_to_clone.pk)))
+                reversion.revisions.set_comment("Cloned from %s (id: %s)" % (self.item.name, str(self.item.pk)))
                 return HttpResponseRedirect(url_slugify_concept(new_clone))
         else:
             return self.form_invalid(form)

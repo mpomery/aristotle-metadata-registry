@@ -1,14 +1,14 @@
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, override_settings, modify_settings
-from django.test.utils import setup_test_environment
 
 from aristotle_mdr.contrib.slots import models
 from aristotle_mdr.models import ObjectClass, Workgroup
 from aristotle_mdr.tests import utils
 from aristotle_mdr.tests.main.test_bulk_actions import BulkActionsTest
+from aristotle_mdr.utils import setup_aristotle_test_environment
 
-setup_test_environment()
+setup_aristotle_test_environment()
 
 
 class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):
@@ -72,7 +72,7 @@ class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):
 
 class TestSlotsBulkAction(BulkActionsTest, TestCase):
     def setUp(self, *args, **kwargs):
-        super(TestSlotsBulkAction, self).setUp(*args, **kwargs)
+        super().setUp(*args, **kwargs)
         self.item5 = ObjectClass.objects.create(name="OC5", definition="OC5 definition", workgroup=self.wg2)
         self.slot_name = 'my_name'
         self.slot_type = 'bulk_insert'

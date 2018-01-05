@@ -3,18 +3,20 @@ from django.test import TestCase
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test.utils import override_settings
 
-from django.test.utils import setup_test_environment
 from reversion import revisions as reversion
-setup_test_environment()
+from aristotle_mdr.utils import setup_aristotle_test_environment
 
 from time import sleep
 import datetime
 from django.utils import timezone
+
+
+setup_aristotle_test_environment()
 
 
 class TestSearch(utils.LoggedInViewPages,TestCase):
@@ -23,7 +25,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
     @reversion.create_revision()
     def setUp(self):
-        super(TestSearch, self).setUp()
+        super().setUp()
         import haystack
         haystack.connections.reload('default')
 
@@ -625,7 +627,7 @@ class TestTokenSearch(TestCase):
     def setUp(self):
         # These are really terrible Object Classes, but I was bored and needed to spice things up.
         # Technically, the Object Class would be "Mutant"
-        super(TestTokenSearch, self).setUp()
+        super().setUp()
         import haystack
         haystack.connections.reload('default')
 

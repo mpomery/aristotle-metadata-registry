@@ -3,21 +3,23 @@ from django.test import TestCase
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 import datetime
 from django.utils import timezone
 
 from reversion import revisions as reversion
 
-from django.test.utils import setup_test_environment
-setup_test_environment()
+from aristotle_mdr.utils import setup_aristotle_test_environment
+
+
+setup_aristotle_test_environment()
 
 
 class ComparatorTester(utils.LoggedInViewPages):
 
     def setUp(self):
-        super(ComparatorTester, self).setUp()
+        super().setUp()
         self.ra = models.RegistrationAuthority.objects.create(name="Test RA")
         self.wg = models.Workgroup.objects.create(name="Setup WG")
         self.item1 = self.itemType.objects.create(name="Item with a name", workgroup=self.wg)
@@ -100,7 +102,7 @@ class ValueDomainComparatorTester(ComparatorTester, TestCase):
     itemType=models.ValueDomain
 
     def setUp(self):
-        super(ValueDomainComparatorTester, self).setUp()
+        super().setUp()
 
         for i in range(4):
             models.PermissibleValue.objects.create(

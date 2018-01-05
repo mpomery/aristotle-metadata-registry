@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Count, Q
 from django.db.models.functions import Lower
 from django.http import Http404
@@ -213,7 +213,7 @@ def generate_visibility_matrix(user):
 
     for ra in user.profile.registrarAuthorities:
         ra_matrix = {'name': ra.name, 'states': {}}
-        for s, _ in STATES:
+        for s, name in STATES:
             if s >= ra.public_state:
                 ra_matrix['states'][s] = "public"
             elif s >= ra.locked_state:
@@ -254,7 +254,7 @@ class GroupMemberMixin(object):
         """
         Insert the single object into the context dict.
         """
-        kwargs = super(GroupMemberMixin, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs.update({'user_to_change': self.user_to_change})
         return kwargs
 
@@ -265,7 +265,7 @@ class RoleChangeView(GroupMemberMixin, LoginRequiredMixin, ObjectLevelPermission
     object_level_permissions = True
 
     def get_form_kwargs(self):
-        kwargs = super(RoleChangeView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({'user': self.request.user})
         initial = {'roles': []}
         initial['roles'] = self.get_object().list_roles_for_user(self.user_to_change)

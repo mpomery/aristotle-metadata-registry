@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 import aristotle_mdr.models as MDR
 from aristotle_mdr.forms.creation_wizards import UserAwareModelForm, UserAwareForm
 from aristotle_mdr.forms import ChangeStatusForm
-from bootstrap3_datetime.widgets import DateTimePicker
+from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 from django.contrib.auth import get_user_model
 
 from aristotle_mdr.contrib.autocomplete import widgets
@@ -18,7 +18,7 @@ class RequestReviewForm(RegistrationAuthorityMixin, UserAwareModelForm):
     registration_date = forms.DateField(
         required=False,
         label=_("Registration date"),
-        widget=DateTimePicker(options={"format": "YYYY-MM-DD"}),
+        widget=BootstrapDateTimePicker(options={"format": "YYYY-MM-DD"}),
         initial=timezone.now()
     )
     state = forms.ChoiceField(choices=MDR.STATES, widget=forms.RadioSelect)
@@ -31,7 +31,7 @@ class RequestReviewForm(RegistrationAuthorityMixin, UserAwareModelForm):
 
     def __init__(self, *args, **kwargs):
         # self.user = kwargs.pop('user')
-        super(RequestReviewForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.set_registration_authority_field(
             field_name="registration_authority"
         )

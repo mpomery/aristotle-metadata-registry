@@ -16,7 +16,7 @@ defaults:
     # Make a MariaDB database
     # Fix wierdness with MariaDB on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0  
       - if [[ $DB == mariadb ]]; then ./aristotle_mdr/tests/bin/prep_mysql.sh ; fi
-      - if [[ $SEARCH == elasticsearch ]]; then sleep 10; fi
+      - if [[ $SEARCH == elastic ]]; then sudo service elasticsearch start && sleep 10; fi
     # Make a posgres database
       - if [[ $DB == postgres* ]]; then ./aristotle_mdr/tests/bin/prep_psql.sh; fi
 
@@ -46,78 +46,60 @@ defaults:
         repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
       mariadb: '10.1'
 
-  - &main_test_script_py27
-      python: 2.7
+  - &main_test_script_py36
+      python: 3.6
       <<: *main_test_script
 
-  - &main_test_script_py35
-      python: 3.5
-      <<: *main_test_script
-
-  - &test_accessibility_py35
+  - &test_accessibility_py36
     stage: accessibility
-    python: 3.5
+    python: 3.6
     script: tox -e ally-$ALLY --skip-missing-interpreters
 
 jobs:
-  allow_failures:
-    - env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-    - env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-    - env: DJANGO_VERSION='1.11' DB=sqlite    SEARCH=whoosh
 
   include:
     - stage: stylecheck
-      python: 3.5
-      script: tox -e pep8 --skip-missing-interpreters
+      python: 3.6
+      script: tox -e flake8 --skip-missing-interpreters
 
     - stage: documentation
-      python: 3.5
+      python: 3.6
       script: tox -e docs --skip-missing-interpreters
+    
 
-    - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
-    - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.10'  DB=postgres  SEARCH=elastic
-    - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh
-    - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=whoosh
-    - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=whoosh
-    - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=elastic
-
-    - <<: *main_test_script_py27
-      env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=elastic
-    - <<: *main_test_script_py27
-      env: DJANGO_VERSION='1.10'  DB=postgres  SEARCH=elastic
-    - <<: *main_test_script_py27
-      env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh
-    - <<: *main_test_script_py27
-      env: DJANGO_VERSION='1.8'  DB=postgres  SEARCH=whoosh
-    - <<: *main_test_script_py27
-      env: DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=whoosh
-    - <<: *main_test_script_py27
-      env: DJANGO_VERSION='1.8'  DB=mariadb   SEARCH=elastic
-
-    - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.10' DB=sqlite    SEARCH=elastic
-    - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.10' DB=sqlite    SEARCH=whoosh
-  # Possible failures:
-    - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-    - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.8'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-    - <<: *main_test_script_py35
-      env: DJANGO_VERSION='1.11' DB=sqlite    SEARCH=whoosh
+    - stage: testing
+      env: DJANGO_VERSION='1.11'  DB=sqlite  SEARCH=elastic
+      <<: *main_test_script_py36
+    - stage: testing
+      env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic
+      <<: *main_test_script_py36
+    - stage: testing
+      env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh
+      <<: *main_test_script_py36
+    - stage: testing
+      env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=whoosh
+      <<: *main_test_script_py36
+    - stage: testing
+      env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=whoosh
+      <<: *main_test_script_py36
+    - stage: testing
+      env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic
+      <<: *main_test_script_py36
+    
+      # Possible failures:
+    # - stage: testing
+    #   env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
+    #   <<: *main_test_script_py36
+    # - stage: testing
+    #   env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
+    #   <<: *main_test_script_py36
 
   # Test Accessibility
-    - <<: *test_accessibility_py35
+    - <<: *test_accessibility_py36
       env: ALLY=metadata_item
-    - <<: *test_accessibility_py35
+    - <<: *test_accessibility_py36
       env: ALLY=metadata_action
-    - <<: *test_accessibility_py35
+    - <<: *test_accessibility_py36
       env: ALLY=static
 
     - stage: deploy
@@ -132,6 +114,10 @@ jobs:
           branch: master
           distributions: sdist bdist_wheel
           repo: aristotle-mdr/aristotle-metadata-registry
+
+  # allow_failures:
+    # - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
+    # - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
 
 
 after_success:
