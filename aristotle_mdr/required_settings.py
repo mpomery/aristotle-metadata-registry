@@ -123,7 +123,7 @@ USE_L10N = True
 USE_TZ = True
 USE_I18N = True
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -135,7 +135,7 @@ MIDDLEWARE_CLASSES = (
 
 
     # 'reversion.middleware.RevisionMiddleware',
-)
+]
 
 
 ROOT_URLCONF = 'aristotle_mdr.urls'
