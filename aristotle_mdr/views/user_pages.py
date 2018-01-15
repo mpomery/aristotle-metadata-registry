@@ -2,6 +2,7 @@ import datetime
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from braces.views import LoginRequiredMixin
 from django.contrib.auth.views import login
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
@@ -10,7 +11,7 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, UpdateView
 
 
 from aristotle_mdr import forms as MDRForms
@@ -211,6 +212,18 @@ def edit(request):
             'email': request.user.email,
             })
     return render(request, "aristotle_mdr/user/userEdit.html", {"form": form})
+
+
+class EditView(LoginRequiredMixin, UpdateView):
+
+    template_name = "aristotle_mdr/user/userEdit.html"
+    fields = ['first_name', 'last_name', 'email']
+
+    def get_object(self, querySet=None):
+        return self.request.user
+
+    def get_success_url(self):
+        return reverse('aristotle:userHome')
 
 
 @login_required
