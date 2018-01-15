@@ -10,7 +10,7 @@ from model_utils import Choices
 
 from haystack import connections
 from haystack.constants import DEFAULT_ALIAS
-from haystack.forms import SearchForm, FacetedSearchForm
+from haystack.forms import SearchForm, FacetedSearchForm, model_choices
 from haystack.query import EmptySearchQuerySet, SearchQuerySet, SQ
 
 import aristotle_mdr.models as MDR
@@ -365,8 +365,6 @@ class PermissionSearchForm(TokenSearchForm):
         if not issubclass(type(kwargs['searchqueryset']), PermissionSearchQuerySet):
             raise ImproperlyConfigured("Aristotle Search Queryset connection must be a subclass of PermissionSearchQuerySet")
         super().__init__(*args, **kwargs)
-
-        from haystack.forms import SearchForm, FacetedSearchForm, model_choices
 
         self.fields['ra'].choices = [(ra.id, ra.name) for ra in MDR.RegistrationAuthority.objects.all()]
 

@@ -2,12 +2,12 @@ from django.test import TestCase
 from django.core.management import call_command
 from django.urls import reverse
 
-import aristotle_mdr.tests.utils as utils
 from aristotle_mdr import models
 import datetime
 
 from aristotle_mdr.utils import setup_aristotle_test_environment
 
+from aristotle_mdr import utils
 
 setup_aristotle_test_environment()
 
@@ -18,9 +18,7 @@ class UtilsTests(TestCase):
         ra = models.RegistrationAuthority.objects.create(name=" ",definition="my definition")
         org = models.Organization.objects.create(name=" ",definition="my definition")
         wg = models.Workgroup.objects.create(name=" ",definition="my definition")
-        
-        from aristotle_mdr import utils
-        
+
         self.assertTrue('--' in utils.url_slugify_concept(item))
         self.assertTrue('--' in utils.url_slugify_workgroup(wg))
         self.assertTrue('--' in utils.url_slugify_registration_authoritity(ra))

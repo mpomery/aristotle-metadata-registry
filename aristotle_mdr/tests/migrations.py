@@ -6,7 +6,6 @@ from django.db import connection
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
-from django.db import connection
 
 import unittest
 
