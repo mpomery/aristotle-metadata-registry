@@ -623,7 +623,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
     #@override_settings(RESULTS_PER_PAGE=[1,2,3])
     def test_number_search_results(self):
 
-        rpp_values = settings.RESULTS_PER_PAGE
+        rpp_values = getattr(settings, 'RESULTS_PER_PAGE', [20])
 
         #add new test data
         letters = ""
@@ -647,11 +647,9 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         response = self.client.get(reverse('aristotle:search')+"?q=random")
         self.assertEqual(response.context['page'].end_index(),rpp_values[0])
 
-        response = self.client.get(reverse('aristotle:search')+"?q=random&rpp=" + str(rpp_values[1]))
-        self.assertEqual(response.context['page'].end_index(),rpp_values[1])
-
-        response = self.client.get(reverse('aristotle:search')+"?q=random&rpp=" + str(rpp_values[2]))
-        self.assertEqual(response.context['page'].end_index(),rpp_values[2])
+        for val in rpp_values:
+            response = self.client.get(reverse('aristotle:search')+"?q=random&rpp=" + str(val))
+            self.assertEqual(response.context['page'].end_index(),val)
 
         #test with invalid number (drops back to default)
         response = self.client.get(reverse('aristotle:search')+"?q=random&rpp=92")

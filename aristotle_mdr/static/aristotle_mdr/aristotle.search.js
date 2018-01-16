@@ -164,7 +164,7 @@ $( document ).ready( function() {
 
     //set appropriate button to primary
     var set = false;
-    $('.rpp').each(function() {;
+    $('.rpp').each(function() {
       var current_rpp = $('#id_rpp').val()
       if ($(this).val().valueOf() == current_rpp) {
         $(this).addClass('btn-primary');
@@ -172,7 +172,7 @@ $( document ).ready( function() {
         set = true;
       }
     });
-    
+
     if (set == false) {
       $('#default_rpp').addClass('btn-primary')
       $('#default_rpp').removeClass('btn-default')
