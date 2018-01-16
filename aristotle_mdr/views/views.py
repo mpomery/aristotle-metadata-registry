@@ -360,6 +360,16 @@ def extensions(request):
 # Search views
 
 class PermissionSearchView(FacetedSearchView):
+
+    def build_page(self):
+
+        rpp = self.form.cleaned_data['rpp']
+
+        if rpp:
+            self.results_per_page = rpp
+
+        return super().build_page()
+
     def build_form(self):
         form = super().build_form()
         form.request = self.request

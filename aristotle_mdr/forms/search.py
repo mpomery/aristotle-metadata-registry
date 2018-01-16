@@ -356,6 +356,10 @@ class PermissionSearchForm(TokenSearchForm):
         required=False, label=_('Item type'),
         widget=BootstrapDropdownSelectMultiple
     )
+    rpp = forms.IntegerField(
+        required=False,
+        label='Results per page'
+    )
     # F for facet!
     # searchqueryset = PermissionSearchQuerySet
 
