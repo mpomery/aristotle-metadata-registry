@@ -1,4 +1,5 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
+from django.conf import settings
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
@@ -6,7 +7,6 @@ import aristotle_mdr.tests.utils as utils
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
-from django.test.utils import override_settings
 
 from reversion import revisions as reversion
 from aristotle_mdr.utils import setup_aristotle_test_environment
@@ -15,6 +15,8 @@ from time import sleep
 import datetime
 from django.utils import timezone
 
+import string
+import random
 
 setup_aristotle_test_environment()
 
@@ -617,6 +619,51 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         psqs = PSQS.auto_query('FLT').apply_permission_checks(self.su)
         self.assertEqual(len(psqs),1)
         self.assertEqual(psqs[0].object.pk, vd.pk)
+
+    #@override_settings(RESULTS_PER_PAGE=[1,2,3])
+    def test_number_search_results(self):
+
+        rpp_values = settings.RESULTS_PER_PAGE
+
+        #add new test data
+        letters = ""
+        for i in range(100):
+            letters += random.choice(string.ascii_letters)
+            letters += ' '
+
+        self.login_regular_user()
+
+        random_wg = models.Workgroup.objects.create(name="random_wg")
+
+        item_random = [
+            models.ObjectClass.objects.create(name=t, definition='random', workgroup=random_wg)
+            for t in letters.split()]
+
+        for item in item_random:
+            registered = self.ra.register(item,models.STATES.standard,self.su)
+            self.assertTrue(item in registered['success'])
+
+        #test default number of items
+        response = self.client.get(reverse('aristotle:search')+"?q=random")
+        self.assertEqual(response.context['page'].end_index(),rpp_values[0])
+
+        response = self.client.get(reverse('aristotle:search')+"?q=random&rpp=" + str(rpp_values[1]))
+        self.assertEqual(response.context['page'].end_index(),rpp_values[1])
+
+        response = self.client.get(reverse('aristotle:search')+"?q=random&rpp=" + str(rpp_values[2]))
+        self.assertEqual(response.context['page'].end_index(),rpp_values[2])
+
+        #test with invalid number (drops back to default)
+        response = self.client.get(reverse('aristotle:search')+"?q=random&rpp=92")
+        self.assertEqual(response.context['page'].end_index(),rpp_values[0])
+
+        self.logout()
+
+        #delete newly added data
+        for item in item_random:
+            item.delete()
+
+        random_wg.delete()
 
 
 class TestTokenSearch(TestCase):
