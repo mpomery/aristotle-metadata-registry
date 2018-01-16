@@ -286,7 +286,6 @@ class EditComment(LoginRequiredMixin, ObjectLevelPermissionRequiredMixin, Commen
 
     def post(self, request, *args, **kwargs):
         comment = self.get_object()
-        post = comment.post
 
         form = MDRForms.discussions.CommentForm(request.POST)
         if form.is_valid():

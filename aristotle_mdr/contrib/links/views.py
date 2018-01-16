@@ -152,7 +152,6 @@ class AddLinkWizard(SessionWizardView):
     @transaction.atomic
     def done(self, *args, **kwargs):
         self.relation = self.get_cleaned_data_for_step('0')['relation']
-        role_concepts = self.get_cleaned_data_for_step('1')
 
         link = link_models.Link.objects.create(relation=self.relation)
         for role, concepts in self.get_role_concepts():

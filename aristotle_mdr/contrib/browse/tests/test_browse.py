@@ -115,7 +115,7 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
         self.assertNotContains(response, self.item3.name)
         self.assertNotContains(response, self.item4.name)
 
-        slot = Slot.objects.create(concept=self.item1.concept, name=slot_name, value="hello")
+        Slot.objects.create(concept=self.item1.concept, name=slot_name, value="hello")
 
         response = self.client.get(
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name]),
@@ -195,7 +195,7 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
         self.assertEqual(response.status_code, 200)
 
         self.assertContains(response, self.itemType.get_verbose_name_plural())
-        self.assertContains(response, 
+        self.assertContains(response,
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name]),
         )
 
@@ -207,7 +207,7 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
         self.assertEqual(response.status_code, 200)
 
         self.assertNotContains(response, self.itemType.get_verbose_name_plural())
-        self.assertNotContains(response, 
+        self.assertNotContains(response,
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name]),
         )
 

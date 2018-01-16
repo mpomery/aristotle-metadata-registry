@@ -35,7 +35,7 @@ def model_to_dict_with_change_time(item, fetch_time=None):
         fetch_time = timezone.now()
     d = model_to_dict(item)
     d['last_fetched'] = str(fetch_time)
-    
+
     # Add slots management form
     d['slots-TOTAL_FORMS'] = 0
     d['slots-INITIAL_FORMS'] = 0
@@ -249,7 +249,7 @@ class ManagedObjectVisibility(object):
 
     def test_object_is_public_after_ra_state_changes(self):
         self.assertEqual(self.item.is_public(), False)
-        s = models.Status.objects.create(
+        models.Status.objects.create(
             concept=self.item,
             registrationAuthority=self.ra,
             registrationDate=timezone.now(),
@@ -302,7 +302,7 @@ class ManagedObjectVisibility(object):
 
     def test_object_is_locked_after_ra_state_changes(self):
         self.assertEqual(self.item.is_locked(), False)
-        s = models.Status.objects.create(
+        models.Status.objects.create(
             concept=self.item,
             registrationAuthority=self.ra,
             registrationDate=timezone.now(),
@@ -336,7 +336,7 @@ class ManagedObjectVisibility(object):
         r1 = get_user_model().objects.create_user('reggie', '', 'reg')
 
         self.assertEqual(perms.user_can_view(r1, self.item), False)
-        s = models.Status.objects.create(
+        models.Status.objects.create(
             concept=self.item,
             registrationAuthority=self.ra,
             registrationDate=timezone.now(),
@@ -430,7 +430,7 @@ class ManagedObjectVisibility(object):
         self.assertEqual(perms.user_can_edit(e1, self.item), False)
 
         # self.ra.register(self.item,self.ra.locked_state,registrar,timezone.now(),)
-        s = models.Status.objects.create(
+        models.Status.objects.create(
             concept=self.item,
             registrationAuthority=self.ra,
             registrationDate=timezone.now(),

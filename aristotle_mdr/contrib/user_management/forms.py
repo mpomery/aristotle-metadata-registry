@@ -25,8 +25,6 @@ class UserInvitationForm(FormRequestMixin, forms.Form):
         data = self.cleaned_data['email_list']
         emails = [e.strip() for e in data.split('\n')]
 
-        email_suffixes = fetch_aristotle_settings().get('USER_EMAIL_RESTRICTIONS', [])
-
         errors = []
         for i, email in enumerate(emails):
             if email.strip() == "":

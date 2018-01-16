@@ -47,7 +47,7 @@ def compare_concepts(request, obj_type=None):
         revs=[]
         for item in [item_a, item_b]:
             from reversion.models import Version
-            versions = Version.objects.get_for_object(item)
+            Version.objects.get_for_object(item)
             ct = ContentType.objects.get_for_model(item)
             version = reversion.models.Version.objects.filter(content_type=ct, object_id=item.pk).order_by('-revision__date_created').first()
             revs.append(version)

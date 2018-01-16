@@ -61,7 +61,7 @@ class UserHomePages(utils.LoggedInViewPages, TestCase):
         # Should not see item2 because it has a review request
         self.item2 = models._concept.objects.create(
             name="Test Item 2 (not visible in sandbox, review request)",
-            definition="my definition", 
+            definition="my definition",
             submitter=self.viewer)
         review = models.ReviewRequest.objects.create(
             requester=self.su,
@@ -75,12 +75,15 @@ class UserHomePages(utils.LoggedInViewPages, TestCase):
         self.item3 = models._concept.objects.create(
             name="Test Item 3 (not visible in sandbox, status)",
             definition="my definition",
-            submitter=self.viewer)
-        status = models.Status.objects.create(
+            submitter=self.viewer
+        )
+
+        models.Status.objects.create(
             concept=self.item3,
             registrationAuthority=self.ra,
             registrationDate = datetime.date(2009,4,28),
-            state =  models.STATES.standard)
+            state =  models.STATES.standard
+        )
 
         response = self.client.get(reverse('aristotle:userSandbox',))
         self.assertEqual(response.status_code, 200)

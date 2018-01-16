@@ -612,15 +612,15 @@ class _concept(baseAristotleObject):
     @property
     def non_cached_fields_changed(self):
         changed = self.tracker.changed()
-        public_changed = changed.pop('_is_public', False)
-        locked_changed = changed.pop('_is_locked', False)
+        changed.pop('_is_public', False)
+        changed.pop('_is_locked', False)
         return len(changed.keys()) > 0
 
     @property
     def changed_fields(self):
         changed = self.tracker.changed()
-        public_changed = changed.pop('_is_public', False)
-        locked_changed = changed.pop('_is_locked', False)
+        changed.pop('_is_public', False)
+        changed.pop('_is_locked', False)
         return changed.keys()
 
     def can_edit(self, user):

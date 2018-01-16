@@ -20,12 +20,11 @@ class TestExtensionListVisibility(TestCase):
         from django.apps import apps
 
         response = self.client.get(reverse('aristotle_mdr:extensions'))
-        self.assertEqual(response.status_code, 200)
-        ext = apps.get_app_config('extension_test')
+        self.assertEqual(response.status_code, 200))
 
         from django.utils.module_loading import import_string
         dowloader = import_string('text_download_test.downloader.TestTextDownloader')
-        
+
         self.assertContains(response, dowloader.description)
 
 
@@ -54,7 +53,7 @@ class QuestionViewPage(LoggedInViewExtensionConceptPages, TestCase):
         self.logout()
         response = self.client.get(self.get_help_page())
         self.assertEqual(response.status_code, 200)
-        
+
 
 # ---- Questionnaire tests
 
@@ -98,7 +97,7 @@ class QuestionnaireViewPage(LoggedInViewExtensionConceptPages, TestCase):
 
         with self.assertRaises(TemplateDoesNotExist):
             # They never made this help page, this will error
-            response = self.client.get(self.get_help_page())
+            self.client.get(self.get_help_page())
 
     def test_questions_not_on_edit_screen(self):
         self.login_editor()
@@ -125,15 +124,14 @@ class QuestionnaireViewPage(LoggedInViewExtensionConceptPages, TestCase):
         self.loggedin_user_can_use_value_page(value_url,self.item2,403)
         self.loggedin_user_can_use_value_page(value_url,self.item3,200)
 
-        data = {}
         num_vals = self.item1.questions.count()
         self.assertTrue(num_vals == 0)
 
         q1 = Question.objects.create(name="Q1",definition="Q1",submitter=self.editor)
         q2 = Question.objects.create(name="Q2",definition="Q2",submitter=self.editor)
         q3 = Question.objects.create(name="Q3",definition="Q3")
-        
-        
+
+
         response = self.client.post(
             reverse(value_url,args=[self.item1.id]),
             {"items_to_add":[q1.pk,q2.pk,q3.pk],}

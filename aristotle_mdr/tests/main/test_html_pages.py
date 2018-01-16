@@ -450,7 +450,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         self.assertTrue(perms.user_can_view(self.viewer, self.item1))
         response = self.client.get(reverse('aristotle:clone_item',args=[self.item1.id]))
         self.assertEqual(response.status_code,200)
-        
+
         # Viewer can't clone an item they can't see
         self.assertFalse(perms.user_can_view(self.viewer, self.item2))
         response = self.client.get(reverse('aristotle:clone_item',args=[self.item2.id]))
@@ -567,7 +567,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.post(
             reverse('aristotle:deprecate',args=[self.item3.id]),{'olderItems':[self.item1.id]})
         self.assertEqual(response.status_code,302)
-        
+
         self.item1 = self.itemType.objects.get(id=self.item1.id) # Stupid cache
         self.assertTrue(self.item1.superseded_by == self.item3.concept)
 
@@ -631,7 +631,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         with reversion.revisions.create_revision():
             self.item1.name = "change 2"
             reversion.set_comment("change 2")
-            r = self.ra.register(
+            self.ra.register(
                 item=self.item1,
                 state=models.STATES.incomplete,
                 user=self.registrar
@@ -695,7 +695,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         )
 
         review.concepts.add(self.item1)
-        r = self.ra.register(
+        self.ra.register(
             item=self.item1,
             state=models.STATES.incomplete,
             user=self.registrar
@@ -1040,7 +1040,7 @@ class ValueDomainViewPage(LoggedInViewConceptPages, TestCase):
             "form-TOTAL_FORMS":num_vals+1, "form-INITIAL_FORMS": num_vals, "form-MAX_NUM_FORMS":1000,
 
             })
-        response = self.client.post(reverse(value_url,args=[self.item1.id]),data)
+        self.client.post(reverse(value_url,args=[self.item1.id]),data)
         self.item1 = models.ValueDomain.objects.get(pk=self.item1.pk)
 
         self.assertTrue(num_vals == getattr(self.item1,value_type+"Values").count())
@@ -1103,7 +1103,7 @@ class ValueDomainViewPage(LoggedInViewConceptPages, TestCase):
             "form-TOTAL_FORMS":num_vals+1, "form-INITIAL_FORMS": num_vals, "form-MAX_NUM_FORMS":1000,
 
             })
-        response = self.client.post(reverse(value_url,args=[self.item1.id]),data)
+        self.client.post(reverse(value_url,args=[self.item1.id]),data)
         self.item1 = models.ValueDomain.objects.get(pk=self.item1.pk)
 
         self.assertTrue(num_vals == getattr(self.item1,value_type+"Values").count())
@@ -1403,12 +1403,12 @@ class RegistrationAuthorityViewPage(LoggedInViewUnmanagedPages, TestCase):
 
         self.item2 = models.DataElement.objects.create(name="OC1",workgroup=self.wg1,**self.defaults)
 
-        s = models.Status.objects.create(
-                concept=self.item2,
-                registrationAuthority=self.item1,
-                registrationDate=timezone.now(),
-                state=models.STATES.standard
-                )
+        models.Status.objects.create(
+            concept=self.item2,
+            registrationAuthority=self.item1,
+            registrationDate=timezone.now(),
+            state=models.STATES.standard
+        )
 
     def get_page(self,item):
         return item.get_absolute_url()

@@ -182,7 +182,6 @@ def paginated_registration_authority_list(request, ras, template, extra_context=
         'sort': sort_by,
         'page': items,
         }
-    f = qs.first()
 
     context.update(extra_context)
     return render(request, template, context)

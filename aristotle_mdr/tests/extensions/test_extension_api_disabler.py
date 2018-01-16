@@ -159,7 +159,7 @@ class ConfigDisableCheckTests(utils.LoggedInViewPages, TestCase):
         sqs = SearchQuerySet().auto_query("Different Question unique")
         self.assertTrue(unindexed_item.pk not in [s.object.pk for s in sqs])
 
-    
+
     # -------------------------------------------
 
     def test_object_savable_if_enabled(self):
@@ -182,7 +182,7 @@ class ConfigDisableCheckTests(utils.LoggedInViewPages, TestCase):
         pre_count_q = Question.objects.count()
 
         with self.assertRaises(ImproperlyConfigured):
-            uncreated_item = Question.objects.create(
+            Question.objects.create(
                 name="Different Question",
                 definition="Some different unique string"
             )
@@ -191,4 +191,3 @@ class ConfigDisableCheckTests(utils.LoggedInViewPages, TestCase):
         post_count_q = Question.objects.count()
         self.assertTrue(post_count_c == pre_count_c)
         self.assertTrue(post_count_q == pre_count_q)
-

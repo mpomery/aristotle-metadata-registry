@@ -46,7 +46,6 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
         response = self.client.get(reverse('aristotle:request_review',args=[self.item1.id]))
         self.assertEqual(response.status_code,200)
-        form = response.context['form']
 
         self.assertEqual(self.item1.review_requests.count(),0)
         response = self.client.post(
@@ -259,7 +258,7 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         review = models.ReviewRequest.objects.get(pk=review.pk) #decache
         response = self.client.get(reverse('aristotle:userReviewAccept',args=[review.pk]))
         self.assertEqual(response.status_code,403)
-        
+
         response = self.client.post(reverse('aristotle:userReviewAccept',args=[review.pk]),
             {
                 'response':"I can't accept this, its cancelled"
@@ -333,7 +332,7 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         review = models.ReviewRequest.objects.get(pk=review.pk) #decache
         response = self.client.get(reverse('aristotle:userReviewReject',args=[review.pk]))
         self.assertEqual(response.status_code,403)
-        
+
         response = self.client.post(reverse('aristotle:userReviewReject',args=[review.pk]),
             {
                 'response':"I can't reject this, its cancelled"
@@ -404,7 +403,7 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
         review.concepts.add(self.item1)
 
-        self.assertFalse(review.status == models.REVIEW_STATES.cancelled)        
+        self.assertFalse(review.status == models.REVIEW_STATES.cancelled)
         response = self.client.post(reverse('aristotle:userReviewCancel',args=[review.pk]),{})
         self.assertRedirects(response,reverse('aristotle:userMyReviewRequests',))
 
@@ -413,7 +412,7 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
     def test_registrar_cant_load_rejected_or_accepted_review(self):
         self.login_registrar()
-        other_ra = models.RegistrationAuthority.objects.create(name="A different ra")
+        models.RegistrationAuthority.objects.create(name="A different ra")
 
         review = models.ReviewRequest.objects.create(
             requester=self.editor,
@@ -478,7 +477,7 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.assertTrue(user_can_view_review(self.registrar,review))
         self.assertTrue(user_can_view_review(self.su,review))
         self.assertFalse(user_can_view_review(self.viewer,review))
-        
+
         review.status = models.REVIEW_STATES.cancelled
         review.save()
 

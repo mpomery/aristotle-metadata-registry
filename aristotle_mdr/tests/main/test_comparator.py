@@ -52,7 +52,7 @@ class ComparatorTester(utils.LoggedInViewPages):
         self.assertTrue('Select a valid choice', form.errors['item_b'][0])
         self.assertTrue('item_a' not in form.errors.keys())  # No error will show as we need two choices
 
-        s = models.Status.objects.create(
+        models.Status.objects.create(
             concept=item2,
             registrationAuthority=self.ra,
             registrationDate=timezone.now(),

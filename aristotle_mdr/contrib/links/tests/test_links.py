@@ -58,7 +58,7 @@ class LinkTestBase(utils.LoggedInViewPages):
             name="Test Item 4 (visible to only superusers)",
             definition="my definition",
         )
-        
+
         self.relation = models.Relation.objects.create(name="test_relation", definition="Used for testing", arity=2)
         self.relation_role1 = models.RelationRole.objects.create(
             name="part1", definition="first role", multiplicity=1,
@@ -160,7 +160,7 @@ class TestLinkPages(LinkTestBase, TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('aristotle_mdr_links:edit_link', args=[self.link1.pk]))
         self.assertEqual(response.status_code, 200)
-        
+
         response = self.client.post(
             reverse('aristotle_mdr_links:edit_link', args=[self.link1.pk]),
             {
@@ -178,7 +178,7 @@ class TestLinkPages(LinkTestBase, TestCase):
         next_url = "/"
         self.wizard_url = reverse('aristotle_mdr_links:add_link')+'?next=' + next_url
 
-        r = self.ra.register(
+        self.ra.register(
             item=self.relation,
             state=STATES.standard,
             user=self.su
@@ -288,4 +288,3 @@ class TestLinkAssortedPages(LinkTestBase, TestCase):
         self.login_superuser()
         response = self.client.get(reverse('aristotle_mdr_links:link_json_for_item', args=[self.item1.pk]))
         self.assertEqual(response.status_code,200)
-

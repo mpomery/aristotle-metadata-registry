@@ -53,7 +53,6 @@ class ForbiddenAllowedModelMultipleChoiceField(forms.ModelMultipleChoiceField):
                 self.error_messages['list'],
                 code='list',
             )
-        true_value = []
         for pk in value:
             try:
                 self.validate_queryset.filter(**{key: pk})
@@ -338,7 +337,6 @@ class ChangeWorkgroupForm(BulkActionForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        wgs = [(wg.id, wg.name) for wg in self.user.profile.workgroups]
         self.fields['workgroup']=forms.ModelChoiceField(
             label="Workgroup to move items to",
             queryset=self.user.profile.workgroups
