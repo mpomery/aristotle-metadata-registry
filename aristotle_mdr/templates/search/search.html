@@ -393,10 +393,14 @@
 
             {% include "aristotle_mdr/helpers/paginator.html" with page=page %}
             <div class='float-right'>
+                {% for value in rpp_values %}
+                {% if forloop.first %}
                 <span>Results per page:</span>
-                <button type="button" class="btn btn-default rpp" id="default_rpp" value="20">20</button>
-                <button type="button" class="btn btn-default rpp" value="30">30</button>
-                <button type="button" class="btn btn-default rpp" value="40">40</button>
+                <button type="button" class="btn btn-default rpp" id="default_rpp" value="{{value}}">{{value}}</button>
+                {% else %}
+                <button type="button" class="btn btn-default rpp" value="{{value}}">{{value}}</button>
+                {% endif %}
+                {% endfor %}
             </div>
           </div>
         </div>

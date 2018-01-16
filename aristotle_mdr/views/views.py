@@ -361,16 +361,22 @@ def extensions(request):
 
 class PermissionSearchView(FacetedSearchView):
 
+    results_per_page_values = getattr(settings, 'RESULTS_PER_PAGE', [])
+
     def build_page(self):
 
         rpp = self.form.cleaned_data['rpp']
 
-        if rpp:
+        if rpp in self.results_per_page_values:
             self.results_per_page = rpp
+        else:
+            if len(self.results_per_page_values) > 0:
+                self.results_per_page = self.results_per_page_values[0]
 
         return super().build_page()
 
     def build_form(self):
+
         form = super().build_form()
         form.request = self.request
         form.request.GET = self.clean_facets(self.request)
@@ -384,3 +390,7 @@ class PermissionSearchView(FacetedSearchView):
                 k = k[4:]
                 get.update({'f': '%s::%s' % (k, val)})
         return get
+
+    def extra_context(self):
+
+        return {'rpp_values' : self.results_per_page_values}
