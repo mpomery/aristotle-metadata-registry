@@ -193,26 +193,6 @@ def get_cached_object_count(model_type):
     return get_cached_query_count(query, CACHE_KEY, 60 * 60 * 12)  # Cache for 12 hours
 
 
-@login_required
-def edit(request):
-    if request.method == 'POST':  # If the form has been submitted...
-        form = MDRForms.UserSelfEditForm(request.POST)  # A form bound to the POST data
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            request.user.first_name = form.cleaned_data['first_name']
-            request.user.last_name = form.cleaned_data['last_name']
-            request.user.email = form.cleaned_data['email']
-            request.user.save()
-            return redirect(reverse('aristotle:userHome', ))
-    else:
-        form = MDRForms.UserSelfEditForm({
-            'first_name': request.user.first_name,
-            'last_name': request.user.last_name,
-            'email': request.user.email,
-            })
-    return render(request, "aristotle_mdr/user/userEdit.html", {"form": form})
-
-
 class EditView(LoginRequiredMixin, UpdateView):
 
     template_name = "aristotle_mdr/user/userEdit.html"
