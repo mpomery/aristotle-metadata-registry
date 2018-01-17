@@ -14,6 +14,10 @@ except ImportError:
 else:
     docutils_is_available = True
 
+from django.contrib.admindocs.utils import (
+    trim_docstring, parse_docstring
+)
+
 
 def parse_rst(text, default_reference_context, thing_being_parsed=None):
     """
