@@ -1,10 +1,7 @@
-from django.urls import reverse
 from django.template import Context, Template
 from django.test import TestCase
 
 import aristotle_mdr.models as models
-import aristotle_mdr.perms as perms
-import aristotle_mdr.tests.utils as utils
 
 from django.core.exceptions import FieldDoesNotExist
 from django.template.exceptions import TemplateSyntaxError

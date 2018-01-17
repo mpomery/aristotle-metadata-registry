@@ -5,7 +5,6 @@ import string
 
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 
 import aristotle_mdr.models as models

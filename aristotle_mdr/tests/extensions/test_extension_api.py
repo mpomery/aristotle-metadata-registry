@@ -6,7 +6,6 @@ from django.template import TemplateDoesNotExist
 
 from aristotle_mdr.tests.main.test_html_pages import LoggedInViewConceptPages
 from aristotle_mdr.tests.main.test_admin_pages import AdminPageForConcept
-from django.test.utils import override_settings
 
 from extension_test.models import Question, Questionnaire
 

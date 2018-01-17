@@ -1,11 +1,8 @@
 from django import template
 from django.contrib.contenttypes.models import ContentType
-from django.urls import reverse, resolve, reverse_lazy
-from django.template.defaultfilters import slugify
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from aristotle_mdr import perms
-import aristotle_mdr.models as MDR
 from aristotle_mdr.contrib.help.models import ConceptHelp, HelpPage
 from aristotle_mdr.templatetags.aristotle_tags import doc
 from django.conf import settings
@@ -19,7 +16,6 @@ def help_doc(item, field='brief', request=None):
     """Gets the appropriate help text for a model.
     """
 
-    from aristotle_mdr.utils.doc_parse import parse_rst, parse_docstring
     app_label = item._meta.app_label
     model_name = item._meta.model_name
 

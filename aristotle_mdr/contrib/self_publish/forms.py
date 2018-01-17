@@ -1,4 +1,4 @@
-from django.forms import ValidationError, ModelForm
+from django.forms import ModelForm
 from aristotle_mdr.contrib.self_publish.models import PublicationRecord
 from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 from django.forms import RadioSelect

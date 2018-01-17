@@ -1,5 +1,3 @@
-from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
 from notifications.signals import notify
 
 

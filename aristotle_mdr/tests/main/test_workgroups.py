@@ -4,7 +4,6 @@ from django.urls import reverse
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
-from django.core.exceptions import PermissionDenied
 
 from aristotle_mdr.utils import setup_aristotle_test_environment
 
@@ -73,7 +72,7 @@ class WorkgroupMembership(TestCase):
         wg3.save()
 
         editor = get_user_model().objects.get(pk=editor.pk)
-        
+
         editable = editor.profile.editable_workgroups
         self.assertTrue(editable.count() == 2)
         self.assertTrue(wg1 in editable.all())
@@ -222,7 +221,7 @@ class WorkgroupUpdateTests(utils.LoggedInViewPages,TestCase):
 
         response = self.client.get(reverse('aristotle:workgroup_edit', args=[my_wg.pk]))
         self.assertEqual(response.status_code, 200)
-        
+
         data = response.context['form'].initial
         data.update({
             'name':"My cool registrar",

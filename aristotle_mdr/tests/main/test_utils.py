@@ -1,9 +1,6 @@
 from django.test import TestCase
-from django.core.management import call_command
-from django.urls import reverse
 
 from aristotle_mdr import models
-import datetime
 
 from aristotle_mdr.utils import setup_aristotle_test_environment
 

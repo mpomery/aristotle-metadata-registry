@@ -1,9 +1,5 @@
 from django.conf import settings
-from django.urls import reverse
 from django.test import TestCase, override_settings
-import aristotle_mdr.models as models
-import aristotle_mdr.perms as perms
-import aristotle_mdr.tests.utils as utils
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -17,7 +13,7 @@ from unittest.mock import patch
 
 
 class TestAristotleSettings(TestCase):
-    
+
     @patch('aristotle_mdr.utils.utils.logger')
     def test_bad_bulk_action_settings_log_correctly(self, mock_logger):
         with override_settings(

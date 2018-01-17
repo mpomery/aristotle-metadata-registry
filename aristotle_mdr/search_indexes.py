@@ -1,4 +1,3 @@
-import datetime
 import haystack.indexes as indexes
 
 import aristotle_mdr.models as models

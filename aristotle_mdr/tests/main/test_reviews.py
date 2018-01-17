@@ -1,8 +1,6 @@
-from django.conf import settings
 from django.urls import reverse
-from django.test import TestCase, override_settings
+from django.test import TestCase
 import aristotle_mdr.models as models
-import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 from aristotle_mdr.utils import url_slugify_concept
 

@@ -13,7 +13,7 @@ from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import perms
 from aristotle_mdr.views.utils import ObjectLevelPermissionRequiredMixin
 
-from braces.views import LoginRequiredMixin, PermissionRequiredMixin
+from braces.views import LoginRequiredMixin
 from django.views.generic import DeleteView, TemplateView, FormView, UpdateView
 
 

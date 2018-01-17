@@ -1,10 +1,9 @@
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from django.test import TestCase, override_settings, modify_settings
+from django.test import TestCase
 
 from aristotle_mdr.contrib.links import models, perms
-from aristotle_mdr.models import Workgroup, ObjectClass, STATES
+from aristotle_mdr.models import ObjectClass, STATES
 from aristotle_mdr.tests import utils
 from aristotle_mdr.utils import setup_aristotle_test_environment
 

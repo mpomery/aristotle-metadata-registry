@@ -1,18 +1,14 @@
 from django import forms
-from django.apps import apps
-from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.db import transaction
 from django.forms.models import modelformset_factory
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import FormView, ListView, TemplateView, View
+from django.views.generic import FormView, TemplateView, View
 
 from aristotle_mdr.contrib.autocomplete import widgets
-from aristotle_mdr.utils import get_concepts_for_apps
 from aristotle_mdr.models import _concept
 from aristotle_mdr.perms import user_can_edit, user_can_view
 from aristotle_mdr.utils import construct_change_message

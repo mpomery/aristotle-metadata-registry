@@ -1,16 +1,13 @@
 from django import forms
-from django.conf import settings
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone, dateparse
-from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 import aristotle_mdr.models as MDR
 from aristotle_mdr.exceptions import NoUserGivenForUserForm
-from aristotle_mdr.perms import user_can_move_between_workgroups, user_can_move_any_workgroup, user_can_remove_from_workgroup, user_can_move_to_workgroup
+from aristotle_mdr.perms import user_can_move_between_workgroups, user_can_move_any_workgroup, user_can_remove_from_workgroup
 from aristotle_mdr.contrib.autocomplete import widgets
 
-from dal import autocomplete
 from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 
 

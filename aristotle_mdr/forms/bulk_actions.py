@@ -1,5 +1,4 @@
 from django import forms
-from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.db import transaction
@@ -15,12 +14,11 @@ from aristotle_mdr.forms import ChangeStatusForm
 from aristotle_mdr.perms import (
     user_can_view,
     user_is_registrar,
-    user_is_workgroup_manager,
     user_can_move_any_workgroup
 )
 from aristotle_mdr.forms.creation_wizards import UserAwareForm
 from aristotle_mdr.contrib.autocomplete import widgets
-from aristotle_mdr.utils import fetch_aristotle_settings, fetch_aristotle_downloaders
+from aristotle_mdr.utils import fetch_aristotle_downloaders
 
 from .utils import RegistrationAuthorityMixin
 

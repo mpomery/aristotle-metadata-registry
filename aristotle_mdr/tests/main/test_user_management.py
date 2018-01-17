@@ -1,11 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from django.core.management import call_command
 from django.urls import reverse
 
 import aristotle_mdr.tests.utils as utils
-from aristotle_mdr import models
-import datetime
 
 from aristotle_mdr.utils import setup_aristotle_test_environment
 

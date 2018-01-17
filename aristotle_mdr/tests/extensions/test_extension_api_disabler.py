@@ -2,14 +2,9 @@ from django.test import TestCase
 
 import aristotle_mdr.tests.utils as utils
 from django.urls import reverse
-from django.template import TemplateDoesNotExist
-from aristotle_mdr.tests.main.test_html_pages import LoggedInViewConceptPages
-from aristotle_mdr.tests.main.test_admin_pages import AdminPageForConcept
 from django.test.utils import override_settings
 
-from extension_test.models import Question, Questionnaire
-
-from django.test.utils import setup_test_environment
+from extension_test.models import Question
 
 from aristotle_mdr.required_settings import ARISTOTLE_SETTINGS as BASE_ARISTOTLE_SETTINGS
 from aristotle_mdr.utils import fetch_metadata_apps

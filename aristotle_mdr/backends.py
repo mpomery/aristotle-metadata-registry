@@ -1,5 +1,4 @@
 from django.contrib.auth.backends import ModelBackend
-from django.conf import settings
 
 from aristotle_mdr import perms
 from aristotle_mdr.utils import fetch_aristotle_settings

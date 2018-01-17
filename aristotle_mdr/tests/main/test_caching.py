@@ -2,9 +2,7 @@ from django.test import TestCase
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
-import aristotle_mdr.tests.utils as utils
 from django.contrib.auth import get_user_model
-from django.urls import reverse
 
 import datetime
 from time import sleep

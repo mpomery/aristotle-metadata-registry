@@ -1,6 +1,4 @@
-from channels import Group
 from django.contrib.auth import get_user_model
-from aristotle_mdr import models as MDR
 from aristotle_mdr import messages
 from aristotle_mdr.contrib.channels.utils import safe_object
 

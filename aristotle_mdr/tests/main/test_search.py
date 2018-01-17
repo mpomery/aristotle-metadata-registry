@@ -1,4 +1,4 @@
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.conf import settings
 
 import aristotle_mdr.models as models
@@ -11,7 +11,6 @@ from django.core.management import call_command
 from reversion import revisions as reversion
 from aristotle_mdr.utils import setup_aristotle_test_environment
 
-from time import sleep
 import datetime
 from django.utils import timezone
 
@@ -61,11 +60,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
             for t in avengers.split()]
 
     def test_search_factory_fails_with_bad_queryset(self):
-        from haystack.query import SearchQuerySet
-        from haystack.views import search_view_factory
         from django.core.exceptions import ImproperlyConfigured
-        from aristotle_mdr.views.views import PermissionSearchView
-        from aristotle_mdr.forms.search import PermissionSearchForm
 
         with self.assertRaises(ImproperlyConfigured):
             self.client.get(reverse('fail_search')+"?q=wolverine")
@@ -549,7 +544,6 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         self.login_superuser()
 
-        from aristotle_mdr.forms.search import get_permission_sqs
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
 
         objs = response.context['page'].object_list
@@ -620,7 +614,6 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertEqual(len(psqs),1)
         self.assertEqual(psqs[0].object.pk, vd.pk)
 
-    #@override_settings(RESULTS_PER_PAGE=[1,2,3])
     def test_number_search_results(self):
 
         rpp_values = getattr(settings, 'RESULTS_PER_PAGE', [20])

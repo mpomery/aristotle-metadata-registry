@@ -5,15 +5,8 @@ Aristotle MDR 11179 Slots models
 These are based on the Slots definition in ISO/IEC 11179 Part 3 - 7.2.2.4
 """
 
-from django.apps import apps
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
-from django.conf.global_settings import LANGUAGES
-from django.core.exceptions import ValidationError
-from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _
 
-from model_utils import Choices
 from model_utils.models import TimeStampedModel
 
 from aristotle_mdr import models as MDR

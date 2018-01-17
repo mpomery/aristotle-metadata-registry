@@ -3,12 +3,8 @@
 # It also provides facetting
 # 2016-11-27 - Module inherited to add Python 3 functionality
 
-from collections import defaultdict
 from haystack.backends import whoosh_backend as original_backend
 from haystack.backends import BaseEngine
-from whoosh import analysis, fields, highlight, query, scoring
-from whoosh.reading import TermNotFound
-from whoosh.support.levenshtein import distance
 from whoosh.writing import AsyncWriter
 
 
@@ -48,7 +44,6 @@ class WriterWithFasterSpellingUpdate(AsyncWriter):
     def update_document(self, **doc):
         # remove every word previously found in the document from the
         # spelling index
-        from haystack.constants import ID
         super().update_document(**doc)
         document_schema = self.index.schema
         for fieldname in self.spelling_fields:
@@ -249,7 +244,7 @@ class FixedWhooshSearchBackend(CustomWhooshBackend):
         if len(model_choices) > 0:
             if narrow_queries is None:
                 narrow_queries = set()
-            from haystack.constants import ID, DJANGO_CT, DJANGO_ID
+            from haystack.constants import DJANGO_CT
             narrow_queries.add(' OR '.join(['%s:%s' % (DJANGO_CT, rm) for rm in model_choices]))
         narrow_searcher = None
         if narrow_queries is not None:

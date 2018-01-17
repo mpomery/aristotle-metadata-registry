@@ -2,9 +2,7 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 import aristotle_mdr.models as models
-import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
-from django.core.exceptions import PermissionDenied
 
 from aristotle_mdr.utils import setup_aristotle_test_environment
 setup_aristotle_test_environment()
@@ -124,7 +122,7 @@ class RAUpdateTests(utils.LoggedInViewPages,TestCase):
 
         response = self.client.get(reverse('aristotle:registrationauthority_edit', args=[my_ra.pk]))
         self.assertEqual(response.status_code, 200)
-        
+
         data = response.context['form'].initial
         data.update({
             'name':"My cool registrar",

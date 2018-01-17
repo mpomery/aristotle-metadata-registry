@@ -219,8 +219,6 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
 
         self.assertEqual(self.item1.slots.count(),0)
 
-        from aristotle_mdr.contrib.slots.models import Slot
-
         updated_item = utils.model_to_dict_with_change_time(response.context['item'])
         updated_name = updated_item['name'] + " updated!"
         updated_item['name'] = updated_name

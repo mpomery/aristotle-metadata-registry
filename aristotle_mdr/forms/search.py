@@ -2,7 +2,6 @@ import datetime
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.apps import apps
-from django.db import models
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_lazy as _
 
@@ -10,7 +9,7 @@ from model_utils import Choices
 
 from haystack import connections
 from haystack.constants import DEFAULT_ALIAS
-from haystack.forms import SearchForm, FacetedSearchForm, model_choices
+from haystack.forms import FacetedSearchForm, model_choices
 from haystack.query import EmptySearchQuerySet, SearchQuerySet, SQ
 
 import aristotle_mdr.models as MDR
@@ -20,14 +19,8 @@ from aristotle_mdr.widgets.bootstrap import (
     BootstrapDropdownSelect,
     BootstrapDateTimePicker
 )
-from django.forms.widgets import (
-    SelectMultiple
-    # SelectMultiple as BootstrapDropdownSelectMultiple,
-    # DateInput as BootstrapDropdownIntelligentDate,
-    # Select as BootstrapDropdownSelect,
-    # DateInput as BootstrapDateTimePicker
-)
-from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
+
+from aristotle_mdr.utils import fetch_metadata_apps
 
 
 QUICK_DATES = Choices(
@@ -210,7 +203,6 @@ class TokenSearchForm(FacetedSearchForm):
                     kwargs[str(opt)]=arg
                 elif opt == "type":
                     # we'll allow these through and assume they meant content type
-                    from django.conf import settings
 
                     from django.contrib.contenttypes.models import ContentType
                     arg = arg.lower().replace('_', '').replace('-', '')
@@ -485,7 +477,6 @@ class PermissionSearchForm(TokenSearchForm):
         extra_facets = []
 
         from aristotle_mdr.search_indexes import registered_indexes
-        from haystack.fields import FacetField
         for model_index in registered_indexes:
             for name, field in model_index.fields.items():
                 if field.faceted:

@@ -298,7 +298,6 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(self.item1.current_statuses().first().state == new_state)
         self.assertTrue(self.item1.current_statuses().first().registrationAuthority == self.ra)
 
-        from django.utils.html import escape
         err1 = "Some items failed"
         err2 = "s: %s" % ','.join(sorted([str(self.item2.id), str(self.item4.id)]))
 

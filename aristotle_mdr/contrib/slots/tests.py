@@ -1,6 +1,5 @@
-from django.conf import settings
 from django.urls import reverse
-from django.test import TestCase, override_settings, modify_settings
+from django.test import TestCase
 
 from aristotle_mdr.contrib.slots import models
 from aristotle_mdr.models import ObjectClass, Workgroup

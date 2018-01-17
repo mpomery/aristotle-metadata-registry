@@ -1,5 +1,4 @@
-from django.dispatch import receiver
-from django.db.models.signals import m2m_changed, post_save, post_delete, pre_delete, pre_save
+from django.db.models.signals import m2m_changed, post_save, pre_delete
 # from reversion.signals import post_revision_commit
 import haystack.signals as signals  # .RealtimeSignalProcessor as RealtimeSignalProcessor
 from aristotle_mdr.utils import fetch_metadata_apps
@@ -18,7 +17,7 @@ def pre_save_clean(sender, instance, *args, **kwargs):
 
 class AristotleSignalProcessor(signals.BaseSignalProcessor):
     def setup(self):
-        from aristotle_mdr.models import _concept, Workgroup, ReviewRequest, concept_visibility_updated
+        from aristotle_mdr.models import _concept, ReviewRequest, concept_visibility_updated
         post_save.connect(self.handle_concept_save)
         # post_revision_commit.connect(self.handle_concept_revision)
         pre_delete.connect(self.handle_concept_delete, sender=_concept)
@@ -35,7 +34,6 @@ class AristotleSignalProcessor(signals.BaseSignalProcessor):
         super().teardown()
 
     def handle_concept_recache(self, concept, **kwargs):
-        from aristotle_mdr.models import _concept
         instance = concept.item
         self.handle_save(instance.__class__, instance)
 

@@ -1,6 +1,5 @@
 import datetime
 from django.apps import apps
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from braces.views import LoginRequiredMixin
 from django.contrib.auth.views import login
@@ -17,7 +16,7 @@ from django.views.generic import DetailView, ListView, UpdateView
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.views.utils import paginated_list, paginated_workgroup_list
-from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
+from aristotle_mdr.utils import fetch_metadata_apps
 
 
 def friendly_redirect_login(request):

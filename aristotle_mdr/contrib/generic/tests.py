@@ -1,9 +1,6 @@
-from django.conf import settings
 from django.urls import reverse
-from django.test import TestCase, override_settings, modify_settings
+from django.test import TestCase
 
-from django.core.management import call_command
-from aristotle_mdr.contrib.help import models
 from aristotle_mdr.tests import utils
 from aristotle_mdr.utils import setup_aristotle_test_environment
 
@@ -13,7 +10,7 @@ setup_aristotle_test_environment()
 class TestGenericPagesLoad(utils.LoggedInViewPages, TestCase):
 
     def test_anon_cant_use_generic(self):
-        from extension_test.models import Question, Questionnaire
+        from extension_test.models import Questionnaire
         from aristotle_mdr.models import Workgroup
 
         wg = Workgroup.objects.create(name="Setup WG")

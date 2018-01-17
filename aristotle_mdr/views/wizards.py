@@ -3,11 +3,9 @@ from aristotle_mdr import forms as MDRForms
 from aristotle_mdr.perms import user_is_editor
 from aristotle_mdr.utils import url_slugify_concept
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
-from django.urls import reverse
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render

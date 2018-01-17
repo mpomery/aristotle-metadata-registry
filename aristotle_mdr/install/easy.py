@@ -16,7 +16,6 @@ from __future__ import unicode_literals, print_function
 
 import getopt
 import os
-import pip
 import re
 import sys
 from subprocess import call

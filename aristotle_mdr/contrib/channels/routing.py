@@ -1,4 +1,4 @@
-from channels.routing import route, route_class, include
+from channels.routing import route, include
 from haystack_channels.routing import channel_routing as haystack_routing
 
 

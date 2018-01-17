@@ -1,10 +1,9 @@
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.db import models, transaction
 from django.db.models import Q
-from django.db.models.signals import post_save, m2m_changed, post_delete, pre_save
+from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver, Signal
 from django.utils import timezone
 from django.utils.module_loading import import_string
@@ -20,7 +19,6 @@ import reversion  # import revisions
 import datetime
 from ckeditor_uploader.fields import RichTextUploadingField as RichTextField
 from aristotle_mdr import perms
-from aristotle_mdr import messages
 from aristotle_mdr.utils import (
     fetch_aristotle_settings,
     fetch_metadata_apps,
@@ -32,7 +30,7 @@ from aristotle_mdr.utils import (
 from aristotle_mdr import comparators
 
 from .fields import ConceptForeignKey, ConceptManyToManyField
-from .managers import MetadataItemManager, ConceptManager, UUIDManager
+from .managers import MetadataItemManager, ConceptManager
 
 import logging
 logger = logging.getLogger(__name__)

@@ -1,11 +1,9 @@
 from django.test import TestCase
 
 import aristotle_mdr.models as models
-import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 from django.urls import reverse
 
-import datetime
 from django.utils import timezone
 
 from reversion import revisions as reversion

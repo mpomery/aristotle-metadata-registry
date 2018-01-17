@@ -1,7 +1,6 @@
 from django.test import TestCase
 
-import aristotle_mdr.tests.utils as utils
-from aristotle_mdr.models import ObjectClass, Workgroup
+from aristotle_mdr.models import ObjectClass
 from django.urls import reverse
 
 from aristotle_mdr.tests.main.test_bulk_actions import BulkActionsTest
@@ -56,7 +55,7 @@ class TestDeleteBulkAction(BulkActionsTest, TestCase):
         self.assertEqual(num_items - 2, ObjectClass.objects.count())
 
     def test_delete_by_editor(self):
-        
+
         self.editor.is_staff = False
         self.editor.save()
         self.editor = self.editor.__class__.objects.get(pk=self.editor.pk)  # decache
@@ -190,4 +189,3 @@ class BulkDownloadTests(BulkActionsTest, TestCase):
         self.assertContains(response, self.item1.definition)
         self.assertContains(response, self.item2.definition)  # Will be in as its a component of DEC5
         self.assertContains(response, self.item5.definition)
-

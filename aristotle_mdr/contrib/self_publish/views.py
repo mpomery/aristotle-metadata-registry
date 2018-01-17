@@ -1,8 +1,4 @@
-from django.apps import apps
-from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.utils.translation import ugettext_lazy as _
+from django.http import HttpResponseRedirect
 
 from aristotle_mdr.contrib.generic.views import GenericWithItemURLFormView
 from aristotle_mdr.contrib.self_publish.forms import MetadataPublishForm

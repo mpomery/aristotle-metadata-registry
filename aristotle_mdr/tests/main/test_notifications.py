@@ -1,14 +1,9 @@
 from django import VERSION as django_version
-from django.conf import settings
 from django.urls import reverse
-from django.test import TestCase, override_settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 import aristotle_mdr.models as models
-import aristotle_mdr.perms as perms
-from aristotle_mdr.utils import url_slugify_concept
-from aristotle_mdr.forms.creation_wizards import WorkgroupVerificationMixin,CheckIfModifiedMixin
 
 from aristotle_mdr.tests import utils
 import datetime
@@ -52,7 +47,7 @@ class TestNotifications(utils.LoggedInViewPages, TestCase):
         self.item2.supersedes.add(self.item1, **kwargs)
 
         self.assertTrue(self.item1.superseded_by == self.item2)
-        
+
         user1 = get_user_model().objects.get(pk=user1.pk)
         self.assertEqual(user1.notifications.all().count(), 1)
         self.assertTrue('favourited item has been superseded' in user1.notifications.first().verb )
@@ -68,11 +63,11 @@ class TestNotifications(utils.LoggedInViewPages, TestCase):
         response = self.client.post(
             reverse('aristotle:deprecate',args=[self.item2.id]),{'olderItems':[self.item1.id]})
         self.assertEqual(response.status_code,302)
-        
+
         self.item1 = models.ObjectClass.objects.get(id=self.item1.id) # Stupid cache
 
         self.assertTrue(self.item1.superseded_by == self.item2.concept)
-        
+
         user1 = get_user_model().objects.get(pk=user1.pk)
         self.assertEqual(user1.notifications.all().count(), 1)
         self.assertTrue('favourited item has been superseded' in user1.notifications.first().verb )

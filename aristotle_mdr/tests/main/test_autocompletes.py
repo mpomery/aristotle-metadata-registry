@@ -1,16 +1,11 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from django.test import TestCase, override_settings
-from django.utils import timezone
+from django.test import TestCase
 
 import aristotle_mdr.models as models
-import aristotle_mdr.perms as perms
-from aristotle_mdr.utils import url_slugify_concept
 from aristotle_mdr.tests.utils import get_json_from_response
 
 from aristotle_mdr.tests import utils
-import datetime
 
 from aristotle_mdr.utils import setup_aristotle_test_environment
 
