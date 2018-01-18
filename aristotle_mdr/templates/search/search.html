@@ -372,7 +372,7 @@
                     {% if result.object.concept %}
                         <span>
                         <input type='checkbox' id="id_items_{{result.object.id}}" name="items" value='{{ result.object.id }}' title='{% trans "select to perform a bulk action" %}'>
-                            {% include "search/badge.html" with item=item %}
+                            {{ result.rendered_badge|safe }}
                         </span>
                         {% if result.object_pk in request.user.profile.favourites.all %}
                             <i class="fa fa-bookmark" title="{% trans 'This item is in your favourites list' %}"></i>
