@@ -366,15 +366,14 @@
                 class="searchResults {% ternary user.is_active 'active' '' %}">
             {% for result in page.object_list %}
                 {% if result %}
-                {% with item=result.object %}
                 <li>
                     <div class="action">
-                    {% if result.object.concept %}
+                    {% if result.rendered_badge %}
                         <span>
                         <input type='checkbox' id="id_items_{{result.object.id}}" name="items" value='{{ result.object.id }}' title='{% trans "select to perform a bulk action" %}'>
                             {{ result.rendered_badge|safe }}
                         </span>
-                        {% if result.object_pk in request.user.profile.favourites.all %}
+                        {% if result.pk in favourites %}
                             <i class="fa fa-bookmark" title="{% trans 'This item is in your favourites list' %}"></i>
                         {% endif %}
                     {% else %}
@@ -383,7 +382,6 @@
                     </div>
                     {{ result.rendered_search_result|safe }}
                 </li>
-                {% endwith %}
                 {% endif %}
             {% empty %}
                 <li>No results found.</li>

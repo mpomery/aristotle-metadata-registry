@@ -47,8 +47,6 @@ class baseObjectIndex(indexes.SearchIndex):
 
     def prepare_rendered_search_result(self, obj):
 
-        print(self.template_name)
-
         t = loader.get_template(self.template_name)
         return t.render({'object': obj})
 
