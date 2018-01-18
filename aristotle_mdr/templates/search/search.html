@@ -366,27 +366,24 @@
                 class="searchResults {% ternary user.is_active 'active' '' %}">
             {% for result in page.object_list %}
                 {% if result %}
-                <!---
                 {% with item=result.object %}
                 <li>
                     <div class="action">
-                    {% if item.concept %}
+                    {% if result.object.concept %}
                         <span>
                         <input type='checkbox' id="id_items_{{result.object.id}}" name="items" value='{{ result.object.id }}' title='{% trans "select to perform a bulk action" %}'>
                             {% include "search/badge.html" with item=item %}
                         </span>
-                        {% if item.concept in request.user.profile.favourites.all %}
+                        {% if result.object_pk in request.user.profile.favourites.all %}
                             <i class="fa fa-bookmark" title="{% trans 'This item is in your favourites list' %}"></i>
                         {% endif %}
                     {% else %}
                         <div></div>
                     {% endif %}
                     </div>
-                    {% include result.searchindex.template_name with item=item %}
+                    {{ result.rendered_search_result|safe }}
                 </li>
                 {% endwith %}
-                --->
-                {{ result.rendered_search_result|safe }}
                 {% endif %}
             {% empty %}
                 <li>No results found.</li>
