@@ -1,3 +1,5 @@
+from django.test import TestCase
+
 from django import VERSION as django_version
 from django.urls import reverse
 from django.utils import timezone
