@@ -19,7 +19,7 @@ class TestExtensionListVisibility(TestCase):
         from django.apps import apps
 
         response = self.client.get(reverse('aristotle_mdr:extensions'))
-        self.assertEqual(response.status_code, 200))
+        self.assertEqual(response.status_code, 200)
 
         from django.utils.module_loading import import_string
         dowloader = import_string('text_download_test.downloader.TestTextDownloader')

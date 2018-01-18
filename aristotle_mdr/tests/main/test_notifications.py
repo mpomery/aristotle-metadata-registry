@@ -2,6 +2,7 @@ from django import VERSION as django_version
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 
 import aristotle_mdr.models as models
 
