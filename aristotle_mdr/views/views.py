@@ -396,4 +396,4 @@ class PermissionSearchView(FacetedSearchView):
 
     def extra_context(self):
 
-        return {'rpp_values' : self.results_per_page_values}
+        return {'rpp_values': self.results_per_page_values}
