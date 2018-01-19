@@ -392,7 +392,7 @@ class PermissionSearchView(FacetedSearchView):
         return get
 
     def extra_context(self):
-        #needed to compare to indexed primary key value
+        # needed to compare to indexed primary key value
         favourites_pks = self.request.user.profile.favourites.all().values_list('id', flat=True)
         favourites_list = list(favourites_pks)
         return {'rpp_values': self.results_per_page_values, 'favourites': favourites_list}
