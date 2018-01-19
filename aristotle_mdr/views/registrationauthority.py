@@ -1,21 +1,13 @@
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
-from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.db.models import Q
-from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template.defaultfilters import slugify
 
-from django.views.generic import CreateView, ListView, DetailView, UpdateView, FormView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView
 
 from aristotle_mdr import models as MDR
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr.views.utils import (
-    workgroup_item_statuses,
-    paginated_list,
-    paginated_workgroup_list,
     paginated_registration_authority_list,
     ObjectLevelPermissionRequiredMixin,
     RoleChangeView,

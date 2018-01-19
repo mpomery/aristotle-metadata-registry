@@ -51,7 +51,7 @@ class AristotleAutocompletes(utils.LoggedInViewPages, TestCase):
         self.assertContains(response, 'AC2')
         self.assertNotContains(response, 'AC3')
         self.assertContains(response, 'AC4')
-        
+
         response = self.client.get(
             reverse(
                 'aristotle-autocomplete:concept',
@@ -66,7 +66,7 @@ class AristotleAutocompletes(utils.LoggedInViewPages, TestCase):
         self.assertContains(response, 'AC2')
         self.assertNotContains(response, 'AC3')
         self.assertNotContains(response, 'AC4')
-        
+
         self.item1.save()
 
         review = models.ReviewRequest.objects.create(
@@ -76,7 +76,7 @@ class AristotleAutocompletes(utils.LoggedInViewPages, TestCase):
         )
         review.concepts.add(self.item1)
 
-        registered = self.ra.register(self.item1,models.STATES.standard,self.registrar,
+        self.ra.register(self.item1,models.STATES.standard,self.registrar,
             registrationDate=timezone.now()+datetime.timedelta(days=-1)
         )
         self.assertTrue(models.ObjectClass.objects.get(name='AC1').is_public())
@@ -100,7 +100,7 @@ class AristotleAutocompletes(utils.LoggedInViewPages, TestCase):
     def test_concept_autocomplete_statuses(self):
         # see also
         # tests.main.test_search.test_current_statuses_only_in_search_results_and_index
-        
+
         from django.contrib.auth import get_user_model
         self.registrar = get_user_model().objects.create_user('stryker','william.styker@weaponx.mil','mutantsMustDie')
         self.ra.giveRoleToUser('registrar',self.registrar)

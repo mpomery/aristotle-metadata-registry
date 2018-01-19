@@ -13,7 +13,7 @@ def fire(channel, obj=None, **kwargs):
                 'model_name': instance._meta.model_name,
             }
         })
-        c = Channel("aristotle_mdr.contrib.channels.%s" % channel).send(message)
+        Channel("aristotle_mdr.contrib.channels.%s" % channel).send(message)
     else:
         message.update({'__object__': {'object': obj}})
         import_string("aristotle_mdr.contrib.channels.%s" % channel)(message)

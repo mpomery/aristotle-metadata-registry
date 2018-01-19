@@ -160,6 +160,31 @@ $( document ).ready( function() {
         }
     });
 
+    //Results Per Page Functionality
+
+    //set appropriate button to primary
+    var set = false;
+    $('.rpp').each(function() {
+      var current_rpp = $('#id_rpp').val()
+      if ($(this).val().valueOf() == current_rpp) {
+        $(this).addClass('btn-primary');
+        $(this).removeClass('btn-default');
+        set = true;
+      }
+    });
+
+    if (set == false) {
+      $('#default_rpp').addClass('btn-primary')
+      $('#default_rpp').removeClass('btn-default')
+    }
+
+    //on button click update hidden field
+    $('.rpp').click(function() {
+      var new_rpp = $(this).val();
+      $('#id_rpp').val(new_rpp);
+      $('#search_form').submit();
+    });
+
 
 
 });

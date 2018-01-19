@@ -4,7 +4,7 @@ from django.utils import timezone
 from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 
 import aristotle_mdr.models as MDR
-from aristotle_mdr.perms import user_can_edit, user_can_view
+from aristotle_mdr.perms import user_can_edit
 from aristotle_mdr.forms.creation_wizards import UserAwareForm
 from aristotle_mdr.contrib.autocomplete import widgets
 

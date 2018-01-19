@@ -1,8 +1,6 @@
-import datetime
 import haystack.indexes as indexes
 
 from aristotle_mdr.contrib.help import models
-from django.template import TemplateDoesNotExist
 from django.utils import timezone
 from aristotle_mdr.search_indexes import RESTRICTION
 

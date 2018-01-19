@@ -1,25 +1,13 @@
-from django.apps import apps
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.core.exceptions import PermissionDenied, ImproperlyConfigured
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse
-from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404
+from django.shortcuts import redirect
 from django.template import TemplateDoesNotExist
-from django.template.defaultfilters import slugify
-from django.template.loader import select_template
-from django.utils.translation import ugettext_lazy as _
-import re
 
-from aristotle_mdr.perms import user_can_view
-from aristotle_mdr import perms
-from aristotle_mdr.utils import cache_per_item_user
-from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.views import get_if_user_can_view
-from aristotle_mdr.utils import fetch_aristotle_settings, fetch_aristotle_downloaders
-from aristotle_mdr.utils.downloads import get_download_module
+from aristotle_mdr.utils import fetch_aristotle_downloaders
 
 import logging
 

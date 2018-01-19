@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, post_delete, pre_delete
+from django.db.models.signals import post_save
 # from reversion.signals import post_revision_commit
 import haystack.signals as signals  # .RealtimeSignalProcessor as RealtimeSignalProcessor
 from aristotle_mdr.signals import AristotleSignalProcessor

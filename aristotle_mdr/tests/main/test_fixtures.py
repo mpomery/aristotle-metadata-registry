@@ -1,9 +1,6 @@
-from django.conf import settings
-from django.urls import reverse
-from django.test import TestCase, override_settings, modify_settings
+from django.test import TestCase
 
 from django.core.management import call_command
-from aristotle_mdr.contrib.help import models
 
 from aristotle_mdr.utils import setup_aristotle_test_environment
 

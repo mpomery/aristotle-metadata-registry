@@ -1,11 +1,8 @@
 from django.conf.urls import url
-from django.views.generic import TemplateView
-from django.views.generic.base import RedirectView
 from django.utils.translation import ugettext_lazy as _
 
 from aristotle_mdr.contrib.generic.views import (
     GenericAlterOneToManyView,
-    generic_foreign_key_factory_view
 )
 
 from aristotle_mdr.contrib.links import models, views

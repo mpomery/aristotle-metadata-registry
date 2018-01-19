@@ -1,10 +1,4 @@
-from django.apps import apps
-from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
-from django.views.generic import ListView, TemplateView, DetailView
+from django.views.generic import ListView
 
 from aristotle_mdr.models import _concept
 from aristotle_mdr.contrib.slots.models import Slot, concepts_with_similar_slots

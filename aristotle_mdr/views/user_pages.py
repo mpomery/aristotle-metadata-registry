@@ -1,7 +1,7 @@
 import datetime
 from django.apps import apps
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from braces.views import LoginRequiredMixin
 from django.contrib.auth.views import login
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
@@ -10,13 +10,13 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, UpdateView
 
 
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.views.utils import paginated_list, paginated_workgroup_list
-from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
+from aristotle_mdr.utils import fetch_metadata_apps
 
 
 def friendly_redirect_login(request):
@@ -193,24 +193,16 @@ def get_cached_object_count(model_type):
     return get_cached_query_count(query, CACHE_KEY, 60 * 60 * 12)  # Cache for 12 hours
 
 
-@login_required
-def edit(request):
-    if request.method == 'POST':  # If the form has been submitted...
-        form = MDRForms.UserSelfEditForm(request.POST)  # A form bound to the POST data
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            request.user.first_name = form.cleaned_data['first_name']
-            request.user.last_name = form.cleaned_data['last_name']
-            request.user.email = form.cleaned_data['email']
-            request.user.save()
-            return redirect(reverse('aristotle:userHome', ))
-    else:
-        form = MDRForms.UserSelfEditForm({
-            'first_name': request.user.first_name,
-            'last_name': request.user.last_name,
-            'email': request.user.email,
-            })
-    return render(request, "aristotle_mdr/user/userEdit.html", {"form": form})
+class EditView(LoginRequiredMixin, UpdateView):
+
+    template_name = "aristotle_mdr/user/userEdit.html"
+    fields = ['first_name', 'last_name', 'email']
+
+    def get_object(self, querySet=None):
+        return self.request.user
+
+    def get_success_url(self):
+        return reverse('aristotle:userHome')
 
 
 @login_required

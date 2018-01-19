@@ -6,7 +6,6 @@ Aristotle Help models
 from django.apps import apps
 from django.db import models
 from django.core.exceptions import ValidationError
-from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from django.conf.global_settings import LANGUAGES
 from aristotle_mdr.models import RichTextField

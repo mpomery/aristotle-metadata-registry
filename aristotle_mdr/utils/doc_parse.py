@@ -1,10 +1,6 @@
 "Misc. utility functions/classes for admin documentation generator."
 # Once the contrib.help functionality is completed this module will become deprecated.
 
-import re
-from email.errors import HeaderParseError
-from email.parser import HeaderParser
-
 from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.safestring import mark_safe

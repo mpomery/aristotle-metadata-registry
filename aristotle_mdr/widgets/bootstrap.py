@@ -1,6 +1,5 @@
-from django import forms
 from django.forms.widgets import (
-    TextInput, CheckboxSelectMultiple, Input,
+    CheckboxSelectMultiple,
     RadioSelect, DateTimeInput
 )
 

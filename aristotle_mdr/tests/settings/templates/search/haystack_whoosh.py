@@ -1,4 +1,3 @@
-import os
 import tempfile
 
 HAYSTACK_CONNECTIONS = {

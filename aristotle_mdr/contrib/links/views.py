@@ -1,13 +1,9 @@
-from django.apps import apps
-from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.db import transaction
-from django.http import HttpResponse, Http404, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, get_object_or_404
-from django.utils.translation import ugettext_lazy as _
-from django.views.generic import ListView, TemplateView, DetailView, FormView
+from django.views.generic import FormView
 
 from aristotle_mdr import models as MDR
 from aristotle_mdr.contrib.links import forms as link_forms
@@ -152,7 +148,6 @@ class AddLinkWizard(SessionWizardView):
     @transaction.atomic
     def done(self, *args, **kwargs):
         self.relation = self.get_cleaned_data_for_step('0')['relation']
-        role_concepts = self.get_cleaned_data_for_step('1')
 
         link = link_models.Link.objects.create(relation=self.relation)
         for role, concepts in self.get_role_concepts():

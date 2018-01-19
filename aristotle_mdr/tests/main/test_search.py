@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.conf import settings
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
@@ -6,15 +7,15 @@ import aristotle_mdr.tests.utils as utils
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
-from django.test.utils import override_settings
 
 from reversion import revisions as reversion
 from aristotle_mdr.utils import setup_aristotle_test_environment
 
-from time import sleep
 import datetime
 from django.utils import timezone
 
+import string
+import random
 
 setup_aristotle_test_environment()
 
@@ -59,14 +60,10 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
             for t in avengers.split()]
 
     def test_search_factory_fails_with_bad_queryset(self):
-        from haystack.query import SearchQuerySet
-        from haystack.views import search_view_factory
         from django.core.exceptions import ImproperlyConfigured
-        from aristotle_mdr.views.views import PermissionSearchView
-        from aristotle_mdr.forms.search import PermissionSearchForm
-        
+
         with self.assertRaises(ImproperlyConfigured):
-            response = self.client.get(reverse('fail_search')+"?q=wolverine")
+            self.client.get(reverse('fail_search')+"?q=wolverine")
 
     def test_empty_search_loads(self):
         self.logout()
@@ -121,7 +118,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         self.assertTrue('facet_model_ct' in facets.keys())
         self.assertTrue('statuses' in facets.keys())
-        
+
         for state, count in facets['statuses']:
             self.assertTrue(int(state) >= self.ra.public_state)
 
@@ -142,10 +139,10 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
     def test_registrar_favourite_in_list(self):
         self.logout()
-        
+
         response = self.client.get(reverse('aristotle:search')+"?q=xman")
         self.assertNotContains(response, 'Add Favourite')
-        
+
         response = self.client.post(reverse('friendly_login'),
                     {'username': 'stryker', 'password': 'mutantsMustDie'})
 
@@ -155,10 +152,10 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertNotContains(response, 'This item is in your favourites list')
 
         i = self.xmen_wg.items.first()
-        
+
         self.registrar.profile.favourites.add(i)
         self.assertTrue(i in self.registrar.profile.favourites.all())
-        
+
         response = self.client.get(reverse('aristotle:search')+"?q=xman")
         self.assertContains(response, 'This item is in your favourites list')
 
@@ -339,7 +336,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
     def test_visibility_restriction_facets(self):
         # See issue #351
         self.logout()
-        
+
         response = self.client.get(reverse('aristotle:search')+"?q=xman")
         self.assertNotContains(response, 'Restriction')
 
@@ -371,7 +368,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         response = self.client.get(reverse('aristotle:search')+"?q=xman")
         self.assertContains(response, 'Restriction')
-        
+
 
         response = self.client.get(reverse('aristotle:search')+"?q=xman&res=1")
         self.assertNotContains(response, 'Restriction')
@@ -393,9 +390,9 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.context['page'].object_list),0)
-        
+
         url = reverse('aristotle:createItem', args=['aristotle_mdr', 'objectclass'])
-        
+
         step_1_data = {
             'dynamic_aristotle_wizard-current_step': 'initial',
             'initial-name':"pokemon",
@@ -429,9 +426,9 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.context['page'].object_list),0)
-        
+
         url = reverse('aristotle:createItem', args=['aristotle_mdr', 'objectclass'])
-        
+
         step_1_data = {
             'dynamic_aristotle_wizard-current_step': 'initial',
             'initial-name':"pokemon",
@@ -490,7 +487,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         from aristotle_mdr.forms.search import get_permission_sqs
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
-        
+
         objs = response.context['page'].object_list
         self.assertDelayedEqual(len(objs),3)
         extra_facets = response.context['form'].extra_facet_fields
@@ -498,7 +495,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertTrue(len(extra_facets) == 2)
         self.assertTrue('data_element_concept' in [f[0] for f in extra_facets] )
         self.assertTrue('object_class' in [f[0] for f in extra_facets] )
-        
+
         # Confirm spaces are included in the facet
         self.assertTrue(dec.name in [v[0] for v in dict(extra_facets)['data_element_concept']['values']])
 
@@ -547,9 +544,8 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         self.login_superuser()
 
-        from aristotle_mdr.forms.search import get_permission_sqs
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
-        
+
         objs = response.context['page'].object_list
         self.assertDelayedEqual(len(objs),2)
 
@@ -618,6 +614,48 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertEqual(len(psqs),1)
         self.assertEqual(psqs[0].object.pk, vd.pk)
 
+    def test_number_search_results(self):
+
+        rpp_values = getattr(settings, 'RESULTS_PER_PAGE', [20])
+
+        #add new test data
+        letters = ""
+        for i in range(100):
+            letters += random.choice(string.ascii_letters)
+            letters += ' '
+
+        self.login_regular_user()
+
+        random_wg = models.Workgroup.objects.create(name="random_wg")
+
+        item_random = [
+            models.ObjectClass.objects.create(name=t, definition='random', workgroup=random_wg)
+            for t in letters.split()]
+
+        for item in item_random:
+            registered = self.ra.register(item,models.STATES.standard,self.su)
+            self.assertTrue(item in registered['success'])
+
+        #test default number of items
+        response = self.client.get(reverse('aristotle:search')+"?q=random")
+        self.assertEqual(response.context['page'].end_index(),rpp_values[0])
+
+        for val in rpp_values:
+            response = self.client.get(reverse('aristotle:search')+"?q=random&rpp=" + str(val))
+            self.assertEqual(response.context['page'].end_index(),val)
+
+        #test with invalid number (drops back to default)
+        response = self.client.get(reverse('aristotle:search')+"?q=random&rpp=92")
+        self.assertEqual(response.context['page'].end_index(),rpp_values[0])
+
+        self.logout()
+
+        #delete newly added data
+        for item in item_random:
+            item.delete()
+
+        random_wg.delete()
+
 
 class TestTokenSearch(TestCase):
     def tearDown(self):
@@ -678,7 +716,7 @@ class TestSearchDescriptions(TestCase):
     Test the 'form to plain text' description generator
     """
     # def setUp(self):
-    
+
     def test_descriptions(self):
         from aristotle_mdr.forms.search import PermissionSearchForm as PSF
         from aristotle_mdr.templatetags.aristotle_search_tags import \
@@ -688,7 +726,7 @@ class TestSearchDescriptions(TestCase):
 
         filters = {'models':['aristotle_mdr.objectclass']}
         form = PSF(filters)
-        
+
         if not form.is_valid(): # pragma: no cover
             # If this branch happens, we messed up the test bad.
             print(form.errors)
@@ -707,7 +745,7 @@ class TestSearchDescriptions(TestCase):
         if not form.is_valid(): # pragma: no cover
             print(form.errors)
             self.assertTrue('programmer' is 'good')
-        
+
         description = gen(form)
 
         self.assertTrue(
@@ -732,7 +770,7 @@ class TestSearchDescriptions(TestCase):
             'res':0
         }
         form = PSF(filters)
-        
+
         if not form.is_valid(): # pragma: no cover
             # If this branch happens, we messed up the test bad.
             print(form.errors)

@@ -2,20 +2,18 @@ from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.urls import reverse
 from django.db.models import Count, Q
 from django.db.models.functions import Lower
 from django.http import Http404
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from django.views.generic.detail import BaseDetailView
 from django.views.generic import (
-    CreateView, DetailView, FormView, ListView, RedirectView, UpdateView
+    DetailView, FormView
 )
 
 
@@ -182,7 +180,6 @@ def paginated_registration_authority_list(request, ras, template, extra_context=
         'sort': sort_by,
         'page': items,
         }
-    f = qs.first()
 
     context.update(extra_context)
     return render(request, template, context)

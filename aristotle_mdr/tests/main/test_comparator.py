@@ -1,11 +1,9 @@
 from django.test import TestCase
 
 import aristotle_mdr.models as models
-import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 from django.urls import reverse
 
-import datetime
 from django.utils import timezone
 
 from reversion import revisions as reversion
@@ -52,7 +50,7 @@ class ComparatorTester(utils.LoggedInViewPages):
         self.assertTrue('Select a valid choice', form.errors['item_b'][0])
         self.assertTrue('item_a' not in form.errors.keys())  # No error will show as we need two choices
 
-        s = models.Status.objects.create(
+        models.Status.objects.create(
             concept=item2,
             registrationAuthority=self.ra,
             registrationDate=timezone.now(),

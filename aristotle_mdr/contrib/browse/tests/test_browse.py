@@ -1,16 +1,10 @@
-from django.conf import settings
 from django.urls import reverse
-from django.test import TestCase, override_settings, modify_settings
-from django.utils import timezone
+from django.test import TestCase
 
 import aristotle_mdr.models as models
-import aristotle_mdr.perms as perms
-from aristotle_mdr.utils import url_slugify_concept
-from aristotle_mdr.forms.creation_wizards import WorkgroupVerificationMixin,CheckIfModifiedMixin
 from aristotle_mdr.utils import setup_aristotle_test_environment
 
 from aristotle_mdr.tests import utils
-import datetime
 
 setup_aristotle_test_environment()
 
@@ -115,7 +109,7 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
         self.assertNotContains(response, self.item3.name)
         self.assertNotContains(response, self.item4.name)
 
-        slot = Slot.objects.create(concept=self.item1.concept, name=slot_name, value="hello")
+        Slot.objects.create(concept=self.item1.concept, name=slot_name, value="hello")
 
         response = self.client.get(
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name]),
@@ -195,7 +189,7 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
         self.assertEqual(response.status_code, 200)
 
         self.assertContains(response, self.itemType.get_verbose_name_plural())
-        self.assertContains(response, 
+        self.assertContains(response,
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name]),
         )
 
@@ -207,7 +201,7 @@ class LoggedInViewConceptBrowsePages(utils.LoggedInViewPages):
         self.assertEqual(response.status_code, 200)
 
         self.assertNotContains(response, self.itemType.get_verbose_name_plural())
-        self.assertNotContains(response, 
+        self.assertNotContains(response,
             reverse("browse_concepts",args=[self.itemType._meta.app_label,self.itemType._meta.model_name]),
         )
 

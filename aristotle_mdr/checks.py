@@ -1,4 +1,4 @@
-from django.core.checks import Error, register, Warning
+from django.core.checks import register, Warning
 
 # Deprecated Errors:
 # * Nil

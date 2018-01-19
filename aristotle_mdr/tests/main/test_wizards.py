@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.utils import timezone
 from django.urls import reverse
 from django.core.management import call_command
 
@@ -134,9 +133,9 @@ class ConceptWizardPage(utils.LoggedInViewPages):
         wizard = response.context['wizard']
         self.assertEqual(response.status_code, 200)
         self.assertEqual(wizard['steps'].current, 'results')
-        
+
         self.do_test_for_issue333(response)
-        
+
         step_2_data = {
             self.wizard_form_name+'-current_step': 'results',
             'results-name':"Test Item",
@@ -189,7 +188,7 @@ class DataElementDerivationWizardPage(ConceptWizardPage,TestCase):
         self.de1 = models.DataElement.objects.create(name='DE1 - visible',definition="my definition",workgroup=self.wg1)
         self.de2 = models.DataElement.objects.create(name='DE2 - not visible',definition="my definition",workgroup=self.wg2)
         self.login_editor()
-        
+
         item_name = "My New DED Test Item"
 
         step_1_data = {
@@ -462,7 +461,7 @@ class DataElementWizardPage(ConceptWizardPage,TestCase):
             at    = models.Property.objects.create(name="animal type",definition="my definition",workgroup=self.wg1)
             momat = models.ValueDomain.objects.create(name="MoM animal type classification",
                     definition="Ministry of Magic standard classification of animagus animal types",workgroup=self.wg1)
-            ani_dec = models.DataElementConcept.objects.create(
+            models.DataElementConcept.objects.create(
                 name="animagus--animal type",
                 definition="my definition",
                 workgroup=self.wg1,

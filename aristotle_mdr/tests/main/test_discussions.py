@@ -447,11 +447,11 @@ class ViewDiscussionPostPage(utils.LoggedInViewPages,TestCase):
 
         response = self.client.get(reverse('aristotle:discussionsWorkgroup',args=[self.wg1.id]))
         self.assertEqual(len(response.context['discussions']),2)
-        
+
         self.assertTrue(p1 in response.context['discussions'].all())
         self.assertTrue(p2 in response.context['discussions'].all())
         self.assertTrue(p3 not in response.context['discussions'].all())
-        
+
         response = self.client.get(reverse('aristotle:discussions'))
         self.assertEqual(len(response.context['discussions']),3)
 
@@ -476,7 +476,7 @@ class ViewDiscussionPostPage(utils.LoggedInViewPages,TestCase):
 
     def test_viewer_can_see_post_in_workgroup(self):
         post = models.DiscussionPost.objects.create(author=self.viewer,workgroup=self.wg1,title="test",body="test")
-        comment = models.DiscussionComment.objects.create(author=self.viewer2,post=post,body="test")
+        models.DiscussionComment.objects.create(author=self.viewer2,post=post,body="test")
         self.login_viewer()
         response = self.client.get(reverse('aristotle:discussionsPost',args=[post.id]))
         self.assertEqual(response.status_code,200)

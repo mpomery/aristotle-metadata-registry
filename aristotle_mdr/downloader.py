@@ -1,10 +1,6 @@
 from aristotle_mdr.utils import get_download_template_path_for_item
 
-from django.http import HttpResponse, Http404
-# from django.shortcuts import render
-from django.template.loader import select_template
-from django.template import Context
-from django.utils.safestring import mark_safe
+from django.http import HttpResponse
 
 import csv
 from aristotle_mdr.contrib.help.models import ConceptHelp
@@ -56,8 +52,6 @@ class CSVDownloader(DownloaderBase):
     @classmethod
     def download(cls, request, item):
         """Built in download method"""
-        template = get_download_template_path_for_item(item, cls.download_type)
-        from django.conf import settings
 
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="%s.csv"' % (

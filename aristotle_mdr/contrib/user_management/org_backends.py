@@ -5,9 +5,9 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
-from django.views.generic import CreateView, ListView, DetailView, UpdateView, FormView
+from django.views.generic import FormView
 
-from organizations.backends.defaults import BaseBackend, InvitationBackend
+from organizations.backends.defaults import InvitationBackend
 from organizations.backends.forms import UserRegistrationForm
 
 from . import forms
@@ -15,7 +15,6 @@ from . import forms
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.core.mail import EmailMessage
-from django.template import loader, Context
 from django.utils.translation import ugettext_lazy as _
 
 from django.http import Http404

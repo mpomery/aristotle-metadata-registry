@@ -1,8 +1,7 @@
 from django.conf import settings
 from django.core.management import call_command
 from django.urls import reverse
-from django.test import TestCase, override_settings, modify_settings
-from django.test.utils import setup_test_environment
+from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 
 from django.utils.timezone import now
@@ -12,7 +11,7 @@ from reversion import revisions as reversion
 
 from aristotle_mdr.contrib.self_publish import models as pub
 from aristotle_mdr.forms.search import get_permission_sqs
-from aristotle_mdr.models import ObjectClass, Workgroup
+from aristotle_mdr.models import ObjectClass
 from aristotle_mdr.tests import utils
 from aristotle_mdr.utils import setup_aristotle_test_environment
 

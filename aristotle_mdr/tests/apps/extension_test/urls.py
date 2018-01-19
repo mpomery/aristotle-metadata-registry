@@ -1,5 +1,4 @@
 from django.conf.urls import include, url
-from aristotle_mdr.contrib.generic.views import GenericAlterManyToManyView
 
 from aristotle_mdr.views import views
 from aristotle_mdr.forms.search import PermissionSearchForm

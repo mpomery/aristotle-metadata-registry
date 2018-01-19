@@ -436,7 +436,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
         self.login_editor()
 
         from reversion import revisions as reversion
-        
+
         with reversion.create_revision():
             self.item1.name = "change 1"
             reversion.set_comment("change 1")
@@ -452,14 +452,14 @@ class AdminPageForConcept(utils.LoggedInViewPages):
         with reversion.create_revision():
             self.item1.name = "change 2"
             reversion.set_comment("change 2")
-            r = self.ra.register(
+            self.ra.register(
                 item=self.item1,
                 state=models.STATES.incomplete,
                 user=self.registrar
             )
             self.item1.save()
         self.assertTrue(self.item1.statuses.count() == old_count + 1)
-        
+
         from reversion.models import Version
         revisions = Version.objects.get_for_object(self.item1)
 
@@ -477,7 +477,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
         self.assertResponseStatusCodeEqual(response,200)
         self.assertContains(response, "change 2")
         self.assertContains(response, 'statuses')
-        
+
         self.item1 = self.itemType.objects.get(pk=self.item1.pk) #decache
         self.assertTrue(self.item1.name == "change 2")
         for s in self.item1.statuses.all():
@@ -491,7 +491,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
         self.login_editor()
         # make an item
         response = self.client.get(reverse("admin:%s_%s_add"%(self.itemType._meta.app_label,self.itemType._meta.model_name)))
-        
+
         short_name = utils.id_generator()
         data = {
             'name':"admin_page_test_oc_has_submitter",
@@ -518,7 +518,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
         })
         updated_item.update(self.form_defaults)
 
-        response = self.client.post(
+        self.client.post(
             reverse(
                 "admin:%s_%s_change"%(self.itemType._meta.app_label,self.itemType._meta.model_name),
                 args=[new_item.pk]
@@ -568,7 +568,7 @@ class DataElementDerivationAdminPage(AdminPageForConcept,TestCase):
             self.derived_de = models.DataElement.objects.create(name='derivedDE',definition="my definition",workgroup=self.ded_wg)
 
         self.ra.register(self.derived_de, models.STATES.standard, self.su)
-        
+
         self.assertTrue(self.derived_de.is_public())
         self.create_items()
 
@@ -596,7 +596,7 @@ class OrganizationAdminPage(utils.LoggedInViewPages, TestCase):
         org = models.Organization.objects.create(name="My org", definition="My new org")
         ra_count = models.RegistrationAuthority.objects.count()
         org_count = models.Organization.objects.count()
-        
+
         response = self.client.post(
             reverse('admin:%s_%s_changelist' % ('aristotle_mdr','organization')),
             {

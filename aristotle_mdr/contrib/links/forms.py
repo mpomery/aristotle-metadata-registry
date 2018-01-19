@@ -1,10 +1,9 @@
 from django import forms
-from django.forms import ValidationError, ModelForm
 from django.utils.translation import ugettext_lazy as _
 
 from aristotle_mdr import models as MDR
 from aristotle_mdr.forms.creation_wizards import UserAwareForm
-from aristotle_mdr.contrib.links.models import Link, LinkEnd, Relation, RelationRole
+from aristotle_mdr.contrib.links.models import Relation
 from aristotle_mdr.contrib.autocomplete import widgets
 
 

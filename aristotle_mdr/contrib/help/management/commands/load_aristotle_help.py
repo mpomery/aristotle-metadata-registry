@@ -11,7 +11,7 @@ from itertools import product
 from django.apps import apps
 from django.conf import settings
 from django.core import serializers
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.db import (

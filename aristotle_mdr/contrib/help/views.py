@@ -1,13 +1,11 @@
 from django.apps import apps
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
-from django.views.generic import ListView, TemplateView, DetailView
+from django.views.generic import ListView, DetailView
 
-from aristotle_mdr.contrib.help.models import ConceptHelp, HelpPage, HelpBase
-from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
+from aristotle_mdr.contrib.help.models import ConceptHelp, HelpPage
+from aristotle_mdr.utils import fetch_metadata_apps
 from django.db.models import Q
 
 

@@ -1,7 +1,6 @@
 import mock
 from django.db import DatabaseError
 from django.test import Client
-from django.conf import settings
 from django.urls import reverse
 from django.test import TestCase
 from django.test import override_settings

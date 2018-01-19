@@ -1,11 +1,6 @@
 from django import forms
-from django.forms.widgets import (
-    TextInput, CheckboxSelectMultiple, Input,
-    RadioSelect
-)
+from django.forms.widgets import TextInput
 
-from django.utils.encoding import force_text
-from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 

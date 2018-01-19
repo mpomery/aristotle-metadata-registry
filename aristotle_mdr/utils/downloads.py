@@ -1,9 +1,6 @@
 from importlib import import_module
 
-from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import PermissionDenied, ImproperlyConfigured
-from django.utils.translation import ugettext_lazy as _
 
 from aristotle_mdr import exceptions as registry_exceptions
 

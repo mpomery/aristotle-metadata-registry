@@ -20,7 +20,7 @@
 {% endblock %}
 {% block title %}{% trans "Search" %}{% if query %} {% trans "results" context 'Search results' %} - {{ query }}{% endif %}{% endblock %}
 {% block content %}
-    <form method="get" class="row"> {# open main_search_form #}
+    <form method="get" class="row" id="search_form"> {# open main_search_form #}
         <div id="searchbar" class="row">
             <div class="col-sm-8 col-sm-offset-2">
                 <div class="input-group">
@@ -148,6 +148,7 @@
               </div>
           </div>
         </nav>
+        {{ form.rpp.as_hidden }}
     </form> {# close main_search_form for when results #}
 <div class="row">
     {% if form.errors %}
@@ -164,7 +165,7 @@
         </p>
     </div>
     {% endif %}
-    
+
     <div class="col-xs-12 results_header">
     {% if query or form.filter_search %}
         <div class="row">
@@ -185,7 +186,7 @@
                     {% search_describe_filters form %}
                 </div>
                 {% endif %}
-    
+
                 <p class="results_count">
                     {% if page.has_other_pages %}
                     Showing {{ page.start_index }} - {{ page.end_index }} of <span class="count">{{ page.paginator.count }}</span> results.
@@ -193,7 +194,7 @@
                     Showing <span class="count">{{ page.paginator.count }}</span> results.
                     {% endif %}
                 </p>
-            
+
             {#  ----- If there are spelling suggestions, show them. ----- #}
             {% if form.auto_correct_spell_search or form.has_spelling_suggestions %}
                 {% if form.auto_correct_spell_search %}
@@ -245,7 +246,7 @@
         </div>
     {% endif %}
 
-            
+
     </div>
 
     {#  ----- MAIN RESULTS PAGE STARTS HERE ----- #}
@@ -324,7 +325,7 @@
                             <input name="f___{{field}}">
                             </label>
                             {% endif %}
-    
+
                         </dd>
                         {% if details.details.applied %}
                         <dd>
@@ -335,7 +336,7 @@
                                 <a href='?{% unfacet request field af|urlencode %}'>
                                     {% facet_display details.details af %}
                                     <span class='badge pull-right'><i class="fa fa-times"></i></span>
-                                    
+
                                 </a>
                             </li>
                             {% endfor %}
@@ -391,6 +392,17 @@
             </form>
 
             {% include "aristotle_mdr/helpers/paginator.html" with page=page %}
+            <div class='pull-right'>
+                {% for value in rpp_values %}
+                {% if forloop.first %}
+                <span>Results per page:</span>
+                <button type="button" class="btn btn-default rpp" id="default_rpp" value="{{value}}">{{value}}</button>
+                {% else %}
+                <button type="button" class="btn btn-default rpp" value="{{value}}">{{value}}</button>
+                {% endif %}
+                {% endfor %}
+            </div>
+          </div>
         </div>
         {% else %}
             <h3>No results found.</h3>

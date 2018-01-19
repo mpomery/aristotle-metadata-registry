@@ -1,6 +1,3 @@
-from django.apps import apps
-from django.conf import settings
-from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.http import JsonResponse
 
 from aristotle_mdr.models import _concept

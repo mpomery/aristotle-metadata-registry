@@ -117,7 +117,6 @@ def register_concept_admin(concept_class, *args, **kwargs):
     # late import this as we call this in aristotle_mdr.admin and need it to be ready before we call this.
     from aristotle_mdr.admin import ConceptAdmin
     from aristotle_mdr.models import concept
-    from django.db.models.fields.related import ManyToManyField, ManyToOneRel
     if not extra_fieldsets and auto_fieldsets:
         # returns every field that isn't in a concept
         field_names = [f.name for f in concept._meta.get_fields()] + ['supersedes']

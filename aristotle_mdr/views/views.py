@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.db import transaction
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
@@ -360,7 +360,26 @@ def extensions(request):
 # Search views
 
 class PermissionSearchView(FacetedSearchView):
+
+    results_per_page_values = getattr(settings, 'RESULTS_PER_PAGE', [])
+
+    def build_page(self):
+
+        try:
+            rpp = self.form.cleaned_data['rpp']
+        except AttributeError:
+            rpp = ''
+
+        if rpp in self.results_per_page_values:
+            self.results_per_page = rpp
+        else:
+            if len(self.results_per_page_values) > 0:
+                self.results_per_page = self.results_per_page_values[0]
+
+        return super().build_page()
+
     def build_form(self):
+
         form = super().build_form()
         form.request = self.request
         form.request.GET = self.clean_facets(self.request)
@@ -374,3 +393,7 @@ class PermissionSearchView(FacetedSearchView):
                 k = k[4:]
                 get.update({'f': '%s::%s' % (k, val)})
         return get
+
+    def extra_context(self):
+
+        return {'rpp_values': self.results_per_page_values}

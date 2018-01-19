@@ -1,6 +1,5 @@
-from django.conf import settings
 from django.urls import reverse
-from django.test import TestCase, override_settings, modify_settings
+from django.test import TestCase
 
 from aristotle_mdr.contrib.identifiers import models as ID
 from aristotle_mdr import models as MDR

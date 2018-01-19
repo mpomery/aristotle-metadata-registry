@@ -1,27 +1,14 @@
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
-from django.core.exceptions import PermissionDenied, ImproperlyConfigured
-from django.urls import reverse
 from django.db import transaction
-from django.forms import ValidationError, ModelForm
-from django.forms.models import modelformset_factory, inlineformset_factory
-from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render, redirect, get_object_or_404
-from django.template import TemplateDoesNotExist
-from django.template.defaultfilters import slugify
-from django.utils.translation import ugettext_lazy as _
+from django.forms.models import inlineformset_factory
+from django.http import HttpResponseRedirect
 from django.views.generic import (
-    CreateView, DetailView, ListView, UpdateView, FormView
+    CreateView, DetailView, UpdateView
 )
-from django.utils import timezone
-from django.utils.decorators import method_decorator
 
 import reversion
 
-from aristotle_mdr.perms import user_can_view, user_can_edit, user_can_change_status
 from aristotle_mdr.utils import (
-    cache_per_item_user, concept_to_clone_dict, concept_to_dict,
+    concept_to_clone_dict,
     construct_change_message, url_slugify_concept, is_active_module
 )
 from aristotle_mdr import forms as MDRForms

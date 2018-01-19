@@ -1,20 +1,10 @@
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
-from django.core.exceptions import PermissionDenied, ImproperlyConfigured
-from django.urls import reverse
-from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render, redirect, get_object_or_404
-from django.template import TemplateDoesNotExist
-from django.template.loader import render_to_string
+from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import TemplateView
 
 import reversion
 
-from aristotle_mdr.utils import cache_per_item_user, concept_to_dict, construct_change_message, url_slugify_concept
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
-from aristotle_mdr import perms
 
 
 def compare_concepts(request, obj_type=None):
@@ -47,7 +37,7 @@ def compare_concepts(request, obj_type=None):
         revs=[]
         for item in [item_a, item_b]:
             from reversion.models import Version
-            versions = Version.objects.get_for_object(item)
+            Version.objects.get_for_object(item)
             ct = ContentType.objects.get_for_model(item)
             version = reversion.models.Version.objects.filter(content_type=ct, object_id=item.pk).order_by('-revision__date_created').first()
             revs.append(version)

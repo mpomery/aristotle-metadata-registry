@@ -1,14 +1,10 @@
-import copy
-import os
 import sys
-import tempfile
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.conf import settings
 from django.core.management import call_command
 from django.urls import reverse
 
 import aristotle_mdr.models as models
-import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
 from wcag_zoo.validators import parade
 
@@ -45,7 +41,7 @@ class TestWebPageAccessibilityBase(utils.LoggedInViewPages):
 
         call_command('compilestatic', interactive=False, verbosity=0)
         call_command('collectstatic', interactive=False, verbosity=0)
-        
+
         process = subprocess.Popen(
             ["ls", settings.STATIC_ROOT],
             stdout=subprocess.PIPE
@@ -101,7 +97,7 @@ class TestStaticPageAccessibility(TestWebPageAccessibilityBase, TestCase):
             reverse("aristotle:%s" % u.name) for u in urlpatterns
             if hasattr(u, 'name') and u.name is not None and u.regex.groups == 0
         ]
-        
+
 
         self.pages_tester(pages)
 
@@ -133,7 +129,7 @@ class TestMetadataActionPageAccessibility(TestWebPageAccessibilityBase, TestCase
                 self.de,
                 self.cd,
         ]
-        
+
         pages = [
             url
             for item in items

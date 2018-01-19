@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, post_delete, pre_delete, m2m_changed
+from django.db.models.signals import post_save, pre_delete, m2m_changed
 # from reversion.signals import post_revision_commit
 import haystack.signals as signals  # .RealtimeSignalProcessor as RealtimeSignalProcessor
 from haystack_channels.signals import ChannelsRealTimeAsyncSignalProcessor
@@ -28,7 +28,6 @@ class AristotleChannelsSignalProcessor(ChannelsRealTimeAsyncSignalProcessor):
         super().teardown()
 
     def handle_concept_recache(self, concept, **kwargs):
-        from aristotle_mdr.models import _concept
         instance = concept.item
         self.handle_save(instance.__class__, instance)
 

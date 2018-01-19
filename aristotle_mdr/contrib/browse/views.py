@@ -1,12 +1,10 @@
 from django.apps import apps
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
-from django.db.models import Q
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, TemplateView
-from aristotle_mdr.utils import get_concepts_for_apps, fetch_aristotle_settings, fetch_metadata_apps
+from aristotle_mdr.utils import get_concepts_for_apps, fetch_metadata_apps
 from collections import OrderedDict
 
 

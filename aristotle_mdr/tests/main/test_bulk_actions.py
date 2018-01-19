@@ -80,7 +80,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.new_workgroup = models.Workgroup.objects.create(name="new workgroup")
         self.new_workgroup.submitters.add(self.editor)
         self.login_superuser()
-        
+
         response = self.client.post(
             reverse('aristotle:bulk_action'),
             {
@@ -118,7 +118,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.new_workgroup = models.Workgroup.objects.create(name="new workgroup")
         self.new_workgroup.submitters.add(self.editor)
         self.login_editor()
-        
+
         self.assertTrue(self.item1.concept not in self.new_workgroup.items.all())
         self.assertTrue(self.item2.concept not in self.new_workgroup.items.all())
         self.assertTrue(self.item4.concept not in self.new_workgroup.items.all())
@@ -170,7 +170,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.new_workgroup = models.Workgroup.objects.create(name="new workgroup")
         self.new_workgroup.submitters.add(self.editor)
         self.login_editor()
-        
+
         self.assertTrue(self.item1.concept not in self.new_workgroup.items.all())
         self.assertTrue(self.item2.concept not in self.new_workgroup.items.all())
         self.assertTrue(self.item5.concept not in self.new_workgroup.items.all())
@@ -230,7 +230,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(perms.user_can_change_status(self.registrar, self.item2))
         self.assertFalse(self.item1.is_registered)
         self.assertFalse(self.item2.is_registered)
-        
+
         reg_date = datetime.date(2014,10,27)
         new_state = self.ra.locked_state
         response = self.client.post(
@@ -273,7 +273,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertFalse(self.item1.is_registered)
         self.assertFalse(self.item2.is_registered)
         self.assertFalse(self.item4.is_registered)
-        
+
         reg_date = datetime.date(2014,10,27)
         new_state = self.ra.locked_state
         response = self.client.post(
@@ -298,7 +298,6 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(self.item1.current_statuses().first().state == new_state)
         self.assertTrue(self.item1.current_statuses().first().registrationAuthority == self.ra)
 
-        from django.utils.html import escape
         err1 = "Some items failed"
         err2 = "s: %s" % ','.join(sorted([str(self.item2.id), str(self.item4.id)]))
 
@@ -318,7 +317,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.new_workgroup = models.Workgroup.objects.create(name="new workgroup")
         self.new_workgroup.submitters.add(self.editor)
         self.login_editor()
-        
+
         self.assertTrue(self.item1.concept not in self.new_workgroup.items.all())
         self.assertTrue(self.item2.concept not in self.new_workgroup.items.all())
         self.assertTrue(self.item4.concept not in self.new_workgroup.items.all())
@@ -348,7 +347,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
 
         qs = self.new_workgroup.items.all()
 
-        response = self.client.post(
+        self.client.post(
             reverse('aristotle:bulk_action'),
             {
                 'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeWorkgroupForm',
@@ -372,8 +371,8 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(perms.user_can_view(self.viewer, self.item2))
 
         self.assertTrue(models.ReviewRequest.objects.count() == 0)
-        
-        response = self.client.post(
+
+        self.client.post(
             reverse('aristotle:bulk_action'),
             {
                 'bulkaction': 'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
@@ -401,8 +400,8 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertFalse(perms.user_can_view(self.viewer, self.item4))
 
         self.assertTrue(models.ReviewRequest.objects.count() == 0)
-        
-        response = self.client.post(
+
+        self.client.post(
             reverse('aristotle:bulk_action'),
             {
                 'bulkaction': 'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
@@ -423,4 +422,3 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertTrue(review.concepts.count() == 1)
         self.assertTrue(self.item1.concept in review.concepts.all())
         self.assertFalse(self.item4.concept in review.concepts.all())
-

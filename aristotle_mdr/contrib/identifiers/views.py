@@ -1,4 +1,3 @@
-from django.apps import apps
 from django.http import Http404
 from django.shortcuts import redirect
 
