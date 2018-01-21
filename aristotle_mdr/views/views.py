@@ -402,5 +402,5 @@ class PermissionSearchView(FacetedSearchView):
             favourites_list = list(favourites_pks)
         else:
             favourites_list = []
-            
+
         return {'rpp_values': self.results_per_page_values, 'favourites': favourites_list}
