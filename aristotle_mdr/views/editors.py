@@ -18,6 +18,8 @@ from aristotle_mdr.views.utils import ObjectLevelPermissionRequiredMixin
 
 import logging
 
+from aristotle_mdr.forms import one_to_many_formset_factory
+
 logger = logging.getLogger(__name__)
 logger.debug("Logging started for " + __name__)
 
@@ -120,6 +122,9 @@ class EditItemView(ConceptEditFormView, UpdateView):
             extra=1,
             )
 
+    def get_weak_formset(self):
+        return 0
+
     def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None):
         """
         If the form is invalid, re-render the context data with the
@@ -148,6 +153,17 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
         context['show_slots_tab'] = self.slots_active
         context['show_id_tab'] = self.identifiers_active
+
+        if (hasattr(self.item, 'serialize_weak_entities')):
+            weak = self.item.serialize_weak_entities
+            entity = weak[0] #needs to be for loop
+            queryset = getattr(self.item, entity[1]).all()
+            formset = one_to_many_formset_factory(queryset.model, '', 'order')
+            context['weak_formset'] = formset(
+                queryset=queryset,
+                initial=[{'ORDER': queryset.count() + 1}]
+            )
+
         return context
 
 

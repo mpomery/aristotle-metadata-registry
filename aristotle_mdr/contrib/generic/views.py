@@ -12,7 +12,7 @@ from aristotle_mdr.contrib.autocomplete import widgets
 from aristotle_mdr.models import _concept
 from aristotle_mdr.perms import user_can_edit, user_can_view
 from aristotle_mdr.utils import construct_change_message
-
+from aristotle_mdr.forms import one_to_many_formset_factory
 import reversion
 
 
@@ -268,36 +268,7 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
         return None
 
     def get_formset(self):
-        _widgets = {}
-
-        for f in self.model_to_add._meta.fields:
-            foreign_model = self.model_to_add._meta.get_field(f.name).related_model
-            if foreign_model and issubclass(foreign_model, _concept):
-                _widgets.update({
-                    f.name: widgets.ConceptAutocompleteSelect(
-                        model=foreign_model
-                    )
-                })
-        for f in self.model_to_add._meta.many_to_many:
-            foreign_model = self.model_to_add._meta.get_field(f.name).related_model
-            if foreign_model and issubclass(foreign_model, _concept):
-                _widgets.update({
-                    f.name: widgets.ConceptAutocompleteSelectMultiple(
-                        model=foreign_model
-                    )
-                })
-
-        from aristotle_mdr.contrib.generic.forms import HiddenOrderModelFormSet
-        return modelformset_factory(
-            self.model_to_add,
-            formset=HiddenOrderModelFormSet,
-            can_order=True,  # we assign this back to the ordering field
-            can_delete=True,
-            exclude=[self.model_to_add_field, self.ordering_field],
-            # fields='__all__',
-            extra=1,
-            widgets=_widgets
-            )
+        return one_to_many_formset_factory(self.model_to_add, self.model_to_add_field, self.ordering_field)
 
     def post(self, request, *args, **kwargs):
         """

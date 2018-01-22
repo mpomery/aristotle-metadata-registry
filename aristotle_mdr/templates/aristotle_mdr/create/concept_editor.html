@@ -150,6 +150,11 @@
                 {% endif %}
             </div>
         {% endfor %}
+        {% if weak_formset %}
+            {% include 'aristotle_mdr/generic/actions/alter_one_to_many_table.html' with formset=weak_formset %}
+            <a class="btn btn-primary" onclick="addCode()">
+                <i class="fa fa-plus-circle"></i> Add another</a>
+        {% endif %}
         </div>
         {% endif %}
         {% if show_slots_tab %}
@@ -215,29 +220,29 @@
                     <dt>Definition</dt>
                     <dd>The fields in this tab cover the basic definition
                     of an object fields. <em>Name</em> and <em>Definition</em>
-                    are always required, while <em>Version</em> may be 
+                    are always required, while <em>Version</em> may be
                     optional depending on your agency.
                     </dd>
                     <dt>Names & References</dt>
                     <dd>
-                        The fields in this tab are common to all concepts in this registry 
+                        The fields in this tab are common to all concepts in this registry
                     and are all optional. Where possible completing fields adds
                     additional context to metadata to make it more discoverable,
-                    complete and resuable.  
+                    complete and resuable.
                     </dd>
                     <dt>{{ model_name|title }} Components</dt>
                     <dd>
                        The fields in the tab are specific to {{model_name_plural}}
-                       and allow for item specific metadata and relations to be 
+                       and allow for item specific metadata and relations to be
                        recorded.
-                       
+
                        For more information on {{model_name_plural}}, read the
                         <a href="{% url 'aristotle_help:concept_help' app_label model %}">
                         help page.</a>
                     </dd>
                 </dl>
             </p>
-            
+
             {% if help %}
                 <header>Help on {{ model_name_plural }}</header>
                 <strong>For more information on {{model_name_plural}}, read the

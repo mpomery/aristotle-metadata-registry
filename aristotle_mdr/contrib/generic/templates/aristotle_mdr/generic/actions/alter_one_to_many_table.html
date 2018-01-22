@@ -1,0 +1,39 @@
+<table id="formset" class="form table  table-hover">
+{% with formset.forms.0 as form %}
+  <thead><tr>
+      <th></th>
+    {% for field in form.visible_fields %}
+    <th><div>{{ field.label|capfirst }}</div>
+    <small title="{{ field.help_text }}">{{ field.help_text|truncatewords:10 }}</small>
+    </th>
+    {% endfor %}
+  </tr></thead>
+{% endwith %}
+<tbody id="draggableTable">
+{% for form in formset.forms %}
+{% if not forloop.last %}
+<p>{{form.errors}}</p>
+  <tr class="moveablerow">
+      <td title="Drag to reorder"><i class="fa fa-bars grabber"></i>
+          {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+          {% endfor %}
+      </td>
+      {% for field in form.visible_fields %}
+        <td>
+        {# Include the hidden fields in the form #}
+          {% if field.errors %}
+              <div class="alert alert-danger">
+          {% endif %}
+          {{ field }}
+          {% if field.errors %}
+              {{ field.errors.as_ul }}
+              </div>
+          {% endif %}
+        </td>
+      {% endfor %}
+  </tr>
+{% endif %}
+{% endfor %}
+</tbody>
+</table>
