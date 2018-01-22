@@ -1,0 +1,18 @@
+<table id="formstage">
+    {% with formset.forms|last as form %}
+      <tr class="moveablerow">
+          <td title="Drag to reorder"><i class="fa fa-bars grabber"></i>
+              {% for hidden in form.hidden_fields %}
+              {{ hidden }}
+              {% endfor %}
+          </td>
+          {% for field in form.visible_fields %}
+            <td>
+            {# Include the hidden fields in the form #}
+              {{ field.errors.as_ul }}
+              {{ field }}
+            </td>
+          {% endfor %}
+      </tr>
+    {% endwith %}
+</table>

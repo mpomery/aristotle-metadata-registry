@@ -151,9 +151,7 @@
             </div>
         {% endfor %}
         {% if weak_formset %}
-            {% include 'aristotle_mdr/generic/actions/alter_one_to_many_table.html' with formset=weak_formset %}
-            <a class="btn btn-primary" onclick="addCode()">
-                <i class="fa fa-plus-circle"></i> Add another</a>
+            {% include 'aristotle_mdr/create/weak_editor.html' with weak_formset=weak_formset %}
         {% endif %}
         </div>
         {% endif %}
