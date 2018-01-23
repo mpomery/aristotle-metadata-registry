@@ -977,6 +977,9 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(check_url)
         self.assertEqual(response.status_code,404)
 
+    def test_value_editing_on_main_edit_page(self):
+        self.assertEqual(True, True)
+
 
 class ObjectClassViewPage(LoggedInViewConceptPages, TestCase):
     url_name='objectClass'

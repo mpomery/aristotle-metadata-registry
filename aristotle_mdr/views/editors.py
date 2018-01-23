@@ -211,7 +211,9 @@ class EditItemView(ConceptEditFormView, UpdateView):
                     prefix=entity[0]
                 )
 
-                formsets.append(weak_formset)
+                title = 'Edit ' + entity[0].replace('_', ' ').title()
+
+                formsets.append({'formset' : weak_formset, 'title' : title})
 
             context['weak_formsets'] = formsets
 
