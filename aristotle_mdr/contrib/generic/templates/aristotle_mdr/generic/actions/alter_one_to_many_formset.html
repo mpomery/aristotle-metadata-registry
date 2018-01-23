@@ -1,4 +1,4 @@
-<table id="formset" class="form table  table-hover">
+<table id="{{ formset.prefix }}" class="formset form table table-hover">
 {% with formset.forms.0 as form %}
   <thead><tr>
       <th></th>
@@ -9,7 +9,7 @@
     {% endfor %}
   </tr></thead>
 {% endwith %}
-<tbody id="draggableTable">
+<tbody id="{{ formset.prefix }}" class="draggableTable">
 {% for form in formset.forms %}
 {% if not forloop.last %}
 <p>{{form.errors}}</p>

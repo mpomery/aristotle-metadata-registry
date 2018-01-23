@@ -106,7 +106,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                     for entity in weak:
 
-                        formset_info = get_weak_formset(entity)
+                        formset_info = self.get_weak_formset(entity)
 
                         weak_formset = formset_info['formset'](request.POST, request.FILES, prefix=formset_info['prefix'])
 
@@ -119,6 +119,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                         else:
 
+                            logger.debug('invalid_form')
                             return self.form_invalid(form, identifier_FormSet=weak_formset)
 
 
@@ -149,7 +150,6 @@ class EditItemView(ConceptEditFormView, UpdateView):
         # where entity is an entry in serialize_weak_entities
 
         field_model = getattr(self.item, entity[1]).model
-        logger.debug(field_model)
         # get the model to add field
         modelname = self.model.__name__.lower()
         model_to_add_field = ''
@@ -164,7 +164,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
         formset_info = {
             'formset' : formset,
             'model_field' : model_to_add_field,
-            'preifx' : entity[0]
+            'prefix' : entity[0]
         }
 
         return formset_info
@@ -213,7 +213,6 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                 formsets.append(weak_formset)
 
-            logger.debug(formsets)
             context['weak_formsets'] = formsets
 
 

@@ -41,7 +41,7 @@ def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field
         widgets=_widgets
         )
 
-def one_to_many_formset_save(formset, item, ordering_field, model_to_add_field):
+def one_to_many_formset_save(formset, item, model_to_add_field, ordering_field):
 
     item.save()  # do this to ensure we are saving reversion records for the value domain, not just the values
     formset.save(commit=False)
