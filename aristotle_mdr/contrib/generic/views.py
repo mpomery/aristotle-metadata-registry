@@ -12,7 +12,7 @@ from aristotle_mdr.contrib.autocomplete import widgets
 from aristotle_mdr.models import _concept
 from aristotle_mdr.perms import user_can_edit, user_can_view
 from aristotle_mdr.utils import construct_change_message
-from aristotle_mdr.forms import one_to_many_formset_factory
+from aristotle_mdr.contrib.generic.forms import one_to_many_formset_factory, one_to_many_formset_save
 import reversion
 
 
@@ -281,22 +281,8 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
         formset = self.formset
         if formset.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
-                self.item.save()  # do this to ensure we are saving reversion records for the value domain, not just the values
-                formset.save(commit=False)
-                for form in formset.forms:
-                    all_blank = not any(form[f].value() for f in form.fields if f is not self.ordering_field)
-                    if all_blank:
-                        continue
-                    if form['id'].value() not in [deleted_record['id'].value() for deleted_record in formset.deleted_forms]:
-                        # Don't immediately save, we need to attach the parent object
-                        value = form.save(commit=False)
-                        setattr(value, self.model_to_add_field, self.item)
-                        if self.ordering_field:
-                            setattr(value, self.ordering_field, form.cleaned_data['ORDER'])
-                        value.save()
-                for obj in formset.deleted_objects:
-                    obj.delete()
-                formset.save_m2m()
+                one_to_many_formset_save(formset, self.item, self.ordering_field, self.model_to_add_field)
+
                 # formset.save(commit=True)
                 reversion.revisions.set_user(request.user)
                 reversion.revisions.set_comment(construct_change_message(request, None, [formset]))

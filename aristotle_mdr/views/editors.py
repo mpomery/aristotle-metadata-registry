@@ -18,7 +18,7 @@ from aristotle_mdr.views.utils import ObjectLevelPermissionRequiredMixin
 
 import logging
 
-from aristotle_mdr.forms import one_to_many_formset_factory
+from aristotle_mdr.contrib.generic.forms import one_to_many_formset_factory, one_to_many_formset_save
 
 logger = logging.getLogger(__name__)
 logger.debug("Logging started for " + __name__)
@@ -100,6 +100,24 @@ class EditItemView(ConceptEditFormView, UpdateView):
                     else:
                         return self.form_invalid(form, identifier_FormSet=id_formset)
 
+                if (hasattr(self.item, 'serialize_weak_entities')):
+                    # if weak formset is active
+
+                    (GenericFormSet, model_to_add_field) = self.get_weak_formset()
+                    weak_formset = GenericFormSet(request.POST, request.FILES)
+
+                    if weak_formset.is_valid():
+
+                        one_to_many_formset_save(weak_formset, self.item, 'order', model_to_add_field)
+
+                        if not has_change_comments:
+                            change_comments += construct_change_message(request, form, [weak_formset])
+
+                    else:
+
+                        return self.form_invalid(form, identifier_FormSet=weak_formset)
+
+
                 reversion.revisions.set_user(request.user)
                 reversion.revisions.set_comment(change_comments)
                 form.save_m2m()
@@ -123,7 +141,24 @@ class EditItemView(ConceptEditFormView, UpdateView):
             )
 
     def get_weak_formset(self):
-        return 0
+
+        weak = self.item.serialize_weak_entities
+        entity = weak[0] #needs to be for loop
+
+        field_model = getattr(self.item, entity[1]).model
+        logger.debug(field_model)
+        # get the model to add field
+        modelname = self.model.__name__.lower()
+        model_to_add_field = ''
+        for field in field_model._meta.fields:
+            # compare field name all lowercase with underscores removed
+            if field.name.lower().replace('_', '') == modelname:
+                model_to_add_field = field.name
+
+        formset = one_to_many_formset_factory(field_model, model_to_add_field, 'order')
+
+        return (formset, model_to_add_field)
+
 
     def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None):
         """
@@ -151,18 +186,26 @@ class EditItemView(ConceptEditFormView, UpdateView):
                 instance=self.item.concept
                 )
 
-        context['show_slots_tab'] = self.slots_active
-        context['show_id_tab'] = self.identifiers_active
-
         if (hasattr(self.item, 'serialize_weak_entities')):
             weak = self.item.serialize_weak_entities
             entity = weak[0] #needs to be for loop
+            # query weak entity
             queryset = getattr(self.item, entity[1]).all()
-            formset = one_to_many_formset_factory(queryset.model, '', 'order')
-            context['weak_formset'] = formset(
+
+            (formset, mtaf) = self.get_weak_formset()
+
+            weak_formset = formset(
                 queryset=queryset,
                 initial=[{'ORDER': queryset.count() + 1}]
             )
+
+            context['weak_formset'] = weak_formset
+
+
+        context['show_slots_tab'] = self.slots_active
+        context['show_id_tab'] = self.identifiers_active
+
+
 
         return context
 

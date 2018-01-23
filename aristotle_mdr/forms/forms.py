@@ -185,35 +185,3 @@ class CompareConceptsForm(forms.Form):
             required=True,
             widget=widgets.ConceptAutocompleteSelect()
         )
-
-def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field):
-    _widgets = {}
-
-    for f in model_to_add._meta.fields:
-        foreign_model = model_to_add._meta.get_field(f.name).related_model
-        if foreign_model and issubclass(foreign_model, MDR._concept):
-            _widgets.update({
-                f.name: widgets.ConceptAutocompleteSelect(
-                    model=foreign_model
-                )
-            })
-    for f in model_to_add._meta.many_to_many:
-        foreign_model = model_to_add._meta.get_field(f.name).related_model
-        if foreign_model and issubclass(foreign_model, MDR._concept):
-            _widgets.update({
-                f.name: widgets.ConceptAutocompleteSelectMultiple(
-                    model=foreign_model
-                )
-            })
-
-    from aristotle_mdr.contrib.generic.forms import HiddenOrderModelFormSet
-    return modelformset_factory(
-        model_to_add,
-        formset=HiddenOrderModelFormSet,
-        can_order=True,  # we assign this back to the ordering field
-        can_delete=True,
-        exclude=[model_to_add_field, ordering_field],
-        # fields='__all__',
-        extra=1,
-        widgets=_widgets
-        )
