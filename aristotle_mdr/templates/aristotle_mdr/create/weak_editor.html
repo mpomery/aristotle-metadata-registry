@@ -1,19 +1,11 @@
-{% load compile_static %}
-{% load static from staticfiles %}
-
 {% block content %}
-    {% block extra_head_scripts %}
-        <script src="{% static 'aristotle_mdr/jqueryui/jquery-ui.min.js' %}"></script>
-        <script src="{% static 'aristotle_mdr/aristotle.moveable.js' %}" type="text/javascript"></script>
-        <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.moveable.less'|compile %}" />
-    {% endblock %}
 
     {% for weak_formset in formsets %}
 
         {{ weak_formset.management_form }}
         {{ weak_formset.non_form_errors.as_ul }}
         {% include 'aristotle_mdr/generic/actions/alter_one_to_many_formset.html' with formset=weak_formset %}
-        <a class="btn btn-primary" onclick="addCode('{{ weak_formset.prefix }}')">
+        <a class="btn btn-primary add_code_button" formid='{{ weak_formset.prefix}}'>
             <i class="fa fa-plus-circle"></i> Add another</a>
 
     {% endfor %}

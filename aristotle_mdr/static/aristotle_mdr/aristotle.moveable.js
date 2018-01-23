@@ -20,6 +20,12 @@ jQuery(function($) {
 
     })
 
+    $('a.add_code_button').click(function() {
+
+        addCode($(this).attr('formid'));
+
+    });
+
 
     $( "form" ).submit(function( event ) {
         var blank_row = $('#formstage tr');
@@ -52,9 +58,7 @@ jQuery(function($) {
 
 function addCode(id) {
     var table = '.draggableTable#' + id;
-    console.log(table);
     var formstage = '.formstage#' + id + ' tr';
-    console.log(formstage);
     var panelList = $(table);
 
     new_form = $(formstage).clone();

@@ -1,10 +1,6 @@
-{% load compile_static i18n %}
-{% load static from staticfiles %}
+{% load i18n %}
 
 {% block content %}
-    {% block extra_head_scripts %}
-        <script src="{% static 'aristotle_mdr/jqueryui/jquery-ui.min.js' %}"></script>
-    {% endblock %}
 
 <a class="sr-only" onclick="addSlot()" href="?extra=1" accesskey='r'>Add a slot (adding a slot does not save changes)</a>
     {% with formset=slots_FormSet %}
@@ -44,5 +40,4 @@
         <i class="fa fa-plus-circle"></i> Add a slot</a>
 
 {% endwith %}
-        <script src="{% static 'aristotle_mdr/aristotle.moveable.js' %}"></script>
 {% endblock %}
