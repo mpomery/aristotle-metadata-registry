@@ -150,8 +150,8 @@
                 {% endif %}
             </div>
         {% endfor %}
-        {% if weak_formset %}
-            {% include 'aristotle_mdr/create/weak_editor.html' with weak_formset=weak_formset %}
+        {% if weak_formsets %}
+            {% include 'aristotle_mdr/create/weak_editor.html' with formsets=weak_formsets %}
         {% endif %}
         </div>
         {% endif %}

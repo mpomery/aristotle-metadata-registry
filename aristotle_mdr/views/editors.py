@@ -102,20 +102,24 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                 if (hasattr(self.item, 'serialize_weak_entities')):
                     # if weak formset is active
+                    weak = self.item.serialize_weak_entities
 
-                    (GenericFormSet, model_to_add_field) = self.get_weak_formset()
-                    weak_formset = GenericFormSet(request.POST, request.FILES)
+                    for entity in weak:
 
-                    if weak_formset.is_valid():
+                        formset_info = get_weak_formset(entity)
 
-                        one_to_many_formset_save(weak_formset, self.item, 'order', model_to_add_field)
+                        weak_formset = formset_info['formset'](request.POST, request.FILES, prefix=formset_info['prefix'])
 
-                        if not has_change_comments:
-                            change_comments += construct_change_message(request, form, [weak_formset])
+                        if weak_formset.is_valid():
 
-                    else:
+                            one_to_many_formset_save(weak_formset, self.item, formset_info['model_field'], 'order')
 
-                        return self.form_invalid(form, identifier_FormSet=weak_formset)
+                            if not has_change_comments:
+                                change_comments += construct_change_message(request, form, [weak_formset])
+
+                        else:
+
+                            return self.form_invalid(form, identifier_FormSet=weak_formset)
 
 
                 reversion.revisions.set_user(request.user)
@@ -140,10 +144,9 @@ class EditItemView(ConceptEditFormView, UpdateView):
             extra=1,
             )
 
-    def get_weak_formset(self):
+    def get_weak_formset(self, entity):
 
-        weak = self.item.serialize_weak_entities
-        entity = weak[0] #needs to be for loop
+        # where entity is an entry in serialize_weak_entities
 
         field_model = getattr(self.item, entity[1]).model
         logger.debug(field_model)
@@ -157,7 +160,14 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
         formset = one_to_many_formset_factory(field_model, model_to_add_field, 'order')
 
-        return (formset, model_to_add_field)
+        # could have model field as seperate function, dont really need prefix here either
+        formset_info = {
+            'formset' : formset,
+            'model_field' : model_to_add_field,
+            'preifx' : entity[0]
+        }
+
+        return formset_info
 
 
     def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None):
@@ -188,18 +198,23 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
         if (hasattr(self.item, 'serialize_weak_entities')):
             weak = self.item.serialize_weak_entities
-            entity = weak[0] #needs to be for loop
-            # query weak entity
-            queryset = getattr(self.item, entity[1]).all()
+            formsets = []
+            for entity in weak:
+                # query weak entity
+                queryset = getattr(self.item, entity[1]).all()
 
-            (formset, mtaf) = self.get_weak_formset()
+                formset = self.get_weak_formset(entity)['formset']
 
-            weak_formset = formset(
-                queryset=queryset,
-                initial=[{'ORDER': queryset.count() + 1}]
-            )
+                weak_formset = formset(
+                    queryset=queryset,
+                    initial=[{'ORDER': queryset.count() + 1}],
+                    prefix=entity[0]
+                )
 
-            context['weak_formset'] = weak_formset
+                formsets.append(weak_formset)
+
+            logger.debug(formsets)
+            context['weak_formsets'] = formsets
 
 
         context['show_slots_tab'] = self.slots_active

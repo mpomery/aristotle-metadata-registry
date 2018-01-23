@@ -281,7 +281,7 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
         formset = self.formset
         if formset.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
-                one_to_many_formset_save(formset, self.item, self.ordering_field, self.model_to_add_field)
+                one_to_many_formset_save(formset, self.item, self.model_to_add_field, self.ordering_field)
 
                 # formset.save(commit=True)
                 reversion.revisions.set_user(request.user)
