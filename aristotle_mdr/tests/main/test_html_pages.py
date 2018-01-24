@@ -172,6 +172,12 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         updated_item = utils.model_to_dict_with_change_time(response.context['item'])
         updated_name = updated_item['name'] + " updated!"
         updated_item['name'] = updated_name
+
+        for pre in ['permissible_values', 'supplementary_values']:
+            updated_item.update({
+                "%s-TOTAL_FORMS"%pre: 1, "%s-INITIAL_FORMS"%pre: 0, "%s-MAX_NUM_FORMS"%pre:1000,
+                })
+
         response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
         self.item1 = self.itemType.objects.get(pk=self.item1.pk)
         self.assertRedirects(response,url_slugify_concept(self.item1))
@@ -977,9 +983,6 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(check_url)
         self.assertEqual(response.status_code,404)
 
-    def test_value_editing_on_main_edit_page(self):
-        self.assertEqual(True, True)
-
 
 class ObjectClassViewPage(LoggedInViewConceptPages, TestCase):
     url_name='objectClass'
@@ -1139,6 +1142,51 @@ class ValueDomainViewPage(LoggedInViewConceptPages, TestCase):
             self.assertContains(response,pv.meaning,1)
         for sv in self.item1.supplementaryvalue_set.all():
             self.assertContains(response,sv.meaning,1)
+
+    def test_weak_editing_in_advanced_editor(self):
+
+        self.login_editor()
+
+        value_url = 'aristotle:edit_item'
+        value_type = 'permissible'
+        pre = 'permissible_values'
+
+        self.loggedin_user_can_use_value_page(value_url,self.item1,200)
+        self.loggedin_user_can_use_value_page(value_url,self.item2,403)
+        self.loggedin_user_can_use_value_page(value_url,self.item3,200)
+
+        response = self.client.get(reverse(value_url,args=[self.item1.id]))
+        self.assertEqual(response.status_code, 200)
+
+        data = utils.model_to_dict_with_change_time(self.item1)
+
+        num_vals = getattr(self.item1,value_type+"Values").count()
+        i=0
+        for i,v in enumerate(getattr(self.item1,value_type+"Values").all()):
+            data.update({"%s-%d-id"%(pre,i): v.pk, "%s-%d-ORDER"%(pre,i) : v.order, "%s-%d-value"%(pre,i) : v.value, "%s-%d-meaning"%(pre,i) : v.meaning+" -updated"})
+        data.update({"%s-%d-DELETE"%(pre,i): 'checked', "%s-%d-meaning"%(pre,i) : v.meaning+" - deleted"}) # delete the last one.
+        # now add a new one
+        i=i+1
+        data.update({"%s-%d-ORDER"%(pre,i) : i, "%s-%d-value"%(pre,i) : 100, "%s-%d-meaning"%(pre,i) : "new value -updated"})
+        data.update({
+            "%s-TOTAL_FORMS"%pre:num_vals+1, "%s-INITIAL_FORMS"%pre: num_vals, "%s-MAX_NUM_FORMS"%pre:1000,
+            })
+
+        for pre in ['supplementary_values']:
+            data.update({
+                "%s-TOTAL_FORMS"%pre: 1, "%s-INITIAL_FORMS"%pre: 0, "%s-MAX_NUM_FORMS"%pre:1000,
+                })
+
+        self.client.post(reverse(value_url,args=[self.item1.id]), data)
+        self.item1 = models.ValueDomain.objects.get(pk=self.item1.pk)
+
+        self.assertTrue(num_vals == getattr(self.item1,value_type+"Values").count())
+        new_value_seen = False
+        for v in getattr(self.item1,value_type+"Values").all():
+            self.assertTrue('updated' in v.meaning) # This will fail if the deleted item isn't deleted
+            if v.value == '100':
+                new_value_seen = True
+        self.assertTrue(new_value_seen)
 
 class ConceptualDomainViewPage(LoggedInViewConceptPages, TestCase):
     url_name='conceptualDomain'
