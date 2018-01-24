@@ -62,6 +62,6 @@
     </div>
 </form>
 {% for formset in weak_formsets %}
-{% include 'aristotle_mdr/generic/actions/alter_one_to_many_formstage.html' with formset=formset %}
+{% include 'aristotle_mdr/generic/actions/alter_one_to_many_formstage.html' with formset=formset.formset %}
 {% endfor %}
 {% endblock %}

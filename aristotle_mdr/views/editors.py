@@ -19,6 +19,7 @@ from aristotle_mdr.views.utils import ObjectLevelPermissionRequiredMixin
 import logging
 
 from aristotle_mdr.contrib.generic.forms import one_to_many_formset_factory, one_to_many_formset_save
+import re
 
 logger = logging.getLogger(__name__)
 logger.debug("Logging started for " + __name__)
@@ -145,12 +146,8 @@ class EditItemView(ConceptEditFormView, UpdateView):
             extra=1,
             )
 
-    def get_weak_formset(self, entity):
-
-        # where entity is an entry in serialize_weak_entities
-
-        field_model = getattr(self.item, entity[1]).model
-        # get the model to add field
+    def get_weak_model_field(self, field_model):
+        # get the field in the model that we are adding so it can be excluded from form
         modelname = self.model.__name__.lower()
         model_to_add_field = ''
         for field in field_model._meta.fields:
@@ -158,9 +155,16 @@ class EditItemView(ConceptEditFormView, UpdateView):
             if field.name.lower().replace('_', '') == modelname:
                 model_to_add_field = field.name
 
+        return model_to_add_field
+
+    def get_weak_formset(self, entity):
+
+        # where entity is an entry in serialize_weak_entities
+
+        field_model = getattr(self.item, entity[1]).model
+        model_to_add_field = self.get_weak_model_field(field_model)
         formset = one_to_many_formset_factory(field_model, model_to_add_field, 'order')
 
-        # could have model field as seperate function, dont really need prefix here either
         formset_info = {
             'formset' : formset,
             'model_field' : model_to_add_field,
@@ -211,7 +215,10 @@ class EditItemView(ConceptEditFormView, UpdateView):
                     prefix=entity[0]
                 )
 
-                title = 'Edit ' + entity[0].replace('_', ' ').title()
+
+                title = 'Edit ' + queryset.model.__name__
+                # add spaces before capital letters
+                title = re.sub(r"\B([A-Z])", r" \1", title)
 
                 formsets.append({'formset' : weak_formset, 'title' : title})
 
