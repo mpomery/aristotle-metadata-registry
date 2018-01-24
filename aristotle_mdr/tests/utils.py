@@ -46,6 +46,14 @@ def model_to_dict_with_change_time(item, fetch_time=None):
     d['identifiers-MIN_NUM_FORMS'] = 0
     d['identifiers-MAX_NUM_FORMS'] = 1
 
+    if hasattr(item, 'serialize_weak_entities'):
+        weak = item.serialize_weak_entities
+        for entity in weak:
+            d['%s-TOTAL_FORMS'%entity[0]] = 0
+            d['%s-INITIAL_FORMS'%entity[0]] = 0
+            d['%s-MIN_NUM_FORMS'%entity[0]] = 0
+            d['%s-MAX_NUM_FORMS'%entity[0]] = 1
+
     return d
 
 
