@@ -76,6 +76,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                 has_change_comments = form.data.get('change_comments', False)
                 change_comments = form.data.get('change_comments', "")
+                changed_formsets = []
                 if self.slots_active:
                     slot_formset = self.get_slots_formset()(request.POST, request.FILES, item.concept)
                     if slot_formset.is_valid():
@@ -83,9 +84,8 @@ class EditItemView(ConceptEditFormView, UpdateView):
                         # Save the slots
                         slot_formset.save()
 
-                        # Save the change comments
-                        if not has_change_comments:
-                            change_comments += construct_change_message(request, form, [slot_formset])
+                        changed_formsets.append(slot_formset)
+
                     else:
                         return self.form_invalid(form, slots_FormSet=slot_formset)
 
@@ -96,8 +96,8 @@ class EditItemView(ConceptEditFormView, UpdateView):
                         # Save the slots
                         id_formset.save()
 
-                        if not has_change_comments:
-                            change_comments += construct_change_message(request, form, [id_formset])
+                        changed_formsets.append(id_formset)
+
                     else:
                         return self.form_invalid(form, identifier_FormSet=id_formset)
 
@@ -115,13 +115,15 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                             one_to_many_formset_save(weak_formset, self.item, formset_info['model_field'], 'order')
 
-                            if not has_change_comments:
-                                change_comments += construct_change_message(request, form, [weak_formset])
+                            changed_formsets.append(weak_formset)
 
                         else:
 
                             return self.form_invalid(form, identifier_FormSet=weak_formset)
 
+                # save the change comments
+                if not has_change_comments:
+                    change_comments += construct_change_message(request, form, changed_formsets)
 
                 reversion.revisions.set_user(request.user)
                 reversion.revisions.set_comment(change_comments)
@@ -152,6 +154,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
             if (field.is_relation):
                 if (field.related_model == self.model):
                     model_to_add_field = field.name
+                    break
 
         return model_to_add_field
 
