@@ -120,7 +120,6 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                         else:
 
-                            logger.debug('invalid_form')
                             return self.form_invalid(form, identifier_FormSet=weak_formset)
 
 
