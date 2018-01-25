@@ -145,7 +145,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
             extra=1,
             )
 
-    def get_weak_model_field(self, field_model, related):
+    def get_weak_model_field(self, field_model):
         # get the field in the model that we are adding so it can be excluded from form
         model_to_add_field = ''
         for field in field_model._meta.get_fields():
@@ -160,7 +160,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
         # where entity is an entry in serialize_weak_entities
 
         field_model = getattr(self.item, entity[1]).model
-        model_to_add_field = self.get_weak_model_field(field_model, entity[1])
+        model_to_add_field = self.get_weak_model_field(field_model)
         formset = one_to_many_formset_factory(field_model, model_to_add_field, 'order')
 
         formset_info = {
