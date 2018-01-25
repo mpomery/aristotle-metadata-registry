@@ -167,13 +167,12 @@ class EditItemView(ConceptEditFormView, UpdateView):
         formset = one_to_many_formset_factory(field_model, model_to_add_field, 'order')
 
         formset_info = {
-            'formset' : formset,
-            'model_field' : model_to_add_field,
-            'prefix' : entity[0]
+            'formset': formset,
+            'model_field': model_to_add_field,
+            'prefix': entity[0]
         }
 
         return formset_info
-
 
     def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None):
         """
@@ -216,23 +215,19 @@ class EditItemView(ConceptEditFormView, UpdateView):
                     prefix=entity[0]
                 )
 
-
                 title = 'Edit ' + queryset.model.__name__
                 # add spaces before capital letters
                 title = re.sub(r"\B([A-Z])", r" \1", title)
 
-                formsets.append({'formset' : weak_formset, 'title' : title})
+                formsets.append({'formset': weak_formset, 'title': title})
 
             context['weak_formsets'] = formsets
-
 
         context['show_slots_tab'] = self.slots_active
         context['show_id_tab'] = self.identifiers_active
 
-
-
         return context
-
+        
 
 class CloneItemView(ConceptEditFormView, DetailView, CreateView):
     template_name = "aristotle_mdr/create/clone_item.html"

@@ -10,6 +10,7 @@ class HiddenOrderModelFormSet(BaseModelFormSet):
         super().add_fields(form, index)
         form.fields["ORDER"].widget = forms.HiddenInput()
 
+
 def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field):
     _widgets = {}
 
@@ -40,6 +41,7 @@ def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field
         extra=1,
         widgets=_widgets
         )
+
 
 def one_to_many_formset_save(formset, item, model_to_add_field, ordering_field):
 
