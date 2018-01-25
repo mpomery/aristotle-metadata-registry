@@ -1008,6 +1008,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                 data = utils.model_to_dict_with_change_time(self.item1)
 
                 num_vals = getattr(self.item1,value_type).all().count()
+                ordering_field = getattr(self.item1,value_type).model.ordering_field
 
                 # check to make sure the classes with weak entities added them on setUp below
                 self.assertGreater(num_vals, 0)
@@ -1015,7 +1016,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                 updating_field = None
                 skipped_fields = ['id', 'ORDER', 'start_date', 'end_date', 'DELETE']
                 for i,v in enumerate(getattr(self.item1,value_type).all()):
-                    data.update({"%s-%d-id"%(pre,i): v.pk, "%s-%d-ORDER"%(pre,i) : v.order})
+                    data.update({"%s-%d-id"%(pre,i): v.pk, "%s-%d-ORDER"%(pre,i) : getattr(v, ordering_field)})
                     for field in current_formset[0].fields:
                         if hasattr(v, field) and field not in skipped_fields:
                             value = getattr(v, field)

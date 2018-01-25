@@ -57,6 +57,8 @@ class RelationRole(MDR.aristotleComponent):  # 9.1.2.5
     )
     relation = ConceptForeignKey(Relation)
 
+    ordering_field = 'ordinal'
+
     @property
     def parentItem(self):
         return self.relation

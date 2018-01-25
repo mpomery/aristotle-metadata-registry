@@ -113,7 +113,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                         if weak_formset.is_valid():
 
-                            one_to_many_formset_save(weak_formset, self.item, formset_info['model_field'], 'order')
+                            one_to_many_formset_save(weak_formset, self.item, formset_info['model_field'], formset_info['ordering'])
 
                             changed_formsets.append(weak_formset)
 
@@ -164,12 +164,13 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
         field_model = getattr(self.item, entity[1]).model
         model_to_add_field = self.get_weak_model_field(field_model)
-        formset = one_to_many_formset_factory(field_model, model_to_add_field, 'order')
+        formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field)
 
         formset_info = {
             'formset': formset,
             'model_field': model_to_add_field,
-            'prefix': entity[0]
+            'prefix': entity[0],
+            'ordering': field_model.ordering_field,
         }
 
         return formset_info
