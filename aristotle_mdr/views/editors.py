@@ -227,7 +227,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
         context['show_id_tab'] = self.identifiers_active
 
         return context
-        
+
 
 class CloneItemView(ConceptEditFormView, DetailView, CreateView):
     template_name = "aristotle_mdr/create/clone_item.html"
