@@ -74,7 +74,8 @@ function addCode(id) {
 
     // rename the form entries
     renumberRow(new_form,num_forms-1);
-    $('input[name=form-TOTAL_FORMS]').val(num_forms);
+    var total_forms_identifier = 'input[name=' + id + '-TOTAL_FORMS]'
+    $(total_forms_identifier).val(num_forms);
     return false;
 
 }
