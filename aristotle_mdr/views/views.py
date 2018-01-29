@@ -1,3 +1,4 @@
+
 from django import VERSION as django_version
 from django.apps import apps
 from django.contrib import messages
@@ -395,5 +396,11 @@ class PermissionSearchView(FacetedSearchView):
         return get
 
     def extra_context(self):
+        # needed to compare to indexed primary key value
+        if not self.request.user.is_anonymous():
+            favourites_pks = self.request.user.profile.favourites.all().values_list('id', flat=True)
+            favourites_list = list(favourites_pks)
+        else:
+            favourites_list = []
 
-        return {'rpp_values': self.results_per_page_values}
+        return {'rpp_values': self.results_per_page_values, 'favourites': favourites_list}

@@ -4,6 +4,7 @@ import aristotle_mdr.models as models
 from django.db.models import Q
 from django.template import TemplateDoesNotExist, loader
 from django.utils import timezone
+from django.template import loader
 
 import logging
 logger = logging.getLogger(__name__)
@@ -41,6 +42,13 @@ class baseObjectIndex(indexes.SearchIndex):
     django_ct_app_label = indexes.CharField()
     # django_ct_model_name = indexes.CharField()
     # access = indexes.MultiValueField()
+
+    rendered_search_result = indexes.CharField(indexed=False)
+
+    def prepare_rendered_search_result(self, obj):
+
+        t = loader.get_template(self.template_name)
+        return t.render({'object': obj})
 
     def prepare_django_ct_app_label(self, obj):
         return obj._meta.app_label
@@ -89,6 +97,13 @@ class conceptIndex(baseObjectIndex):
     facet_model_ct = indexes.IntegerField(faceted=True)
 
     template_name = "search/searchItem.html"
+
+    rendered_badge = indexes.CharField(indexed=False)
+
+    def prepare_rendered_badge(self, obj):
+
+        t = loader.get_template('search/badge.html')
+        return t.render({'object': obj})
 
     def prepare_registrationAuthorities(self, obj):
         ras_stats = [str(s.registrationAuthority.id) for s in obj.current_statuses().all()]

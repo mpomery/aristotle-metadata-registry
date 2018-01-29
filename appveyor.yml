@@ -9,12 +9,12 @@ environment:
   matrix:
       - DJANGO_VERSION: '1.11'
         DB: mssql
-        DATABASE_URL: mssql://sa:Password12!@(local)\SQL2016/master
+        DATABASE_URL: mssql://sa:Password12!@(local)\SQL2016/master?driver=SQL+Server+Native+Client+11.0
         SEARCH: whoosh
         PYTHON_HOME: "C:/Python35"
       - DJANGO_VERSION: '1.11'
         DB: mssql
-        DATABASE_URL: mssql://sa:Password12!@(local)\SQL2016/master
+        DATABASE_URL: mssql://sa:Password12!@(local)\SQL2016/master?driver=SQL+Server+Native+Client+11.0
         SEARCH: whoosh
         PYTHON_HOME: "C:/Python35-x64"
 
@@ -27,4 +27,3 @@ install:
 test_script:
   - cmd: |
         tox -e dj%DJANGO_VERSION%-test-azure-db-%DB%-search-%SEARCH% --skip-missing-interpreters
-

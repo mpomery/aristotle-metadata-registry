@@ -368,19 +368,19 @@
                 {% if result %}
                 <li>
                     <div class="action">
-                    {% if result.object.concept %}
+                    {% if result.rendered_badge %}
                         <span>
                         <input type='checkbox' id="id_items_{{result.object.id}}" name="items" value='{{ result.object.id }}' title='{% trans "select to perform a bulk action" %}'>
-                            {% include "search/badge.html" with result=result %}
+                            {{ result.rendered_badge|safe }}
                         </span>
-                        {% if result.object.concept in request.user.profile.favourites.all %}
+                        {% if result.pk in favourites %}
                             <i class="fa fa-bookmark" title="{% trans 'This item is in your favourites list' %}"></i>
                         {% endif %}
                     {% else %}
                         <div></div>
                     {% endif %}
                     </div>
-                    {% include result.searchindex.template_name with item=result.object %}
+                    {{ result.rendered_search_result|safe }}
                 </li>
                 {% endif %}
             {% empty %}

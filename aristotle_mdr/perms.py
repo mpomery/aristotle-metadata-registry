@@ -174,6 +174,9 @@ def user_can_move_any_workgroup(user):
     """Checks if a user can move an item from any of their workgroups"""
     workgroup_change_access = fetch_aristotle_settings().get('WORKGROUP_CHANGES', [])
 
+    if user.is_anonymous:
+        return False
+
     if user.is_superuser:
         return True
     if 'admin' in workgroup_change_access and user.is_staff:
