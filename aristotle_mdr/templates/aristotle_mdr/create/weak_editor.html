@@ -1,0 +1,14 @@
+{% block content %}
+
+    {% for weak_formset in formsets %}
+        <div class="wizard_field" style="overflow:auto">
+        <label>{{ weak_formset.title }}</label>
+        {{ weak_formset.formset.management_form }}
+        {{ weak_formset.formset.non_form_errors.as_ul }}
+        {% include 'aristotle_mdr/generic/actions/alter_one_to_many_formset.html' with formset=weak_formset.formset %}
+        <a class="btn btn-primary add_code_button" formid='{{ weak_formset.formset.prefix}}'>
+            <i class="fa fa-plus-circle"></i> Add another</a>
+        </div>
+    {% endfor %}
+
+{% endblock %}

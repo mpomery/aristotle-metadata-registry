@@ -172,6 +172,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         updated_item = utils.model_to_dict_with_change_time(response.context['item'])
         updated_name = updated_item['name'] + " updated!"
         updated_item['name'] = updated_name
+
         response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
         self.item1 = self.itemType.objects.get(pk=self.item1.pk)
         self.assertRedirects(response,url_slugify_concept(self.item1))
@@ -977,6 +978,93 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(check_url)
         self.assertEqual(response.status_code,404)
 
+    def test_weak_editing_in_advanced_editor_dynamic(self):
+
+        if hasattr(self.item1, 'serialize_weak_entities'):
+            self.login_editor()
+            value_url = 'aristotle:edit_item'
+
+            response = self.client.get(reverse(value_url,args=[self.item1.id]))
+            self.assertEqual(response.status_code, 200)
+
+            weak_formsets = response.context['weak_formsets']
+
+            weak = self.item1.serialize_weak_entities
+
+            for entity in weak:
+
+                value_type = entity[1]
+                pre = entity[0]
+
+                # find associated formset
+                current_formset = None
+                for formset in weak_formsets:
+                    if formset['formset'].prefix == pre:
+                        current_formset = formset['formset']
+
+                # check that a formset with the correct prefix was rendered
+                self.assertIsNotNone(current_formset)
+
+                data = utils.model_to_dict_with_change_time(self.item1)
+
+                num_vals = getattr(self.item1,value_type).all().count()
+                ordering_field = getattr(self.item1,value_type).model.ordering_field
+
+                # check to make sure the classes with weak entities added them on setUp below
+                self.assertGreater(num_vals, 0)
+
+                updating_field = None
+                skipped_fields = ['id', 'ORDER', 'start_date', 'end_date', 'DELETE']
+                for i,v in enumerate(getattr(self.item1,value_type).all()):
+                    data.update({"%s-%d-id"%(pre,i): v.pk, "%s-%d-ORDER"%(pre,i) : getattr(v, ordering_field)})
+                    for field in current_formset[0].fields:
+                        if hasattr(v, field) and field not in skipped_fields:
+                            value = getattr(v, field)
+                            if value is not None:
+
+                                if (updating_field is None):
+                                    # see if this is the field to update
+                                    if isinstance(value, str):
+                                        updating_field = field
+
+                                if field == updating_field:
+                                    data.update({"%s-%d-%s"%(pre,i,field) : getattr(v, field) + ' -updated'})
+                                else:
+                                    data.update({"%s-%d-%s"%(pre,i,field) : getattr(v, field)})
+                                    if (i == num_vals - 1):
+                                        # add a copy
+                                        data.update({"%s-%d-%s"%(pre,i+1,field) : getattr(v, field)})
+
+                self.assertIsNotNone(updating_field)
+                # no string was found to update
+                # if this happends the test needs to be updated to not check for just strings to update
+
+                i=0
+                data.update({"%s-%d-DELETE"%(pre,i): 'checked', "%s-%d-%s"%(pre,i,updating_field) : getattr(v, updating_field)+" - deleted"}) # delete the last one.
+
+                # add order and updating_value to newly added data
+                i=num_vals
+                data.update({"%s-%d-ORDER"%(pre,i) : i, "%s-%d-%s"%(pre,i,updating_field) : "new value -updated"})
+
+                # add management form
+                data.update({
+                    "%s-TOTAL_FORMS"%pre:num_vals+1, "%s-INITIAL_FORMS"%pre: num_vals, "%s-MAX_NUM_FORMS"%pre:1000,
+                    })
+
+                self.client.post(reverse(value_url,args=[self.item1.id]), data)
+                self.item1 = self.itemType.objects.get(pk=self.item1.pk)
+
+                self.assertTrue(num_vals == getattr(self.item1,value_type).all().count())
+
+                new_value_seen = False
+                for v in getattr(self.item1,value_type).all():
+                    value = getattr(v, updating_field)
+                    self.assertTrue('updated' in value) # This will fail if the deleted item isn't deleted
+                    self.assertFalse('deleted' in value) # make sure deleted value not present
+                    if value == 'new value -updated':
+                        new_value_seen = True
+                self.assertTrue(new_value_seen)
+
 
 class ObjectClassViewPage(LoggedInViewConceptPages, TestCase):
     url_name='objectClass'
@@ -1137,9 +1225,23 @@ class ValueDomainViewPage(LoggedInViewConceptPages, TestCase):
         for sv in self.item1.supplementaryvalue_set.all():
             self.assertContains(response,sv.meaning,1)
 
+
 class ConceptualDomainViewPage(LoggedInViewConceptPages, TestCase):
     url_name='conceptualDomain'
     itemType=models.ConceptualDomain
+
+    def setUp(self):
+        super().setUp()
+
+        for i in range(4):
+            models.ValueMeaning.objects.create(
+                name="test name",
+                definition="test definition",
+                conceptual_domain=self.item1,
+                order=i,
+            )
+
+
 class DataElementConceptViewPage(LoggedInViewConceptPages, TestCase):
     url_name='dataElementConcept'
     itemType=models.DataElementConcept

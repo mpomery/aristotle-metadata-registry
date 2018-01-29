@@ -109,7 +109,11 @@ def construct_change_message(request, form, formsets):
     """
     change_message = []
     if form and form.changed_data:
-        change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
+        changed = form.changed_data
+        if 'last_fetched' in changed:
+            changed.remove('last_fetched')
+
+        change_message.append(_('Changed %s.') % get_text_list(changed, _('and')))
 
     if formsets:
         for formset in formsets:

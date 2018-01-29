@@ -23,6 +23,18 @@ class RelationViewPage(LoggedInViewConceptPages, TestCase):
     itemType = models.Relation
     defaults = {'arity': 2}
 
+    def setUp(self):
+        super().setUp()
+
+        for i in range(4):
+            models.RelationRole.objects.create(
+                name="test name",
+                definition="test definition",
+                relation=self.item1,
+                ordinal=i,
+                multiplicity=3,
+            )
+
 
 class RelationAdminPage(AdminPageForConcept, TestCase):
     itemType = models.Relation

@@ -6,6 +6,8 @@
 {% block extra_head_scripts %}
     <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.wizard.less'|compile %}" />
     <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle_search.less'|compile %}" />
+    <script src="{% static 'aristotle_mdr/jqueryui/jquery-ui.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.moveable.less'|compile %}" />
     {% if request.is_ajax %}
         <script type="text/javascript">
             CKEDITOR_BASEPATH="/static/ckeditor/ckeditor/";
@@ -59,4 +61,7 @@
         <input accesskey="s" type="submit" class="btn btn-primary" value="Save changes" />
     </div>
 </form>
+{% for formset in weak_formsets %}
+{% include 'aristotle_mdr/generic/actions/alter_one_to_many_formstage.html' with formset=formset.formset %}
+{% endfor %}
 {% endblock %}

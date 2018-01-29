@@ -151,6 +151,8 @@ class aristotleComponent(models.Model):
     class Meta:
         abstract = True
 
+    ordering_field = 'order'
+
     def can_edit(self, user):
         return self.parentItem.can_edit(user)
 

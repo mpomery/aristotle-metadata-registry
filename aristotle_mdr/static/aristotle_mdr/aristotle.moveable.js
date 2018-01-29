@@ -1,22 +1,32 @@
 jQuery(function($) {
-    var panelList = $('#draggableTable');
 
-    panelList.sortable({
-        // Only make the .panel-heading child elements support dragging.
-        // Omit this to make the entire <li>...</li> draggable.
-        handle: '.grabber',
-        start: function () {
-            $(this).addClass('info');
-            $('.grabber').addClass('grabbed');
-        },
-        stop: function () {
-          $('.grabber').removeClass('grabbed');
-        },
+    $('.draggableTable').each(function(){
+      $(this).sortable({
+          // Only make the .panel-heading child elements support dragging.
+          // Omit this to make the entire <li>...</li> draggable.
+          handle: '.grabber',
+          start: function () {
+              $(this).addClass('info');
+              $('.grabber').addClass('grabbed');
+          },
+          stop: function () {
+            $('.grabber').removeClass('grabbed');
+          },
 
-        update: function() {
-            reorderRows();
-        }
+          update: function() {
+              reorderRows();
+          }
+      });
+
+    })
+
+    $('a.add_code_button').click(function() {
+
+        addCode($(this).attr('formid'));
+
     });
+
+
     $( "form" ).submit(function( event ) {
         var blank_row = $('#formstage tr');
         $( "table#formset #draggableTable tr" ).each(function() {
@@ -39,29 +49,35 @@ jQuery(function($) {
                     // So lets just forcefully null everything
                     $(row).find(':input').val('').prop('checked', false);
                     $(row).find('input[name$=-DELETE]').val('on').prop('checked', 'on');
-                    
+
                 }
             }
         })
     });
 });
 
-function addCode() {
-    var panelList = $('#draggableTable');
-    new_form = $('#formstage tr').clone()
-    
+function addCode(id) {
+    var table = '.draggableTable#' + id;
+    var formstage = '.formstage#' + id + ' tr';
+    var panelList = $(table);
+
+    new_form = $(formstage).clone();
+
     // Remove redundant select2s (they'll be remade when reinserted into the node)
     $(new_form).find('span.select2.select2-container').remove();
 
     new_form.appendTo(panelList);
-    num_forms = $('#draggableTable tr').length
+    var all_tr = table + ' tr'
+    num_forms = $(all_tr).length
     $(new_form).find('input').attr('value','');
     $(new_form).find('input[name$="-id"]').removeAttr('value');
-    
+
     // rename the form entries
-    renumberRow(new_form,num_forms-1)
-    $('input[name=form-TOTAL_FORMS]').val(num_forms)
+    renumberRow(new_form,num_forms-1);
+    var total_forms_identifier = 'input[name=' + id + '-TOTAL_FORMS]'
+    $(total_forms_identifier).val(num_forms);
     return false;
+
 }
 
 function renumberRow(row,num) {
@@ -93,6 +109,6 @@ function addSlot() {
     $(new_form).find('input[name$="-id"]').removeAttr('value');
     reorderRows(panelList);
     // rename the form entries
-    $('input[name=slots-TOTAL_FORMS]').val(num_forms)
+    $('input[name=slots-TOTAL_FORMS]').val(num_forms);
     return false;
 }
