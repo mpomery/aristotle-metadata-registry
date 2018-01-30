@@ -11,7 +11,6 @@ install:
 
 defaults:
   - &main_test_script
-    stage: testing-aristotle-mdr
     before_script:
     # Make a MariaDB database
     # Fix wierdness with MariaDB on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0  
@@ -108,7 +107,7 @@ jobs:
     #   <<: *main_test_script_py36
 
     - stage: testing-modules
-      env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic MODULE=aristotle-dataset-extensions
+      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-dataset-extensions
       <<: *main_test_script_py36
 
   # Test Accessibility
