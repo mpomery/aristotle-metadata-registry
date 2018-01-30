@@ -15,10 +15,10 @@ defaults:
     before_script:
     # Make a MariaDB database
     # Fix wierdness with MariaDB on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0  
-      - if [[ $DB == mariadb ]]; then ./tests/scripts/prep_mysql.sh ; fi
+      - if [[ $DB == mariadb ]]; then ./scripts/prep_mysql.sh ; fi
       - if [[ $SEARCH == elastic ]]; then sudo service elasticsearch start && sleep 10; fi
     # Make a posgres database
-      - if [[ $DB == postgres* ]]; then ./tests/scripts/prep_psql.sh; fi
+      - if [[ $DB == postgres* ]]; then ./scripts/prep_psql.sh; fi
 
     script:
       - |
@@ -30,8 +30,12 @@ defaults:
         esac
         echo "Running script with DATABASE_URL="$DATABASE_URL
         echo "Running script with DB="$DB
-        cd $TRAVIS_BUILD_DIR/python/$MODULE
-        tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
+        pip install $TRAVIS_BUILD_DIR
+        if [[./scripts/check_path.sh $MODULE || ./scripts/check_path.sh aristotle-metadata-registry]]; then
+          cd $TRAVIS_BUILD_DIR/python/$MODULE
+          tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
+          cd -
+        fi;
     services:
       - postgresql
       - redis-server
@@ -54,7 +58,13 @@ defaults:
   - &test_accessibility_py36
     stage: accessibility
     python: 3.6
-    script: cd $TRAVIS_BUILD_DIR/python/$MODULE && tox -e ally-$ALLY --skip-missing-interpreters
+    script: 
+      - |
+       if [[./scripts/check_path.sh $MODULE || ./scripts/check_path.sh aristotle-metadata-registry]]; then
+          cd $TRAVIS_BUILD_DIR/python/$MODULE
+          tox -e ally-$ALLY --skip-missing-interpreters
+          cd -
+        fi;
 
 jobs:
 
@@ -97,6 +107,10 @@ jobs:
     #   env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
     #   <<: *main_test_script_py36
 
+    - stage: testing-modules
+      env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic MODULE=aristotle-dataset-extensions
+      <<: *main_test_script_py36
+
   # Test Accessibility
     - <<: *test_accessibility_py36
       env: ALLY=metadata_item MODULE=aristotle-metadata-registry
@@ -104,6 +118,7 @@ jobs:
       env: ALLY=metadata_action MODULE=aristotle-metadata-registry
     - <<: *test_accessibility_py36
       env: ALLY=static MODULE=aristotle-metadata-registry
+
 
     # - stage: deploy
     #   script: true
