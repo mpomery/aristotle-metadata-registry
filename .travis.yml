@@ -54,18 +54,20 @@ defaults:
   - &test_accessibility_py36
     stage: accessibility
     python: 3.6
-    script: tox -e ally-$ALLY --skip-missing-interpreters
+    script: cd $TRAVIS_BUILD_DIR/python/$MODULE && tox -e ally-$ALLY --skip-missing-interpreters
 
 jobs:
 
   include:
-    # - stage: stylecheck
-    #   python: 3.6
-    #   script: tox -e flake8 --skip-missing-interpreters
+    - stage: stylecheck
+      python: 3.6
+      env: MODULE=aristotle-metadata-registry
+      script: cd $TRAVIS_BUILD_DIR/python/$MODULE && tox -e flake8 --skip-missing-interpreters
 
-    # - stage: documentation
-    #   python: 3.6
-    #   script: tox -e docs --skip-missing-interpreters
+    - stage: documentation
+      python: 3.6
+      env: MODULE=aristotle-metadata-registry
+      script: cd $TRAVIS_BUILD_DIR/python/$MODULE && tox -e docs --skip-missing-interpreters
     
 
     - stage: testing-aristotle-mdr
@@ -97,11 +99,11 @@ jobs:
 
   # Test Accessibility
     - <<: *test_accessibility_py36
-      env: ALLY=metadata_item
+      env: ALLY=metadata_item MODULE=aristotle-metadata-registry
     - <<: *test_accessibility_py36
-      env: ALLY=metadata_action
+      env: ALLY=metadata_action MODULE=aristotle-metadata-registry
     - <<: *test_accessibility_py36
-      env: ALLY=static
+      env: ALLY=static MODULE=aristotle-metadata-registry
 
     # - stage: deploy
     #   script: true
