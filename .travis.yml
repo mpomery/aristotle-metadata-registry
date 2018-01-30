@@ -15,10 +15,10 @@ defaults:
     before_script:
     # Make a MariaDB database
     # Fix wierdness with MariaDB on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0  
-      - if [[ $DB == mariadb ]]; then ./aristotle_mdr/tests/bin/prep_mysql.sh ; fi
+      - if [[ $DB == mariadb ]]; then ./tests/scripts/prep_mysql.sh ; fi
       - if [[ $SEARCH == elastic ]]; then sudo service elasticsearch start && sleep 10; fi
     # Make a posgres database
-      - if [[ $DB == postgres* ]]; then ./aristotle_mdr/tests/bin/prep_psql.sh; fi
+      - if [[ $DB == postgres* ]]; then ./tests/scripts/prep_psql.sh; fi
 
     script:
       - |
