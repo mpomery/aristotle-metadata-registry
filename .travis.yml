@@ -30,9 +30,11 @@ defaults:
         echo "Running script with DATABASE_URL="$DATABASE_URL
         echo "Running script with DB="$DB
         echo $TRAVIS_BRANCH
+        echo "HEAD to TRAVIS_BRANCH"
         git diff --name-only HEAD...$TRAVIS_BRANCH
+        echo "TRAVIS_BRANCH to HEAD"
         git diff --name-only $TRAVIS_BRANCH...HEAD
-        if [[./scripts/check_path.sh $MODULE || ./scripts/check_path.sh aristotle-metadata-registry]]; then
+        if [[ ./scripts/check_path.sh $MODULE || ./scripts/check_path.sh aristotle-metadata-registry ]]; then
           pip install $TRAVIS_BUILD_DIR
           cd $TRAVIS_BUILD_DIR/python/$MODULE
           tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
@@ -62,7 +64,7 @@ defaults:
     python: 3.6
     script: 
       - |
-       if [[./scripts/check_path.sh $MODULE || ./scripts/check_path.sh aristotle-metadata-registry]]; then
+       if [[ ./scripts/check_path.sh $MODULE || ./scripts/check_path.sh aristotle-metadata-registry ]]; then
           cd $TRAVIS_BUILD_DIR/python/$MODULE
           tox -e ally-$ALLY --skip-missing-interpreters
           cd -
@@ -81,7 +83,7 @@ jobs:
       env: MODULE=aristotle-metadata-registry
       script: 
         - |
-         if [[./scripts/check_path.sh aristotle-metadata-registry/docs]]; then
+         if [[ ./scripts/check_path.sh aristotle-metadata-registry/docs ]]; then
             cd $TRAVIS_BUILD_DIR/python/$MODULE
             tox -e docs --skip-missing-interpreters
             cd -
