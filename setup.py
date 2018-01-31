@@ -23,6 +23,8 @@ class InstallLocalPackages(install):
             out = subprocess.call(cmd) #, shell=True)
             if out == 1:
                 1/0
+            else:
+                print("Installed ", py_path)
 
 
 setup(
