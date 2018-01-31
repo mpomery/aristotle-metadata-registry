@@ -29,6 +29,9 @@ defaults:
         esac
         echo "Running script with DATABASE_URL="$DATABASE_URL
         echo "Running script with DB="$DB
+        echo $TRAVIS_BRANCH
+        git diff --name-only HEAD...$TRAVIS_BRANCH
+        git diff --name-only $TRAVIS_BRANCH...HEAD
         if [[./scripts/check_path.sh $MODULE || ./scripts/check_path.sh aristotle-metadata-registry]]; then
           pip install $TRAVIS_BUILD_DIR
           cd $TRAVIS_BUILD_DIR/python/$MODULE
