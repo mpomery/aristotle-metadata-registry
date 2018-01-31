@@ -18,7 +18,9 @@ from aristotle_mdr.views.utils import ObjectLevelPermissionRequiredMixin
 
 import logging
 
-from aristotle_mdr.contrib.generic.forms import one_to_many_formset_factory, one_to_many_formset_save
+from aristotle_mdr.contrib.generic.forms import (
+    one_to_many_formset_factory, one_to_many_formset_save, one_to_many_formset_excludes
+)
 import re
 
 logger = logging.getLogger(__name__)
@@ -165,14 +167,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
         field_model = getattr(self.item, entity[1]).model
         model_to_add_field = self.get_weak_model_field(field_model)
 
-        extra_excludes = []
-        if isinstance(self.item, MDR.ValueDomain):
-            # Value Domain specific excludes
-            if not self.item.conceptual_domain:
-                extra_excludes.append('value_meaning')
-            else:
-                extra_excludes.append('meaning')
-
+        extra_excludes = one_to_many_formset_excludes(self.item)
         formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field, extra_excludes)
 
         formset_info = {

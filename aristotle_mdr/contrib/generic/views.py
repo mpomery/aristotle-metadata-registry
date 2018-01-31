@@ -12,7 +12,9 @@ from aristotle_mdr.contrib.autocomplete import widgets
 from aristotle_mdr.models import _concept, ValueDomain
 from aristotle_mdr.perms import user_can_edit, user_can_view
 from aristotle_mdr.utils import construct_change_message
-from aristotle_mdr.contrib.generic.forms import one_to_many_formset_factory, one_to_many_formset_save
+from aristotle_mdr.contrib.generic.forms import (
+    one_to_many_formset_factory, one_to_many_formset_save, one_to_many_formset_excludes
+)
 import reversion
 
 
@@ -269,14 +271,7 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
 
     def get_formset(self):
 
-        extra_excludes = []
-        if isinstance(self.item, ValueDomain):
-            # Value Domain specific excludes
-            if not self.item.conceptual_domain:
-                extra_excludes.append('value_meaning')
-            else:
-                extra_excludes.append('meaning')
-
+        extra_excludes = one_to_many_formset_excludes(self.item)
         return one_to_many_formset_factory(self.model_to_add, self.model_to_add_field, self.ordering_field, extra_excludes)
 
     def post(self, request, *args, **kwargs):

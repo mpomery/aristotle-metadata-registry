@@ -10,6 +10,17 @@ class HiddenOrderModelFormSet(BaseModelFormSet):
         super().add_fields(form, index)
         form.fields["ORDER"].widget = forms.HiddenInput()
 
+def one_to_many_formset_excludes(item):
+
+    extra_excludes = []
+    if isinstance(item, ValueDomain):
+        # Value Domain specific excludes
+        if not item.conceptual_domain:
+            extra_excludes.append('value_meaning')
+        else:
+            extra_excludes.append('meaning')
+
+    return extra_excludes
 
 def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field, extra_excludes=[]):
     _widgets = {}
