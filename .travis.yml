@@ -79,8 +79,14 @@ jobs:
     - stage: documentation
       python: 3.6
       env: MODULE=aristotle-metadata-registry
-      script: cd $TRAVIS_BUILD_DIR/python/$MODULE && tox -e docs --skip-missing-interpreters
-    
+      script: 
+        - |
+         if [[./scripts/check_path.sh aristotle-metadata-registry/docs]]; then
+            cd $TRAVIS_BUILD_DIR/python/$MODULE
+            tox -e docs --skip-missing-interpreters
+            cd -
+          fi;
+
 
     - stage: testing-aristotle-mdr
       env: DJANGO_VERSION='1.11'  DB=sqlite  SEARCH=elastic MODULE=aristotle-metadata-registry
