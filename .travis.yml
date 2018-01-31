@@ -29,8 +29,8 @@ defaults:
         esac
         echo "Running script with DATABASE_URL="$DATABASE_URL
         echo "Running script with DB="$DB
-        pip install $TRAVIS_BUILD_DIR
         if [[./scripts/check_path.sh $MODULE || ./scripts/check_path.sh aristotle-metadata-registry]]; then
+          pip install $TRAVIS_BUILD_DIR
           cd $TRAVIS_BUILD_DIR/python/$MODULE
           tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
           cd -
