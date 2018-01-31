@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, TemplateView, View
 
 from aristotle_mdr.contrib.autocomplete import widgets
-from aristotle_mdr.models import _concept
+from aristotle_mdr.models import _concept, ValueDomain
 from aristotle_mdr.perms import user_can_edit, user_can_view
 from aristotle_mdr.utils import construct_change_message
 from aristotle_mdr.contrib.generic.forms import one_to_many_formset_factory, one_to_many_formset_save
@@ -268,7 +268,16 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
         return None
 
     def get_formset(self):
-        return one_to_many_formset_factory(self.model_to_add, self.model_to_add_field, self.ordering_field)
+
+        extra_excludes = []
+        if isinstance(self.item, ValueDomain):
+            # Value Domain specific excludes
+            if not self.item.conceptual_domain:
+                extra_excludes.append('value_meaning')
+            else:
+                extra_excludes.append('meaning')
+
+        return one_to_many_formset_factory(self.model_to_add, self.model_to_add_field, self.ordering_field, extra_excludes)
 
     def post(self, request, *args, **kwargs):
         """

@@ -164,7 +164,16 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
         field_model = getattr(self.item, entity[1]).model
         model_to_add_field = self.get_weak_model_field(field_model)
-        formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field)
+
+        extra_excludes = []
+        if isinstance(self.item, MDR.ValueDomain):
+            # Value Domain specific excludes
+            if not self.item.conceptual_domain:
+                extra_excludes.append('value_meaning')
+            else:
+                extra_excludes.append('meaning')
+
+        formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field, extra_excludes)
 
         formset_info = {
             'formset': formset,

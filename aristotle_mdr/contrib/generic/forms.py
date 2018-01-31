@@ -1,6 +1,6 @@
 from django import forms
 from django.forms.models import BaseModelFormSet
-from aristotle_mdr.models import _concept
+from aristotle_mdr.models import _concept, ValueDomain
 from aristotle_mdr.contrib.autocomplete import widgets
 from django.forms.models import modelformset_factory
 
@@ -11,8 +11,10 @@ class HiddenOrderModelFormSet(BaseModelFormSet):
         form.fields["ORDER"].widget = forms.HiddenInput()
 
 
-def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field):
+def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field, extra_excludes=[]):
     _widgets = {}
+    exclude_fields = [model_to_add_field, ordering_field]
+    exclude_fields += extra_excludes
 
     for f in model_to_add._meta.fields:
         foreign_model = model_to_add._meta.get_field(f.name).related_model
@@ -36,7 +38,7 @@ def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field
         formset=HiddenOrderModelFormSet,
         can_order=True,  # we assign this back to the ordering field
         can_delete=True,
-        exclude=[model_to_add_field, ordering_field],
+        exclude=exclude_fields,
         # fields='__all__',
         extra=1,
         widgets=_widgets
