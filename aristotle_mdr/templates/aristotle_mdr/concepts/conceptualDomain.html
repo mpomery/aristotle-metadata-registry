@@ -37,8 +37,8 @@
                 <tr>
                     <td>{{ perm.name }}</td>
                     <td>{{ perm.definition }}</td>
-                    <td>{{ perm.start_date|default_if_none:"Unspecified" }}</td>
-                    <td>{{ perm.end_date|default_if_none:"Unspecified" }}</td>
+                    <td>{{ perm.start_date|default_if_none:"-" }}</td>
+                    <td>{{ perm.end_date|default_if_none:"-" }}</td>
                 </tr>
             {% empty %}
                 {% if item|can_edit:request.user %}

@@ -76,8 +76,8 @@ So we've split this out into its own template.
                     {% else %}
                         <td>{{ perm.meaning }}</td>
                     {% endif %}
-                    <td>{{ perm.start_date|default_if_none:"Unspecified" }}</td>
-                    <td>{{ perm.end_date|default_if_none:"Unspecified" }}</td>
+                    <td>{{ perm.start_date|default_if_none:"-" }}</td>
+                    <td>{{ perm.end_date|default_if_none:"-" }}</td>
                 </tr>
             {% empty %}
                 {% if item|can_edit:request.user %}
@@ -109,8 +109,8 @@ So we've split this out into its own template.
                     {% endif %}
                     <td>{{ perm.value }}</td>
                     <td>{{ perm.meaning }}</td>
-                    <td>{{ perm.start_date|default_if_none:"Unspecified" }}</td>
-                    <td>{{ perm.end_date|default_if_none:"Unspecified" }}</td>
+                    <td>{{ perm.start_date|default_if_none:"-" }}</td>
+                    <td>{{ perm.end_date|default_if_none:"-" }}</td>
                 </tr>
             {% empty %}
                 {% if item|can_edit:request.user %}
