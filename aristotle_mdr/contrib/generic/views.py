@@ -13,7 +13,8 @@ from aristotle_mdr.models import _concept, ValueDomain
 from aristotle_mdr.perms import user_can_edit, user_can_view
 from aristotle_mdr.utils import construct_change_message
 from aristotle_mdr.contrib.generic.forms import (
-    one_to_many_formset_factory, one_to_many_formset_save, one_to_many_formset_excludes
+    one_to_many_formset_factory, one_to_many_formset_save,
+    one_to_many_formset_excludes, one_to_many_formset_filters
 )
 import reversion
 
@@ -260,10 +261,11 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
         context = super().get_context_data(*args, **kwargs)
         context['form_add_another_text'] = self.form_add_another_text or _('Add another')
         num_items = getattr(self.item, self.model_base_field).count()
-        context['formset'] = self.formset or self.get_formset()(
+        formset = self.formset or self.get_formset()(
             queryset=getattr(self.item, self.model_base_field).all(),
             initial=[{'ORDER': num_items + 1}]
             )
+        context['formset'] = one_to_many_formset_filters(formset, self.item)
         return context
 
     def get_form(self, form_class=None):
@@ -272,7 +274,9 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
     def get_formset(self):
 
         extra_excludes = one_to_many_formset_excludes(self.item)
-        return one_to_many_formset_factory(self.model_to_add, self.model_to_add_field, self.ordering_field, extra_excludes)
+        formset = one_to_many_formset_factory(self.model_to_add, self.model_to_add_field, self.ordering_field, extra_excludes)
+
+        return formset
 
     def post(self, request, *args, **kwargs):
         """

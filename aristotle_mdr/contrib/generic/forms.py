@@ -1,11 +1,12 @@
 from django import forms
 from django.forms.models import BaseModelFormSet
-from aristotle_mdr.models import _concept, ValueDomain
+from aristotle_mdr.models import _concept, ValueDomain, ValueMeaning
 from aristotle_mdr.contrib.autocomplete import widgets
 from django.forms.models import modelformset_factory
-
+from django.forms import ModelChoiceField, CharField
 
 class HiddenOrderModelFormSet(BaseModelFormSet):
+
     def add_fields(self, form, index):
         super().add_fields(form, index)
         form.fields["ORDER"].widget = forms.HiddenInput()
@@ -21,6 +22,16 @@ def one_to_many_formset_excludes(item):
             extra_excludes.append('meaning')
 
     return extra_excludes
+
+def one_to_many_formset_filters(formset, item):
+
+    if isinstance(item, ValueDomain) and item.conceptual_domain:
+        vmqueryset = ValueMeaning.objects.filter(conceptual_domain=item.conceptual_domain)
+
+        for form in formset:
+            form.fields['value_meaning'].queryset = vmqueryset
+
+    return formset
 
 def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field, extra_excludes=[]):
     _widgets = {}
