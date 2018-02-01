@@ -1,7 +1,7 @@
 {% block content %}
 
     {% for weak_formset in formsets %}
-        <div class="wizard_field" style="overflow:auto">
+        <div class="weak_formset">
         <label>{{ weak_formset.title }}</label>
         {{ weak_formset.formset.management_form }}
         {{ weak_formset.formset.non_form_errors.as_ul }}
