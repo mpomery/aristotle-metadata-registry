@@ -1,0 +1,43 @@
+- model: aristotle_mdr_help.concepthelp
+  fields:
+    app_label: comet
+    concept_type: outcomearea
+    language: en
+    brief: A statement that specifically defines the target, standard, or the
+        ideal result against which an [[indicator]] is to be assessed.
+    offical_definition: A statement that specifically defines the target,
+        standard, or the ideal result of the indicator against which the
+        indicator is to be assessed.
+    official_reference: Australia Institute of Health and Welfare
+    official_link: http://meteor.aihw.gov.au/content/index.phtml/itemId/462856
+    body: >
+        <p>A statement that specifically defines the target, standard,
+        or the ideal result of the indicator against which an [[indicator]]
+        is to be assessed. Outcomes should be strategic, high level and
+        observable, expressed in clear, measurable and achievable terms.
+        Several outcome areas may be identified for each objective.
+        </p>
+        <p>
+        The union of a specific outcome area with a specific indicator
+        set and an indicator creates a performance indicator for a 
+        specific agreement.
+        </p>
+        <p>
+        For example, the <em>People with disability 
+        achieve economic participation and social inclusion</em> outcome 
+        area can be combined with <em>National Disability Agreement</em>
+        [[indicator set]] and <em>Labour force participation rate for people with disability
+        aged 15-64 years, 2011</em> [[indicator]] to create the performance 
+        indicator,
+        <em>National Disability Agreement: a(3)-Labour force participation 
+        rate for people with disability aged 15-64 years, 2011.</em>
+        </p>
+    creation_tip: >
+        <p>Outcomes should be strategic, high level and
+        observable, expressed in clear, measurable and achievable terms.
+        Several outcome areas may be identified for each objective.
+        </p>
+        <p>
+        Once an Outcome Area has been saved, you can attach [[indicator|s]]
+        from the saved Outcome Area page.
+        </p>

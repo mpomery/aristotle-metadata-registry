@@ -34,12 +34,7 @@ defaults:
         git diff --name-only HEAD...$TRAVIS_BRANCH
         echo "TRAVIS_BRANCH to HEAD"
         git diff --name-only $TRAVIS_BRANCH...HEAD
-        if ./scripts/check_path.sh $MODULE || ./scripts/check_path.sh aristotle-metadata-registry; then
-          pip install $TRAVIS_BUILD_DIR
-          cd $TRAVIS_BUILD_DIR/python/$MODULE
-          tox -e dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH --skip-missing-interpreters
-          cd -
-        fi;
+        ./scripts/tox_if.sh $MODULE dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH
     services:
       - postgresql
       - redis-server
@@ -62,13 +57,7 @@ defaults:
   - &test_accessibility_py36
     stage: accessibility
     python: 3.6
-    script: 
-      - |
-       if ./scripts/check_path.sh $MODULE || ./scripts/check_path.sh aristotle-metadata-registry; then
-          cd $TRAVIS_BUILD_DIR/python/$MODULE
-          tox -e ally-$ALLY --skip-missing-interpreters
-          cd -
-        fi;
+    script: ./scripts/tox_if.sh $MODULE $ally-$ALLY
 
 jobs:
 
@@ -81,14 +70,7 @@ jobs:
     - stage: documentation
       python: 3.6
       env: MODULE=aristotle-metadata-registry
-      script: 
-        - |
-         if ./scripts/check_path.sh aristotle-metadata-registry/docs; then
-            cd $TRAVIS_BUILD_DIR/python/$MODULE
-            tox -e docs --skip-missing-interpreters
-            cd -
-          fi;
-
+      script: ./scripts/tox_if.sh $MODULE docs
 
     - stage: testing-aristotle-mdr
       env: DJANGO_VERSION='1.11'  DB=sqlite  SEARCH=elastic MODULE=aristotle-metadata-registry
@@ -119,6 +101,10 @@ jobs:
 
     - stage: testing-modules
       env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-dataset-extensions
+      <<: *main_test_script_py36
+
+    - stage: testing-modules
+      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=comet-indicator-registry
       <<: *main_test_script_py36
 
   # Test Accessibility
