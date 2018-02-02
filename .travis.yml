@@ -107,6 +107,10 @@ jobs:
       env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=comet-indicator-registry
       <<: *main_test_script_py36
 
+    - stage: testing-modules
+      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-pdf-downloads
+      <<: *main_test_script_py36
+
   # Test Accessibility
     - <<: *test_accessibility_py36
       env: ALLY=metadata_item MODULE=aristotle-metadata-registry
