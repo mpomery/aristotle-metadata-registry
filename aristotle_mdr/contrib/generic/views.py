@@ -273,7 +273,7 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
 
     def get_formset(self):
 
-        extra_excludes = one_to_many_formset_excludes(self.item)
+        extra_excludes = one_to_many_formset_excludes(self.item, self.model_to_add)
         formset = one_to_many_formset_factory(self.model_to_add, self.model_to_add_field, self.ordering_field, extra_excludes)
 
         return formset

@@ -168,7 +168,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
         field_model = getattr(self.item, entity[1]).model
         model_to_add_field = self.get_weak_model_field(field_model)
 
-        extra_excludes = one_to_many_formset_excludes(self.item)
+        extra_excludes = one_to_many_formset_excludes(self.item, field_model)
         formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field, extra_excludes)
 
         formset_info = {
