@@ -72,7 +72,7 @@ setup(
         # required for help, but thats required
         'django-autoslug',
         # for more 'real-time' notifications
-        'channels',
+        'channels>1.0,<2.0',
         'django-haystack-channels',
         'asgi-redis',
         
