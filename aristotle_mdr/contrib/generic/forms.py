@@ -26,7 +26,7 @@ class HiddenOrderModelFormSet(BaseModelFormSet):
         super().add_fields(form, index)
         form.fields["ORDER"].widget = forms.HiddenInput()
 
-        
+
 def one_to_many_formset_excludes(item, model_to_add):
     # creates a list of extra fields to be excluded based on the item related to the weak entity
     extra_excludes = []
