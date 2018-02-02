@@ -19,12 +19,14 @@ datePickerOptions = {
     # "pickTime": False
 }
 
+
 class HiddenOrderModelFormSet(BaseModelFormSet):
 
     def add_fields(self, form, index):
         super().add_fields(form, index)
         form.fields["ORDER"].widget = forms.HiddenInput()
 
+        
 def one_to_many_formset_excludes(item, model_to_add):
     # creates a list of extra fields to be excluded based on the item related to the weak entity
     extra_excludes = []
@@ -38,6 +40,7 @@ def one_to_many_formset_excludes(item, model_to_add):
 
     return extra_excludes
 
+
 def one_to_many_formset_filters(formset, item):
     # applies different querysets to the forms after they are instanciated
     if isinstance(item, ValueDomain) and item.conceptual_domain:
@@ -49,6 +52,7 @@ def one_to_many_formset_filters(formset, item):
                 form.fields['value_meaning'].queryset = vmqueryset
 
     return formset
+
 
 def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field, extra_excludes=[]):
     # creates a one to many formset
@@ -68,7 +72,7 @@ def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field
 
         if isinstance(model_to_add._meta.get_field(f.name), DateField):
             _widgets.update({
-                f.name : BootstrapDateTimePicker(options=datePickerOptions)
+                f.name: BootstrapDateTimePicker(options=datePickerOptions)
             })
 
     for f in model_to_add._meta.many_to_many:
