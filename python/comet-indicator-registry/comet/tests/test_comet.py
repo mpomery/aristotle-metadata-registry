@@ -6,8 +6,8 @@ from aristotle_mdr.tests.utils import ManagedObjectVisibility
 from aristotle_mdr.tests.main.test_html_pages import LoggedInViewConceptPages
 from aristotle_mdr.tests.main.test_admin_pages import AdminPageForConcept
 
-from django.test.utils import setup_test_environment
-setup_test_environment()
+from aristotle_mdr.utils import setup_aristotle_test_environment
+setup_aristotle_test_environment()
 
 from comet import models
 

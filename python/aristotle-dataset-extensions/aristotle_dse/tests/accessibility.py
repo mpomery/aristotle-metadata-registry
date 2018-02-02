@@ -14,8 +14,8 @@ from wcag_zoo.validators import parade
 import subprocess
 import pprint
 
-from django.test.utils import setup_test_environment
-setup_test_environment()
+from aristotle_mdr.utils import setup_aristotle_test_environment
+setup_aristotle_test_environment()
 
 from aristotle_mdr.tests.accessibility import MEDIA_TYPES, TestWebPageAccessibilityBase
 
