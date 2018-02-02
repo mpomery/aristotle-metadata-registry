@@ -61,7 +61,17 @@ function addCode(id) {
     var formstage = '.formstage#' + id + ' tr';
     var panelList = $(table);
 
-    new_form = $(formstage).clone();
+    // Deep clone
+    new_form = $(formstage).clone(true, true);
+
+    //Recreate the date time pickers
+    //Get options from the formstage
+    var options = $(formstage).find('.date').data('DateTimePicker').options()
+    //Initialize all date time objects
+    $(new_form).find('.date').each(function() {
+        $(this).removeData('DateTimePicker');
+        $(this).datetimepicker(options);
+    })
 
     // Remove redundant select2s (they'll be remade when reinserted into the node)
     $(new_form).find('span.select2.select2-container').remove();

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 datePickerOptions = {
     "format": "YYYY-MM-DD",
-    "useCurrent": True,
+    "useCurrent": False,
     # "pickDate": True,
     # "pickTime": False
 }
