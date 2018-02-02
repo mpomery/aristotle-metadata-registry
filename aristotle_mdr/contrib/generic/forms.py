@@ -4,7 +4,7 @@ from aristotle_mdr.models import _concept, ValueDomain, ValueMeaning
 from aristotle_mdr.contrib.autocomplete import widgets
 from django.forms.models import modelformset_factory
 from django.forms import ModelChoiceField, CharField
-from aristotle_mdr.widgets.bootstrap import BootstrapDropdownIntelligentDate, BootstrapDateTimePicker
+from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 from django.db.models import DateField
 from aristotle_mdr.models import AbstractValue
 
@@ -14,8 +14,9 @@ logger = logging.getLogger(__name__)
 
 datePickerOptions = {
     "format": "YYYY-MM-DD",
-    "defaultDate": "",
-    "useCurrent": False,
+    "useCurrent": True,
+    # "pickDate": True,
+    # "pickTime": False
 }
 
 class HiddenOrderModelFormSet(BaseModelFormSet):
@@ -66,9 +67,8 @@ def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field
             })
 
         if isinstance(model_to_add._meta.get_field(f.name), DateField):
-            logger.debug(f.name)
             _widgets.update({
-                f.name : BootstrapDateTimePicker(datePickerOptions)
+                f.name : BootstrapDateTimePicker(options=datePickerOptions)
             })
 
     for f in model_to_add._meta.many_to_many:
