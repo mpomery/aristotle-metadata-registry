@@ -72,16 +72,16 @@ setup(
         # required for help, but thats required
         'django-autoslug',
         # for more 'real-time' notifications
-        'channels',
+        'channels>1.0,<2.0',
         'django-haystack-channels',
         'asgi-redis',
-        
+
         # This is only needed for Migration 0024 once this is squashed, remove this dependency
         'sqlparse',
-        
+
         # Required for utils.cached_querysets
         'dill',
-        
+
         'django-organizations',
 
     ],
