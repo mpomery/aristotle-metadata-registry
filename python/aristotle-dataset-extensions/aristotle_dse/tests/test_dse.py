@@ -37,6 +37,22 @@ class DataSetSpecificationViewPage(LoggedInViewConceptPages,TestCase):
     url_name='datasetspecification'
     itemType=models.DataSetSpecification
 
+    def test_weak_editing_in_advanced_editor_dynamic(self):
+
+        for i in range(4):
+            de = MDR.DataElement.objects.create(
+                name="test name",
+                definition="test definition",
+            )
+            models.DSSDEInclusion.objects.create(
+                data_element=de,
+                specific_information="",
+                conditional_obligation="",
+                order=i,
+                dss=self.item1
+            )
+        super().test_weak_editing_in_advanced_editor_dynamic()
+
     def test_add_data_element(self):
         de,created = MDR.DataElement.objects.get_or_create(name="Person-sex, Code N",
             workgroup=self.wg1,definition="The sex of the person with a code.",
@@ -85,3 +101,18 @@ class DatasetViewPage(LoggedInViewConceptPages,TestCase):
 class DistributionViewPage(LoggedInViewConceptPages,TestCase):
     url_name='distribution'
     itemType=models.Distribution
+
+    def test_weak_editing_in_advanced_editor_dynamic(self):
+
+        for i in range(4):
+            de = MDR.DataElement.objects.create(
+                name="test name",
+                definition="test definition",
+            )
+            models.DistributionDataElementPath.objects.create(
+                data_element=de,
+                logical_path=str(i),
+                order=i,
+                distribution=self.item1,
+            )
+        super().test_weak_editing_in_advanced_editor_dynamic()
