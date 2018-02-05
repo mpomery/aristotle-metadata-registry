@@ -1,89 +1,57 @@
 import os
 from setuptools import setup, find_packages
-from aristotle_mdr import get_version
+from setuptools.command.install import install
 
-VERSION = get_version()
-
-with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
-    README = readme.read()
+__version__ = '0.1.0'
 
 # allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
+import subprocess
+
+class InstallLocalPackages(install):
+    def run(self):
+
+        install.run(self)
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+        py_path = os.path.join(this_dir, "python")
+
+        for d in os.listdir(py_path):
+            print( os.path.join(py_path, d))
+            cmd = ["python", '%s/setup.py'%os.path.join(py_path, d), 'install']
+            cmd = ["pip", 'install', '%s'%os.path.join(py_path, d)]
+            out = subprocess.call(cmd) #, shell=True)
+            if out == 1:
+                1/0
+            else:
+                print("Installed ", py_path)
+
+
 setup(
-    name='aristotle-metadata-registry',
-    version=VERSION,
-    packages=find_packages(),
-    include_package_data=True,
-    license='Aristotle-MDR Modified BSD Licence',
-    description='Aristotle-MDR is an open-source metadata registry as laid out by the requirements of the IEC/ISO 11179:2013 specification.',
-    long_description=README,
-    url='https://github.com/aristotle-mdr/aristotle-metadata-registry',
+    name='plato',
+    version=__version__,
+    # packages=find_packages(),
+    # include_package_data=True,
+    license='MIT License',
+    description='Plato',
+    long_description='Plato',
+    url='https://www.aristotlemetadata.com/cloud',
     author='Samuel Spencer',
     author_email='sam@aristotlemetadata.com',
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
-
         'Environment :: Web Environment',
         'Framework :: Django',
-        'Intended Audience :: Healthcare Industry',
-        'Intended Audience :: Information Technology',
-        'Intended Audience :: Science/Research',
-
+        'Intended Audience :: Developers',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
-    install_requires = [
-        "Django>=1.11.1,<2.0",
-        'six', # Setuptools > 36 doesn't install this by default
-        'pytz',
-        'pyyaml',
-        'lesscpy',
-
-        'django-model-utils>=2.3.1',
-        'django-notifications-hq>=1.0',
-        'django-braces',
-        'docutils',
-
-        #Search requirements
-        'django-haystack>=2.6.0,<2.7.0',
-
-        #Rich text editors
-        'django-ckeditor>=5.3.0',
-        'pillow',
-
-        # Revision control
-        "django-reversion>=2.0,<2.1",
-        'django-reversion-compare>=0.7,<0.8',
-        'diff-match-patch',
-
-        # Fancy UI stuff
-        'django-static-precompiler',
-        'django-autocomplete-light>=3.0.0',
-        'django-bootstrap3',
-        'django-bootstrap3-datetimepicker-2>=2.5.0',
-
-        'django-formtools>=2.0',
-
-        # required for help, but thats required
-        'django-autoslug',
-        # for more 'real-time' notifications
-        'channels',
-        'django-haystack-channels',
-        'asgi-redis',
-        
-        # This is only needed for Migration 0024 once this is squashed, remove this dependency
-        'sqlparse',
-        
-        # Required for utils.cached_querysets
-        'dill',
-        
-        'django-organizations',
-
+    install_requires=[
     ],
-
+    cmdclass={ 'install': InstallLocalPackages }
 )

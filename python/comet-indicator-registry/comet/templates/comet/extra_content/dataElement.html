@@ -1,0 +1,32 @@
+{% load aristotle_tags %}
+
+<h3>Use in indicators</h3>
+{% if item.as_numerator.exists or item.as_denominator.exists or item.as_disaggregator.exists %}
+    This data element is included in the following Indicators, some indicators may be hidden based on your current permissions.
+    {% if item.as_numerator.exists %}
+    <h4>As a numerator</h4>
+    <ul>
+        {% for num in item.as_numerator.all|can_view_iter:user %}
+            <li>{% include "aristotle_mdr/helpers/itemLink.html" with item=num %}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if item.as_denominator.exists %}
+    <h4>As a denominator</h4>
+    <ul>
+        {% for denom in item.as_denominator.all|can_view_iter:user %}
+            <li>{% include "aristotle_mdr/helpers/itemLink.html" with item=denom %}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if item.as_disaggregator.exists %}
+    <h4>As a disaggregation</h4>
+    <ul>
+        {% for dis in item.as_disaggregator.all|can_view_iter:user %}
+            <li>{% include "aristotle_mdr/helpers/itemLink.html" with item=dis %}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% else %}
+    This data element is not included in any Indicators.
+{% endif %}

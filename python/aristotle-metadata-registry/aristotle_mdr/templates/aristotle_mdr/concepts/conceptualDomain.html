@@ -1,0 +1,90 @@
+{% extends "aristotle_mdr/concepts/managedContent.html" %}
+
+{% load aristotle_tags %}
+
+{% block type %}conceptualdomain{% endblock %}
+{% block includes %}
+    <dd>
+        {% with total=item.dataelementconcept_set.count %}
+        {{ total }} Data Element Concept{{ total|pluralize }}
+        {% endwith %}
+        <br/>
+        {% with total=item.valuedomain_set.count %}
+        {{ total }} Value Domain{{ total|pluralize }}
+        {% endwith %}
+    </dd>
+{% endblock %}
+
+{% block objSpecific %}
+
+{% if item.valuemeaning_set.count > 0 or item|can_edit:request.user %}
+  <strong>Value meanings</strong>
+        {% if item|can_edit:request.user %}
+            <a class="btn btn-default pull-right" data-toggle="modal" data-target="#conceptual_domain_modal"
+            href="{% url 'aristotle:value_meanings_edit' item.id %}">Edit value meanings</a>
+        {% endif %}
+    <table class="codeList table table-striped">
+        <thead>
+            <tr>
+                <th>Value</th>
+                <th>Meaning</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for perm in item.valuemeaning_set.all %}
+                <tr>
+                    <td>{{ perm.name }}</td>
+                    <td>{{ perm.definition }}</td>
+                    <td>{{ perm.start_date|default_if_none:"-" }}</td>
+                    <td>{{ perm.end_date|default_if_none:"-" }}</td>
+                </tr>
+            {% empty %}
+                {% if item|can_edit:request.user %}
+                <tr>
+                    <th>
+                        {% if item|can_edit:request.user %}
+                            <a class="inline_action" data-toggle="modal" data-target="#conceptual_domain_modal"
+                            href="{% url 'aristotle:value_meanings_edit' item.id %}">Add Values Meanings</a>
+                        {% endif %}
+                    </th>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% bootstrap_modal "conceptual_domain_modal" size='lg' %}
+{% endif %}
+
+{% endblock %}
+
+{% block relationships %}
+    {% with total=item.dataelementconcept_set.count %}
+            <h3>Data Element Concepts implementing this Conceptual Domain</h3>
+            <ul>
+            {% for dec in item.dataelementconcept_set.all|can_view_iter:request.user %}
+                <li>
+                    {% include "aristotle_mdr/helpers/inlineDetails.html" with item=dec %}
+                </li>
+            {% empty %}
+                <li><em>None</em></li>
+            {% endfor %}
+            </ul>
+    {% endwith %}
+    {% with total=item.valuedomain_set.count %}
+            <h3>Value Domains implementing this Conceptual Domain</h3>
+            <ul>
+            {% for vd in item.valuedomain_set.all|can_view_iter:request.user %}
+                <li>
+                    {% include "aristotle_mdr/helpers/inlineDetails.html" with item=vd %}
+                </li>
+            {% empty %}
+                <li><em>None</em></li>
+            {% endfor %}
+            </ul>
+    {% endwith %}
+{% endblock %}

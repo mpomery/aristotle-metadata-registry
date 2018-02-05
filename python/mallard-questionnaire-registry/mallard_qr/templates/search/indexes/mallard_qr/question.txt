@@ -1,0 +1,5 @@
+{% include "search/indexes/aristotle_mdr/managedobject_text.txt" %}
+
+{{ object.question_text }}
+
+{% include "search/indexes/aristotle_mdr/dataelement_text.txt" with object=object.dataElement only %}
