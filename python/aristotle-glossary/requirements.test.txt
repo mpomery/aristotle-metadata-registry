@@ -2,4 +2,4 @@
 
 coveralls
 whoosh
-django_tools
+django_tools==0.38.9
