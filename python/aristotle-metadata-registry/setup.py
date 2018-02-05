@@ -50,7 +50,7 @@ setup(
         'docutils',
 
         #Search requirements
-        'django-haystack>=2.6.0,<2.7.0',
+        'django-haystack>=2.7.dev1,<2.8.0',
 
         #Rich text editors
         'django-ckeditor>=5.3.0',
@@ -58,13 +58,13 @@ setup(
 
         # Revision control
         "django-reversion>=2.0,<2.1",
-        'django-reversion-compare>=0.7,<0.8',
+        'django-reversion-compare~=0.8.0',
         'diff-match-patch',
 
         # Fancy UI stuff
         'django-static-precompiler',
         'django-autocomplete-light>=3.0.0',
-        'django-bootstrap3',
+        'django-bootstrap3>8.0,<9.0',
         'django-bootstrap3-datetimepicker-2>=2.5.0',
 
         'django-formtools>=2.0',
