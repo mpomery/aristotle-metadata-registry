@@ -26,7 +26,10 @@
     <table class="codeList table table-striped">
         <thead>
             <tr>
-                <th>Value</th><th>Meaning</th>
+                <th>Value</th>
+                <th>Meaning</th>
+                <th>Start Date</th>
+                <th>End Date</th>
             </tr>
         </thead>
         <tbody>
@@ -34,6 +37,8 @@
                 <tr>
                     <td>{{ perm.name }}</td>
                     <td>{{ perm.definition }}</td>
+                    <td>{{ perm.start_date|default_if_none:"-" }}</td>
+                    <td>{{ perm.end_date|default_if_none:"-" }}</td>
                 </tr>
             {% empty %}
                 {% if item|can_edit:request.user %}
@@ -44,6 +49,8 @@
                             href="{% url 'aristotle:value_meanings_edit' item.id %}">Add Values Meanings</a>
                         {% endif %}
                     </th>
+                    <td></td>
+                    <td></td>
                     <td></td>
                 </tr>
                 {% endif %}

@@ -18,7 +18,10 @@ from aristotle_mdr.views.utils import ObjectLevelPermissionRequiredMixin
 
 import logging
 
-from aristotle_mdr.contrib.generic.forms import one_to_many_formset_factory, one_to_many_formset_save
+from aristotle_mdr.contrib.generic.forms import (
+    one_to_many_formset_factory, one_to_many_formset_save,
+    one_to_many_formset_excludes, one_to_many_formset_filters
+)
 import re
 
 logger = logging.getLogger(__name__)
@@ -164,7 +167,9 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
         field_model = getattr(self.item, entity[1]).model
         model_to_add_field = self.get_weak_model_field(field_model)
-        formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field)
+
+        extra_excludes = one_to_many_formset_excludes(self.item, field_model)
+        formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field, extra_excludes)
 
         formset_info = {
             'formset': formset,
@@ -215,6 +220,8 @@ class EditItemView(ConceptEditFormView, UpdateView):
                     initial=[{'ORDER': queryset.count() + 1}],
                     prefix=entity[0]
                 )
+
+                weak_formset = one_to_many_formset_filters(weak_formset, self.item)
 
                 title = 'Edit ' + queryset.model.__name__
                 # add spaces before capital letters
