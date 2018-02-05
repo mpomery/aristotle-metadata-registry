@@ -1,0 +1,38 @@
+{% extends "aristotle_mdr/base.html" %}
+
+{% block title %}About: Comet Indicator Registry{% endblock %}
+
+{% block content %}
+<div clas="row">
+<h1><a href="#">Comet Indicator Registry</a></h1>
+
+<p>The Comet Indicator Registry is an extension set for the <a href="https://github.com/LegoStormtroopr/aristotle-metadata-registry">Aristotle MetaData Registry</a>
+that provides additional items necessary for tracking the performance of entities in the health context.
+</p>
+
+<p><b>Comet</b> adds the following <a href='{% url "aristotle:about" template="administeditems" %}'>administed items</a>:
+<ul>
+    <li>
+        <a href='{% url "comet:about" template="indicator" %}'>Indicators</a>
+    </li>
+    <li>
+        <a href='{% url "comet:about" template="indicatorset" %}'>Indicator Sets</a>
+    </li>
+    <li>
+        <a href='{% url "comet:about" template="outcomearea" %}'>Outcome Areas</a>
+    </li>
+    <li>
+        <a href='{% url "comet:about" template="qualitystatement" %}'>Quality Statements</a>
+    </li>
+</ul>
+
+<b>Comet</b> also adds the following <a href='{% url "aristotle:about" template="unmanagedItems" %}'>unmanaged items</a>:
+<ul>
+     <li>
+        <a href=''>Frameworks</a>
+    </li>
+</ul>
+</p>
+</div>
+
+{% endblock %}

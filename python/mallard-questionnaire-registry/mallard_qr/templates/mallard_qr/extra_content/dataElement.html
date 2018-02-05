@@ -1,0 +1,13 @@
+{% load aristotle_tags %}
+
+<h3>Use in Questions</h3>
+{% if item.questions.exists %}
+    This data element collected by the following questions, some may be hidden based on your current permissions.
+    <ul>
+        {% for q in item.questions.all|can_view_iter:user %}
+            <li>{% include "aristotle_mdr/helpers/itemLink.html" with item=q %}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    This data element is collected by any questions.
+{% endif %}
