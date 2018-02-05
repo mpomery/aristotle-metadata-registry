@@ -61,15 +61,13 @@ function addCode(id) {
     var formstage = '.formstage#' + id + ' tr';
     var panelList = $(table);
 
-    // Deep clone
-    new_form = $(formstage).clone(true, true);
+    new_form = $(formstage).clone();
 
     //Recreate the date time pickers
     //Get options from the formstage
     var options = $(formstage).find('.date').data('DateTimePicker').options()
     //Initialize all date time objects
     $(new_form).find('.date').each(function() {
-        $(this).removeData('DateTimePicker');
         $(this).datetimepicker(options);
     })
 
