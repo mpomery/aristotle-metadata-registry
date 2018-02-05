@@ -65,11 +65,13 @@ function addCode(id) {
 
     //Recreate the date time pickers
     //Get options from the formstage
-    var options = $(formstage).find('.date').data('DateTimePicker').options()
-    //Initialize all date time objects
-    $(new_form).find('.date').each(function() {
-        $(this).datetimepicker(options);
-    })
+    if ($(formstage).find('.date').data('DateTimePicker')) {
+      var options = $(formstage).find('.date').data('DateTimePicker').options()
+      //Initialize all date time objects
+      $(new_form).find('.date').each(function() {
+          $(this).datetimepicker(options);
+      })
+    }
 
     // Remove redundant select2s (they'll be remade when reinserted into the node)
     $(new_form).find('span.select2.select2-container').remove();
