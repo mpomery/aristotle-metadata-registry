@@ -2,6 +2,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from django.db.models.fields import CharField
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
@@ -978,7 +979,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(check_url)
         self.assertEqual(response.status_code,404)
 
-    def test_weak_editing_in_advanced_editor_dynamic(self):
+    def test_weak_editing_in_advanced_editor_dynamic(self, updating_field=None, default_fields={}):
 
         if hasattr(self.item1, 'serialize_weak_entities'):
             self.login_editor()
@@ -1013,7 +1014,6 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                 # check to make sure the classes with weak entities added them on setUp below
                 self.assertGreater(num_vals, 0)
 
-                updating_field = None
                 skipped_fields = ['id', 'ORDER', 'start_date', 'end_date', 'DELETE']
                 for i,v in enumerate(getattr(self.item1,value_type).all()):
                     data.update({"%s-%d-id"%(pre,i): v.pk, "%s-%d-ORDER"%(pre,i) : getattr(v, ordering_field)})
@@ -1024,20 +1024,27 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
 
                                 if (updating_field is None):
                                     # see if this is the field to update
-                                    if isinstance(value, str):
+                                    model_field = current_formset[0]._meta.model._meta.get_field(field)
+
+                                    if isinstance(model_field, CharField):
                                         updating_field = field
 
                                 if field == updating_field:
-                                    data.update({"%s-%d-%s"%(pre,i,field) : getattr(v, field) + ' -updated'})
+                                    data.update({"%s-%d-%s"%(pre,i,field) : value + ' -updated'})
                                 else:
-                                    data.update({"%s-%d-%s"%(pre,i,field) : getattr(v, field)})
+                                    added_value = value
+                                    if field in default_fields:
+                                        data.update({"%s-%d-%s"%(pre,i,field) : default_fields[field]})
+                                        added_value = default_fields[field]
+                                    else:
+                                        data.update({"%s-%d-%s"%(pre,i,field) : value})
                                     if (i == num_vals - 1):
                                         # add a copy
-                                        data.update({"%s-%d-%s"%(pre,i+1,field) : getattr(v, field)})
+                                        data.update({"%s-%d-%s"%(pre,i+1,field) : added_value})
 
                 self.assertIsNotNone(updating_field)
                 # no string was found to update
-                # if this happends the test needs to be updated to not check for just strings to update
+                # if this happends the test needs to be passed an updating_field or changed to support more than text updates
 
                 i=0
                 data.update({"%s-%d-DELETE"%(pre,i): 'checked', "%s-%d-%s"%(pre,i,updating_field) : getattr(v, updating_field)+" - deleted"}) # delete the last one.
@@ -1051,7 +1058,8 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                     "%s-TOTAL_FORMS"%pre:num_vals+1, "%s-INITIAL_FORMS"%pre: num_vals, "%s-MAX_NUM_FORMS"%pre:1000,
                     })
 
-                self.client.post(reverse(value_url,args=[self.item1.id]), data)
+                response = self.client.post(reverse(value_url,args=[self.item1.id]), data)
+
                 self.item1 = self.itemType.objects.get(pk=self.item1.pk)
 
                 self.assertTrue(num_vals == getattr(self.item1,value_type).all().count())
@@ -1059,7 +1067,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                 new_value_seen = False
                 for v in getattr(self.item1,value_type).all():
                     value = getattr(v, updating_field)
-                    self.assertTrue('updated' in value) # This will fail if the deleted item isn't deleted
+                    self.assertTrue('updated' in value) # This will fail if the item isn't updated
                     self.assertFalse('deleted' in value) # make sure deleted value not present
                     if value == 'new value -updated':
                         new_value_seen = True
