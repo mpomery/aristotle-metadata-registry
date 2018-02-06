@@ -115,13 +115,11 @@ class EditItemView(ConceptEditFormView, UpdateView):
                         weak_formset = formset_info['formset'](request.POST, request.FILES, prefix=formset_info['prefix'])
 
                         if weak_formset.is_valid():
-
                             one_to_many_formset_save(weak_formset, self.item, formset_info['model_field'], formset_info['ordering'])
 
                             changed_formsets.append(weak_formset)
 
                         else:
-
                             return self.form_invalid(form, weak_formset=weak_formset)
 
                 # save the change comments
@@ -170,7 +168,6 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
         extra_excludes = one_to_many_formset_excludes(self.item, field_model)
         formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field, extra_excludes)
-
         formset_info = {
             'formset': formset,
             'model_field': model_to_add_field,
@@ -209,7 +206,6 @@ class EditItemView(ConceptEditFormView, UpdateView):
         if (hasattr(self.item, 'serialize_weak_entities')):
             if kwargs.get('weak_formset', None):
                 # Will only display the formset that produced an error
-                logger.debug('set from kwargs')
                 weak_formset = kwargs['weak_formset']
                 title = 'Edit ' + weak_formset.model.__name__
                 formsets = [{'formset': weak_formset, 'title': title}]

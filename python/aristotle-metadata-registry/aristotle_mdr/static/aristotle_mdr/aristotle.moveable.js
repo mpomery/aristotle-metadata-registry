@@ -26,6 +26,12 @@ jQuery(function($) {
 
     });
 
+    $('a.add_code_button').each(function() {
+        //Set the initial value of total forms to 0
+        var tf_identifier = 'input[name=' + $(this).attr('formid') + '-TOTAL_FORMS]';
+        $(tf_identifier).val(0);
+    })
+
 
     $( "form" ).submit(function( event ) {
         var blank_row = $('#formstage tr');
@@ -93,13 +99,15 @@ function addCode(id) {
 function renumberRow(row,num) {
     $(row).find('input[name$="-ORDER"]').attr('value',num);
     $(row).find(':input').each(function(index, elem) {
-        name = [
-            $(this).attr('name').split('-')[0],
-            num,
-            $(this).attr('name').split('-')[2]
-            ].join('-');
-        $(this).attr('name',name);
-        $(this).attr('id',"id_"+name);
+        if ($(this).attr('name')) {
+            name = [
+                $(this).attr('name').split('-')[0],
+                num,
+                $(this).attr('name').split('-')[2]
+                ].join('-');
+            $(this).attr('name',name);
+            $(this).attr('id',"id_"+name);
+        }
     });
 }
 
