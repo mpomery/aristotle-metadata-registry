@@ -137,6 +137,7 @@ def unfacet(request, field, value):
 
     return dict_.urlencode()
 
+
 @register.filter
 def remove_query_params(request, params=''):
     # http://stackoverflow.com/questions/2047622/how-to-paginate-django-with-other-get-variables
