@@ -39,19 +39,50 @@ class DataSetSpecificationViewPage(LoggedInViewConceptPages,TestCase):
 
     def test_weak_editing_in_advanced_editor_dynamic(self):
 
+        oc = MDR.ObjectClass.objects.create(
+            name="a very nice object class"
+        )
+        oc.save()
+
+        de = MDR.DataElement.objects.create(
+            name="test name",
+            definition="test definition",
+        )
+        de.save()
+
         for i in range(4):
-            de = MDR.DataElement.objects.create(
-                name="test name",
-                definition="test definition",
-            )
             models.DSSDEInclusion.objects.create(
                 data_element=de,
-                specific_information="",
-                conditional_obligation="",
+                specific_information="test info",
+                conditional_obligation="test obligation",
                 order=i,
                 dss=self.item1
             )
-        super().test_weak_editing_in_advanced_editor_dynamic()
+        for i in range(4):
+            inc = models.DSSDEInclusion.objects.create(
+                data_element=de,
+                specific_information="test info",
+                conditional_obligation="test obligation",
+                order=i,
+                dss=self.item1
+            )
+            clust = models.DSSClusterInclusion.objects.create(
+                specific_information="test info",
+                conditional_obligation="test obligation",
+                order=i,
+                dss=self.item1,
+                child=self.item1
+            )
+
+
+        #self.item1.addCluster(child=self.item3)
+        default_fields = {
+            'specialisation_classes': oc.id,
+            'data_element': de.id,
+            'child': self.item1.id
+        }
+
+        super().test_weak_editing_in_advanced_editor_dynamic(updating_field='specific_information', default_fields=default_fields)
 
     def test_add_data_element(self):
         de,created = MDR.DataElement.objects.get_or_create(name="Person-sex, Code N",
@@ -66,7 +97,7 @@ class DataSetSpecificationViewPage(LoggedInViewConceptPages,TestCase):
         response = self.client.get(self.get_page(self.item1))
         self.assertEqual(response.status_code,302)
         # self.assertNotContains(response, check_url)  # No content on the page as the user was redirected to a login page
-        
+
         response = self.client.get(check_url)
         self.assertTrue(response.status_code,403)
 
@@ -79,7 +110,7 @@ class DataSetSpecificationViewPage(LoggedInViewConceptPages,TestCase):
         self.assertTrue(response.status_code,403)
 
         self.test_add_data_element()  # add a data element
-        
+
         response = self.client.get(self.get_page(self.item1))
         self.assertEqual(response.status_code,200)
         self.assertContains(response, check_url)  # now there are child items, we can review
@@ -103,16 +134,26 @@ class DistributionViewPage(LoggedInViewConceptPages,TestCase):
     itemType=models.Distribution
 
     def test_weak_editing_in_advanced_editor_dynamic(self):
+        de = MDR.DataElement.objects.create(
+            name="test name",
+            definition="test definition",
+        )
+        oc = MDR.ObjectClass.objects.create(
+            name="a very nice object class"
+        )
+        oc.save()
 
         for i in range(4):
-            de = MDR.DataElement.objects.create(
-                name="test name",
-                definition="test definition",
-            )
             models.DistributionDataElementPath.objects.create(
                 data_element=de,
                 logical_path=str(i),
                 order=i,
                 distribution=self.item1,
             )
-        super().test_weak_editing_in_advanced_editor_dynamic()
+            
+        default_fields = {
+            'specialisation_classes': oc.id,
+            'data_element': de.id
+        }
+
+        super().test_weak_editing_in_advanced_editor_dynamic(updating_field='logical_path', default_fields=default_fields)
