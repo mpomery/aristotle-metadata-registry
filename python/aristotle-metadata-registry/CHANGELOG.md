@@ -5,10 +5,19 @@ Changelog
       - Dropped support for Python 3.4 and below, and Django 1.10 and below
       - Dropped requirements for `django-bootstrap3-datetimepicker-2`
       - Dependancies are now defined using `Pipfile` instead of `setup.py` and `requirements.txt`
+      - Moved to a single monorepo that holds the core code and all Aristotle Metadata Extensions
     - Fixed WCAG testing and corrected some minor accessibility issues - #697
     - Minor tweak to dash board - 'recent workgroups' panel no longer exists, 'recent favourites' is no above 'recent actions'
     - Darkend Bootstrap "brand-danger" variable by 10% to improve contrast
     - Speed improvements on search pages - #715
+    - Added links to Conceptual Domain to Value Domain page #766
+    - Hide relationships section when no links are on a metadata item
+    - Allow Permissible Values of any length
+    - All "Aristotle Components" (including Permissible and Supplementary Values) can be edited and reordered from their parent object edit screen
+    - Permissible Values lists now only show value meaning dropdowns when the Value Domain has an attached Conceptual Domain #756
+    - Value Meaning start and end dates are now shown on Value Domain and Conceptual Domain pages
+    - Fixed bug where spaces in search facets showed blank pages
+    - Search facet links now return to the first page to prevent 404s #763
 
 - 1.6.5
   - Fixed regression where private methods showed up in creation wizards

@@ -1126,6 +1126,9 @@ class ValueDomainViewPage(LoggedInViewConceptPages, TestCase):
         self.item3.conceptual_domain = cd
         self.item3.save()
 
+    def test_weak_editing_in_advanced_editor_dynamic(self):
+        super().test_weak_editing_in_advanced_editor_dynamic(updating_field='value')
+
     def test_anon_cannot_use_value_page(self):
         self.logout()
         response = self.client.get(reverse('aristotle:permsissible_values_edit',args=[self.item1.id]))
