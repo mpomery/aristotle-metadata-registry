@@ -473,7 +473,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
                 definition="a Pocket monster"
             )
             dec = models.DataElementConcept.objects.create(
-                name="Pokemon-CombatPower",
+                name="Pokemon_Combat Power",
                 definition="a Pokemons combat power",
                 objectClass=oc
             )
