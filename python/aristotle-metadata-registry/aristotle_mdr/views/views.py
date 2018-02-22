@@ -61,12 +61,14 @@ class ConceptHistoryCompareView(HistoryCompareDetailView):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
+
 def notification_redirect(self, content_type, object_id):
 
     ct = ContentType.objects.get(id=content_type)
     model_class = ct.model_class()
     obj = model_class.objects.get(id=object_id)
     return HttpResponseRedirect(obj.get_absolute_url())
+
 
 def get_if_user_can_view(objtype, user, iid):
     item = get_object_or_404(objtype, pk=iid)
