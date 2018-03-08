@@ -3,6 +3,10 @@
 {% load aristotle_tags %}
 
 {% block objSpecific %}
+    {% if item.conceptual_domain %}
+    <h2>Conceptual Domain</h2>
+    {% include "aristotle_mdr/helpers/inlineDetails.html" with item=item.conceptual_domain %}
+    {% endif %}
     <h2>Representation</h2>
     {% include "aristotle_mdr/concepts/valueDomainRepresentation.html" with allowEditing=True %}
 {% endblock %}

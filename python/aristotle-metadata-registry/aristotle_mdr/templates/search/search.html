@@ -262,7 +262,7 @@
                 {% for f in form.facets.fields.facet_model_ct %}
                     <dd>
                         {% with ct='ct'|get_item_from_facet:f.0 %}
-                        <a href="{{ request.get_full_path }}&amp;models={{ ct.app_label|urlencode }}.{{ ct.model|urlencode }}">
+                        <a href="?{{ request|remove_query_params:'page' }}&amp;models={{ ct.app_label|urlencode }}.{{ ct.model|urlencode }}">
                             {{ ct.name|title }}</a>
                         ({{ f.1 }})
                         {% endwith %}
@@ -275,7 +275,7 @@
                     <dd>
                         {% with ra='ra'|get_item_from_facet:f.0 %}
                         {% if ra %}
-                            <a href="{{ request.get_full_path }}&amp;ra={{ f.0|urlencode }}">
+                            <a href="?{{ request|remove_query_params:'page' }}&amp;ra={{ f.0|urlencode }}">
                                 {{ ra.name }}</a>
                             ({{ f.1 }})
                         {% else %}
@@ -288,7 +288,7 @@
                 <dt>Restriction</dt>
                 {% for f in form.facets.fields.restriction %}
                     <dd>
-                        <a href="{{ request.get_full_path }}&amp;res={{ f.0|urlencode }}">
+                        <a href="?{{ request|remove_query_params:'page' }}&amp;res={{ f.0|urlencode }}">
                             {{ f.0|restriction_to_text }}</a>{{f.o}}
                         ({{ f.1 }})
                     </dd>
@@ -317,26 +317,27 @@
                 {% endif %}
 
                 {% for field,details in form.extra_facet_fields %}
-                    {% if details.values|length > 1 %}
+                    {% if details.values|length > 1 or details.details.applied %}
                         <dt>{{details.details.title}}</dt>
-                        <dd>
-                            {% if details.details.allow_search %}
-                            <label>
-                            <input name="f___{{field}}">
-                            </label>
-                            {% endif %}
-
-                        </dd>
+                        {% if details.values|length > 1 %}
+                            <dd>
+                                {% if details.details.allow_search %}
+                                <label>
+                                <input name="f___{{field}}">
+                                </label>
+                                {% endif %}
+    
+                            </dd>
+                        {% endif %}
                         {% if details.details.applied %}
                         <dd>
-                        Active facets
+                        {# Active facets #}
                         <ul class='active-facets'>
                             {% for af in details.details.applied %}
                             <li>
-                                <a href='?{% unfacet request field af|urlencode %}'>
+                                <a href='?{% unfacet request field af %}'>
                                     {% facet_display details.details af %}
-                                    <span class='badge pull-right'><i class="fa fa-times"></i></span>
-
+                                    <span class='badge pull-right' title="Remove this facet"><i class="fa fa-times"></i></span>
                                 </a>
                             </li>
                             {% endfor %}

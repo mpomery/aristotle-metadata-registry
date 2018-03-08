@@ -16,10 +16,14 @@ of the Django builtins.
 
 """
 
+from django import forms
 from django.db.models import (
     ForeignKey, ManyToOneRel,
     ManyToManyField, ManyToManyRel,
     OneToOneField, OneToOneRel
+)
+from django.db.models.fields import (
+    TextField
 )
 
 
@@ -57,3 +61,14 @@ class ConceptManyToManyField(ManyToManyField):
     a model to a Concept
     """
     rel_class = ConceptManyToManyRel
+
+
+class ShortTextField(TextField):
+
+    def formfield(self, **kwargs):
+        # Passing max_length to forms.CharField means that the value's length
+        # will be validated twice. This is considered acceptable since we want
+        # the value in the form field (to pass into widget for example).
+        defaults = {'widget': forms.TextInput}
+        defaults.update(kwargs)
+        return super().formfield(**defaults)
