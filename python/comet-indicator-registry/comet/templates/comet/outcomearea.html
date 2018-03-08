@@ -1,0 +1,21 @@
+{% extends "aristotle_mdr/concepts/managedContent.html" %}
+{% load aristotle_tags %}
+
+{% block objSpecific %}
+<h2>Associated Indicators</h2>
+    <a href="{% url 'comet:outcomearea_alter_indicators' item.id %}"
+        data-toggle="modal" data-target="#editIndicatorsPopover"
+        class="pull-right btn btn-default btn-sm">
+        <i class="fa fa-plus"></i>
+        Add Indicator
+    </a>
+
+    <ul>
+    {% for i in item.indicators.all %}
+        <li>{% include "aristotle_mdr/helpers/inlineDetails.html" with item=i %}
+    {% endfor %}
+    </ul>
+
+    {% bootstrap_modal 'editIndicatorsPopover' %}
+
+{% endblock %}

@@ -1,0 +1,13 @@
+<div {{div_attrs}}>
+  {% include "django/forms/widgets/input.html" %}
+  <span class="input-group-addon">
+    <span {{icon_attrs}}></span>
+  </span>
+</div>
+{% if picker_id %}
+<script>
+  $(function(){
+    $("#{{picker_id}}:has(input:not([readonly],[disabled]))").datetimepicker({{options|safe}});
+  });
+</script>
+{% endif %}

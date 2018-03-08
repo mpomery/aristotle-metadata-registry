@@ -1,0 +1,7 @@
+include LICENSE
+include README.rst
+recursive-include mallard_qr/aristotle_help_files *
+recursive-include mallard_qr/static *
+recursive-include mallard_qr/templates *
+recursive-exclude mallard_qr/ *.pyc
+exclude MANIFEST.in

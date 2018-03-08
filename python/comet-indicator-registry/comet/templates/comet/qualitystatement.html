@@ -1,0 +1,45 @@
+{% extends "aristotle_mdr/concepts/managedContent.html" %}
+
+{% block asideContent %}
+    <dl>
+        {% if item.implementationStartDate %}
+        <dt>Start Date</dt>
+        <dd>{{ item.implementationStartDate }}</dd>
+        {% endif %}
+        {% if item.implementationEndDate %}
+        <dt>End Date</dt>
+        <dd>{{ item.implementationEndDate }}</dd>
+        {% endif %}
+    </dl>
+{% endblock %}
+
+{% block objSpecific %}
+<h2>Adherence to quality guidelines</h2>
+<dl class="qualityStatement">
+    {% if item.timeliness %}
+    <dt>Timeliness</dt>
+    <dd>{{ item.timeliness| safe }}</dd>
+    {% endif %}
+    {% if item.accessibility %}
+    <dt>Accessibility</dt>
+    <dd>{{ item.accessibility| safe }}</dd>
+    {% endif %}
+    {% if item.interpretability %}
+    <dt>Interpretability</dt>
+    <dd>{{ item.interpretability| safe }}</dd>
+    {% endif %}
+    {% if item.relevance %}
+    <dt>Relevance</dt>
+    <dd>{{ item.relevance| safe }}</dd>
+    {% endif %}
+    {% if item.accuracy %}
+    <dt>Accuracy</dt>
+    <dd>{{ item.accuracy| safe }}</dd>
+    {% endif %}
+    {% if item.coherence %}
+    <dt>Coherence</dt>
+    <dd>{{ item.coherence| safe }}</dd>
+    {% endif %}
+</dl>
+
+{% endblock %}

@@ -1,0 +1,8 @@
+{% include "search/indexes/aristotle_mdr/managedobject_text.txt" %}
+
+{{ object.timeliness }}
+{{ object.accessibility }}
+{{ object.interpretability }}
+{{ object.relevance }}
+{{ object.accuracy }}
+{{ object.coherence }}

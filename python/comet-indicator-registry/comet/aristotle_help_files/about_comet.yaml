@@ -1,0 +1,16 @@
+- model: aristotle_mdr_help.helppage
+  fields:
+    title: About the Comet Indicator extension
+    language: en
+    body: >
+        <p>The Comet Indicator Registry adds a number of additional 
+        content types for recording metadata for tracking the
+        performance of health institutes.
+        </p>
+        <p>
+        The metadata types in this extension are based heavily on public
+        research into health indicator measurement and recording from both
+        <a href="http://www.cihi.ca">CIHI - the Canadian Institute of Health Information</a>
+        and
+        <a href="http://www.aihw.gov.au">AIWH - the Australian Institute of Health and Welfare</a>.
+        </p>
