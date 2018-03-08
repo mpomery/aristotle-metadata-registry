@@ -15,10 +15,8 @@ logger = logging.getLogger(__name__)
 datePickerOptions = {
     "format": "YYYY-MM-DD",
     "useCurrent": False,
-    "widgetPositioning": {
-        "horizontal": "left",
-        "vertical": "auto"
-    }
+    # "pickDate": True,
+    # "pickTime": False
 }
 
 

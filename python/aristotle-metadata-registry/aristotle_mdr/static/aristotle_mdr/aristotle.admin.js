@@ -29,12 +29,10 @@ $( document ).ready( function() {
     });
 
     $('a').click(function(e) {
-        if ($(this).attr('href')) {
-          url = $(this).attr('href').replace('django\/admin','account\/django')
-          title = $('title').text()
+        url = $(this).attr('href').replace('django\/admin','account\/django')
+        title = $('title').text()
 
-          top.window.history.pushState("", title, url);
-        }
+        top.window.history.pushState("", title, url);
     });
 
 

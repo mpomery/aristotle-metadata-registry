@@ -425,7 +425,8 @@ class PermissionSearchForm(TokenSearchForm):
         for _facet in facets_opts:
             _facet, value = _facet.split("::", 1)
             # Force exact as otherwise we don't match when there are spaces.
-            sqs = sqs.filter(**{"%s__exact" % _facet: value})
+            # Insensitive to improve matching
+            sqs = sqs.filter(**{"%s__iexact" % _facet: value})
             facets_details = extra_facets_details.get(_facet, {'applied': []})
             facets_details['applied'] = list(set(facets_details['applied'] + [value]))
             extra_facets_details[_facet] = facets_details

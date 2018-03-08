@@ -29,7 +29,7 @@ from aristotle_mdr.utils import (
 )
 from aristotle_mdr import comparators
 
-from .fields import ConceptForeignKey, ConceptManyToManyField, ShortTextField
+from .fields import ConceptForeignKey, ConceptManyToManyField
 from .managers import MetadataItemManager, ConceptManager
 
 import logging
@@ -1142,10 +1142,12 @@ class AbstractValue(aristotleComponent):
     class Meta:
         abstract = True
         ordering = ['order']
-    value = ShortTextField(  # 11.3.2.7.2.1 - Renamed from permitted value for abstracts
+    value = models.CharField(  # 11.3.2.7.2.1 - Renamed from permitted value for abstracts
+        max_length=32,
         help_text=_("the actual value of the Value")
     )
-    meaning = ShortTextField(  # 11.3.2.7.1
+    meaning = models.CharField(  # 11.3.2.7.1
+        max_length=255,
         help_text=_("A textual designation of a value, where a relation to a Value meaning doesn't exist")
     )
     value_meaning = models.ForeignKey(  # 11.3.2.7.1

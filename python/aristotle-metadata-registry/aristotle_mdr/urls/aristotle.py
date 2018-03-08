@@ -176,8 +176,6 @@ urlpatterns=[
 
     url(r'^extensions/?$', views.extensions, name='extensions'),
 
-    url(r'^notifyredirect/(?P<content_type>\d+)/(?P<object_id>\d+)/', views.notification_redirect, name="notify_redirect"),
-
     url(r'^about/aristotle/?$', TemplateView.as_view(template_name='aristotle_mdr/static/aristotle_mdr.html'), name="aboutMain"),
     url(r'^about/(?P<template>.+)/?$', views.DynamicTemplateView.as_view(), name="about"),
 
