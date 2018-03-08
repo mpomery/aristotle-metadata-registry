@@ -38,6 +38,9 @@ Showing {{ page.paginator.count }} results.
         <a href="?{% paginator_get request page.number pop='sort' %}&sort=mod_desc"><i class="fa fa-sort"></i></a>
         {% endif %}
         {% trans 'Last modified' %}</th>
+        {% if delete %}
+          <th>{% trans 'Delete' %}</th>
+        {% endif %}
 
     </tr>
 </thead>
@@ -86,6 +89,11 @@ Showing {{ page.paginator.count }} results.
             </ul>
         </td>
         <td>{{ item.modified }}</td>
+        {% if delete %}
+          <td>
+            <button type="submit" class="btn btn-default">Delete<span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+          </td>
+        {% endif %}
     </tr>
     {% endfor %}
 {% endwith %}
@@ -93,4 +101,3 @@ Showing {{ page.paginator.count }} results.
 </table>
 
 {% include "aristotle_mdr/helpers/paginator.html" with page=page %}
-
