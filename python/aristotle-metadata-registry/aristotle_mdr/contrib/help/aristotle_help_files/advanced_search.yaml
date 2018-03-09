@@ -31,7 +31,7 @@
       <h3><i class="fa fa-magic fa-fw"></i> Smart spellcheck and filter removal</h3>
       <p>
           When searching Aristotle-MDR performs spellchecks against search terms, and if there is
-          a low number of resutls will recommend an alternate search term.
+          a low number of results will recommend an alternate search term.
           <br>
           Along with this, if a search returns zero results, Aristotle-MDR will remove any filters such as
           item type or date restrictions to automatically broaden the search corpus.
