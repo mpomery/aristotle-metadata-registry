@@ -1,7 +1,7 @@
 {% load aristotle_tags %}
 
 {% if item %}
-    <a href="{{ item.get_absolute_url }}">
+    <a class="itemLink" href="{{ item.get_absolute_url }}">
     {% if space %}
         {% zws item.name %}
     {% else %}

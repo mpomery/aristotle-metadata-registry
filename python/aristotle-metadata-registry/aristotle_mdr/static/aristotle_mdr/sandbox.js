@@ -3,8 +3,12 @@ $(document).ready(function() {
     var button = $(event.relatedTarget) // Button that triggered the modal
     var item_id = button.data('item-id') // Extract info from data-* attributes
     var csrftoken = $("[name=csrfmiddlewaretoken]").val(); // Can do this since a token is already on the page
-
     var modal = $(this);
+
+    // Set element name
+    var element_name = button.closest('tr').find('.itemLink').text();
+    modal.find('#element-name').html($.trim(element_name));
+
     submit_button = modal.find('#delete-submit-button');
     submit_url = submit_button.attr('submit-url');
     message_p = modal.find('#modal-message')

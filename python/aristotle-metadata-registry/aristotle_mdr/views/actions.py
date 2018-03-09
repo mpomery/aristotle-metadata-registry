@@ -294,6 +294,7 @@ class DeleteSandboxView(View):
             return JsonResponse({'completed': False, 'message': 'Item does not exist'})
 
         if can_delete_metadata(request.user, item):
+            # No reversion needed here, can still be recreated from previous version
             item.delete()
             return JsonResponse({'completed': True})
         else:
