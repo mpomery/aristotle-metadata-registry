@@ -6,6 +6,7 @@ from django.urls import reverse
 import aristotle_mdr.tests.utils as utils
 from aristotle_mdr import models
 import datetime
+import json
 
 from aristotle_mdr.utils import setup_aristotle_test_environment
 
@@ -90,6 +91,36 @@ class UserHomePages(utils.LoggedInViewPages, TestCase):
         self.assertTrue(self.item1.concept in response.context['page'])
         self.assertTrue(self.item2.concept not in response.context['page'])
         self.assertTrue(self.item3.concept not in response.context['page'])
+
+    def test_user_can_delete_from_sandbox(self):
+        self.login_viewer()
+        self.item1 = models.ObjectClass.objects.create(
+            name="Test Item 1 (visible to tested viewers)",definition="my definition",submitter=self.viewer)
+
+        response = self.client.post(reverse('aristotle_mdr:sandbox_delete'), {'iid': self.item1.id})
+        self.assertEqual(response.status_code, 200)
+        response_dict = json.loads(response.content)
+        self.assertEqual(response_dict['completed'], True)
+
+    def test_delete_non_owned_content_sandbox(self):
+        self.login_viewer()
+        self.item1 = models.ObjectClass.objects.create(
+            name="Test Item 1 (visible to tested viewers)",definition="my definition",submitter=self.su)
+
+        response = self.client.post(reverse('aristotle_mdr:sandbox_delete'), {'iid': self.item1.id})
+        self.assertEqual(response.status_code, 200)
+        response_dict = json.loads(response.content)
+        self.assertEqual(response_dict['completed'], False)
+        self.assertTrue('message' in response_dict.keys())
+
+    def test_delete_non_existant_content_sandbox(self):
+        self.login_viewer()
+
+        response = self.client.post(reverse('aristotle_mdr:sandbox_delete'), {'iid': 123456789})
+        self.assertEqual(response.status_code, 200)
+        response_dict = json.loads(response.content)
+        self.assertEqual(response_dict['completed'], False)
+        self.assertTrue('message' in response_dict.keys())
 
     def test_user_can_edit_own_details(self):
         self.login_viewer()
