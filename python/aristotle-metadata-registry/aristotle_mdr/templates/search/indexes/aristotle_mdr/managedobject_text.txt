@@ -1,11 +1,19 @@
 {{ object.name }} {{ object.version }}
-{{ object.shortName }}
-{{ object.definition }}
+{{ object.short_name }}
 {{ object.synonyms }}
+{{ object.definition }}
+{{ object.comments }}
+{{ object.references }}
 {{ object.submitting_organisation }}
 {{ object.responsible_organisation }}
+{{ object.origin_URI }}
+
 {% for state in object.statuses.all %}{{ state.state_name }} {% endfor %}
 
 {% for slot in object.slots.all %}
 {{slot.name}} {{slot.value}}
+{% endfor %}
+
+{% for identifier in object.identifiers.all %}
+{{identifier.identifier}} {{identifier.version}}
 {% endfor %}
