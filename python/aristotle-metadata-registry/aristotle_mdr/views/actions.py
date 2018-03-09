@@ -19,6 +19,7 @@ from aristotle_mdr import perms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.forms import actions
 from aristotle_mdr.views.utils import generate_visibility_matrix
+from aristotle_mdr.perms import can_delete_metadata
 
 
 class ItemSubpageView(object):
@@ -292,7 +293,7 @@ class DeleteSandboxView(View):
         except MDR._concept.DoesNotExist:
             return JsonResponse({'completed': False, 'message': 'Item does not exist'})
 
-        if item.submitter == request.user:
+        if can_delete_metadata(request.user, item):
             item.delete()
             return JsonResponse({'completed': True})
         else:
