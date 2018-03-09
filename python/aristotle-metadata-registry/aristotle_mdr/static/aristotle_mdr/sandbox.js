@@ -32,7 +32,6 @@ $(document).ready(function() {
   $('#delete-modal').on('hide.bs.modal', function(event) {
     var modal = $(this);
     submit_button = modal.find('#delete-submit-button');
-    console.log(submit_button)
     submit_button.off("click") //Unbind the on click event
   })
 })
