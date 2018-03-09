@@ -32,9 +32,9 @@ def can_delete_discussion_post(user, post):
 
 def can_delete_metadata(user, item):
     if item.submitter == user and item.workgroup is None:
-        if item.statuses.exists():
+        if not item.statuses.exists():
             return True
-            
+
     return False
 
 def user_can_view(user, item):
