@@ -4,9 +4,10 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import FormView, DetailView
+from django.views.generic import FormView, DetailView, View
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
@@ -280,3 +281,12 @@ class CheckCascadedStates(ItemSubpageView, DetailView):
         kwargs['known_states'] = states
         kwargs['state_matrix'] = state_matrix
         return kwargs
+
+class DeleteSandboxView(View):
+
+    def post(self, request):
+        iid = request.POST.get('iid')
+        item = MDR._concept.objects.get(id=iid)
+        item.delete()
+        response = JsonResponse({'status': 'deleted'})
+        return response
