@@ -9,6 +9,7 @@ $(document).ready(function() {
     var modal = $(this);
     submit_button = modal.find('#delete-submit-button');
     submit_url = submit_button.attr('submit-url');
+    message_p = modal.find('#modal-message')
 
     submit_button.click(function() {
         $.ajax({
@@ -18,6 +19,14 @@ $(document).ready(function() {
           datatype: "json",
           success: function(data) {
               console.log(data)
+              if (data.completed) {
+                location.reload();
+              } else if (data.message) {
+                message_p.html(data.message);
+              }
+          },
+          error: function() {
+              message_p.html("The item could not be deleted");
           }
         })
     })
