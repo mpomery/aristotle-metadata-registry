@@ -17,7 +17,9 @@ $(document).ready(function() {
           datatype: "json",
           success: function(data) {
               if (data.completed) {
-                location.reload();
+                // Remove item's row
+                button.closest('tr').remove();
+                modal.modal('hide');
               } else if (data.message) {
                 message_p.html(data.message);
               }
