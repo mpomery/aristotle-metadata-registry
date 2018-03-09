@@ -57,7 +57,7 @@ defaults:
   - &test_accessibility_py36
     stage: accessibility
     python: 3.6
-    script: ./scripts/tox_if.sh $MODULE ally-$ALLY
+    script: ./scripts/tox_if.sh $MODULE $ally-$ALLY
 
 jobs:
 
