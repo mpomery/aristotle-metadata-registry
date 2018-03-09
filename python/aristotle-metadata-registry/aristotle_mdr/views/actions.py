@@ -286,7 +286,14 @@ class DeleteSandboxView(View):
 
     def post(self, request):
         iid = request.POST.get('iid')
-        item = MDR._concept.objects.get(id=iid)
-        item.delete()
-        response = JsonResponse({'status': 'deleted'})
-        return response
+
+        try:
+            item = MDR._concept.objects.get(id=iid)
+        except MDR._concept.DoesNotExist:
+            return JsonResponse({'completed': False, 'message': 'Item does not exist'})
+
+        if item.submitter == request.user:
+            item.delete()
+            return JsonResponse({'completed': True})
+        else:
+            return JsonResponse({'completed': False, 'message': 'You do not have permission to delete this item'})
