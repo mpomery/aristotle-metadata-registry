@@ -37,6 +37,7 @@ def can_delete_metadata(user, item):
 
     return False
 
+
 def user_can_view(user, item):
     """Can the user view the item?"""
     if user.is_superuser:

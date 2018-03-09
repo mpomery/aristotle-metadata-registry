@@ -283,6 +283,7 @@ class CheckCascadedStates(ItemSubpageView, DetailView):
         kwargs['state_matrix'] = state_matrix
         return kwargs
 
+
 class DeleteSandboxView(View):
 
     def post(self, request):
