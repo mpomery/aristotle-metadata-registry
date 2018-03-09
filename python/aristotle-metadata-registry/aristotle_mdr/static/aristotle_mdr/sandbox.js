@@ -2,9 +2,7 @@ $(document).ready(function() {
   $('#delete-modal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget) // Button that triggered the modal
     var item_id = button.data('item-id') // Extract info from data-* attributes
-    console.log(item_id);
-    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-    console.log(csrftoken);
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val(); // Can do this since a token is already on the page
 
     var modal = $(this);
     submit_button = modal.find('#delete-submit-button');
@@ -18,7 +16,6 @@ $(document).ready(function() {
           data: {iid: item_id, csrfmiddlewaretoken: csrftoken},
           datatype: "json",
           success: function(data) {
-              console.log(data)
               if (data.completed) {
                 location.reload();
               } else if (data.message) {
