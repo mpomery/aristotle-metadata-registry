@@ -1,5 +1,9 @@
 {% extends "aristotle_mdr/user/userHome.html" %}
-{% load i18n %}
+{% load i18n static %}
+
+{% block individual_scripts %}
+<script src="{% static 'aristotle_mdr/sandbox.js' %}"></script>
+{% endblock %}
 
 {% block page %}
 <h1><i class="fa fa-pencil-square-o fa-fw"></i> {% block title %}{% trans "My Sandbox" %}{% endblock %}</h1>
@@ -9,5 +13,23 @@
 </p>
 
 {% include "aristotle_mdr/helpers/bulk_action_paginated_list.html" with allow_select_all=True page=page_obj delete=True %}
+
+<div id="delete-modal" class="modal fade exclude-scrap" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Delete</h4>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+        <button type="button" id="delete-submit-button" class="btn btn-primary">Yes</button>
+      </div>
+    </div>
+    </div>
+</div>
 
 {% endblock %}
