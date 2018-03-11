@@ -71,7 +71,7 @@ So we've split this out into its own template.
                     </th>
                     {% endif %}
                     <td>{{ perm.value }}</td>
-                    {% if item.conceptual_domain %}
+                    {% if perm.value_meaning %}
                         <td>{{ perm.value_meaning }}</td>
                     {% else %}
                         <td>{{ perm.meaning }}</td>
@@ -108,7 +108,11 @@ So we've split this out into its own template.
                     </th>
                     {% endif %}
                     <td>{{ perm.value }}</td>
-                    <td>{{ perm.meaning }}</td>
+                    {% if perm.value_meaning %}
+                        <td>{{ perm.value_meaning }}</td>
+                    {% else %}
+                        <td>{{ perm.meaning }}</td>
+                    {% endif %}
                     <td>{{ perm.start_date|default_if_none:"-" }}</td>
                     <td>{{ perm.end_date|default_if_none:"-" }}</td>
                 </tr>
