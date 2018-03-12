@@ -14,6 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
+from django.contrib.contenttypes.models import ContentType
 
 import reversion
 from reversion_compare.views import HistoryCompareDetailView
@@ -59,6 +60,14 @@ class ConceptHistoryCompareView(HistoryCompareDetailView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
+
+
+def notification_redirect(self, content_type, object_id):
+
+    ct = ContentType.objects.get(id=content_type)
+    model_class = ct.model_class()
+    obj = model_class.objects.get(id=object_id)
+    return HttpResponseRedirect(obj.get_absolute_url())
 
 
 def get_if_user_can_view(objtype, user, iid):
