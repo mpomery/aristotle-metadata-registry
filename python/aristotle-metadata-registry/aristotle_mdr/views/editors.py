@@ -115,14 +115,12 @@ class EditItemView(ConceptEditFormView, UpdateView):
                         weak_formset = formset_info['formset'](request.POST, request.FILES, prefix=formset_info['prefix'])
 
                         if weak_formset.is_valid():
-
                             one_to_many_formset_save(weak_formset, self.item, formset_info['model_field'], formset_info['ordering'])
 
                             changed_formsets.append(weak_formset)
 
                         else:
-
-                            return self.form_invalid(form, identifier_FormSet=weak_formset)
+                            return self.form_invalid(form, weak_formset=weak_formset)
 
                 # save the change comments
                 if not has_change_comments:
@@ -170,7 +168,6 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
         extra_excludes = one_to_many_formset_excludes(self.item, field_model)
         formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field, extra_excludes)
-
         formset_info = {
             'formset': formset,
             'model_field': model_to_add_field,
@@ -180,12 +177,12 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
         return formset_info
 
-    def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None):
+    def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None, weak_formset=None):
         """
         If the form is invalid, re-render the context data with the
         data-filled form and errors.
         """
-        return self.render_to_response(self.get_context_data(form=form, slots_FormSet=slots_FormSet))
+        return self.render_to_response(self.get_context_data(form=form, slots_FormSet=slots_FormSet, weak_formset=weak_formset))
 
     def get_context_data(self, *args, **kwargs):
         from aristotle_mdr.contrib.slots.models import Slot
@@ -207,29 +204,36 @@ class EditItemView(ConceptEditFormView, UpdateView):
                 )
 
         if (hasattr(self.item, 'serialize_weak_entities')):
-            weak = self.item.serialize_weak_entities
-            formsets = []
-            for entity in weak:
-                # query weak entity
-                queryset = getattr(self.item, entity[1]).all()
+            if kwargs.get('weak_formset', None):
+                # Will only display the formset that produced an error
+                weak_formset = kwargs['weak_formset']
+                title = 'Edit ' + weak_formset.model.__name__
+                formsets = [{'formset': weak_formset, 'title': title}]
+                context['weak_formsets'] = formsets
+            else:
+                weak = self.item.serialize_weak_entities
+                formsets = []
+                for entity in weak:
+                    # query weak entity
+                    queryset = getattr(self.item, entity[1]).all()
 
-                formset = self.get_weak_formset(entity)['formset']
+                    formset = self.get_weak_formset(entity)['formset']
 
-                weak_formset = formset(
-                    queryset=queryset,
-                    initial=[{'ORDER': queryset.count() + 1}],
-                    prefix=entity[0]
-                )
+                    weak_formset = formset(
+                        queryset=queryset,
+                        initial=[{'ORDER': queryset.count() + 1}],
+                        prefix=entity[0]
+                    )
 
-                weak_formset = one_to_many_formset_filters(weak_formset, self.item)
+                    weak_formset = one_to_many_formset_filters(weak_formset, self.item)
 
-                title = 'Edit ' + queryset.model.__name__
-                # add spaces before capital letters
-                title = re.sub(r"\B([A-Z])", r" \1", title)
+                    title = 'Edit ' + queryset.model.__name__
+                    # add spaces before capital letters
+                    title = re.sub(r"\B([A-Z])", r" \1", title)
 
-                formsets.append({'formset': weak_formset, 'title': title})
+                    formsets.append({'formset': weak_formset, 'title': title})
 
-            context['weak_formsets'] = formsets
+                context['weak_formsets'] = formsets
 
         context['show_slots_tab'] = self.slots_active
         context['show_id_tab'] = self.identifiers_active
