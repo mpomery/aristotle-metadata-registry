@@ -25,7 +25,9 @@ from django.db.models import (
 from django.db.models.fields import (
     TextField
 )
+from django.forms.models import ModelMultipleChoiceField
 
+from aristotle_mdr.widgets.widgets import TableCheckboxSelect
 
 class ConceptOneToOneRel(OneToOneRel):
     pass
@@ -72,3 +74,10 @@ class ShortTextField(TextField):
         defaults = {'widget': forms.TextInput}
         defaults.update(kwargs)
         return super().formfield(**defaults)
+
+class ReviewChangesChoiceField(ModelMultipleChoiceField):
+
+    widget=TableCheckboxSelect
+
+    def label_from_instance(self, obj):
+        return str(obj)

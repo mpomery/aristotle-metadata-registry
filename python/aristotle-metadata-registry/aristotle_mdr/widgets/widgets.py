@@ -1,5 +1,5 @@
 from django import forms
-from django.forms.widgets import TextInput
+from django.forms.widgets import TextInput, CheckboxSelectMultiple
 
 from django.utils.safestring import mark_safe
 
@@ -34,3 +34,8 @@ class RegistrationAuthoritySelect(forms.Select):
             return mark_safe(rendered + hidden_input_with_value)
         else:
             return super().render(name, value, **kwargs)
+
+class TableCheckboxSelect(CheckboxSelectMultiple):
+
+    template_name = 'aristotle_mdr/widgets/table_checkbox_select.html'
+    #option_template_name = 'django/forms/widgets/checkbox_option.html'

@@ -7,6 +7,7 @@ import aristotle_mdr.models as MDR
 from aristotle_mdr.perms import user_can_edit
 from aristotle_mdr.forms.creation_wizards import UserAwareForm
 from aristotle_mdr.contrib.autocomplete import widgets
+from aristotle_mdr.fields import ReviewChangesChoiceField
 
 from django.forms.models import modelformset_factory
 
@@ -143,7 +144,7 @@ class ReviewChangesForm(forms.Form):
 
     def __init__(self, queryset, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['selected_list'] = forms.ModelMultipleChoiceField(queryset=queryset, widget=forms.CheckboxSelectMultiple)
+        self.fields['selected_list'] = ReviewChangesChoiceField(queryset=queryset)
 
 # Thanks http://stackoverflow.com/questions/6958708/grappelli-to-hide-sortable-field-in-inline-sortable-django-admin
 class PermissibleValueForm(forms.ModelForm):
