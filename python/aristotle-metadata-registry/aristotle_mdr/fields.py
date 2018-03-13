@@ -79,9 +79,10 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
     def __init__(self, queryset, **kwargs):
         extra_info = {}
-        for concept in queryset:
+        subclassed_queryset = queryset.select_subclasses()
+        for concept in subclassed_queryset:
             innerdict = {}
-            innerdict.update({'type': str(concept.item.__class__.__name__)})
+            innerdict.update({'type': concept.__class__.get_verbose_name()})
             old_states = []
             for status in concept.statuses.all():
                 old_states.append(str(status.state_name))
