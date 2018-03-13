@@ -77,4 +77,17 @@ class ShortTextField(TextField):
 
 class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
-    widget=TableCheckboxSelect
+    def __init__(self, queryset, **kwargs):
+        extra_info = {}
+        for concept in queryset:
+            innerdict = {}
+            innerdict.update({'type': str(concept.item.__class__.__name__)})
+            old_states = []
+            for status in concept.statuses.all():
+                old_states.append(str(status.state_name))
+            innerdict.update({'old': ",".join(old_states)})
+            extra_info.update({concept.id: innerdict})
+
+        self.widget = TableCheckboxSelect(extra_info=extra_info)
+
+        super().__init__(queryset, **kwargs)
