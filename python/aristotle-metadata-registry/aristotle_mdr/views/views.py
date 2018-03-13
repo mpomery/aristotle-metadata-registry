@@ -291,7 +291,8 @@ def changeStatus(request, iid):
 class ChangeStatusView(SessionWizardView):
 
     form_list = [
-        ('change_status', MDRForms.ChangeStatusForm)
+        ('change_status', MDRForms.ChangeStatusForm),
+        ('review_changes', MDRForms.ReviewChangesForm)
     ]
 
     templates = {
@@ -302,10 +303,8 @@ class ChangeStatusView(SessionWizardView):
     def dispatch(self, request, *args, **kwargs):
         # Check for keyError here
         self.item = item = get_object_or_404(MDR._concept, pk=kwargs['iid']).item
-        self.form_list.update({'review_changes': MDRForms.ReviewChangesForm(queryset=item)})
         self.cascaded = self.item.registry_cascade_items
-        self.cascaded_ids = [a.pk for a in self.cascaded]
-        logger.debug('cascaded ids: %s'%self.cascaded_ids)
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_template_names(self):
@@ -315,6 +314,12 @@ class ChangeStatusView(SessionWizardView):
 
         if step == 'change_status':
             return {'user': self.request.user}
+        elif step == 'review_changes':
+            # Need to check wether cascaded was true here
+            cascaded_ids = [a.pk for a in self.cascaded]
+            logger.debug('cascaded ids: %s'%cascaded_ids)
+            cascaded_queryset = MDR._concept.objects.filter(id__in=cascaded_ids)
+            return {'queryset': cascaded_queryset}
 
         return {}
 

@@ -143,7 +143,7 @@ class ReviewChangesForm(forms.Form):
 
     def __init__(self, queryset, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['selected_list'] = forms.ModelMultipleChoiceField(queryset=queryset)
+        self.fields['selected_list'] = forms.ModelMultipleChoiceField(queryset=queryset, widget=forms.CheckboxSelectMultiple)
 
 # Thanks http://stackoverflow.com/questions/6958708/grappelli-to-hide-sortable-field-in-inline-sortable-django-admin
 class PermissibleValueForm(forms.ModelForm):
