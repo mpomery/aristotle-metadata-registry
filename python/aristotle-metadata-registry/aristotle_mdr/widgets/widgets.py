@@ -38,4 +38,9 @@ class RegistrationAuthoritySelect(forms.Select):
 class TableCheckboxSelect(CheckboxSelectMultiple):
 
     template_name = 'aristotle_mdr/widgets/table_checkbox_select.html'
-    #option_template_name = 'django/forms/widgets/checkbox_option.html'
+    option_template_name = 'aristotle_mdr/widgets/table_checkbox_option.html'
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(value, name, attrs)
+        context.update({'extra_info': {43: {'type': 'a type', 'old': 'old'}}})
+        return context

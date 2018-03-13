@@ -78,6 +78,3 @@ class ShortTextField(TextField):
 class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
     widget=TableCheckboxSelect
-
-    def label_from_instance(self, obj):
-        return str(obj)
