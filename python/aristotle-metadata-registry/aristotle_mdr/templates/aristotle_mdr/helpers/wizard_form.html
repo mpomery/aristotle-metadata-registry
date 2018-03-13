@@ -1,0 +1,32 @@
+{% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
+{% load compile_static i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_head_scripts %}
+{{ wizard.form.media }}
+{% endblock %}
+
+{% block content %}
+<p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
+<form action="" method="post">{% csrf_token %}
+<table>
+{{ wizard.management_form }}
+{% if wizard.form.forms %}
+    {{ wizard.form.management_form }}
+    {% for form in wizard.form.forms %}
+        {% block form %}
+        {{ form }}
+        {% endblock %}
+    {% endfor %}
+{% else %}
+    {{ wizard.form }}
+{% endif %}
+</table>
+{% if wizard.steps.prev %}
+<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
+<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
+{% endif %}
+<input type="submit" value="{% trans "submit" %}"/>
+</form>
+{% endblock %}
