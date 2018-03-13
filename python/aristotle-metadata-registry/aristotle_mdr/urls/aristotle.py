@@ -128,7 +128,7 @@ urlpatterns=[
     url(r'^action/bulkaction/?$', views.bulk_actions.BulkAction.as_view(), name='bulk_action'),
     url(r'^action/compare/?$', views.comparator.compare_concepts, name='compare_concepts'),
 
-    url(r'^action/changestatus/(?P<iid>\d+)$', views.changeStatus, name='changeStatus'),
+    url(r'^action/changestatus/(?P<iid>\d+)$', views.ChangeStatusView.as_view(), name='changeStatus'),
     # url(r'^remove/WorkgroupUser/(?P<iid>\d+)/(?P<userid>\d+)$', views.removeWorkgroupUser, name='removeWorkgroupUser'),
 
     url(r'^account/?$', RedirectView.as_view(url=reverse_lazy("aristotle:userHome"), permanent=True)),
