@@ -15,6 +15,9 @@ from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
 from django.contrib.contenttypes.models import ContentType
+from formtools.wizard.views import SessionWizardView
+
+import json
 
 import reversion
 from reversion_compare.views import HistoryCompareDetailView
@@ -285,6 +288,45 @@ def changeStatus(request, iid):
         }
     )
 
+class ChangeStatusView(SessionWizardView):
+
+    form_list = [
+        ('change_status', MDRForms.ChangeStatusForm)
+    ]
+
+    templates = {
+        'change_status': 'aristotle_mdr/actions/changeStatus.html',
+        'review_changes': 'aristotle_mdr/helpers/wizard_form.html'
+    }
+
+    def dispatch(self, request, *args, **kwargs):
+        # Check for keyError here
+        self.item = item = get_object_or_404(MDR._concept, pk=kwargs['iid']).item
+        self.form_list.update({'review_changes': MDRForms.ReviewChangesForm(queryset=item)})
+        self.cascaded = self.item.registry_cascade_items
+        self.cascaded_ids = [a.pk for a in self.cascaded]
+        logger.debug('cascaded ids: %s'%self.cascaded_ids)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return [self.templates[self.steps.current]]
+
+    def get_form_kwargs(self, step):
+
+        if step == 'change_status':
+            return {'user': self.request.user}
+
+        return {}
+
+    def get_context_data(self, form, **kwargs):
+        item = self.item
+        status_matrix = json.dumps(generate_visibility_matrix(self.request.user))
+        context = super().get_context_data(form, **kwargs)
+        context.update({'item': item, 'status_matrix': status_matrix })
+        return context
+
+    def done(self, formlist, **kwargs):
+        return HttpResponse('You did it')
 
 def supersede(request, iid):
     item = get_object_or_404(MDR._concept, pk=iid).item
