@@ -340,6 +340,7 @@ class ChangeStatusView(SessionWizardView):
                 queryset = MDR._concept.objects.filter(id__in=cascaded_ids)
             else:
                 queryset = MDR._concept.objects.filter(id=self.item.id)
+                logger.debug('Queryset %s'%str(queryset))
 
             return {'queryset': queryset, 'new_state': state_name, 'ra': ra[0]}
 
@@ -377,23 +378,18 @@ class ChangeStatusView(SessionWizardView):
                 else:
                     register_method = ra.register
 
-                if review_data:
-                    register_method(
-                        self.item,
-                        state,
-                        self.request.user,
-                        selected_list,
-                        changeDetails=changeDetails,
-                        registrationDate=regDate,
-                    )
-                else:
-                    register_method(
-                        self.item,
-                        state,
-                        self.request.user,
-                        changeDetails=changeDetails,
-                        registrationDate=regDate,
-                    )
+                arguments = {
+                    'item': self.item,
+                    'state': state,
+                    'user': self.request.user,
+                    'changeDetails': changeDetails,
+                    'registrationDate': regDate,
+                }
+
+                if review_data and cascade:
+                    arguments['selected'] = selected_list
+
+                register_method(**arguments)
                 # TODO: notification and message on success/failure
         return HttpResponseRedirect(url_slugify_concept(self.item))
 
