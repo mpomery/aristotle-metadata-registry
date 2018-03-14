@@ -3,7 +3,7 @@
 <a href="{% url 'aristotle_help:help_page' object.slug %}">{{ object.title }}</a>
 <span class="item_type">(Help page)</span>
 <p>
-    {{ object.body|truncatewords:20|striptags }}
+    {{ object.body|striptags|truncatewords:20 }}
 </p>
 <div class="attrs">
     <span class="attr">
