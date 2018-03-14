@@ -117,10 +117,10 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
         label=_("Why is the status being changed for these items?"),
         widget=forms.Textarea
     )
-    registrationAuthorities = forms.MultipleChoiceField(
+    registrationAuthorities = forms.ChoiceField(
         label="Registration Authorities",
         choices=MDR.RegistrationAuthority.objects.none(),
-        widget=forms.CheckboxSelectMultiple
+        widget=forms.RadioSelect
     )
 
     def __init__(self, *args, **kwargs):
@@ -133,8 +133,9 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
         return self.cleaned_data['cascadeRegistration'] == "1"
 
     def clean_registrationAuthorities(self):
+        value = self.cleaned_data['registrationAuthorities']
         return [
-            MDR.RegistrationAuthority.objects.get(id=int(ra)) for ra in self.cleaned_data['registrationAuthorities']
+            MDR.RegistrationAuthority.objects.get(id=int(value))
         ]
 
     def clean_state(self):
@@ -221,7 +222,7 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
             state_names = states_dict[concept.id]
 
             # Without states_dict optimisation
-            # current_statuses = concept.current_statuses(qs=statuses)
+            # current_statuses = concept.current_statuses()
             # state_names = [str(status.state_name) for status in current_statuses]
 
             innerdict.update({'old': ",".join(state_names)})
