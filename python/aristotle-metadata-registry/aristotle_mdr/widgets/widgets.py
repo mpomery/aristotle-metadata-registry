@@ -37,14 +37,15 @@ class RegistrationAuthoritySelect(forms.Select):
 
 class TableCheckboxSelect(CheckboxSelectMultiple):
 
-    def __init__(self, extra_info, attrs=None, choices=(), **kwargs):
+    def __init__(self, extra_info, new_state, attrs=None, choices=(), **kwargs):
         super().__init__(attrs, choices, **kwargs)
         self.extra_info = extra_info
+        self.new_state = new_state
 
     template_name = 'aristotle_mdr/widgets/table_checkbox_select.html'
     option_template_name = 'aristotle_mdr/widgets/table_checkbox_option.html'
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        context.update({'extra_info': self.extra_info})
+        context.update({'extra_info': self.extra_info, 'new_state': self.new_state})
         return context

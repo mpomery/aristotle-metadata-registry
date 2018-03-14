@@ -315,11 +315,21 @@ class ChangeStatusView(SessionWizardView):
         if step == 'change_status':
             return {'user': self.request.user}
         elif step == 'review_changes':
+            # Check some values from last step
+            cleaned_data = self.get_cleaned_data_for_step('change_status')
+            cascade = cleaned_data['cascadeRegistration']
+            state = cleaned_data['state']
+            state_name = str(MDR.STATES[state])
+            logger.debug('New state name %s'%state_name)
             # Need to check wether cascaded was true here
-            cascaded_ids = [a.pk for a in self.cascaded]
-            logger.debug('cascaded ids: %s'%cascaded_ids)
-            cascaded_queryset = MDR._concept.objects.filter(id__in=cascaded_ids)
-            return {'queryset': cascaded_queryset}
+            if cascade == 1:
+                cascaded_ids = [a.pk for a in self.cascaded]
+                logger.debug('cascaded ids: %s'%cascaded_ids)
+                queryset = MDR._concept.objects.filter(id__in=cascaded_ids)
+            else:
+                queryset = MDR._concept.objects.filter(id=self.item.id)
+
+            return {'queryset': queryset, 'new_state': state_name}
 
         return {}
 
