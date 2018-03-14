@@ -108,12 +108,12 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
         initial=timezone.now()
     )
     cascadeRegistration = forms.ChoiceField(
-        initial=False,
+        initial=0,
         choices=[(0, _('No')), (1, _('Yes'))],
         label=_("Do you want to request a status change for associated items?")
     )
     review = forms.ChoiceField(
-        initial=True,
+        initial=1,
         choices=[(0, _('No')), (1, _('Yes'))],
         label=_("Do you want to review the changes?")
     )
