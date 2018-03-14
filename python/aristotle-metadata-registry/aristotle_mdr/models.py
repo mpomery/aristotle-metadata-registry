@@ -26,6 +26,7 @@ from aristotle_mdr.utils import (
     url_slugify_workgroup,
     url_slugify_registration_authoritity,
     url_slugify_organization,
+    status_filter,
 )
 from aristotle_mdr import comparators
 
@@ -741,18 +742,12 @@ class _concept(baseAristotleObject):
             qs = self.statuses.all()
         if hasattr(when, 'date'):
             when = when.date()
-        registered_before_now = Q(registrationDate__lte=when)
-        registation_still_valid = (
-            Q(until_date__gte=when) |
-            Q(until_date__isnull=True)
-        )
 
-        states = qs.filter(
-            registered_before_now & registation_still_valid
-        ).order_by("registrationAuthority", "-registrationDate", "-created")
+        states = status_filter(qs, when)
+        states.order_by("registrationAuthority", "-registrationDate", "-created")
 
         from django.db import connection
-        if connection.vendor == 'postgresql':
+        if connection.vendor == 'postgresqll':
             states = states.distinct('registrationAuthority')
         else:
             current_ids = []
@@ -764,6 +759,7 @@ class _concept(baseAristotleObject):
                     seen_ras.append(ra)
             # We hit again so we can return this as a queryset
             states = states.filter(pk__in=current_ids)
+
         return states
 
     def get_download_items(self):

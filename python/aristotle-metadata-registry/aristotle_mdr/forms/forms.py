@@ -9,6 +9,7 @@ import aristotle_mdr.models as MDR
 from aristotle_mdr.perms import user_can_edit
 from aristotle_mdr.forms.creation_wizards import UserAwareForm
 from aristotle_mdr.contrib.autocomplete import widgets
+from aristotle_mdr.utils import status_filter
 
 from django.forms.models import modelformset_factory
 
@@ -204,13 +205,12 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
         extra_info = {}
         subclassed_queryset = queryset.select_subclasses()
         statuses = MDR.Status.objects.filter(concept__in=queryset).select_related('concept')
+        statuses = status_filter(statuses).order_by("-registrationDate", "-created")
 
         states_dict = {}
         for status in statuses:
             state_name = str(MDR.STATES[status.state])
-            if status.concept.id in states_dict:
-                states_dict[status.concept.id].append(state_name)
-            else:
+            if status.concept.id not in states_dict:
                 states_dict[status.concept.id] = [state_name]
         logger.debug("Current States: %s"%str(states_dict))
 
@@ -219,7 +219,10 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
             # Get class name
             innerdict.update({'type': concept.__class__.get_verbose_name()})
 
-            state_names = states_dict[concept.id]
+            try:
+                state_names = states_dict[concept.id]
+            except KeyError:
+                state_names = []
 
             # Without states_dict optimisation
             # current_statuses = concept.current_statuses()
