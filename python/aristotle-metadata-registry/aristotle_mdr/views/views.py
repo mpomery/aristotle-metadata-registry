@@ -336,11 +336,11 @@ class ChangeStatusView(SessionWizardView):
             # Need to check wether cascaded was true here
             if cascade == 1:
                 cascaded_ids = [a.pk for a in self.cascaded]
+                cascaded_ids.append(self.item.id)
                 logger.debug('cascaded ids: %s'%cascaded_ids)
                 queryset = MDR._concept.objects.filter(id__in=cascaded_ids)
             else:
                 queryset = MDR._concept.objects.filter(id=self.item.id)
-                logger.debug('Queryset %s'%str(queryset))
 
             return {'queryset': queryset, 'new_state': state_name, 'ra': ra[0]}
 
