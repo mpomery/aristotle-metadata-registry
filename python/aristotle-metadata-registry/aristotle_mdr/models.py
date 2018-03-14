@@ -308,7 +308,7 @@ class RegistrationAuthority(Organization):
             ('public', public)
         )
 
-    def cascaded_register(self, item, state, user, *args, **kwargs):
+    def cascaded_register(self, item, state, user, selected=None, *args, **kwargs):
         if not perms.user_can_change_status(user, item):
             # Return a failure as this item isn't allowed
             return {'success': [], 'failed': [item] + item.registry_cascade_items}
@@ -327,9 +327,10 @@ class RegistrationAuthority(Organization):
             reversion.revisions.set_comment(revision_message)
 
             for child_item in [item] + item.registry_cascade_items:
-                self._register(
-                    child_item, state, user, *args, **kwargs
-                )
+                if selected is None or child_item in selected:
+                    self._register(
+                        child_item, state, user, *args, **kwargs
+                    )
                 seen_items['success'] = seen_items['success'] + [child_item]
         return seen_items
 

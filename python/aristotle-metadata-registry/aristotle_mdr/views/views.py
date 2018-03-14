@@ -340,8 +340,35 @@ class ChangeStatusView(SessionWizardView):
         context.update({'item': item, 'status_matrix': status_matrix })
         return context
 
-    def done(self, formlist, **kwargs):
-        return HttpResponse('You did it')
+    def done(self, form_list, form_dict, **kwargs):
+        cleaned_data = form_dict['change_status'].cleaned_data
+        review_data = form_dict['review_changes'].cleaned_data
+        selected_list = review_data['selected_list']
+        logger.debug('Selected: %s'%str(selected_list))
+        # process the data in form.cleaned_data as required
+        ras = cleaned_data['registrationAuthorities']
+        state = cleaned_data['state']
+        regDate = cleaned_data['registrationDate']
+        cascade = cleaned_data['cascadeRegistration']
+        changeDetails = cleaned_data['changeDetails']
+        with transaction.atomic(), reversion.revisions.create_revision():
+            reversion.revisions.set_user(self.request.user)
+            for ra in ras:
+                if cascade:
+                    register_method = ra.cascaded_register
+                else:
+                    register_method = ra.register
+
+                register_method(
+                    self.item,
+                    state,
+                    self.request.user,
+                    selected_list,
+                    changeDetails=changeDetails,
+                    registrationDate=regDate,
+                )
+                # TODO: notification and message on success/failure
+        return HttpResponseRedirect(url_slugify_concept(self.item))
 
 def supersede(request, iid):
     item = get_object_or_404(MDR._concept, pk=iid).item
