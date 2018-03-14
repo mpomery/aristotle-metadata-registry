@@ -288,6 +288,15 @@ def changeStatus(request, iid):
         }
     )
 
+def display_review(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step('change_status') or {}
+    try:
+        review = cleaned_data['review']
+    except KeyError:
+        review = True
+
+    return review
+
 class ChangeStatusView(SessionWizardView):
 
     form_list = [
@@ -300,9 +309,11 @@ class ChangeStatusView(SessionWizardView):
         'review_changes': 'aristotle_mdr/helpers/wizard_form.html'
     }
 
+    condition_dict = {'review_changes': display_review}
+
     def dispatch(self, request, *args, **kwargs):
         # Check for keyError here
-        self.item = item = get_object_or_404(MDR._concept, pk=kwargs['iid']).item
+        self.item = get_object_or_404(MDR._concept, pk=kwargs['iid']).item
         self.cascaded = self.item.registry_cascade_items
 
         return super().dispatch(request, *args, **kwargs)
@@ -343,9 +354,15 @@ class ChangeStatusView(SessionWizardView):
 
     def done(self, form_list, form_dict, **kwargs):
         cleaned_data = form_dict['change_status'].cleaned_data
-        review_data = form_dict['review_changes'].cleaned_data
-        selected_list = review_data['selected_list']
-        logger.debug('Selected: %s'%str(selected_list))
+
+        try:
+            review_data = form_dict['review_changes'].cleaned_data
+        except KeyError:
+            review_data = None
+
+        if review_data:
+            selected_list = review_data['selected_list']
+            logger.debug('Selected: %s'%str(selected_list))
         # process the data in form.cleaned_data as required
         ras = cleaned_data['registrationAuthorities']
         state = cleaned_data['state']
@@ -360,14 +377,23 @@ class ChangeStatusView(SessionWizardView):
                 else:
                     register_method = ra.register
 
-                register_method(
-                    self.item,
-                    state,
-                    self.request.user,
-                    selected_list,
-                    changeDetails=changeDetails,
-                    registrationDate=regDate,
-                )
+                if review_data:
+                    register_method(
+                        self.item,
+                        state,
+                        self.request.user,
+                        selected_list,
+                        changeDetails=changeDetails,
+                        registrationDate=regDate,
+                    )
+                else:
+                    register_method(
+                        self.item,
+                        state,
+                        self.request.user,
+                        changeDetails=changeDetails,
+                        registrationDate=regDate,
+                    )
                 # TODO: notification and message on success/failure
         return HttpResponseRedirect(url_slugify_concept(self.item))
 

@@ -112,6 +112,11 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
         choices=[(0, _('No')), (1, _('Yes'))],
         label=_("Do you want to request a status change for associated items?")
     )
+    review = forms.ChoiceField(
+        initial=True,
+        choices=[(0, _('No')), (1, _('Yes'))],
+        label=_("Do you want to review the changes?")
+    )
     changeDetails = forms.CharField(
         max_length=512,
         required=False,
@@ -132,6 +137,9 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
 
     def clean_cascadeRegistration(self):
         return self.cleaned_data['cascadeRegistration'] == "1"
+
+    def clean_review(self):
+        return self.cleaned_data['review'] == "1"
 
     def clean_registrationAuthorities(self):
         value = self.cleaned_data['registrationAuthorities']
