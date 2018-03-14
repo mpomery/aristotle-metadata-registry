@@ -315,6 +315,7 @@ class ChangeStatusView(SessionWizardView):
         # Check for keyError here
         self.item = get_object_or_404(MDR._concept, pk=kwargs['iid']).item
         self.cascaded = self.item.registry_cascade_items
+        self.cascaded.append(self.item)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -370,27 +371,25 @@ class ChangeStatusView(SessionWizardView):
         regDate = cleaned_data['registrationDate']
         cascade = cleaned_data['cascadeRegistration']
         changeDetails = cleaned_data['changeDetails']
-        with transaction.atomic(), reversion.revisions.create_revision():
-            reversion.revisions.set_user(self.request.user)
-            for ra in ras:
-                if cascade:
-                    register_method = ra.cascaded_register
-                else:
-                    register_method = ra.register
+        for ra in ras:
+            # Should only be 1 ra
 
-                arguments = {
-                    'item': self.item,
-                    'state': state,
-                    'user': self.request.user,
-                    'changeDetails': changeDetails,
-                    'registrationDate': regDate,
-                }
+            arguments = {
+                'item': self.item,
+                'state': state,
+                'user': self.request.user,
+                'changeDetails': changeDetails,
+                'registrationDate': regDate,
+            }
 
-                if review_data and cascade:
-                    arguments['selected'] = selected_list
+            if review_data and cascade:
+                arguments['selected'] = selected_list
+                register_method = ra.cascaded_register
+            else:
+                register_method = ra.register
 
-                register_method(**arguments)
-                # TODO: notification and message on success/failure
+            register_method(**arguments)
+            # TODO: notification and message on success/failure
         return HttpResponseRedirect(url_slugify_concept(self.item))
 
 def supersede(request, iid):
