@@ -1,18 +1,21 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
+from django.forms.models import ModelMultipleChoiceField
 
+from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
+from aristotle_mdr.widgets.widgets import TableCheckboxSelect
 import aristotle_mdr.models as MDR
 from aristotle_mdr.perms import user_can_edit
 from aristotle_mdr.forms.creation_wizards import UserAwareForm
 from aristotle_mdr.contrib.autocomplete import widgets
-from aristotle_mdr.fields import ReviewChangesChoiceField
 
 from django.forms.models import modelformset_factory
 
 from .utils import RegistrationAuthorityMixin
 
+import logging
+logger = logging.getLogger(__name__)
 
 class UserSelfEditForm(forms.Form):
     template = "aristotle_mdr/userEdit.html"
@@ -191,3 +194,40 @@ class CompareConceptsForm(forms.Form):
             required=True,
             widget=widgets.ConceptAutocompleteSelect()
         )
+
+# ------------ Form Fields ------------
+
+class ReviewChangesChoiceField(ModelMultipleChoiceField):
+
+    def __init__(self, queryset, **kwargs):
+        extra_info = {}
+        subclassed_queryset = queryset.select_subclasses()
+        statuses = MDR.Status.objects.filter(concept__in=queryset).select_related('concept')
+
+        states_dict = {}
+        for status in statuses:
+            state_name = str(MDR.STATES[status.state])
+            if status.concept.id in states_dict:
+                states_dict[status.concept.id].append(state_name)
+            else:
+                states_dict[status.concept.id] = [state_name]
+        logger.debug("Current States: %s"%str(states_dict))
+
+        for concept in subclassed_queryset:
+            innerdict = {}
+            # Get class name
+            innerdict.update({'type': concept.__class__.get_verbose_name()})
+
+            state_names = states_dict[concept.id]
+
+            # Without states_dict optimisation
+            # current_statuses = concept.current_statuses(qs=statuses)
+            # state_names = [str(status.state_name) for status in current_statuses]
+
+            innerdict.update({'old': ",".join(state_names)})
+
+            extra_info.update({concept.id: innerdict})
+
+        self.widget = TableCheckboxSelect(extra_info=extra_info)
+
+        super().__init__(queryset, **kwargs)

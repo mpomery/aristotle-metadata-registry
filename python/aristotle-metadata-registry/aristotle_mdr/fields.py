@@ -25,9 +25,6 @@ from django.db.models import (
 from django.db.models.fields import (
     TextField
 )
-from django.forms.models import ModelMultipleChoiceField
-
-from aristotle_mdr.widgets.widgets import TableCheckboxSelect
 
 class ConceptOneToOneRel(OneToOneRel):
     pass
@@ -74,21 +71,3 @@ class ShortTextField(TextField):
         defaults = {'widget': forms.TextInput}
         defaults.update(kwargs)
         return super().formfield(**defaults)
-
-class ReviewChangesChoiceField(ModelMultipleChoiceField):
-
-    def __init__(self, queryset, **kwargs):
-        extra_info = {}
-        subclassed_queryset = queryset.select_subclasses()
-        for concept in subclassed_queryset:
-            innerdict = {}
-            innerdict.update({'type': concept.__class__.get_verbose_name()})
-            old_states = []
-            for status in concept.statuses.all():
-                old_states.append(str(status.state_name))
-            innerdict.update({'old': ",".join(old_states)})
-            extra_info.update({concept.id: innerdict})
-
-        self.widget = TableCheckboxSelect(extra_info=extra_info)
-
-        super().__init__(queryset, **kwargs)
