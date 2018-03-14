@@ -147,9 +147,9 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
 
 class ReviewChangesForm(forms.Form):
 
-    def __init__(self, queryset, new_state, *args, **kwargs):
+    def __init__(self, queryset, new_state, ra, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['selected_list'] = ReviewChangesChoiceField(queryset=queryset, new_state=new_state)
+        self.fields['selected_list'] = ReviewChangesChoiceField(queryset=queryset, new_state=new_state, ra=ra)
 
 # Thanks http://stackoverflow.com/questions/6958708/grappelli-to-hide-sortable-field-in-inline-sortable-django-admin
 class PermissibleValueForm(forms.ModelForm):
@@ -201,10 +201,10 @@ class CompareConceptsForm(forms.Form):
 
 class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
-    def __init__(self, queryset, new_state, **kwargs):
+    def __init__(self, queryset, new_state, ra, **kwargs):
         extra_info = {}
         subclassed_queryset = queryset.select_subclasses()
-        statuses = MDR.Status.objects.filter(concept__in=queryset).select_related('concept')
+        statuses = MDR.Status.objects.filter(concept__in=queryset, registrationAuthority=ra).select_related('concept')
         statuses = status_filter(statuses).order_by("-registrationDate", "-created")
 
         states_dict = {}

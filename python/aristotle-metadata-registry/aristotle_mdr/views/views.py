@@ -319,6 +319,7 @@ class ChangeStatusView(SessionWizardView):
             cleaned_data = self.get_cleaned_data_for_step('change_status')
             cascade = cleaned_data['cascadeRegistration']
             state = cleaned_data['state']
+            ra = cleaned_data['registrationAuthorities']
             state_name = str(MDR.STATES[state])
             logger.debug('New state name %s'%state_name)
             # Need to check wether cascaded was true here
@@ -329,7 +330,7 @@ class ChangeStatusView(SessionWizardView):
             else:
                 queryset = MDR._concept.objects.filter(id=self.item.id)
 
-            return {'queryset': queryset, 'new_state': state_name}
+            return {'queryset': queryset, 'new_state': state_name, 'ra': ra[0]}
 
         return {}
 
