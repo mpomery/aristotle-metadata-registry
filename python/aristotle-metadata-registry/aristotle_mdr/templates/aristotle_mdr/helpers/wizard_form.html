@@ -15,12 +15,14 @@
 {% if wizard.form.forms %}
     {{ wizard.form.management_form }}
     {% for form in wizard.form.forms %}
-        {% block form %}
+        {% block formset %}
         {{ form }}
         {% endblock %}
     {% endfor %}
 {% else %}
+    {% block form %}
     {{ wizard.form }}
+    {% endblock %}
 {% endif %}
 </table>
 {% if wizard.steps.prev %}

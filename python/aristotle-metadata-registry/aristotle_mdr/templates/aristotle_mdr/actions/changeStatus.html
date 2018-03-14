@@ -24,88 +24,63 @@
 {% endblock %}
 
 {% block form %}
-    <div class="modal-body">
-        <ol class="breadcrumb">
-          <li><a href="{% url 'aristotle:item' item.id %}">{{ item.name }}</a></li>
-          <li class="active">Change registation status</li>
-        </ol>
+      <ol class="breadcrumb">
+        <li><a href="{% url 'aristotle:item' item.id %}">{{ item.name }}</a></li>
+        <li class="active">Change registation status</li>
+      </ol>
 
-        <header>This form allows you to change the status of multiple items in your registration authorities.
-        </header>
-        <div>
+      <header>This form allows you to change the status of multiple items in your registration authorities.
+      </header>
+      <div>
 
-            {{ form.items }}
-        </div>
-        <div id="visibilty">
-            This item is currently {{item|visibility_text}}.
-            <span id="potential">
-            {% trans 'Select a new state to see how the visibility of this item will change.' %}
-            </span>
-        </div>
-        <section>
-        <div id="changeStatusDate">
-            <span>
-                <label for="id_registrationDate">{{ form.registrationDate.label }}</label>:
-                {{ form.registrationDate.errors }}
-            </span>
-            <span class="pull-right">
-                {{ form.registrationDate }}
-            </span>
-        </div>
-        <div id="cascadeRegistration">
-            <span>
-                <label for="id_cascadeRegistration">
-                {{ form.cascadeRegistration.label }}
-                </label>
-                {{ form.cascadeRegistration.errors }}
-            </span>
-            <span class="pull-right">
-                {{ form.cascadeRegistration }}
-            </span>
-        </div>
-        <div id="changeStatus">
-            <div>
-                <span>
-                    {{ form.state.label }}
-                    {{ form.state.errors }}
-                </span>
-                <span>
-                    {{ form.registrationAuthorities.label }}
-                    {{ form.registrationAuthorities.errors }}
-                </span>
-            </div>
-            <div>
-                {{ form.state }}
-                <ul>
-                    <li class="alert alert-info">
-                        Changing the registration status of an item may impact who can view or make changes to metadata.
-                    </li>
-                {% for val,label_text in form.registrationAuthorities.field.choices %}
-                    <li>
-                        <input type="checkbox" id="registrationAuthorities_{{val}}" name="registrationAuthorities" value="{{val}}">
-                        <label for="registrationAuthorities_{{val}}">{{label_text}}</label>
-                        <a href="{% url 'aristotle_mdr:registrationAuthority' iid=val %}" title="Visit the registration authority page to learn more about state meanings for this authority" class="pull-right">
-                            <i class="fa fa-fw fa-university"></i>
-                        </a>
-                    </li>
-                {% endfor %}
-                </ul>
-            </div>
-        </div>
-        <div class="status_change_description">
-            {{ form.changeDetails.label }} (optional):
-            {{ form.changeDetails }}
-        </div>
-        {% block save %}
-        {% endblock %}
-        </section>
-    </div>
-    <div class="modal-footer">
-        {% if request.is_ajax %}
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        {% else %}
-            <a class="btn btn-default" href="{% url 'aristotle:item' item.id %}">Cancel</a>
-        {% endif %}
-        <input type="submit" class="btn btn-primary" value="Update Status" />
-    </div>
+          {{ wizard.form.items }}
+      </div>
+      <div id="visibilty">
+          This item is currently {{ item|visibility_text }}.
+          <span id="potential">
+          {% trans 'Select a new state to see how the visibility of this item will change.' %}
+          </span>
+      </div>
+      <section>
+      <div id="changeStatusDate">
+          <span>
+              <label for="id_registrationDate">{{ wizard.form.registrationDate.label }}</label>:
+              {{ wizard.form.registrationDate.errors }}
+          </span>
+          <span class="pull-right">
+              {{ wizard.form.registrationDate }}
+          </span>
+      </div>
+      <div id="cascadeRegistration">
+          <span>
+              <label for="id_cascadeRegistration">
+              {{ wizard.form.cascadeRegistration.label }}
+              </label>
+              {{ wizard.form.cascadeRegistration.errors }}
+          </span>
+          <span class="pull-right">
+              {{ wizard.form.cascadeRegistration }}
+          </span>
+      </div>
+      <div id="changeStatus">
+          <div>
+              <span>
+                  {{ wizard.form.state.label }}
+                  {{ wizard.form.state.errors }}
+              </span>
+              <span>
+                  {{ wizard.form.registrationAuthorities.label }}
+                  {{ wizard.form.registrationAuthorities.errors }}
+              </span>
+          </div>
+          <div>
+              {{ wizard.form.state }}
+              {{ wizard.form.registrationAuthorities}}
+          </div>
+      </div>
+      <div class="status_change_description">
+          {{ wizard.form.changeDetails.label }} (optional):
+          {{ wizard.form.changeDetails }}
+      </div>
+      </section>
 {% endblock %}
