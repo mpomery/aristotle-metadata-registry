@@ -334,12 +334,12 @@ class ChangeStatusView(SessionWizardView):
             state = cleaned_data['state']
             ra = cleaned_data['registrationAuthorities']
             state_name = str(MDR.STATES[state])
-            logger.debug('New state name %s'%state_name)
+            #logger.debug('New state name %s'%state_name)
             # Need to check wether cascaded was true here
             if cascade == 1:
                 cascaded_ids = [a.pk for a in self.cascaded]
                 cascaded_ids.append(self.item.id)
-                logger.debug('cascaded ids: %s'%cascaded_ids)
+                #logger.debug('cascaded ids: %s'%cascaded_ids)
                 queryset = MDR._concept.objects.filter(id__in=cascaded_ids)
             else:
                 queryset = MDR._concept.objects.filter(id=self.item.id)
@@ -357,8 +357,8 @@ class ChangeStatusView(SessionWizardView):
         # Set review appropriately
         datacopy = copy.deepcopy(data) # Have to do this beacuse the post data is immutable
         if step == 'change_status' and datacopy is not None and 'change_status-review' not in datacopy:
-            logger.debug('we running')
-            logger.debug('data is %s'%str(data))
+            #logger.debug('we running')
+            #logger.debug('data is %s'%str(data))
             review = '1'
             if data.get('submit_next'):
                 review = '1'
@@ -412,6 +412,7 @@ class ChangeStatusView(SessionWizardView):
 
             register_method(**arguments)
             # TODO: notification and message on success/failure
+        logger.debug('redirecting')
         return HttpResponseRedirect(url_slugify_concept(self.item))
 
 def supersede(request, iid):

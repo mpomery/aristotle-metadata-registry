@@ -210,9 +210,11 @@ class CompareConceptsForm(forms.Form):
 class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
     def __init__(self, queryset, new_state, ra, **kwargs):
+        #logger.debug('Queryset: %s'%str(queryset))
         extra_info = {}
         subclassed_queryset = queryset.select_subclasses()
         statuses = MDR.Status.objects.filter(concept__in=queryset, registrationAuthority=ra).select_related('concept')
+        #logger.debug('Statuses: %s'%str(statuses))
         statuses = status_filter(statuses).order_by("-registrationDate", "-created")
 
         states_dict = {}
@@ -220,7 +222,7 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
             state_name = str(MDR.STATES[status.state])
             if status.concept.id not in states_dict:
                 states_dict[status.concept.id] = [state_name]
-        logger.debug("Current States: %s"%str(states_dict))
+        #logger.debug("Current States: %s"%str(states_dict))
 
         for concept in subclassed_queryset:
             innerdict = {}
@@ -240,6 +242,6 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
             extra_info.update({concept.id: innerdict})
 
-        self.widget = TableCheckboxSelect(extra_info=extra_info, new_state=new_state, attrs={'tableclass': 'table'})
+        self.widget = TableCheckboxSelect(extra_info=extra_info, new_state=new_state, attrs={'tableclass': 'table', 'checked': True})
 
         super().__init__(queryset, **kwargs)
