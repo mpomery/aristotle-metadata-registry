@@ -909,7 +909,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         self.assertTrue(self.item1.is_registered)
         self.assertTrue(self.item1.is_public())
         for sub_item in self.item1.registry_cascade_items:
-            if sub_item is not None and perms.user_can_change_status(self.registrar,sub_item) :
+            if sub_item is not None:
                 if not sub_item.is_registered: # pragma: no cover
                     # This is debug code, and should never happen
                     print(sub_item)
@@ -1035,7 +1035,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         self.assertTrue(self.item1.is_public())
         if cascade:
             for sub_item in self.item1.registry_cascade_items:
-                if sub_item is not None and perms.user_can_change_status(self.registrar,sub_item) :
+                if sub_item is not None:
                     if sub_item.id in selected_for_change:
                         self.assertTrue(sub_item.is_registered)
                     else:
