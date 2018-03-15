@@ -22,7 +22,7 @@
     {% endfor %}
 {% else %}
     {% block form %}
-    {{ wizard.form }}
+    {{ wizard.form.as_p }}
     {% endblock %}
 {% endif %}
 </table>
@@ -31,7 +31,7 @@
 <button class="btn btn-default" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
 {% endif %}
 {% block buttons %}
-<input class="btn btn-primary" type="submit" value="{% trans "submit" %}" />
+<input class="btn btn-primary" type="submit" value="{% trans "Submit" %}" />
 {% endblock %}
 </form>
 {% endblock %}

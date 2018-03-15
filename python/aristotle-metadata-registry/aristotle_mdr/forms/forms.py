@@ -157,7 +157,12 @@ class ReviewChangesForm(forms.Form):
 
     def __init__(self, queryset, new_state, ra, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['selected_list'] = ReviewChangesChoiceField(queryset=queryset, new_state=new_state, ra=ra)
+        self.fields['selected_list'] = ReviewChangesChoiceField(
+            queryset=queryset,
+            new_state=new_state,
+            ra=ra,
+            label=_("Select the items you would like to update")
+        )
 
 # Thanks http://stackoverflow.com/questions/6958708/grappelli-to-hide-sortable-field-in-inline-sortable-django-admin
 class PermissibleValueForm(forms.ModelForm):
