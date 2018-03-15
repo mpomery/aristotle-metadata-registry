@@ -222,6 +222,8 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
         #logger.debug('Statuses: %s'%str(statuses))
         statuses = status_filter(statuses).order_by("-registrationDate", "-created")
 
+        # Build a dict mapping concepts to their status data
+        # So that no additional status queries need to be made
         states_dict = {}
         for status in statuses:
             state_name = str(MDR.STATES[status.state])
@@ -240,9 +242,6 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
             except KeyError:
                 state_info = None
 
-            # Without states_dict optimisation
-            # current_statuses = concept.current_statuses()
-            # state_names = [str(status.state_name) for status in current_statuses]
             if state_info:
                 innerdict.update({'old': state_info['name'], 'old_until': state_info['until']})
 
