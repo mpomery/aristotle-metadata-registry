@@ -313,6 +313,8 @@ class ChangeStatusView(SessionWizardView):
         # If on the first step check which button was used
         # Set review appropriately
         datacopy = copy.deepcopy(data) # Have to do this beacuse the post data is immutable
+        #logger.debug('posted data was %s'%str(datacopy))
+        #return HttpResponse('done')
         if step == 'change_status' and datacopy is not None and 'change_status-review' not in datacopy:
             #logger.debug('we running')
             #logger.debug('data is %s'%str(data))
@@ -369,7 +371,6 @@ class ChangeStatusView(SessionWizardView):
 
             register_method(**arguments)
             # TODO: notification and message on success/failure
-        logger.debug('redirecting')
         return HttpResponseRedirect(url_slugify_concept(self.item))
 
 def supersede(request, iid):
