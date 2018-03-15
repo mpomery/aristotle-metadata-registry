@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.db import transaction
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
@@ -300,3 +300,7 @@ class DeleteSandboxView(View):
             return JsonResponse({'completed': True})
         else:
             return JsonResponse({'completed': False, 'message': 'You do not have permission to delete this item'})
+
+    def get(self, requiest):
+
+        return HttpResponse('get not supported')
