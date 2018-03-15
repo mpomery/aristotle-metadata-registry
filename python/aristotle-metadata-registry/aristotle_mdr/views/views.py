@@ -363,8 +363,10 @@ class ChangeStatusView(SessionWizardView):
                 'registrationDate': regDate,
             }
 
-            if review_data and cascade:
+            if review_data:
                 arguments['selected'] = selected_list
+
+            if cascade:
                 register_method = ra.cascaded_register
             else:
                 register_method = ra.register
