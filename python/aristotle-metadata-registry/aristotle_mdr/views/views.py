@@ -355,8 +355,8 @@ class ChangeStatusView(SessionWizardView):
 
         # If on the first step check which button was used
         # Set review appropriately
-        datacopy = copy.deepcopy(data)
-        if step == 'change_status' and datacopy is not None:
+        datacopy = copy.deepcopy(data) # Have to do this beacuse the post data is immutable
+        if step == 'change_status' and datacopy is not None and 'change_status-review' not in datacopy:
             logger.debug('we running')
             logger.debug('data is %s'%str(data))
             review = '1'
