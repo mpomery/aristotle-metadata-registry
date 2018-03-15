@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block content %}
+{% block content_body %}
 <p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
 <form action="" method="post">
 {% csrf_token %}
@@ -26,12 +27,15 @@
     {% endblock %}
 {% endif %}
 </table>
+{% endblock %}
+{% block content_footer %}
 {% if wizard.steps.prev %}
 <button class="btn btn-default" name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
 <button class="btn btn-default" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
 {% endif %}
 {% block buttons %}
 <input class="btn btn-primary" type="submit" value="{% trans "Submit" %}" />
+{% endblock %}
 {% endblock %}
 </form>
 {% endblock %}
