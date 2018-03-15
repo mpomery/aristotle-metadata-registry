@@ -18,6 +18,7 @@ from django.contrib.contenttypes.models import ContentType
 from formtools.wizard.views import SessionWizardView
 
 import json
+import copy
 
 import reversion
 from reversion_compare.views import HistoryCompareDetailView
@@ -346,6 +347,27 @@ class ChangeStatusView(SessionWizardView):
             return {'queryset': queryset, 'new_state': state_name, 'ra': ra[0]}
 
         return {}
+
+    def get_form(self, step=None, data=None, files=None):
+        # Set step if it's None
+        if step is None:
+            step = self.steps.current
+
+        # If on the first step check which button was used
+        # Set review appropriately
+        datacopy = copy.deepcopy(data)
+        if step == 'change_status' and datacopy is not None:
+            logger.debug('we running')
+            logger.debug('data is %s'%str(data))
+            review = '1'
+            if data.get('submit_next'):
+                review = '1'
+            elif data.get('submit_skip'):
+                review = '0'
+
+            datacopy['change_status-review'] = review
+
+        return super().get_form(step, datacopy, files)
 
     def get_context_data(self, form, **kwargs):
         item = self.item

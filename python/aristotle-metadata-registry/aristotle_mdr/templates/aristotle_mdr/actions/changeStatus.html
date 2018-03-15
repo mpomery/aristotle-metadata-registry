@@ -24,6 +24,7 @@
 {% endblock %}
 
 {% block form %}
+      <p>Errors {{ wizard.form.errors }}</p>
       <ol class="breadcrumb">
         <li><a href="{% url 'aristotle:item' item.id %}">{{ item.name }}</a></li>
         <li class="active">Change registation status</li>
@@ -62,17 +63,6 @@
               {{ wizard.form.cascadeRegistration }}
           </span>
       </div>
-      <div class="changeStatusDiv">
-          <span>
-              <label for="id_review">
-              {{ wizard.form.review.label }}
-              </label>
-              {{ wizard.form.review.errors }}
-          </span>
-          <span class="pull-right">
-              {{ wizard.form.review }}
-          </span>
-      </div>
       <div id="changeStatus">
           <div>
               <span>
@@ -94,4 +84,9 @@
           {{ wizard.form.changeDetails }}
       </div>
       </section>
+{% endblock %}
+
+{% block buttons %}
+<input class="btn btn-primary" type="submit" name="submit_skip" value="{% trans 'Submit' %}" />
+<input class="btn btn-success" type="submit" name="submit_next" value="{% trans 'Submit and Review' %}" />
 {% endblock %}
