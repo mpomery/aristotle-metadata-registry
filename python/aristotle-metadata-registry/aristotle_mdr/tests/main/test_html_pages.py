@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.urls import reverse
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, tag
 from django.utils import timezone
 from django.db.models.fields import CharField
 
@@ -819,6 +819,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(reverse('aristotle:toggleFavourite', args=[self.item1.id]))
         self.assertRedirects(response,reverse('friendly_login')+"?next="+reverse('aristotle:toggleFavourite', args=[self.item1.id]))
 
+    @tag('changestatus')
     def test_registrar_can_change_status(self):
         self.login_registrar()
 
@@ -844,10 +845,12 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.post(
             reverse('aristotle:changeStatus',args=[self.item1.id]),
             {
-                'registrationAuthorities': [str(self.ra.id)],
-                'state': self.ra.public_state,
-                'changeDetails': "testing",
-                'cascadeRegistration': 0, # no
+                'change_status-registrationAuthorities': [str(self.ra.id)],
+                'change_status-state': self.ra.public_state,
+                'change_status-changeDetails': "testing",
+                'change_status-cascadeRegistration': 0, # no
+                'change_status-review': 0, # no
+                'change_status_view-current_step': 'change_status',
             }
         )
         self.assertRedirects(response,url_slugify_concept(self.item1))
@@ -857,6 +860,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         self.assertTrue(self.item1.is_registered)
         self.assertTrue(self.item1.is_public())
 
+    @tag('changestatus')
     def test_registrar_can_change_status_with_cascade(self):
         if not hasattr(self,"run_cascade_tests"):
             return
@@ -890,10 +894,12 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.post(
             reverse('aristotle:changeStatus',args=[self.item1.id]),
             {
-                'registrationAuthorities': [str(self.ra.id)],
-                'state': self.ra.public_state,
-                'changeDetails': "testing",
-                'cascadeRegistration': 1, # yes
+                'change_status-registrationAuthorities': [str(self.ra.id)],
+                'change_status-state': self.ra.public_state,
+                'change_status-changeDetails': "testing",
+                'change_status-cascadeRegistration': 1, # yes
+                'change_status-review': 0, #no
+                'change_status_view-current_step': 'change_status',
             }
         )
         self.assertRedirects(response,url_slugify_concept(self.item1))
@@ -909,7 +915,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                     print(sub_item)
                 self.assertTrue(sub_item.is_registered)
 
-
+    @tag('changestatus')
     def test_registrar_cannot_use_faulty_statuses(self):
         self.login_registrar()
 
@@ -935,10 +941,12 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.post(
             reverse('aristotle:changeStatus', args=[self.item1.id]),
             {
-                'registrationAuthorities': [str(self.ra.id)],
-                'state': "Not a number", # obviously wrong
-                'changeDetails': "testing",
-                'cascadeRegistration': 0, # no
+                'change_status-registrationAuthorities': [str(self.ra.id)],
+                'change_status-state': "Not a number", # obviously wrong
+                'change_status-changeDetails': "testing",
+                'change_status-cascadeRegistration': 0, # no
+                'change_status-review': 0, #no
+                'change_status_view-current_step': 'change_status',
             }
         )
         self.assertFormError(response, 'form', 'state', 'Select a valid choice. Not a number is not one of the available choices.')
@@ -946,27 +954,31 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.post(
             reverse('aristotle:changeStatus',args=[self.item1.id]),
             {
-                'registrationAuthorities': [str(self.ra.id)],
-                'state': "343434", # also wrong
-                'changeDetails': "testing",
-                'cascadeRegistration': 0, # no
+                'change_status-registrationAuthorities': [str(self.ra.id)],
+                'change_status-state': "343434", # also wrong
+                'change_status-changeDetails': "testing",
+                'change_status-cascadeRegistration': 0, # no
+                'change_status-review': 0, #no
+                'change_status_view-current_step': 'change_status',
             }
         )
         self.assertFormError(response, 'form', 'state', 'Select a valid choice. 343434 is not one of the available choices.')
 
+    @tag('changestatus')
     def test_viewer_cannot_change_status(self):
         self.login_viewer()
 
         response = self.client.get(reverse('aristotle:changeStatus',args=[self.item1.id]))
         self.assertEqual(response.status_code,403)
 
-
+    @tag('changestatus')
     def test_anon_cannot_change_status(self):
         self.logout()
 
         response = self.client.get(reverse('aristotle:changeStatus',args=[self.item1.id]))
         self.assertRedirects(response,reverse('friendly_login')+"?next="+reverse('aristotle:changeStatus', args=[self.item1.id]))
 
+    @tag('changestatus')
     def test_cascade_action(self):
         self.logout()
         check_url = reverse('aristotle:check_cascaded_states', args=[self.item1.pk])
