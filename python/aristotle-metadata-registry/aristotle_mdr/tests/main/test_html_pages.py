@@ -2,7 +2,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.test import TestCase, override_settings, tag
 from django.utils import timezone
-from django.db.models.fields import CharField
+from django.db.models.fields import CharField, TextField
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
@@ -1038,7 +1038,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                                     # see if this is the field to update
                                     model_field = current_formset[0]._meta.model._meta.get_field(field)
 
-                                    if isinstance(model_field, CharField):
+                                    if isinstance(model_field, CharField) or isinstance(model_field, TextField):
                                         updating_field = field
 
                                 if field == updating_field:
