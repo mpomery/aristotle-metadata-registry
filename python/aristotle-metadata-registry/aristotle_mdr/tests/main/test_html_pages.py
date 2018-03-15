@@ -2,7 +2,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.test import TestCase, override_settings
 from django.utils import timezone
-from django.db.models.fields import CharField
+from django.db.models.fields import CharField, TextField
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
@@ -1026,7 +1026,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                                     # see if this is the field to update
                                     model_field = current_formset[0]._meta.model._meta.get_field(field)
 
-                                    if isinstance(model_field, CharField):
+                                    if isinstance(model_field, CharField) or isinstance(model_field, TextField):
                                         updating_field = field
 
                                 if field == updating_field:
@@ -1097,6 +1097,37 @@ class ValueDomainViewPage(LoggedInViewConceptPages, TestCase):
             models.SupplementaryValue.objects.create(
                 value=i,meaning="test supplementary meaning %d"%i,order=i,valueDomain=self.item1
                 )
+
+        # Data used to test value domain conceptual domain link
+        cd = models.ConceptualDomain.objects.create(
+            description='test description'
+        )
+
+        cd2 = models.ConceptualDomain.objects.create(
+            description='unrelated conceptual domain'
+        )
+        models.ValueMeaning.objects.create(
+            name="test name",
+            definition="test definition",
+            conceptual_domain=cd2,
+            order=0,
+        )
+
+        self.vms = []
+        for i in range(2):
+            vm = models.ValueMeaning.objects.create(
+                name="test name",
+                definition="test definition",
+                conceptual_domain=cd,
+                order=i,
+            )
+            self.vms.append(vm)
+
+        self.item3.conceptual_domain = cd
+        self.item3.save()
+
+    def test_weak_editing_in_advanced_editor_dynamic(self):
+        super().test_weak_editing_in_advanced_editor_dynamic(updating_field='value')
 
     def test_anon_cannot_use_value_page(self):
         self.logout()
@@ -1233,6 +1264,31 @@ class ValueDomainViewPage(LoggedInViewConceptPages, TestCase):
         for sv in self.item1.supplementaryvalue_set.all():
             self.assertContains(response,sv.meaning,1)
 
+    def test_conceptual_domain_selection(self):
+        self.login_editor()
+        url = 'aristotle:permsissible_values_edit'
+        self.loggedin_user_can_use_value_page(url,self.item3,200)
+
+        response = self.client.get(reverse(url,args=[self.item3.id]))
+        self.assertEqual(response.status_code, 200)
+
+        # check queryset correctly filled from conceptual domain for item 2
+        formset = response.context['formset']
+        for form in formset:
+            self.assertFalse('meaning' in form.fields)
+            self.assertTrue('value_meaning' in form.fields)
+            queryset = form.fields['value_meaning'].queryset
+            for item in queryset:
+                self.assertTrue(item in self.vms)
+
+        # Check empty queryset for item 1 (no cd linked)
+        response = self.client.get(reverse(url,args=[self.item1.id]))
+        self.assertEqual(response.status_code, 200)
+
+        formset = response.context['formset']
+        for form in formset:
+            self.assertFalse('value_meaning' in form.fields)
+            self.assertTrue('meaning' in form.fields)
 
 class ConceptualDomainViewPage(LoggedInViewConceptPages, TestCase):
     url_name='conceptualDomain'
