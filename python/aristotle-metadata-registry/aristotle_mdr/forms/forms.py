@@ -225,8 +225,9 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
         states_dict = {}
         for status in statuses:
             state_name = str(MDR.STATES[status.state])
+            until_date = str(status.until_date)
             if status.concept.id not in states_dict:
-                states_dict[status.concept.id] = [state_name]
+                states_dict[status.concept.id] = {'name': state_name, 'until': until_date}
         #logger.debug("Current States: %s"%str(states_dict))
 
         for concept in subclassed_queryset:
@@ -235,15 +236,15 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
             innerdict.update({'type': concept.__class__.get_verbose_name()})
 
             try:
-                state_names = states_dict[concept.id]
+                state_info = states_dict[concept.id]
             except KeyError:
-                state_names = []
+                state_info = None
 
             # Without states_dict optimisation
             # current_statuses = concept.current_statuses()
             # state_names = [str(status.state_name) for status in current_statuses]
-
-            innerdict.update({'old': ",".join(state_names)})
+            if state_info:
+                innerdict.update({'old': state_info['name'], 'old_until': state_info['until']})
 
             extra_info.update({concept.id: innerdict})
 
