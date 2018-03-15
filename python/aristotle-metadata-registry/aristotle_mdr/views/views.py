@@ -239,56 +239,6 @@ def toggleFavourite(request, iid):
 
 # Actions
 
-
-def changeStatus(request, iid):
-    item = get_object_or_404(MDR._concept, pk=iid).item
-    if not (item and user_can_change_status(request.user, item)):
-        if request.user.is_anonymous():
-            return redirect(reverse('friendly_login') + '?next=%s' % request.path)
-        else:
-            raise PermissionDenied
-    # There would be an else here, but both branches above return,
-    # so we've chopped it out to prevent an arrow anti-pattern.
-    if request.method == 'POST':  # If the form has been submitted...
-        form = MDRForms.ChangeStatusForm(request.POST, user=request.user)  # A form bound to the POST data
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            ras = form.cleaned_data['registrationAuthorities']
-            state = form.cleaned_data['state']
-            regDate = form.cleaned_data['registrationDate']
-            cascade = form.cleaned_data['cascadeRegistration']
-            changeDetails = form.cleaned_data['changeDetails']
-            with transaction.atomic(), reversion.revisions.create_revision():
-                reversion.revisions.set_user(request.user)
-                for ra in ras:
-                    if cascade:
-                        register_method = ra.cascaded_register
-                    else:
-                        register_method = ra.register
-
-                    register_method(
-                        item,
-                        state,
-                        request.user,
-                        changeDetails=changeDetails,
-                        registrationDate=regDate,
-                    )
-                    # TODO: notification and message on success/failure
-            return HttpResponseRedirect(url_slugify_concept(item))
-    else:
-        form = MDRForms.ChangeStatusForm(user=request.user)
-    import json
-
-    return render(
-        request,
-        "aristotle_mdr/actions/changeStatus.html",
-        {
-            "item": item,
-            "form": form,
-            "status_matrix": json.dumps(generate_visibility_matrix(request.user)),
-        }
-    )
-
 def display_review(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step('change_status') or {}
     try:
@@ -315,6 +265,13 @@ class ChangeStatusView(SessionWizardView):
     def dispatch(self, request, *args, **kwargs):
         # Check for keyError here
         self.item = get_object_or_404(MDR._concept, pk=kwargs['iid']).item
+
+        if not (self.item and user_can_change_status(request.user, self.item)):
+            if request.user.is_anonymous():
+                return redirect(reverse('friendly_login') + '?next=%s' % request.path)
+            else:
+                raise PermissionDenied
+
         self.cascaded = self.item.registry_cascade_items
         self.cascaded.append(self.item)
 
