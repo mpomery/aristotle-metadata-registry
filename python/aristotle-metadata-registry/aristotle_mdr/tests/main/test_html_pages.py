@@ -849,7 +849,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                 'change_status-state': self.ra.public_state,
                 'change_status-changeDetails': "testing",
                 'change_status-cascadeRegistration': 0, # no
-                'change_status-review': 0, # no
+                'submit_skip': 'value',
                 'change_status_view-current_step': 'change_status',
             }
         )
@@ -898,7 +898,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                 'change_status-state': self.ra.public_state,
                 'change_status-changeDetails': "testing",
                 'change_status-cascadeRegistration': 1, # yes
-                'change_status-review': 0, #no
+                'submit_skip': 'value',
                 'change_status_view-current_step': 'change_status',
             }
         )
@@ -945,7 +945,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                 'change_status-state': "Not a number", # obviously wrong
                 'change_status-changeDetails': "testing",
                 'change_status-cascadeRegistration': 0, # no
-                'change_status-review': 0, #no
+                'submit_skip': 'value',
                 'change_status_view-current_step': 'change_status',
             }
         )
@@ -958,7 +958,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                 'change_status-state': "343434", # also wrong
                 'change_status-changeDetails': "testing",
                 'change_status-cascadeRegistration': 0, # no
-                'change_status-review': 0, #no
+                'submit_skip': 'value',
                 'change_status_view-current_step': 'change_status',
             }
         )
@@ -1006,7 +1006,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                 'change_status-state': self.ra.public_state,
                 'change_status-changeDetails': "testing",
                 'change_status-cascadeRegistration': cascade_post,
-                'change_status-review': 1, # yes
+                'submit_next': 'value',
                 'change_status_view-current_step': 'change_status',
             }
         )
