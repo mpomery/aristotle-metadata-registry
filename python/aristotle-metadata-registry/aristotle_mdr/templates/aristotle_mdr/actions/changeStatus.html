@@ -23,6 +23,10 @@
 {{ block.super }}
 {% endblock %}
 
+{% block form_tag %}
+<form method="post" action="{% url 'aristotle_mdr:changeStatus' item.id %}">
+{% endblock %}
+
 {% block form %}
       <ol class="breadcrumb">
         <li><a href="{% url 'aristotle:item' item.id %}">{{ item.name }}</a></li>

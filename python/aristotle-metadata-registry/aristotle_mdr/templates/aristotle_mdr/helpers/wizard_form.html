@@ -8,10 +8,12 @@
 {% endblock %}
 
 {% block content %}
+{% block form_tag %}
+<form {% if formurl %}action="{{ formurl }}"{% else %}action=""{% endif %} method="post">
+{% endblock %}
+{% csrf_token %}
 {% block content_body %}
 <p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
-<form action="" method="post">
-{% csrf_token %}
 <table>
 {{ wizard.management_form }}
 {% if wizard.form.forms %}
