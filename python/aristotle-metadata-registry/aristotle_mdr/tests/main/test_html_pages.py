@@ -1041,11 +1041,11 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
                     else:
                         self.assertFalse(sub_item.is_registered)
 
-    @tag('changestatusnew')
+    @tag('changestatus')
     def test_registrar_can_change_status_with_review_cascade(self):
         self.registrar_can_change_status_with_review(cascade=True)
 
-    @tag('changestatusnew')
+    @tag('changestatus')
     def test_registrar_can_change_status_with_review_no_cascade(self):
         self.registrar_can_change_status_with_review(cascade=False)
 
