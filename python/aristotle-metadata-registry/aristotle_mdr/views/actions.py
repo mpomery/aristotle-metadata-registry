@@ -18,6 +18,8 @@ from aristotle_mdr import perms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.forms import actions
 from aristotle_mdr.views.utils import generate_visibility_matrix
+from aristotle_mdr.views import ReviewChangesView, display_review
+from aristotle_mdr.forms.forms import ReviewChangesForm
 
 
 class ItemSubpageView(object):
@@ -153,91 +155,110 @@ class ReviewRejectView(ReviewActionMixin, FormView):
         else:
             return self.form_invalid(form)
 
+class ReviewAcceptView(ReviewChangesView):
 
-class ReviewAcceptView(ReviewActionMixin, FormView):
-    form_class = actions.RequestReviewAcceptForm
-    template_name = "aristotle_mdr/user/user_request_accept.html"
+    form_list = [
+        ('review_accept', actions.RequestReviewAcceptForm),
+        ('review_changes', ReviewChangesForm)
+    ]
+
+    template_name = 'aristotle_mdr/helpers/wizard_form.html'
+
+    condition_dict = {'review_changes': display_review}
+    display_review = None
+
+    def dispatch(self, request, *args, **kwargs):
+
+        review = self.get_review()
+        if not perms.user_can_view_review(self.request.user, review):
+            raise PermissionDenied
+        if review.status != MDR.REVIEW_STATES.submitted:
+            return HttpResponseRedirect(reverse('aristotle_mdr:userReviewDetails', args=[review.pk]))
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_review(self):
+        self.review = get_object_or_404(MDR.ReviewRequest, pk=self.kwargs['review_id'])
+        return self.review
+
+    def get_change_data(self):
+        review = self.get_review()
+
+        # Register status changes
+        change_data = {
+            'registrationAuthorities': [review.registration_authority],
+            'state': review.state,
+            'registrationDate': review.registration_date,
+            'cascadeRegistration': review.cascade_registration,
+            'changeDetails': review.message
+        }
+
+        return change_data
 
     def get_context_data(self, *args, **kwargs):
         kwargs = super().get_context_data(*args, **kwargs)
         kwargs['status_matrix'] = json.dumps(generate_visibility_matrix(self.request.user))
         return kwargs
 
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
+    def get_form_kwargs(self, step):
+        self.items = self.get_review().concepts.all()
+        kwargs = super().get_form_kwargs(step)
+
+        if step == 'review_accept':
+            return {'user': self.request.user}
+
+        return kwargs
+
+    def get_form(self, step=None, data=None, files=None):
+        # Set step if it's None
+        if step is None:
+            step = self.steps.current
+
+        # If on the first step check which button was used
+        # Set review appropriately
+        if step == 'review_accept' and data:
+            self.display_review = self.set_review_var(data)
+            print('set review to %s'%str(self.review))
+
+        return super().get_form(step, data, files)
+
+    def done(self, form_list, form_dict, **kwargs):
         review = self.get_review()
 
-        if form.is_valid():
-
-            message = self.register_items(form)
-
-            review.reviewer = request.user
-            review.response = form.cleaned_data['response']
-            review.status = MDR.REVIEW_STATES.accepted
-            review.save()
-
-            messages.add_message(request, messages.INFO, message)
-            return HttpResponseRedirect(reverse('aristotle_mdr:userReadyForReview'))
-        else:
-            return self.form_invalid(form)
-
-    def register_items(self, form):
-        review = self.get_review()
-        ras = [review.registration_authority]  # Make into an iterable, as this may change in future
-        state = review.state
-        regDate = review.registration_date
-        cascade = review.cascade_registration
-        changeDetails = review.message
-
-        items = review.concepts.all()
+        self.items = review.concepts.all()
         with transaction.atomic(), reversion.revisions.create_revision():
             reversion.revisions.set_user(self.request.user)
-            success = []
-            failed = []
-            if regDate is None:
-                regDate = timezone.now().date()
-            for item in items:
 
-                for ra in ras:
-                    if cascade:
-                        register_method = ra.cascaded_register
-                    else:
-                        register_method = ra.register
+            success, failed = self.register_changes(form_dict)
 
-                    r = register_method(
-                        item,
-                        state,
-                        self.request.user,
-                        changeDetails=changeDetails,
-                        registrationDate=regDate,
-                    )
-                    for f in r['failed']:
-                        failed.append(f)
-                    for s in r['success']:
-                        success.append(s)
-            failed = list(set(failed))
-            success = list(set(success))
             bad_items = sorted([str(i.id) for i in failed])
             if failed:
                 message = _(
-                    "%(num_items)s items registered in %(num_ra)s registration authorities. \n"
+                    "%(num_items)s items registered \n"
                     "%(num_faileds)s items failed, they had the id's: %(bad_ids)s"
                 ) % {
-                    'num_items': len(items),
-                    'num_ra': len(ras),
+                    'num_items': items.count(),
                     'num_faileds': len(failed),
                     'bad_ids': ",".join(bad_items)
                 }
             else:
                 message = _(
-                    "%(num_items)s items registered in %(num_ra)s registration authorities. \n"
+                    "%(num_items)s items registered\n"
                 ) % {
-                    'num_items': len(items),
-                    'num_ra': len(ras),
+                    'num_items': self.items.count(),
                 }
 
             reversion.revisions.set_comment(message)
-            return message
+
+        # Update review object
+        review.reviewer = self.request.user
+        review.response = form_dict['review_accept'].cleaned_data['response']
+        review.status = MDR.REVIEW_STATES.accepted
+        review.save()
+
+        messages.add_message(self.request, messages.INFO, message)
+
+        return HttpResponseRedirect(reverse('aristotle_mdr:userReadyForReview'))
 
 
 class CheckCascadedStates(ItemSubpageView, DetailView):
