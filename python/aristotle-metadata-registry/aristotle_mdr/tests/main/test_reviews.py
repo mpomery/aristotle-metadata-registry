@@ -1,5 +1,5 @@
 from django.urls import reverse
-from django.test import TestCase
+from django.test import TestCase, tag
 import aristotle_mdr.models as models
 import aristotle_mdr.tests.utils as utils
 from aristotle_mdr.utils import url_slugify_concept
@@ -259,7 +259,9 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
         response = self.client.post(reverse('aristotle:userReviewAccept',args=[review.pk]),
             {
-                'response':"I can't accept this, its cancelled"
+                'review_accept-response': "I can't accept this, its cancelled",
+                'review_accept_view-current_step': 'review_accept',
+                'submit_skip': 'value',
             })
 
         review = models.ReviewRequest.objects.get(pk=review.pk) #decache
@@ -277,9 +279,11 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
         response = self.client.post(reverse('aristotle:userReviewAccept',args=[review.pk]),
             {
-                'response':"I can accept this!",
+                'review_accept-response': "I can accept this!",
+                'review_accept_view-current_step': 'review_accept',
+                'submit_skip': 'value',
             })
-        self.assertRedirects(response,reverse('aristotle:userReadyForReview',))
+        self.assertRedirects(response,reverse('aristotle:userReadyForReview'))
 
         review = models.ReviewRequest.objects.get(pk=review.pk) #decache
         self.assertEqual(review.response, "I can accept this!")
