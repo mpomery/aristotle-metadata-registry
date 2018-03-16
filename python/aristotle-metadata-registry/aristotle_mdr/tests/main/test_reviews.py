@@ -224,7 +224,7 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         response = self.client.get(reverse('aristotle:userReviewDetails',args=[review.pk]))
         self.assertEqual(response.status_code,200)
 
-    def test_registrar_can_accept_review(self):
+    def registrar_can_accept_review(self, review_changes=False):
         self.login_registrar()
         other_ra = models.RegistrationAuthority.objects.create(name="A different ra")
 
@@ -277,13 +277,34 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.item1 = models.ObjectClass.objects.get(pk=self.item1.pk) # decache
         self.assertFalse(self.item1.is_public())
 
+        if review_changes:
+            button = "submit_next"
+        else:
+            button = "submit_skip"
+
         response = self.client.post(reverse('aristotle:userReviewAccept',args=[review.pk]),
             {
                 'review_accept-response': "I can accept this!",
                 'review_accept_view-current_step': 'review_accept',
-                'submit_skip': 'value',
+                button: 'value',
             })
-        self.assertRedirects(response,reverse('aristotle:userReadyForReview'))
+
+        if review_changes:
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.context['wizard']['steps'].step1, 2) # check we are now on second setep
+            selected_for_change = [self.item1.id]
+            selected_for_change_strings = [str(a) for a in selected_for_change]
+
+            review_response = self.client.post(reverse('aristotle:userReviewAccept',args=[review.pk]),
+                {
+                    'review_changes-selected_list': selected_for_change_strings,
+                    'review_accept_view-current_step': 'review_changes'
+                })
+
+            self.assertRedirects(review_response,reverse('aristotle:userReadyForReview'))
+
+        else:
+            self.assertRedirects(response,reverse('aristotle:userReadyForReview'))
 
         review = models.ReviewRequest.objects.get(pk=review.pk) #decache
         self.assertEqual(review.response, "I can accept this!")
@@ -299,6 +320,13 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.assertTrue(state.state == review.state)
         self.assertTrue(state.registrationDate == review.registration_date)
 
+    @tag('newtests')
+    def test_registrar_can_accept_review_direct(self):
+        self.registrar_can_accept_review(review_changes=False)
+
+    @tag('newtests')
+    def test_registrar_can_accept_review_alter_changes(self):
+        self.registrar_can_accept_review(review_changes=True)
 
     def test_registrar_can_reject_review(self):
         self.login_registrar()

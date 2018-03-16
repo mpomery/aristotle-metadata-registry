@@ -312,6 +312,9 @@ class ReviewChangesView(SessionWizardView):
         cascade = cleaned_data['cascadeRegistration']
         changeDetails = cleaned_data['changeDetails']
 
+        if changeDetails is None:
+            changeDetails = ""
+
         success = []
         failed = []
 
@@ -323,12 +326,11 @@ class ReviewChangesView(SessionWizardView):
         }
 
         if review_data:
-            arguments['items'] = selected_list
-            register_method = ra.register_many
-
-            status = register_method(**arguments)
-            success.extend(status['success'])
-            failed.extend(status['failed'])
+            for ra in ras:
+                arguments['items'] = selected_list
+                status = ra.register_many(**arguments)
+                success.extend(status['success'])
+                failed.extend(status['failed'])
         else:
             for item in self.items:
                 for ra in ras:
