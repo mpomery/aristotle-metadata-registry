@@ -271,7 +271,7 @@ class ReviewChangesView(SessionWizardView):
                 ids = [a.id for a in self.items]
                 queryset = MDR._concept.objects.filter(id__in=ids)
 
-            return {'queryset': queryset, 'new_state': state_name, 'ra': ra[0]}
+            return {'queryset': queryset, 'new_state': state_name, 'ra': ra[0], 'user': self.request.user}
 
         return {}
 

@@ -10,6 +10,7 @@ from aristotle_mdr.perms import user_can_edit
 from aristotle_mdr.forms.creation_wizards import UserAwareForm
 from aristotle_mdr.contrib.autocomplete import widgets
 from aristotle_mdr.utils import status_filter
+from aristotle_mdr import perms
 
 from django.forms.models import modelformset_factory
 
@@ -147,12 +148,13 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
 
 class ReviewChangesForm(forms.Form):
 
-    def __init__(self, queryset, new_state, ra, *args, **kwargs):
+    def __init__(self, queryset, new_state, ra, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['selected_list'] = ReviewChangesChoiceField(
             queryset=queryset,
             new_state=new_state,
             ra=ra,
+            user=user,
             label=_("Select the items you would like to update")
         )
 
@@ -206,7 +208,7 @@ class CompareConceptsForm(forms.Form):
 
 class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
-    def __init__(self, queryset, new_state, ra, **kwargs):
+    def __init__(self, queryset, new_state, ra, user, **kwargs):
         #logger.debug('Queryset: %s'%str(queryset))
         extra_info = {}
         subclassed_queryset = queryset.select_subclasses()
@@ -236,6 +238,8 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
             if state_info:
                 innerdict.update({'old': state_info['name'], 'old_until': state_info['until']})
+
+            innerdict.update({'perm': perms.user_can_change_status(user, concept)})
 
             extra_info.update({concept.id: innerdict})
 
