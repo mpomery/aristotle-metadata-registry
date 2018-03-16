@@ -8,7 +8,7 @@
       {% with extra=extra_info|get_item:option.value %}
       <td>{% if extra.type %}{{ extra.type }}{% endif %}</td>
       <td>{% if extra.old %}{{ extra.old }}{% endif %}</td>
-      <td>{% if extra.old_until %}{{ extra.old_until }}{% endif %}</td>
+      <td>{% if extra.old_until %}{{ extra.old_until|default_if_none:"Never" }}{% endif %}</td>
       {% endwith %}
       <td>{% if new_state %}{{ new_state }}{% endif %}</td>
     </tr>
