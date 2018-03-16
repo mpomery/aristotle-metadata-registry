@@ -259,13 +259,18 @@ class ReviewChangesView(SessionWizardView):
             state_name = str(MDR.STATES[state])
             #logger.debug('New state name %s'%state_name)
             # Need to check wether cascaded was true here
+
             if cascade == 1:
-                cascaded_ids = [a.pk for a in self.cascaded]
-                cascaded_ids.append(self.item.id)
+                all_ids = []
+                for item in self.items:
+                    cascaded_ids = [a.id for a in item.registry_cascade_items]
+                    cascaded_ids.append(item.id)
+                    all_ids.extend(cascaded_ids)
                 #logger.debug('cascaded ids: %s'%cascaded_ids)
-                queryset = MDR._concept.objects.filter(id__in=cascaded_ids)
+                queryset = MDR._concept.objects.filter(id__in=all_ids)
             else:
-                queryset = MDR._concept.objects.filter(id=self.item.id)
+                ids = [a.id for a in self.items]
+                queryset = MDR._concept.objects.filter(id__in=ids)
 
             return {'queryset': queryset, 'new_state': state_name, 'ra': ra[0]}
 
@@ -274,6 +279,16 @@ class ReviewChangesView(SessionWizardView):
     def get_change_data(self):
         # We override this when the change_data doesnt come form a form
         return self.get_cleaned_data_for_step('change_status')
+
+    def set_review_var(self, data):
+
+        review = True
+        if data.get('submit_next'):
+            review = True
+        elif data.get('submit_skip'):
+            review = False
+
+        return review
 
     def register_changes(self, form_dict, change_form=None, **kwargs):
 
@@ -347,15 +362,13 @@ class ChangeStatusView(ReviewChangesView):
     def dispatch(self, request, *args, **kwargs):
         # Check for keyError here
         self.item = get_object_or_404(MDR._concept, pk=kwargs['iid']).item
+        self.items = [self.item]
 
         if not (self.item and user_can_change_status(request.user, self.item)):
             if request.user.is_anonymous():
                 return redirect(reverse('friendly_login') + '?next=%s' % request.path)
             else:
                 raise PermissionDenied
-
-        self.cascaded = self.item.registry_cascade_items
-        self.cascaded.append(self.item)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -369,26 +382,23 @@ class ChangeStatusView(ReviewChangesView):
         if step == 'change_status':
             return {'user': self.request.user}
 
+        print(kwargs)
         return kwargs
 
     def get_form(self, step=None, data=None, files=None):
-        # Set step if it's None
-        if step is None:
-            step = self.steps.current
+            # Set step if it's None
+            if step is None:
+                step = self.steps.current
 
-        # If on the first step check which button was used
-        # Set review appropriately
+            # If on the first step check which button was used
+            # Set review appropriately
 
-        if step == 'change_status' and data:
-            #logger.debug('we running')
-            #logger.debug('data is %s'%str(data))
-            self.review = True
-            if data.get('submit_next'):
-                self.review = True
-            elif data.get('submit_skip'):
-                self.review = False
+            if step == 'change_status' and data:
+                #logger.debug('we running')
+                #logger.debug('data is %s'%str(data))
+                self.review = self.set_review_var(data)
 
-        return super().get_form(step, data, files)
+            return super().get_form(step, data, files)
 
     def get_context_data(self, form, **kwargs):
         item = self.item
