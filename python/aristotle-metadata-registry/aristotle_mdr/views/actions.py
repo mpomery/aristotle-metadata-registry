@@ -162,7 +162,10 @@ class ReviewAcceptView(ReviewChangesView):
         ('review_changes', ReviewChangesForm)
     ]
 
-    template_name = 'aristotle_mdr/helpers/wizard_form.html'
+    templates = {
+        'review_accept': 'aristotle_mdr/user/user_request_accept.html',
+        'review_changes': 'aristotle_mdr/helpers/wizard_form.html'
+    }
 
     condition_dict = {'review_changes': display_review}
     display_review = None
@@ -176,6 +179,9 @@ class ReviewAcceptView(ReviewChangesView):
             return HttpResponseRedirect(reverse('aristotle_mdr:userReviewDetails', args=[review.pk]))
 
         return super().dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return [self.templates[self.steps.current]]
 
     def get_review(self):
         self.review = get_object_or_404(MDR.ReviewRequest, pk=self.kwargs['review_id'])
@@ -198,6 +204,7 @@ class ReviewAcceptView(ReviewChangesView):
     def get_context_data(self, *args, **kwargs):
         kwargs = super().get_context_data(*args, **kwargs)
         kwargs['status_matrix'] = json.dumps(generate_visibility_matrix(self.request.user))
+        kwargs['review'] = self.get_review()
         return kwargs
 
     def get_form_kwargs(self, step):
