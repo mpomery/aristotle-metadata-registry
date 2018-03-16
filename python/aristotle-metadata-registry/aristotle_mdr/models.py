@@ -309,7 +309,30 @@ class RegistrationAuthority(Organization):
             ('public', public)
         )
 
-    def cascaded_register(self, item, state, user, selected=None, items=None, *args, **kwargs):
+    def register_many(self, items, state, user, *args, **kwargs):
+        # Change the registration status of many items
+        # the items argument should be a queryset
+
+        revision_message = _("Bulk registration of %i items\n") % (items.count())
+
+        revision_message = revision_message + kwargs.get('changeDetails', "")
+        seen_items = {'success': [], 'failed': []}
+
+        with transaction.atomic(), reversion.revisions.create_revision():
+            reversion.revisions.set_user(user)
+            reversion.revisions.set_comment(revision_message)
+
+            # can use bulk_create here when background reindex is setup
+            for child_item in items:
+                if perms.user_can_change_status(user, child_item):
+                    self._register(
+                        child_item, state, user, *args, **kwargs
+                    )
+                    seen_items['success'].append(child_item.id)
+                else:
+                    seen_items['failed'].append(child_item.id)
+
+    def cascaded_register(self, item, state, user, *args, **kwargs):
         if not perms.user_can_change_status(user, item):
             # Return a failure as this item isn't allowed
             return {'success': [], 'failed': [item] + item.registry_cascade_items}
@@ -323,18 +346,11 @@ class RegistrationAuthority(Organization):
         revision_message = revision_message + kwargs.get('changeDetails', "")
         seen_items = {'success': [], 'failed': []}
 
-
-
-        if selected is not None:
-            items = selected
-        elif items is None:
-            items = [item] + item.registry_cascade_items
-
         with transaction.atomic(), reversion.revisions.create_revision():
             reversion.revisions.set_user(user)
             reversion.revisions.set_comment(revision_message)
 
-            for child_item in items:
+            for child_item in [item] + item.registry_cascade_items:
                 self._register(
                     child_item, state, user, *args, **kwargs
                 )
