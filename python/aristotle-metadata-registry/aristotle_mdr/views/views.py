@@ -346,6 +346,7 @@ class ChangeStatusView(SessionWizardView):
         if review_data:
             selected_list = review_data['selected_list']
             logger.debug('Selected: %s'%str(selected_list))
+            
         # process the data in form.cleaned_data as required
         ras = cleaned_data['registrationAuthorities']
         state = cleaned_data['state']
@@ -364,12 +365,14 @@ class ChangeStatusView(SessionWizardView):
             }
 
             if review_data:
-                arguments['selected'] = selected_list
-
-            if cascade:
-                register_method = ra.cascaded_register
+                arguments.pop('item')
+                arguments['items'] = selected_list
+                register_method = ra.register_many
             else:
-                register_method = ra.register
+                if cascade:
+                    register_method = ra.cascaded_register
+                else:
+                    register_method = ra.register
 
             register_method(**arguments)
             # TODO: notification and message on success/failure
