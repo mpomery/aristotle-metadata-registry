@@ -240,9 +240,8 @@ def toggleFavourite(request, iid):
 # Actions
 
 def display_review(wizard):
-
-    if wizard.review is not None:
-        return wizard.review
+    if wizard.display_review is not None:
+        return wizard.display_review
     else:
         return True
 
@@ -304,7 +303,7 @@ class ReviewChangesView(SessionWizardView):
         # process the data in form.cleaned_data as required
         if change_form:
             cleaned_data = form_dict[change_form].cleaned_data
-        elif change_data:
+        else:
             cleaned_data = self.get_change_data()
 
         ras = cleaned_data['registrationAuthorities']
@@ -316,31 +315,36 @@ class ReviewChangesView(SessionWizardView):
         success = []
         failed = []
 
-        for ra in ras:
-            # Should only be 1 ra
-            # Need to check before enforcing
+        arguments = {
+            'state': state,
+            'user': self.request.user,
+            'changeDetails': changeDetails,
+            'registrationDate': regDate,
+        }
 
-            arguments = {
-                'item': self.item,
-                'state': state,
-                'user': self.request.user,
-                'changeDetails': changeDetails,
-                'registrationDate': regDate,
-            }
-
-            if review_data:
-                arguments.pop('item')
-                arguments['items'] = selected_list
-                register_method = ra.register_many
-            else:
-                if cascade:
-                    register_method = ra.cascaded_register
-                else:
-                    register_method = ra.register
+        if review_data:
+            arguments['items'] = selected_list
+            register_method = ra.register_many
 
             status = register_method(**arguments)
             success.extend(status['success'])
             failed.extend(status['failed'])
+        else:
+            for item in self.items:
+                for ra in ras:
+                    # Should only be 1 ra
+                    # Need to check before enforcing
+
+                    arguments['item'] = item
+
+                    if cascade:
+                        register_method = ra.cascaded_register
+                    else:
+                        register_method = ra.register
+
+                    status = register_method(**arguments)
+                    success.extend(status['success'])
+                    failed.extend(status['failed'])
 
         return (success, failed)
 
@@ -357,7 +361,7 @@ class ChangeStatusView(ReviewChangesView):
     }
 
     condition_dict = {'review_changes': display_review}
-    review = None
+    display_review = None
 
     def dispatch(self, request, *args, **kwargs):
         # Check for keyError here
@@ -396,7 +400,7 @@ class ChangeStatusView(ReviewChangesView):
             if step == 'change_status' and data:
                 #logger.debug('we running')
                 #logger.debug('data is %s'%str(data))
-                self.review = self.set_review_var(data)
+                self.display_review = self.set_review_var(data)
 
             return super().get_form(step, data, files)
 
