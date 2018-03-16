@@ -240,13 +240,11 @@ def toggleFavourite(request, iid):
 # Actions
 
 def display_review(wizard):
-    cleaned_data = wizard.get_cleaned_data_for_step('change_status') or {}
-    try:
-        review = cleaned_data['review']
-    except KeyError:
-        review = True
 
-    return review
+    if wizard.review is not None:
+        return wizard.review
+    else:
+        return True
 
 class ReviewChangesView(SessionWizardView):
 
@@ -277,7 +275,7 @@ class ReviewChangesView(SessionWizardView):
         # We override this when the change_data doesnt come form a form
         return self.get_cleaned_data_for_step('change_status')
 
-    def process_form_dict(self, form_dict, change_form=None, **kwargs):
+    def register_changes(self, form_dict, change_form=None, **kwargs):
 
         try:
             review_data = form_dict['review_changes'].cleaned_data
@@ -344,6 +342,7 @@ class ChangeStatusView(ReviewChangesView):
     }
 
     condition_dict = {'review_changes': display_review}
+    review = None
 
     def dispatch(self, request, *args, **kwargs):
         # Check for keyError here
@@ -379,21 +378,17 @@ class ChangeStatusView(ReviewChangesView):
 
         # If on the first step check which button was used
         # Set review appropriately
-        datacopy = copy.deepcopy(data) # Have to do this beacuse the post data is immutable
-        #logger.debug('posted data was %s'%str(datacopy))
-        #return HttpResponse('done')
-        if step == 'change_status' and datacopy is not None and 'change_status-review' not in datacopy:
+
+        if step == 'change_status' and data:
             #logger.debug('we running')
             #logger.debug('data is %s'%str(data))
-            review = '1'
+            self.review = True
             if data.get('submit_next'):
-                review = '1'
+                self.review = True
             elif data.get('submit_skip'):
-                review = '0'
+                self.review = False
 
-            datacopy['change_status-review'] = review
-
-        return super().get_form(step, datacopy, files)
+        return super().get_form(step, data, files)
 
     def get_context_data(self, form, **kwargs):
         item = self.item
@@ -403,8 +398,9 @@ class ChangeStatusView(ReviewChangesView):
         return context
 
     def done(self, form_list, form_dict, **kwargs):
-        self.process_form_dict(form_dict, 'change_status')
+        self.register_changes(form_dict, 'change_status')
         return HttpResponseRedirect(url_slugify_concept(self.item))
+
 
 def supersede(request, iid):
     item = get_object_or_404(MDR._concept, pk=iid).item
