@@ -994,7 +994,6 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
             else:
                 pass
 
-        no_perm_item = None
         if cascade:
             cascade_post = 1
             if not check_bad_perms:
