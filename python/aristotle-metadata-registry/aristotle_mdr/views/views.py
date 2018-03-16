@@ -248,7 +248,90 @@ def display_review(wizard):
 
     return review
 
-class ChangeStatusView(SessionWizardView):
+class ReviewChangesView(SessionWizardView):
+
+    def get_form_kwargs(self, step):
+
+        if step == 'review_changes':
+            # Check some values from last step
+            cleaned_data = self.get_change_data()
+            cascade = cleaned_data['cascadeRegistration']
+            state = cleaned_data['state']
+            ra = cleaned_data['registrationAuthorities']
+            state_name = str(MDR.STATES[state])
+            #logger.debug('New state name %s'%state_name)
+            # Need to check wether cascaded was true here
+            if cascade == 1:
+                cascaded_ids = [a.pk for a in self.cascaded]
+                cascaded_ids.append(self.item.id)
+                #logger.debug('cascaded ids: %s'%cascaded_ids)
+                queryset = MDR._concept.objects.filter(id__in=cascaded_ids)
+            else:
+                queryset = MDR._concept.objects.filter(id=self.item.id)
+
+            return {'queryset': queryset, 'new_state': state_name, 'ra': ra[0]}
+
+        return {}
+
+    def get_change_data(self):
+        # We override this when the change_data doesnt come form a form
+        return self.get_cleaned_data_for_step('change_status')
+
+    def process_form_dict(self, form_dict, change_form=None, **kwargs):
+
+        try:
+            review_data = form_dict['review_changes'].cleaned_data
+        except KeyError:
+            review_data = None
+
+        if review_data:
+            selected_list = review_data['selected_list']
+            logger.debug('Selected: %s'%str(selected_list))
+
+        # process the data in form.cleaned_data as required
+        if change_form:
+            cleaned_data = form_dict[change_form].cleaned_data
+        elif change_data:
+            cleaned_data = self.get_change_data()
+
+        ras = cleaned_data['registrationAuthorities']
+        state = cleaned_data['state']
+        regDate = cleaned_data['registrationDate']
+        cascade = cleaned_data['cascadeRegistration']
+        changeDetails = cleaned_data['changeDetails']
+
+        success = []
+        failed = []
+
+        for ra in ras:
+            # Should only be 1 ra
+            # Need to check before enforcing
+
+            arguments = {
+                'item': self.item,
+                'state': state,
+                'user': self.request.user,
+                'changeDetails': changeDetails,
+                'registrationDate': regDate,
+            }
+
+            if review_data:
+                arguments.pop('item')
+                arguments['items'] = selected_list
+                register_method = ra.register_many
+            else:
+                if cascade:
+                    register_method = ra.cascaded_register
+                else:
+                    register_method = ra.register
+
+            status = register_method(**arguments)
+            success.extend(status['success'])
+            failed.extend(status['failed'])
+
+        return (success, failed)
+
+class ChangeStatusView(ReviewChangesView):
 
     form_list = [
         ('change_status', MDRForms.ChangeStatusForm),
@@ -282,28 +365,12 @@ class ChangeStatusView(SessionWizardView):
 
     def get_form_kwargs(self, step):
 
+        kwargs = super().get_form_kwargs(step)
+
         if step == 'change_status':
             return {'user': self.request.user}
-        elif step == 'review_changes':
-            # Check some values from last step
-            cleaned_data = self.get_cleaned_data_for_step('change_status')
-            cascade = cleaned_data['cascadeRegistration']
-            state = cleaned_data['state']
-            ra = cleaned_data['registrationAuthorities']
-            state_name = str(MDR.STATES[state])
-            #logger.debug('New state name %s'%state_name)
-            # Need to check wether cascaded was true here
-            if cascade == 1:
-                cascaded_ids = [a.pk for a in self.cascaded]
-                cascaded_ids.append(self.item.id)
-                #logger.debug('cascaded ids: %s'%cascaded_ids)
-                queryset = MDR._concept.objects.filter(id__in=cascaded_ids)
-            else:
-                queryset = MDR._concept.objects.filter(id=self.item.id)
 
-            return {'queryset': queryset, 'new_state': state_name, 'ra': ra[0]}
-
-        return {}
+        return kwargs
 
     def get_form(self, step=None, data=None, files=None):
         # Set step if it's None
@@ -336,46 +403,7 @@ class ChangeStatusView(SessionWizardView):
         return context
 
     def done(self, form_list, form_dict, **kwargs):
-        cleaned_data = form_dict['change_status'].cleaned_data
-
-        try:
-            review_data = form_dict['review_changes'].cleaned_data
-        except KeyError:
-            review_data = None
-
-        if review_data:
-            selected_list = review_data['selected_list']
-            logger.debug('Selected: %s'%str(selected_list))
-            
-        # process the data in form.cleaned_data as required
-        ras = cleaned_data['registrationAuthorities']
-        state = cleaned_data['state']
-        regDate = cleaned_data['registrationDate']
-        cascade = cleaned_data['cascadeRegistration']
-        changeDetails = cleaned_data['changeDetails']
-        for ra in ras:
-            # Should only be 1 ra
-
-            arguments = {
-                'item': self.item,
-                'state': state,
-                'user': self.request.user,
-                'changeDetails': changeDetails,
-                'registrationDate': regDate,
-            }
-
-            if review_data:
-                arguments.pop('item')
-                arguments['items'] = selected_list
-                register_method = ra.register_many
-            else:
-                if cascade:
-                    register_method = ra.cascaded_register
-                else:
-                    register_method = ra.register
-
-            register_method(**arguments)
-            # TODO: notification and message on success/failure
+        self.process_form_dict(form_dict, 'change_status')
         return HttpResponseRedirect(url_slugify_concept(self.item))
 
 def supersede(request, iid):
