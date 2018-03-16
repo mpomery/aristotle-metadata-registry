@@ -964,7 +964,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         )
         self.assertFormError(response, 'form', 'state', 'Select a valid choice. 343434 is not one of the available choices.')
 
-    def registrar_can_change_status_with_review(self, cascade):
+    def registrar_can_change_status_with_review(self, cascade, check_bad_perms=False):
         if not hasattr(self,"run_cascade_tests") and cascade:
             return
         self.login_registrar()
@@ -994,8 +994,13 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
             else:
                 pass
 
+        no_perm_item = None
         if cascade:
             cascade_post = 1
+            if not check_bad_perms:
+                # add all cascade items to review
+                for item in self.item1.registry_cascade_items:
+                    review.concepts.add(item)
         else:
             cascade_post = 0
 
@@ -1037,13 +1042,20 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
             for sub_item in self.item1.registry_cascade_items:
                 if sub_item is not None:
                     if sub_item.id in selected_for_change:
-                        self.assertTrue(sub_item.is_registered)
+                        if not check_bad_perms:
+                            self.assertTrue(sub_item.is_registered)
+                        else:
+                            self.assertFalse(sub_item.is_registered)
                     else:
                         self.assertFalse(sub_item.is_registered)
 
     @tag('changestatus')
     def test_registrar_can_change_status_with_review_cascade(self):
         self.registrar_can_change_status_with_review(cascade=True)
+
+    @tag('changestatus')
+    def test_registrar_cant_update_cascaded_items_without_perm(self):
+        self.registrar_can_change_status_with_review(cascade=True, check_bad_perms=True)
 
     @tag('changestatus')
     def test_registrar_can_change_status_with_review_no_cascade(self):
