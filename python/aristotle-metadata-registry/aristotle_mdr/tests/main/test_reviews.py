@@ -246,6 +246,7 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
             registration_date=datetime.date(2010,1,1)
         )
         review.concepts.add(self.item1)
+        review.concepts.add(self.item2)
 
         response = self.client.get(reverse('aristotle:userReviewAccept',args=[review.pk]))
         self.assertEqual(response.status_code,200)
@@ -312,13 +313,30 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.assertEqual(review.reviewer, self.registrar)
 
         self.item1 = models.ObjectClass.objects.get(pk=self.item1.pk) # decache
-        self.assertTrue(self.item1.is_public())
-        self.assertTrue(self.item1.current_statuses().count() == 1)
-        state = self.item1.current_statuses().first()
+        self.item2 = models.ObjectClass.objects.get(pk=self.item2.pk) # decache
 
-        self.assertTrue(state.registrationAuthority == review.registration_authority)
-        self.assertTrue(state.state == review.state)
-        self.assertTrue(state.registrationDate == review.registration_date)
+        if review_changes:
+            updated_items = [self.item1.pk]
+        else:
+            updated_items = [self.item1.pk, self.item2.pk]
+
+        for item in [self.item1, self.item2]:
+            if item.id in updated_items:
+                updated = True
+            else:
+                updated = False
+
+            self.assertEqual(item.is_public(), updated)
+            self.assertEqual(item.current_statuses().count() == 1, updated)
+
+            if updated:
+                state = item.current_statuses().first()
+
+                self.assertTrue(state.registrationAuthority == review.registration_authority)
+                self.assertTrue(state.state == review.state)
+                self.assertTrue(state.registrationDate == review.registration_date)
+            else:
+                self.assertTrue(item.current_statuses().count() == 0)
 
     @tag('newtests')
     def test_registrar_can_accept_review_direct(self):
