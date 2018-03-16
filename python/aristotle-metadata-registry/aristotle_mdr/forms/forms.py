@@ -221,7 +221,7 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
         states_dict = {}
         for status in statuses:
             state_name = str(MDR.STATES[status.state])
-            until_date = str(status.until_date)
+            until_date = status.until_date
             if status.concept.id not in states_dict:
                 states_dict[status.concept.id] = {'name': state_name, 'until': until_date}
         #logger.debug("Current States: %s"%str(states_dict))
