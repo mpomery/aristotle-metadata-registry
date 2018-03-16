@@ -332,6 +332,8 @@ class RegistrationAuthority(Organization):
                 else:
                     seen_items['failed'].append(child_item.id)
 
+        return seen_items
+
     def cascaded_register(self, item, state, user, *args, **kwargs):
         if not perms.user_can_change_status(user, item):
             # Return a failure as this item isn't allowed
