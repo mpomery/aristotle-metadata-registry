@@ -1,17 +1,17 @@
 {% load util_tags %}
 {% with id=widget.attrs.id %}<table{% if id %} id="{{ id }}"{% endif %}{% if widget.attrs.tableclass %} class="{{ widget.attrs.tableclass }}"{% endif %}>
-  <th>Select</th><th>Name</th><th>Type</th><th>Old State</th><th>Old State End Date</th><th>Permission to edit</th><th>New State</th>
+  <th>Select</th><th>Name</th><th>Type</th><th>Old State</th><th>Registration Date</th><th>Permission to edit</th><th>New State</th>
   {% for group, options, index in widget.optgroups %}{% if group %}
   <td>{{ group }}<table{% if id %} id="{{ id }}_{{ index }}"{% endif %}>{% endif %}
     {% for option in options %}
     <tr>{% include option.template_name with widget=option %}
       {% with extra=extra_info|get_item:option.value %}
-      <td>{% if extra.type %}{{ extra.type }}{% endif %}</td>
-      <td>{% if extra.old %}{{ extra.old }}{% endif %}</td>
-      <td>{{ extra.old_until|default_if_none:"Never" }}</td>
-      <td>{% if extra.perm %}{{ extra.perm }}{% endif %}</td>
+      <td>{{ extra.type|default:"" }}</td>
+      <td>{{ extra.old|default:"" }}</td>
+      <td>{{ extra.reg_date|default:"" }}</td>
+      <td>{{ extra.perm|default:"" }}</td>
       {% endwith %}
-      <td>{% if new_state %}{{ new_state }}{% endif %}</td>
+      <td>{{ new_state|default:"" }}</td>
     </tr>
     {% endfor %}{% if group %}
   </table></td>{% endif %}{% endfor %}

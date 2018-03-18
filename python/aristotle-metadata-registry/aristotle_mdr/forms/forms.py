@@ -221,10 +221,9 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
         states_dict = {}
         for status in statuses:
             state_name = str(MDR.STATES[status.state])
-            until_date = status.until_date
+            reg_date = status.registrationDate
             if status.concept.id not in states_dict:
-                states_dict[status.concept.id] = {'name': state_name, 'until': until_date}
-        #logger.debug("Current States: %s"%str(states_dict))
+                states_dict[status.concept.id] = {'name': state_name, 'reg_date': reg_date}
 
         for concept in subclassed_queryset:
             innerdict = {}
@@ -237,7 +236,7 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
                 state_info = None
 
             if state_info:
-                innerdict.update({'old': state_info['name'], 'old_until': state_info['until']})
+                innerdict.update({'old': state_info['name'], 'reg_date': state_info['reg_date']})
 
             innerdict.update({'perm': perms.user_can_change_status(user, concept)})
 
