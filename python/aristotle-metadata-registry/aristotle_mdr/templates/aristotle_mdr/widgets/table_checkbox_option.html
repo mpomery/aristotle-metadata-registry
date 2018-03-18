@@ -1,1 +1,2 @@
-<td>{% include "django/forms/widgets/input.html" %}</td>{% if wrap_label %}<td>{{ widget.label }}</td>{% endif %}
+<td><input type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %} {% if disabled %}disabled{% endif %} value="{{ widget.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}>
+</td>{% if wrap_label %}<td>{{ widget.label }}</td>{% endif %}
