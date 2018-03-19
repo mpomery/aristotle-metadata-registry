@@ -184,72 +184,14 @@ class RemoveFavouriteForm(LoggedInBulkActionForm):
         return _('%(num_items)s items removed from favourites') % {'num_items': len(items)}
 
 
-class ChangeStateForm(ChangeStatusForm, BulkActionForm, RegistrationAuthorityMixin):
-    confirm_page = "aristotle_mdr/actions/bulk_actions/change_status.html"
-    classes="fa-university"
-    action_text = _('Change registration status')
-    items_label = "These are the items that will be registered. Add or remove additional items with the autocomplete box."
+class ChangeStateForm(ChangeStatusForm, BulkActionForm):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # self.set_registration_authority_field()
-
-    def make_changes(self):
-        import reversion
-        if not self.user.profile.is_registrar:
-            raise PermissionDenied
-        ras = self.cleaned_data['registrationAuthorities']
-        state = self.cleaned_data['state']
-        items = self.items_to_change
-        regDate = self.cleaned_data['registrationDate']
-        cascade = self.cleaned_data['cascadeRegistration']
-        changeDetails = self.cleaned_data['changeDetails']
-        failed = []
-        success = []
-        with transaction.atomic(), reversion.revisions.create_revision():
-            reversion.revisions.set_user(self.user)
-
-            if regDate is None:
-                regDate = timezone.now().date()
-            for item in items:
-                for ra in ras:
-                    if cascade:
-                        register_method = ra.cascaded_register
-                    else:
-                        register_method = ra.register
-
-                    r = register_method(
-                        item,
-                        state,
-                        self.request.user,
-                        changeDetails=changeDetails,
-                        registrationDate=regDate,
-                    )
-                    for f in r['failed']:
-                        failed.append(f)
-                    for s in r['success']:
-                        success.append(s)
-            failed = list(set(failed))
-            success = list(set(success))
-            bad_items = sorted([str(i.id) for i in failed])
-            if not bad_items:
-                message = _(
-                    "%(num_items)s items registered in %(num_ra)s registration authorities'. \n"
-                ) % {
-                    'num_ra': len(ras),
-                    'num_items': len(success),
-                }
-            else:
-                message = _(
-                    "%(num_items)s items registered in %(num_ra)s registration authorities. \n"
-                    "Some items failed, they had the id's: %(bad_ids)s"
-                ) % {
-                    'num_items': len(items),
-                    'num_ra': len(ras),
-                    'bad_ids': ",".join(bad_items)
-                }
-            reversion.revisions.set_comment(changeDetails + "\n\n" + message)
-            return message
+    items = ForbiddenAllowedModelMultipleChoiceField(
+        queryset=MDR._concept.objects.all(),
+        validate_queryset=MDR._concept.objects.all(),
+        label="Related items",
+        required=False,
+    )
 
     @classmethod
     def can_use(cls, user):

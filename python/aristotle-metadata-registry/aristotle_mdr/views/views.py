@@ -247,6 +247,8 @@ def display_review(wizard):
 
 class ReviewChangesView(SessionWizardView):
 
+    items = None
+
     def get_form_kwargs(self, step):
 
         if step == 'review_changes':

@@ -126,6 +126,7 @@ urlpatterns=[
     url(r'^action/supersede/(?P<iid>\d+)$', views.supersede, name='supersede'),
     url(r'^action/deprecate/(?P<iid>\d+)$', views.deprecate, name='deprecate'),
     url(r'^action/bulkaction/?$', views.bulk_actions.BulkAction.as_view(), name='bulk_action'),
+    url(r'^action/bulkaction/state/?$', views.bulk_actions.ChangeStatusBulkActionView.as_view(), name='change_state_bulk_action'),
     url(r'^action/compare/?$', views.comparator.compare_concepts, name='compare_concepts'),
 
     url(r'^action/changestatus/(?P<iid>\d+)$', views.ChangeStatusView.as_view(), name='changeStatus'),

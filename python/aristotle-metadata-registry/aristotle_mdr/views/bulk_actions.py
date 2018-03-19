@@ -7,7 +7,12 @@ from django.views.generic import FormView
 
 from aristotle_mdr import exceptions as registry_exceptions
 from aristotle_mdr.utils import fetch_aristotle_settings
+from aristotle_mdr.views import ReviewChangesView, display_review
+from aristotle_mdr.forms.forms import ReviewChangesForm
+from aristotle_mdr.forms.bulk_actions import ChangeStateForm
 
+import logging
+logger = logging.getLogger(__name__)
 
 class BulkAction(FormView):
 
@@ -38,12 +43,22 @@ class BulkAction(FormView):
             # no action, messed up, redirect
             return HttpResponseRedirect(url)
         action_form = action['form']
+
+        if issubclass(action_form, ChangeStateForm):
+            form = action_form(request.POST, user=request.user, request=request)
+            if form.is_valid():
+                self.request.session['bulkaction_items'] = form.cleaned_data['items']
+            else:
+                logger.debug('the form was invalid')
+            return HttpResponseRedirect(reverse('aristotle:change_state_bulk_action'))
+
         if action_form.confirm_page is None:
             # if there is no confirm page or extra details required, do the action and redirect
             form = action_form(request.POST, user=request.user, request=request)  # A form bound to the POST data
 
             if form.is_valid():
                 to_change = form.items_to_change
+
                 confirmed = request.POST.get("confirmed", None)
                 if to_change.count() > 10 and not confirmed:
                     new_form = request.POST.copy()
@@ -123,3 +138,61 @@ def get_bulk_actions():
             frm[prop] = getattr(f, prop, None)
         actions[action_name] = frm
     return actions
+
+class ChangeStatusBulkActionView(ReviewChangesView):
+
+    form_list = [
+        ('change_state', ChangeStateForm),
+        ('review_changes', ReviewChangesForm)
+    ]
+
+    templates = {
+        'change_state': 'aristotle_mdr/actions/bulk_actions/change_status.html',
+        'review_changes': 'aristotle_mdr/helpers/wizard_form.html'
+    }
+
+    condition_dict = {'review_changes': display_review}
+    display_review = None
+
+    def get_template_names(self):
+        return [self.templates[self.steps.current]]
+
+    def get_form_kwargs(self, step):
+
+        kwargs = super().get_form_kwargs(step)
+
+        if step == 'change_state':
+            kwargs.update({'user': self.request.user, 'form': None, 'request': self.request})
+
+        return kwargs
+
+    def get_form_initial(self, step):
+
+        initial = super().get_form_initial(step)
+
+        if step == 'change_state':
+            if 'bulkaction_items' in self.request.session:
+                bulk_items = self.request.session['bulkaction_items']
+                initial.update({'items', bulk_items})
+                logger.debug('got initial')
+
+        return initial
+
+    def get_form(self, step=None, data=None, files=None):
+        # Set step if it's None
+        if step is None:
+            step = self.steps.current
+
+        # If on the first step check which button was used
+        # Set review appropriately
+
+        if step == 'change_state' and data:
+            #logger.debug('we running')
+            #logger.debug('data is %s'%str(data))
+            self.display_review = self.set_review_var(data)
+
+        return super().get_form(step, data, files)
+
+    def done(self, form_list, form_dict, **kwargs):
+        self.register_changes(form_dict, 'change_state')
+        return HttpResponseRedirect(url_slugify_concept(self.item))
