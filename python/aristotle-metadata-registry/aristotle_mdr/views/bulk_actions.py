@@ -45,16 +45,11 @@ class BulkAction(FormView):
         action_form = action['form']
 
         if issubclass(action_form, ChangeStateForm):
-            form = action_form(request.POST, user=request.user, request=request)
-            form.full_clean()
-            if 'items' in form.cleaned_data:
-                items_data = form.cleaned_data['items'].values_list('id', flat=True)
-                logger.debug('items data is %s'%str(list(items_data)))
-                self.request.session['bulkaction_items'] = list(items_data)
-                logger.debug('form had valid items')
+            items_list = self.request.POST.getlist('items')
+            logger.debug('items data is %s'%items_list)
+            if items_list:
+                self.request.session['bulkaction_items'] = items_list
             else:
-                logger.debug('the form had invalid items')
-                logger.debug(form.errors)
                 if 'bulkaction_items' in self.request.session:
                     del self.request.session['bulkaction_items']
 
