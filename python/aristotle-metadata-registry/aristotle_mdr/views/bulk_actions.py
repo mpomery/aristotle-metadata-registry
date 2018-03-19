@@ -46,10 +46,18 @@ class BulkAction(FormView):
 
         if issubclass(action_form, ChangeStateForm):
             form = action_form(request.POST, user=request.user, request=request)
-            if form.is_valid():
-                self.request.session['bulkaction_items'] = form.cleaned_data['items']
+            form.full_clean()
+            if 'items' in form.cleaned_data:
+                items_data = form.cleaned_data['items'].values_list('id', flat=True)
+                logger.debug('items data is %s'%str(list(items_data)))
+                self.request.session['bulkaction_items'] = list(items_data)
+                logger.debug('form had valid items')
             else:
-                logger.debug('the form was invalid')
+                logger.debug('the form had invalid items')
+                logger.debug(form.errors)
+                if 'bulkaction_items' in self.request.session:
+                    del self.request.session['bulkaction_items']
+
             return HttpResponseRedirect(reverse('aristotle:change_state_bulk_action'))
 
         if action_form.confirm_page is None:
@@ -164,6 +172,7 @@ class ChangeStatusBulkActionView(ReviewChangesView):
         if step == 'change_state':
             kwargs.update({'user': self.request.user, 'form': None, 'request': self.request})
 
+        logger.debug('kwargs are : %s'%str(kwargs))
         return kwargs
 
     def get_form_initial(self, step):
@@ -173,7 +182,8 @@ class ChangeStatusBulkActionView(ReviewChangesView):
         if step == 'change_state':
             if 'bulkaction_items' in self.request.session:
                 bulk_items = self.request.session['bulkaction_items']
-                initial.update({'items', bulk_items})
+                logger.debug('bulk_items is %s'%str(bulk_items))
+                initial.update({'items': bulk_items})
                 logger.debug('got initial')
 
         return initial

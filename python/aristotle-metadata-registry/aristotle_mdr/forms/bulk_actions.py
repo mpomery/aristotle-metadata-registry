@@ -106,7 +106,10 @@ class BulkActionForm(UserAwareForm):
         else:
             queryset = MDR._concept.objects.public()
 
-        super().__init__(form, *args, **kwargs)
+        if 'data' not in kwargs:
+            super().__init__(form, *args, **kwargs)
+        else:
+            super().__init__(*args, **kwargs)
 
         self.fields['items'] = ForbiddenAllowedModelMultipleChoiceField(
             label=self.items_label,
@@ -186,12 +189,10 @@ class RemoveFavouriteForm(LoggedInBulkActionForm):
 
 class ChangeStateForm(ChangeStatusForm, BulkActionForm):
 
-    items = ForbiddenAllowedModelMultipleChoiceField(
-        queryset=MDR._concept.objects.all(),
-        validate_queryset=MDR._concept.objects.all(),
-        label="Related items",
-        required=False,
-    )
+    confirm_page = "aristotle_mdr/actions/bulk_actions/change_status.html"
+    classes="fa-university"
+    action_text = _('Change registration status')
+    items_label = "These are the items that will be registered. Add or remove additional items with the autocomplete box."
 
     @classmethod
     def can_use(cls, user):
