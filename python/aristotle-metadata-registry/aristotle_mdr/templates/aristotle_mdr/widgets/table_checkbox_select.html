@@ -4,7 +4,7 @@
   {% for group, options, index in widget.optgroups %}{% if group %}
   <td>{{ group }}<table{% if id %} id="{{ id }}_{{ index }}"{% endif %}>{% endif %}
     {% for option in options %}
-    <tr {% if extra.perm %}class="danger"{% endif %}>{% include option.template_name with widget=option disabled=extra.perm %}
+    <tr {% if not extra.perm %}class="danger"{% endif %}>{% include option.template_name with widget=option enabled=extra.perm %}
       {% with extra=extra_info|get_item:option.value %}
       <td>{{ extra.type|default:"" }}</td>
       <td>{{ extra.old|default:"" }}</td>
