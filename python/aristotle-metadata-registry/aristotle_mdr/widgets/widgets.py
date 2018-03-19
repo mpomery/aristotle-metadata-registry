@@ -45,7 +45,12 @@ class TableCheckboxSelect(CheckboxSelectMultiple):
     template_name = 'aristotle_mdr/widgets/table_checkbox_select.html'
     option_template_name = 'aristotle_mdr/widgets/table_checkbox_option.html'
 
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        option['extra'] = self.extra_info[option['value']]
+        return option
+
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        context.update({'extra_info': self.extra_info, 'new_state': self.new_state})
+        context.update({'new_state': self.new_state})
         return context
