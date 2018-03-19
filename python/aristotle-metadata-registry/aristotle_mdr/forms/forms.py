@@ -210,6 +210,29 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
     def __init__(self, queryset, new_state, ra, user, **kwargs):
         #logger.debug('Queryset: %s'%str(queryset))
+
+        extra_info = self.build_extra_info(queryset, new_state, ra, user)
+
+        headers = {
+            'reg_date': 'Registration Date',
+            'type': 'Type',
+            'old': 'Old State',
+            'new_state': 'New State'
+        }
+        order = ['type', 'old', 'reg_date', 'new_state']
+
+        self.widget = TableCheckboxSelect(
+            extra_info=extra_info,
+            static_info={'new_state': new_state},
+            attrs={'tableclass': 'table', 'checked': True},
+            headers=headers,
+            order=order
+        )
+
+        super().__init__(queryset, **kwargs)
+
+    def build_extra_info(self, queryset, new_state, ra, user):
+
         extra_info = {}
         subclassed_queryset = queryset.select_subclasses()
         statuses = MDR.Status.objects.filter(concept__in=queryset, registrationAuthority=ra).select_related('concept')
@@ -242,20 +265,4 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
             extra_info.update({concept.id: innerdict})
 
-        headers = {
-            'reg_date': 'Registration Date',
-            'type': 'Type',
-            'old': 'Old State',
-            'new_state': 'New State'
-        }
-        order = ['type', 'old', 'reg_date', 'new_state']
-
-        self.widget = TableCheckboxSelect(
-            extra_info=extra_info,
-            static_info={'new_state': new_state},
-            attrs={'tableclass': 'table', 'checked': True},
-            headers=headers,
-            order=order
-        )
-
-        super().__init__(queryset, **kwargs)
+        return extra_info
