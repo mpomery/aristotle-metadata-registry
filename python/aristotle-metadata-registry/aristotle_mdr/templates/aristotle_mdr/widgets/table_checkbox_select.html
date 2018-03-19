@@ -1,6 +1,6 @@
 {% load util_tags %}
 {% with id=widget.attrs.id %}<table{% if id %} id="{{ id }}"{% endif %}{% if widget.attrs.tableclass %} class="{{ widget.attrs.tableclass }}"{% endif %}>
-  <th>Select</th><th>Name</th><th>Type</th><th>Old State</th><th>Registration Date</th><th>Permission to edit</th><th>New State</th>
+  <th>Select</th><th>Name</th><th>Type</th><th>Old State</th><th>Registration Date</th><th>New State</th>
   {% for group, options, index in widget.optgroups %}{% if group %}
   <td>{{ group }}<table{% if id %} id="{{ id }}_{{ index }}"{% endif %}>{% endif %}
     {% for option in options %}
@@ -9,7 +9,6 @@
       <td>{{ extra.type|default:"" }}</td>
       <td>{{ extra.old|default:"" }}</td>
       <td>{{ extra.reg_date|default:"" }}</td>
-      <td>{{ extra.perm|default:"" }}</td>
       {% endwith %}
       <td>{{ new_state|default:"" }}</td>
     </tr>
