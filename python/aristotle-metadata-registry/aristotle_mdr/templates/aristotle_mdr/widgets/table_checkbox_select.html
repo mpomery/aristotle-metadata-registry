@@ -1,13 +1,12 @@
 {% with id=widget.attrs.id %}<table{% if id %} id="{{ id }}"{% endif %}{% if widget.attrs.tableclass %} class="{{ widget.attrs.tableclass }}"{% endif %}>
-  <th>Select</th><th>Name</th><th>Type</th><th>Old State</th><th>Registration Date</th><th>New State</th>
+  <th>Select</th><th>Name</th>{% for header in headers %}<th>{{ header }}</th>{% endfor %}
   {% for group, options, index in widget.optgroups %}{% if group %}
   <td>{{ group }}<table{% if id %} id="{{ id }}_{{ index }}"{% endif %}>{% endif %}
     {% for option in options %}
-    <tr {% if not option.extra.perm %}class="danger"{% endif %}>{% include option.template_name with widget=option enabled=option.extra.perm %}
-      <td>{{ option.extra.type|default:"" }}</td>
-      <td>{{ option.extra.old|default:"" }}</td>
-      <td>{{ option.extra.reg_date|default:"" }}</td>
-      <td>{{ new_state|default:"" }}</td>
+    <tr {% if not option.permission %}class="danger"{% endif %}>{% include option.template_name with widget=option enabled=option.permission %}
+      {% for item in option.extra %}
+      <td>{{ item }}</td>
+      {% endfor %}
     </tr>
     {% endfor %}{% if group %}
   </table></td>{% endif %}{% endfor %}

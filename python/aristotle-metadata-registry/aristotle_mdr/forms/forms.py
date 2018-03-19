@@ -242,6 +242,20 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
             extra_info.update({concept.id: innerdict})
 
-        self.widget = TableCheckboxSelect(extra_info=extra_info, new_state=new_state, attrs={'tableclass': 'table', 'checked': True})
+        headers = {
+            'reg_date': 'Registration Date',
+            'type': 'Type',
+            'old': 'Old State',
+            'new_state': 'New State'
+        }
+        order = ['type', 'old', 'reg_date', 'new_state']
+
+        self.widget = TableCheckboxSelect(
+            extra_info=extra_info,
+            static_info={'new_state': new_state},
+            attrs={'tableclass': 'table', 'checked': True},
+            headers=headers,
+            order=order
+        )
 
         super().__init__(queryset, **kwargs)

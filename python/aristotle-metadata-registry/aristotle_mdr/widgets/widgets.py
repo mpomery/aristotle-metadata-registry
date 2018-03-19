@@ -37,20 +37,38 @@ class RegistrationAuthoritySelect(forms.Select):
 
 class TableCheckboxSelect(CheckboxSelectMultiple):
 
-    def __init__(self, extra_info, new_state, attrs=None, choices=(), **kwargs):
+    def __init__(self, extra_info, static_info, headers, order, attrs=None, choices=(), **kwargs):
         super().__init__(attrs, choices, **kwargs)
         self.extra_info = extra_info
-        self.new_state = new_state
+        self.static_info = static_info
+        self.order = order
+        self.header_list = [headers[field] for field in order]
 
     template_name = 'aristotle_mdr/widgets/table_checkbox_select.html'
     option_template_name = 'aristotle_mdr/widgets/table_checkbox_option.html'
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super().create_option(name, value, label, selected, index, subindex, attrs)
-        option['extra'] = self.extra_info[option['value']]
+        option_extra = self.extra_info[option['value']]
+        option_extra_list = []
+
+        for field in self.order:
+            try:
+                value = option_extra[field]
+            except KeyError:
+                try:
+                    value = self.static_info[field]
+                except KeyError:
+                    value = 'None'
+            option_extra_list.append(value)
+
+        option['extra'] = option_extra_list
+        option['permission'] = option_extra['perm']
+        
         return option
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        context.update({'new_state': self.new_state})
+
+        context.update({'static_info': self.static_info, 'headers': self.header_list})
         return context
