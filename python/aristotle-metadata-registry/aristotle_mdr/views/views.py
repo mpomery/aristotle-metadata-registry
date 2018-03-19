@@ -388,7 +388,6 @@ class ChangeStatusView(ReviewChangesView):
         if step == 'change_status':
             return {'user': self.request.user}
 
-        print(kwargs)
         return kwargs
 
     def get_form(self, step=None, data=None, files=None):

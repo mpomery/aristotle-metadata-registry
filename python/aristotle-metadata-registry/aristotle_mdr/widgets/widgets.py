@@ -56,15 +56,19 @@ class TableCheckboxSelect(CheckboxSelectMultiple):
             try:
                 value = option_extra[field]
             except KeyError:
+                value = None
+
+            if not value:
                 try:
                     value = self.static_info[field]
                 except KeyError:
-                    value = 'None'
+                    value = None
+                    
             option_extra_list.append(value)
 
         option['extra'] = option_extra_list
         option['permission'] = option_extra['perm']
-        
+
         return option
 
     def get_context(self, name, value, attrs):
