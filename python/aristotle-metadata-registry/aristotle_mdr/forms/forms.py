@@ -224,7 +224,7 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
         self.widget = TableCheckboxSelect(
             extra_info=extra_info,
             static_info={'new_state': new_state},
-            attrs={'tableclass': 'table', 'checked': True},
+            attrs={'tableclass': 'table'},
             headers=headers,
             order=order
         )
