@@ -1,3 +1,4 @@
+{% if badperms %}<p>You do not have permission to update any items shown below in red</p>{% endif %}
 {% with id=widget.attrs.id %}<table{% if id %} id="{{ id }}"{% endif %}{% if widget.attrs.tableclass %} class="{{ widget.attrs.tableclass }}"{% endif %}>
   <th>Select</th><th>Name</th>{% for header in headers %}<th>{{ header }}</th>{% endfor %}
   {% for group, options, index in widget.optgroups %}{% if group %}
