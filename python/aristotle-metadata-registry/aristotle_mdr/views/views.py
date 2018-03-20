@@ -252,6 +252,7 @@ class ReviewChangesView(SessionWizardView):
     def get_form_kwargs(self, step):
 
         if step == 'review_changes':
+            items = self.get_items()
             # Check some values from last step
             cleaned_data = self.get_change_data()
             cascade = cleaned_data['cascadeRegistration']
@@ -263,14 +264,14 @@ class ReviewChangesView(SessionWizardView):
 
             if cascade == 1:
                 all_ids = []
-                for item in self.items:
+                for item in items:
                     cascaded_ids = [a.id for a in item.registry_cascade_items]
                     cascaded_ids.append(item.id)
                     all_ids.extend(cascaded_ids)
                 #logger.debug('cascaded ids: %s'%cascaded_ids)
                 queryset = MDR._concept.objects.filter(id__in=all_ids)
             else:
-                ids = [a.id for a in self.items]
+                ids = [a.id for a in items]
                 queryset = MDR._concept.objects.filter(id__in=ids)
 
             return {'queryset': queryset, 'new_state': state_name, 'ra': ra[0], 'user': self.request.user}
@@ -296,10 +297,15 @@ class ReviewChangesView(SessionWizardView):
 
             self.display_review = review
 
+    def get_items(self):
+        return self.items
+
     def get_template_names(self):
         return [self.templates[self.steps.current]]
 
     def register_changes(self, form_dict, change_form=None, **kwargs):
+
+        items = self.get_items()
 
         try:
             review_data = form_dict['review_changes'].cleaned_data
@@ -342,7 +348,7 @@ class ReviewChangesView(SessionWizardView):
                 success.extend(status['success'])
                 failed.extend(status['failed'])
         else:
-            for item in self.items:
+            for item in items:
                 for ra in ras:
                     # Should only be 1 ra
                     # Need to check before enforcing
@@ -368,12 +374,14 @@ class ReviewChangesView(SessionWizardView):
             success, failed = self.register_changes(form_dict, change_form)
 
             bad_items = sorted([str(i.id) for i in failed])
+            count = self.get_items().count()
+
             if failed:
                 message = _(
                     "%(num_items)s items registered \n"
                     "%(num_faileds)s items failed, they had the id's: %(bad_ids)s"
                 ) % {
-                    'num_items': self.items.count(),
+                    'num_items': count,
                     'num_faileds': len(failed),
                     'bad_ids': ",".join(bad_items)
                 }
@@ -381,7 +389,7 @@ class ReviewChangesView(SessionWizardView):
                 message = _(
                     "%(num_items)s items registered\n"
                 ) % {
-                    'num_items': self.items.count(),
+                    'num_items': count,
                 }
 
             reversion.revisions.set_comment(message)
@@ -406,7 +414,6 @@ class ChangeStatusView(ReviewChangesView):
     def dispatch(self, request, *args, **kwargs):
         # Check for keyError here
         self.item = get_object_or_404(MDR._concept, pk=kwargs['iid']).item
-        self.items = [self.item]
 
         if not (self.item and user_can_change_status(request.user, self.item)):
             if request.user.is_anonymous():
@@ -415,6 +422,9 @@ class ChangeStatusView(ReviewChangesView):
                 raise PermissionDenied
 
         return super().dispatch(request, *args, **kwargs)
+
+    def get_items(self):
+        return [self.item]
 
     def get_form(self, step=None, data=None, files=None):
 

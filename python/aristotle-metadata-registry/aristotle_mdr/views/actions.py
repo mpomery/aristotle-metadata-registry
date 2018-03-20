@@ -184,6 +184,9 @@ class ReviewAcceptView(ReviewChangesView):
         self.review = get_object_or_404(MDR.ReviewRequest, pk=self.kwargs['review_id'])
         return self.review
 
+    def get_items(self):
+        return self.get_review().concepts.all()
+
     def get_change_data(self):
         review = self.get_review()
 
@@ -205,7 +208,7 @@ class ReviewAcceptView(ReviewChangesView):
         return kwargs
 
     def get_form_kwargs(self, step):
-        self.items = self.get_review().concepts.all()
+
         kwargs = super().get_form_kwargs(step)
 
         if step == 'review_accept':
@@ -221,7 +224,6 @@ class ReviewAcceptView(ReviewChangesView):
     def done(self, form_list, form_dict, **kwargs):
         review = self.get_review()
 
-        self.items = review.concepts.all()
         message = self.register_changes_with_message(form_dict)
 
         # Update review object

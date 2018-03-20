@@ -164,11 +164,10 @@ class ChangeStatusBulkActionView(ReviewChangesView):
     def get_change_data(self):
         return self.get_cleaned_data_for_step('change_state')
 
-    def get_form_kwargs(self, step):
+    def get_items(self):
+        return self.get_change_data()['items']
 
-        if step == 'review_changes':
-            # Need to set items before getting the review form kwargs
-            self.items = self.get_change_data()['items']
+    def get_form_kwargs(self, step):
 
         kwargs = super().get_form_kwargs(step)
 
@@ -195,9 +194,6 @@ class ChangeStatusBulkActionView(ReviewChangesView):
         return super().get_form(step, data, files)
 
     def done(self, form_list, form_dict, **kwargs):
-
-        if self.items is None:
-            self.items = self.get_change_data()['items']
 
         self.register_changes_with_message(form_dict, 'change_state')
 
