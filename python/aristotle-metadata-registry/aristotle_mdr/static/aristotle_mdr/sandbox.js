@@ -1,4 +1,11 @@
 $(document).ready(function() {
+
+  // Remove href attributes if javascript enabled
+  // This will not be needed if using bootstrap 4.0
+  $('.delete-button').each(function() {
+      $(this).removeAttr('href');
+  })
+
   $('#delete-modal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget) // Button that triggered the modal
     var item_id = button.data('item-id') // Extract info from data-* attributes
