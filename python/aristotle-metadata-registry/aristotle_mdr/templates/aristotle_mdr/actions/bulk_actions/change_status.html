@@ -9,12 +9,12 @@
 {% block form %}
       <header>This form allows you to change the status of items in your registration authorities.
       </header>
-      <div>
+      <div class="changeStatusDiv">
           {{ wizard.form.items.label }}
           {{ wizard.form.items }}
       </div>
       <section>
-      <div class="changesStatusDiv">
+      <div class="changeStatusDiv">
           <span>
               {{ wizard.form.registrationDate.label }}:
               {{ wizard.form.registrationDate.errors }}
@@ -23,7 +23,7 @@
               {{ wizard.form.registrationDate }}
           </span>
       </div>
-      <div class="changesStatusDiv">
+      <div class="changeStatusDiv">
           <span>
               {{ wizard.form.cascadeRegistration.label }}:
               {{ wizard.form.cascadeRegistration.errors }}
