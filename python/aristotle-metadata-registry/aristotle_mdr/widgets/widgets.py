@@ -35,6 +35,7 @@ class RegistrationAuthoritySelect(forms.Select):
         else:
             return super().render(name, value, **kwargs)
 
+
 class TableCheckboxSelect(CheckboxSelectMultiple):
 
     def __init__(self, extra_info, static_info, headers, order, attrs=None, choices=(), **kwargs):
