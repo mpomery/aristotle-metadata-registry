@@ -4,6 +4,7 @@
 {% load static from staticfiles %}
 
 {% block title %}Request review for {{ item.name }}{% endblock %}
+
 {% block content %}
 <form method="post" action="{% url 'aristotle:request_review' item.id %}">{% csrf_token %}
     <div class="modal-body">
@@ -33,7 +34,7 @@
             {{form.errors}}
         </div>
         <section>
-        <div id="changeStatusDate">
+        <div class="changeStatusDiv">
             <span>
                 <label for="id_registration_date">{{ form.registration_date.label }}</label>:
                 {{ form.registration_date.errors }}
@@ -42,7 +43,7 @@
                 {{ form.registration_date }}
             </span>
         </div>
-        <div id="cascadeRegistration">
+        <div class="changeStatusDiv">
             <span>
                 <label for="id_cascadeRegistration">
                 {{ form.cascade_registration.label }}
@@ -82,7 +83,7 @@
             </div>
         </div>
         <div class="status_change_description">
-            <label for='id_message'>{{ form.message.label }}:</label> {{ form.message.help_text }} 
+            <label for='id_message'>{{ form.message.label }}:</label> {{ form.message.help_text }}
             {{ form.message }}
         </div>
         {% block save %}
@@ -112,8 +113,5 @@
         "public":"{% trans 'public' %}"
     }
 </script>
-    {% block extra_head_scripts %}
-        {{ form.media }}
-        <script src="{% static 'aristotle_mdr/aristotle.status_change.js' %}"></script>
-    {% endblock %}
+<script src="{% static 'aristotle_mdr/aristotle.status_change.js' %}"></script>
 {% endblock %}

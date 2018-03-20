@@ -12,7 +12,12 @@
 $(document).ready(function() {
     $("#changeStatus input").change(function() {
         var state = $('#changeStatus input[name$=state]:checked').val();
+        console.log(state);
         var selected_ras = $("#changeStatus input[name$=registrationAuthorities]:checked");
+        if (selected_ras.length == 0) {
+           // Diffent name on review create form
+           var selected_ras = $("#changeStatus input[name=registration_authority]:checked")
+        }
         if ((typeof state === "undefined") || (selected_ras.length == 0)){
             $('#potential').html(select_state_to_see);
         } else {
