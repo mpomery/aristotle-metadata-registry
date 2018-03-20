@@ -45,6 +45,9 @@ class BulkAction(FormView):
         action_form = action['form']
 
         if issubclass(action_form, ChangeStateForm):
+            # If the form is a change state form
+            # Put the items into the users session and redirect
+
             items_list = self.request.POST.getlist('items')
             logger.debug('items data is %s'%items_list)
             if items_list:
@@ -52,6 +55,8 @@ class BulkAction(FormView):
             else:
                 if 'bulkaction_items' in self.request.session:
                     del self.request.session['bulkaction_items']
+
+            self.request.session['next'] = url
 
             return HttpResponseRedirect(reverse('aristotle:change_state_bulk_action'))
 
@@ -160,7 +165,13 @@ class ChangeStatusBulkActionView(ReviewChangesView):
     def get_template_names(self):
         return [self.templates[self.steps.current]]
 
+    def get_change_data(self):
+        return self.get_cleaned_data_for_step('change_state')
+
     def get_form_kwargs(self, step):
+
+        if step == 'review_changes':
+            self.items = self.get_change_data()['items']
 
         kwargs = super().get_form_kwargs(step)
 
@@ -200,4 +211,8 @@ class ChangeStatusBulkActionView(ReviewChangesView):
 
     def done(self, form_list, form_dict, **kwargs):
         self.register_changes(form_dict, 'change_state')
-        return HttpResponseRedirect(url_slugify_concept(self.item))
+        if 'next' in self.request.session:
+            url = self.request.session['next']
+        else:
+            url = '/'
+        return HttpResponseRedirect(url)
