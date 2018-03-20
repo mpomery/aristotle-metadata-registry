@@ -216,8 +216,31 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(self.editor.profile.favourites.count(), 0)
 
-    @tag('changestatus')
-    def test_bulk_status_change_on_permitted_items(self):
+    # Util function
+    def perform_state_review(self, postdata, selected_for_change):
+        postdata.pop('submit_skip')
+        postdata['submit_next'] = 'value'
+
+        change_state_response = self.client.post(
+            reverse('aristotle:change_state_bulk_action'),
+            postdata
+        )
+
+        self.assertEqual(change_state_response.status_code, 200)
+        self.assertEqual(change_state_response.context['wizard']['steps'].step1, 2) # check we are now on second step
+
+        review_response = self.client.post(
+            reverse('aristotle:change_state_bulk_action'),
+            {
+                'review_changes-selected_list': selected_for_change,
+                'change_status_bulk_action_view-current_step': 'review_changes',
+            }
+        )
+
+        return review_response
+
+    # Function used for the 2 tests below
+    def bulk_status_change_on_permitted_items(self, review_changes):
         self.login_registrar()
         review = models.ReviewRequest.objects.create(
             requester=self.su,registration_authority=self.ra,
@@ -248,30 +271,50 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         change_state_get_response = self.client.get(reverse('aristotle:change_state_bulk_action'))
         self.assertEqual(change_state_get_response.context['form'].initial['items'], [str(a) for a in items])
 
-        change_state_response = self.client.post(
-            reverse('aristotle:change_state_bulk_action'),
-            {
-                'change_state-state': new_state,
-                'change_state-items': [str(a) for a in items],
-                'change_state-registrationDate': reg_date,
-                'change_state-cascadeRegistration': 0,
-                'change_state-registrationAuthorities': [self.ra.id],
-                'submit_skip': 'value',
-                'change_status_bulk_action_view-current_step': 'change_state',
-            }
-        )
+        postdata = {
+            'change_state-state': new_state,
+            'change_state-items': [str(a) for a in items],
+            'change_state-registrationDate': reg_date,
+            'change_state-cascadeRegistration': 0,
+            'change_state-registrationAuthorities': [self.ra.id],
+            'submit_skip': 'value',
+            'change_status_bulk_action_view-current_step': 'change_state',
+        }
+
+        if review_changes:
+            selected_list = [str(self.item1.id)]
+            change_state_response = self.perform_state_review(postdata, selected_list)
+        else:
+            change_state_response = self.client.post(
+                reverse('aristotle:change_state_bulk_action'),
+                postdata,
+            )
 
         self.assertEqual(change_state_response.status_code, 302)
 
+        item2_changed = not review_changes
+
         self.assertTrue(self.item1.is_registered)
-        self.assertTrue(self.item2.is_registered)
+        self.assertEqual(self.item2.is_registered, item2_changed)
 
         self.assertTrue(self.item1.current_statuses().first().registrationDate == reg_date)
-        self.assertTrue(self.item2.current_statuses().first().registrationDate == reg_date)
         self.assertTrue(self.item1.current_statuses().first().state == new_state)
-        self.assertTrue(self.item2.current_statuses().first().state == new_state)
         self.assertTrue(self.item1.current_statuses().first().registrationAuthority == self.ra)
-        self.assertTrue(self.item2.current_statuses().first().registrationAuthority == self.ra)
+
+        if item2_changed:
+            self.assertTrue(self.item2.current_statuses().first().registrationDate == reg_date)
+            self.assertTrue(self.item2.current_statuses().first().state == new_state)
+            self.assertTrue(self.item2.current_statuses().first().registrationAuthority == self.ra)
+        else:
+            self.assertEqual(len(self.item2.current_statuses()), 0)
+
+    @tag('changestatus')
+    def test_bulk_status_change_on_permitted_items_direct(self):
+        self.bulk_status_change_on_permitted_items(review_changes=False)
+
+    @tag('changestatus')
+    def test_bulk_status_change_on_permitted_items_with_review(self):
+        self.bulk_status_change_on_permitted_items(review_changes=True)
 
     @tag('changestatus')
     def test_bulk_status_change_on_forbidden_items(self):
