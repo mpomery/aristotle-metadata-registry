@@ -169,6 +169,7 @@ class ReviewAcceptView(ReviewChangesView):
 
     condition_dict = {'review_changes': display_review}
     display_review = None
+    review = None
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -218,7 +219,7 @@ class ReviewAcceptView(ReviewChangesView):
 
     def get_form(self, step=None, data=None, files=None):
 
-        self.set_review_var(step, data, files, 'review_changes')
+        self.set_review_var(step, data, files, 'review_accept')
         return super().get_form(step, data, files)
 
     def done(self, form_list, form_dict, **kwargs):

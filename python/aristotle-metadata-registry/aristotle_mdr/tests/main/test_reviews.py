@@ -338,11 +338,11 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
             else:
                 self.assertTrue(item.current_statuses().count() == 0)
 
-    @tag('newtests')
+    @tag('changestatus')
     def test_registrar_can_accept_review_direct(self):
         self.registrar_can_accept_review(review_changes=False)
 
-    @tag('newtests')
+    @tag('changestatus')
     def test_registrar_can_accept_review_alter_changes(self):
         self.registrar_can_accept_review(review_changes=True)
 
