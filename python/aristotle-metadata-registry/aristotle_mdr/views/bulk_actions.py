@@ -49,7 +49,6 @@ class BulkAction(FormView):
             # Put the items into the users session and redirect
 
             items_list = self.request.POST.getlist('items')
-            logger.debug('items data is %s'%items_list)
             if items_list:
                 self.request.session['bulkaction_items'] = items_list
             else:
@@ -162,15 +161,13 @@ class ChangeStatusBulkActionView(ReviewChangesView):
     condition_dict = {'review_changes': display_review}
     display_review = None
 
-    def get_template_names(self):
-        return [self.templates[self.steps.current]]
-
     def get_change_data(self):
         return self.get_cleaned_data_for_step('change_state')
 
     def get_form_kwargs(self, step):
 
         if step == 'review_changes':
+            # Need to set items before getting the review form kwargs
             self.items = self.get_change_data()['items']
 
         kwargs = super().get_form_kwargs(step)
@@ -188,26 +185,9 @@ class ChangeStatusBulkActionView(ReviewChangesView):
         if step == 'change_state':
             if 'bulkaction_items' in self.request.session:
                 bulk_items = self.request.session['bulkaction_items']
-                logger.debug('bulk_items is %s'%str(bulk_items))
                 initial.update({'items': bulk_items})
-                logger.debug('got initial')
 
         return initial
-
-    def get_form(self, step=None, data=None, files=None):
-        # Set step if it's None
-        if step is None:
-            step = self.steps.current
-
-        # If on the first step check which button was used
-        # Set review appropriately
-
-        if step == 'change_state' and data:
-            #logger.debug('we running')
-            #logger.debug('data is %s'%str(data))
-            self.display_review = self.set_review_var(data)
-
-        return super().get_form(step, data, files)
 
     def done(self, form_list, form_dict, **kwargs):
         self.register_changes(form_dict, 'change_state')

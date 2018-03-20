@@ -180,9 +180,6 @@ class ReviewAcceptView(ReviewChangesView):
 
         return super().dispatch(request, *args, **kwargs)
 
-    def get_template_names(self):
-        return [self.templates[self.steps.current]]
-
     def get_review(self):
         self.review = get_object_or_404(MDR.ReviewRequest, pk=self.kwargs['review_id'])
         return self.review
@@ -215,19 +212,6 @@ class ReviewAcceptView(ReviewChangesView):
             return {'user': self.request.user}
 
         return kwargs
-
-    def get_form(self, step=None, data=None, files=None):
-        # Set step if it's None
-        if step is None:
-            step = self.steps.current
-
-        # If on the first step check which button was used
-        # Set review appropriately
-        if step == 'review_accept' and data:
-            self.display_review = self.set_review_var(data)
-            print('set review to %s'%str(self.review))
-
-        return super().get_form(step, data, files)
 
     def done(self, form_list, form_dict, **kwargs):
         review = self.get_review()
