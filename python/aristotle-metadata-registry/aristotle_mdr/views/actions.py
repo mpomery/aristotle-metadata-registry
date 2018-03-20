@@ -217,29 +217,7 @@ class ReviewAcceptView(ReviewChangesView):
         review = self.get_review()
 
         self.items = review.concepts.all()
-        with transaction.atomic(), reversion.revisions.create_revision():
-            reversion.revisions.set_user(self.request.user)
-
-            success, failed = self.register_changes(form_dict)
-
-            bad_items = sorted([str(i.id) for i in failed])
-            if failed:
-                message = _(
-                    "%(num_items)s items registered \n"
-                    "%(num_faileds)s items failed, they had the id's: %(bad_ids)s"
-                ) % {
-                    'num_items': items.count(),
-                    'num_faileds': len(failed),
-                    'bad_ids': ",".join(bad_items)
-                }
-            else:
-                message = _(
-                    "%(num_items)s items registered\n"
-                ) % {
-                    'num_items': self.items.count(),
-                }
-
-            reversion.revisions.set_comment(message)
+        message = self.register_changes_with_message(form_dict)
 
         # Update review object
         review.reviewer = self.request.user

@@ -190,7 +190,9 @@ class ChangeStatusBulkActionView(ReviewChangesView):
         return initial
 
     def done(self, form_list, form_dict, **kwargs):
-        self.register_changes(form_dict, 'change_state')
+
+        self.register_changes_with_message(form_dict, 'change_state')
+
         if 'next' in self.request.session:
             url = self.request.session['next']
         else:
