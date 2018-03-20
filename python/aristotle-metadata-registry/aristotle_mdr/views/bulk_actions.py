@@ -189,7 +189,15 @@ class ChangeStatusBulkActionView(ReviewChangesView):
 
         return initial
 
+    def get_form(self, step=None, data=None, files=None):
+
+        self.set_review_var(step, data, files, 'change_state')
+        return super().get_form(step, data, files)
+
     def done(self, form_list, form_dict, **kwargs):
+
+        if self.items is None:
+            self.items = self.get_change_data()['items']
 
         self.register_changes_with_message(form_dict, 'change_state')
 

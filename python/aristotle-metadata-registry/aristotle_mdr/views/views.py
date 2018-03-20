@@ -281,28 +281,20 @@ class ReviewChangesView(SessionWizardView):
         # We override this when the change_data doesnt come form a form
         return self.get_cleaned_data_for_step('change_status')
 
-    def set_review_var(self, data):
+    def set_review_var(self, step, data, files, change_step):
 
-        review = True
-        if data.get('submit_next'):
-            review = True
-        elif data.get('submit_skip'):
-            review = False
-
-        return review
-
-    def get_form(self, step=None, data=None, files=None):
         # Set step if it's None
         if step is None:
             step = self.steps.current
 
-        # If on the first step check which button was used
-        # Set review appropriately
+        if step == change_step and data:
+            review = True
+            if data.get('submit_next'):
+                review = True
+            elif data.get('submit_skip'):
+                review = False
 
-        if step == 'change_status' and data:
-            self.display_review = self.set_review_var(data)
-
-        return super().get_form(step, data, files)
+            self.display_review = review
 
     def get_template_names(self):
         return [self.templates[self.steps.current]]
@@ -373,7 +365,7 @@ class ReviewChangesView(SessionWizardView):
         with transaction.atomic(), reversion.revisions.create_revision():
             reversion.revisions.set_user(self.request.user)
 
-            success, failed = self.register_changes(form_dict. change_form)
+            success, failed = self.register_changes(form_dict, change_form)
 
             bad_items = sorted([str(i.id) for i in failed])
             if failed:
@@ -424,7 +416,10 @@ class ChangeStatusView(ReviewChangesView):
 
         return super().dispatch(request, *args, **kwargs)
 
+    def get_form(self, step=None, data=None, files=None):
 
+        self.set_review_var(step, data, files, 'change_status')
+        return super().get_form(step, data, files)
 
     def get_form_kwargs(self, step):
 
@@ -434,8 +429,6 @@ class ChangeStatusView(ReviewChangesView):
             return {'user': self.request.user}
 
         return kwargs
-
-
 
     def get_context_data(self, form, **kwargs):
         item = self.item

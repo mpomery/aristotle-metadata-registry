@@ -213,6 +213,11 @@ class ReviewAcceptView(ReviewChangesView):
 
         return kwargs
 
+    def get_form(self, step=None, data=None, files=None):
+
+        self.set_review_var(step, data, files, 'review_changes')
+        return super().get_form(step, data, files)
+
     def done(self, form_list, form_dict, **kwargs):
         review = self.get_review()
 
