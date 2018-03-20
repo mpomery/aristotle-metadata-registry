@@ -11,8 +11,6 @@ from aristotle_mdr.views import ReviewChangesView, display_review
 from aristotle_mdr.forms.forms import ReviewChangesForm
 from aristotle_mdr.forms.bulk_actions import ChangeStateForm
 
-import logging
-logger = logging.getLogger(__name__)
 
 class BulkAction(FormView):
 
@@ -146,6 +144,7 @@ def get_bulk_actions():
         actions[action_name] = frm
     return actions
 
+
 class ChangeStatusBulkActionView(ReviewChangesView):
 
     form_list = [
@@ -174,7 +173,6 @@ class ChangeStatusBulkActionView(ReviewChangesView):
         if step == 'change_state':
             kwargs.update({'user': self.request.user, 'form': None, 'request': self.request})
 
-        logger.debug('kwargs are : %s'%str(kwargs))
         return kwargs
 
     def get_form_initial(self, step):

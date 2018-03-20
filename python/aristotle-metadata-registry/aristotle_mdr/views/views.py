@@ -245,6 +245,7 @@ def display_review(wizard):
     else:
         return True
 
+
 class ReviewChangesView(SessionWizardView):
 
     items = None
@@ -259,7 +260,6 @@ class ReviewChangesView(SessionWizardView):
             state = cleaned_data['state']
             ra = cleaned_data['registrationAuthorities']
             state_name = str(MDR.STATES[state])
-            #logger.debug('New state name %s'%state_name)
             # Need to check wether cascaded was true here
 
             if cascade == 1:
@@ -268,7 +268,7 @@ class ReviewChangesView(SessionWizardView):
                     cascaded_ids = [a.id for a in item.registry_cascade_items]
                     cascaded_ids.append(item.id)
                     all_ids.extend(cascaded_ids)
-                #logger.debug('cascaded ids: %s'%cascaded_ids)
+
                 queryset = MDR._concept.objects.filter(id__in=all_ids)
             else:
                 ids = [a.id for a in items]
@@ -314,7 +314,6 @@ class ReviewChangesView(SessionWizardView):
 
         if review_data:
             selected_list = review_data['selected_list']
-            logger.debug('Selected: %s'%str(selected_list))
 
         # process the data in form.cleaned_data as required
         if change_form:
@@ -396,6 +395,7 @@ class ReviewChangesView(SessionWizardView):
 
         return message
 
+
 class ChangeStatusView(ReviewChangesView):
 
     form_list = [
@@ -444,7 +444,7 @@ class ChangeStatusView(ReviewChangesView):
         item = self.item
         status_matrix = json.dumps(generate_visibility_matrix(self.request.user))
         context = super().get_context_data(form, **kwargs)
-        context.update({'item': item, 'status_matrix': status_matrix })
+        context.update({'item': item, 'status_matrix': status_matrix})
         return context
 
     def done(self, form_list, form_dict, **kwargs):

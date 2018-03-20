@@ -291,6 +291,7 @@ def setup_aristotle_test_environment():
         else:
             raise
 
+
 def status_filter(qs, when=timezone.now().date()):
     registered_before_now = Q(registrationDate__lte=when)
     registration_still_valid = (
@@ -303,4 +304,3 @@ def status_filter(qs, when=timezone.now().date()):
     )
 
     return states
-    

@@ -155,6 +155,7 @@ class ReviewRejectView(ReviewActionMixin, FormView):
         else:
             return self.form_invalid(form)
 
+
 class ReviewAcceptView(ReviewChangesView):
 
     form_list = [

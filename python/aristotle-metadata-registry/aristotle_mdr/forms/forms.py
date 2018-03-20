@@ -16,8 +16,6 @@ from django.forms.models import modelformset_factory
 
 from .utils import RegistrationAuthorityMixin
 
-import logging
-logger = logging.getLogger(__name__)
 
 class UserSelfEditForm(forms.Form):
     template = "aristotle_mdr/userEdit.html"
@@ -146,6 +144,7 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
         MDR.STATES[state]
         return state
 
+
 class ReviewChangesForm(forms.Form):
 
     def __init__(self, queryset, new_state, ra, user, *args, **kwargs):
@@ -157,6 +156,7 @@ class ReviewChangesForm(forms.Form):
             user=user,
             label=_("Select the items you would like to update")
         )
+
 
 # Thanks http://stackoverflow.com/questions/6958708/grappelli-to-hide-sortable-field-in-inline-sortable-django-admin
 class PermissibleValueForm(forms.ModelForm):
@@ -204,12 +204,13 @@ class CompareConceptsForm(forms.Form):
             widget=widgets.ConceptAutocompleteSelect()
         )
 
+
 # ------------ Form Fields ------------
+
 
 class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
     def __init__(self, queryset, new_state, ra, user, **kwargs):
-        #logger.debug('Queryset: %s'%str(queryset))
 
         extra_info = self.build_extra_info(queryset, new_state, ra, user)
 
@@ -236,7 +237,6 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
         extra_info = {}
         subclassed_queryset = queryset.select_subclasses()
         statuses = MDR.Status.objects.filter(concept__in=queryset, registrationAuthority=ra).select_related('concept')
-        #logger.debug('Statuses: %s'%str(statuses))
         statuses = status_filter(statuses).order_by("-registrationDate", "-created")
 
         # Build a dict mapping concepts to their status data

@@ -26,6 +26,7 @@ from django.db.models.fields import (
     TextField
 )
 
+
 class ConceptOneToOneRel(OneToOneRel):
     pass
 
