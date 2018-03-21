@@ -6,6 +6,7 @@ import aristotle_mdr.models as MDR
 from aristotle_mdr.forms.creation_wizards import UserAwareModelForm, UserAwareForm
 from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 from aristotle_mdr.contrib.autocomplete import widgets
 from aristotle_mdr.perms import can_delete_metadata
