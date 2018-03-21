@@ -301,6 +301,14 @@ class DeleteSandboxView(FormView):
         kwargs.update({'user': self.request.user})
         return kwargs
 
+    def get_initial(self):
+        initial = super().get_initial()
+        item = self.request.GET.get('item', None)
+        if item:
+            initial.update({'item': item})
+            
+        return initial
+
     def post(self, request, *args, **kwargs):
 
         return super().post(request, *args, **kwargs)
