@@ -768,7 +768,7 @@ class _concept(baseAristotleObject):
             when = when.date()
 
         states = status_filter(qs, when)
-        states.order_by("registrationAuthority", "-registrationDate", "-created")
+        states = states.order_by("registrationAuthority", "-registrationDate", "-created")
 
         from django.db import connection
         if connection.vendor == 'postgresql':
