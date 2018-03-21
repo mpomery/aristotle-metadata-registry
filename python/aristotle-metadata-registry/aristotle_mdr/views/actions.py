@@ -306,12 +306,8 @@ class DeleteSandboxView(FormView):
         item = self.request.GET.get('item', None)
         if item:
             initial.update({'item': item})
-            
+
         return initial
-
-    def post(self, request, *args, **kwargs):
-
-        return super().post(request, *args, **kwargs)
 
     def form_invalid(self, form):
 
