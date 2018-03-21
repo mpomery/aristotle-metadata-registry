@@ -771,7 +771,7 @@ class _concept(baseAristotleObject):
         states.order_by("registrationAuthority", "-registrationDate", "-created")
 
         from django.db import connection
-        if connection.vendor == 'postgresqll':
+        if connection.vendor == 'postgresql':
             states = states.distinct('registrationAuthority')
         else:
             current_ids = []
