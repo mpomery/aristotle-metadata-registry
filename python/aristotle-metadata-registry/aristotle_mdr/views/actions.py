@@ -21,6 +21,9 @@ from aristotle_mdr.forms import actions
 from aristotle_mdr.views.utils import generate_visibility_matrix
 from aristotle_mdr.perms import can_delete_metadata
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class ItemSubpageView(object):
     def get_item(self):
@@ -284,9 +287,30 @@ class CheckCascadedStates(ItemSubpageView, DetailView):
         return kwargs
 
 
-class DeleteSandboxView(View):
+class DeleteSandboxView(FormView):
 
-    def post(self, request):
+    form_class = actions.DeleteSandboxForm
+    template_name = "aristotle_mdr/actions/delete_sandbox.html"
+
+    def get_success_url(self):
+        return reverse('aristotle:userSandbox')
+
+    def get_form_kwargs(self):
+
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+
+        if request.is_ajax():
+            return self.ajax_post(request)
+
+        return super().post(request, *args, **kwargs)
+
+    def ajax_post(self, request):
+
+        logger.debug('post was ajax')
         iid = request.POST.get('iid')
 
         try:
@@ -301,6 +325,9 @@ class DeleteSandboxView(View):
         else:
             return JsonResponse({'completed': False, 'message': 'You do not have permission to delete this item'})
 
-    def get(self, requiest):
+    def form_valid(self, form):
 
-        return HttpResponse('get not supported')
+        item = form.cleaned_data['item']
+        item.delete()
+
+        return super().form_valid(form)
