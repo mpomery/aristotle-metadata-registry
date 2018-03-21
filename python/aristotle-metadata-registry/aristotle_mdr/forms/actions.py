@@ -84,3 +84,14 @@ class ChangeRegistrationUserRolesForm(UserAwareForm):
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
+
+class DeleteSandboxForm(UserAwareForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['item'] = forms.ModelChoiceField(
+            label=_("Select item to delete"),
+            queryset=_concept.objects.filter(submitter=self.user),
+            required=True,
+        )
