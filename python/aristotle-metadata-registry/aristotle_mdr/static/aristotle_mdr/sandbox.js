@@ -24,7 +24,7 @@ $(document).ready(function() {
         $.ajax({
           method: "POST",
           url: submit_url,
-          data: {iid: item_id, csrfmiddlewaretoken: csrftoken},
+          data: {item: item_id, csrfmiddlewaretoken: csrftoken},
           datatype: "json",
           success: function(data) {
               if (data.completed) {

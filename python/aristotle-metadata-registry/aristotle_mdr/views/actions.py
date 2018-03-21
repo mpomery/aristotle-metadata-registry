@@ -303,31 +303,24 @@ class DeleteSandboxView(FormView):
 
     def post(self, request, *args, **kwargs):
 
-        if request.is_ajax():
-            return self.ajax_post(request)
-
         return super().post(request, *args, **kwargs)
 
-    def ajax_post(self, request):
+    def form_invalid(self, form):
 
-        logger.debug('post was ajax')
-        iid = request.POST.get('iid')
+        if self.request.is_ajax():
+            if 'item' in form.errors:
+                return JsonResponse({'completed': False, 'message': form.errors['item']})
+            else:
+                return JsonResponse({'completed': False, 'message': 'Invalid data'})
 
-        try:
-            item = MDR._concept.objects.get(id=iid)
-        except MDR._concept.DoesNotExist:
-            return JsonResponse({'completed': False, 'message': 'Item does not exist'})
-
-        if can_delete_metadata(request.user, item):
-            # No reversion needed here, can still be recreated from previous version
-            item.delete()
-            return JsonResponse({'completed': True})
-        else:
-            return JsonResponse({'completed': False, 'message': 'You do not have permission to delete this item'})
+        return super().form_invalid(form)
 
     def form_valid(self, form):
 
         item = form.cleaned_data['item']
         item.delete()
+
+        if self.request.is_ajax():
+            return JsonResponse({'completed': True})
 
         return super().form_valid(form)
