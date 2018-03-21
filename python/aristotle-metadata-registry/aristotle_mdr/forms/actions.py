@@ -88,6 +88,7 @@ class ChangeRegistrationUserRolesForm(UserAwareForm):
         required=False
     )
 
+
 class DeleteSandboxForm(UserAwareForm):
 
     def __init__(self, *args, **kwargs):
