@@ -80,6 +80,8 @@ class TestWebPageAccessibilityBase(utils.LoggedInViewPages):
                     pp.pprint("Failures for '%s' with media rules [%s]" % (url, media))
                     pp.pprint(results['failures'])
                     pp.pprint(results['warnings'])
+                    print('Skipped')
+                    pp.pprint(results['skipped'])
                     print("%s failures!!" % len(results['failures']) )
                     failures += len(results['failures'])
                 else:
