@@ -32,7 +32,19 @@
     </div>
     <div>
         {{ form.state }}
-        {{ form.registrationAuthorities}}
+        <ul>
+        {% for val,label_text in form.registrationAuthorities.field.choices %}
+        {% if val %}
+            <li>
+                <input type="radio" id="{{ wizard.steps.current }}-registrationAuthorities_{{val}}" name="{{ wizard.steps.current }}-registrationAuthorities" value="{{val}}">
+                <label for="{{ wizard.steps.current }}-registrationAuthorities_{{val}}">{{label_text}}</label>
+                <a href="{% url 'aristotle_mdr:registrationAuthority' iid=val %}" title="Visit the registration authority page to learn more about state meanings for this authority" class="pull-right">
+                    <i class="fa fa-fw fa-university"></i>
+                </a>
+            </li>
+        {% endif %}
+        {% endfor %}
+        </ul>
     </div>
 </div>
 <div class="status_change_description">
