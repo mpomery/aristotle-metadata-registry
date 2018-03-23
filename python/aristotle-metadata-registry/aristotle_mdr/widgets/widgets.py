@@ -57,9 +57,9 @@ class TableCheckboxSelect(CheckboxSelectMultiple):
 
         for field in self.order:
 
-            if field in ['select', 'name']:
+            if field in ['input', 'label']:
                 continue
-                
+
             try:
                 value = option_extra[field]
             except KeyError:
