@@ -13,7 +13,6 @@
 {% endblock %}
 {% csrf_token %}
 {% block content_body %}
-<p>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</p>
 <table>
 {{ wizard.management_form }}
 {% if wizard.form.forms %}
