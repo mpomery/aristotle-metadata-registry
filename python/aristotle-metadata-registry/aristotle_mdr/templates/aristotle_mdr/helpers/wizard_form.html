@@ -1,7 +1,7 @@
 {% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
 {% load compile_static i18n %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}Review Changes{% endblock %}
 
 {% block extra_head_scripts %}
 {{ wizard.form.media }}

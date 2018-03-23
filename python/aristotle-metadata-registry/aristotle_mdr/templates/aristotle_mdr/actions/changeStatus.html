@@ -4,6 +4,8 @@
 {% load compile_static i18n %}
 {% load static %}
 
+{% block title %}Change Status{% endblock %}
+
 {% block extra_head_scripts %}
 <script>
     status_matrix = {{status_matrix|safe}};
