@@ -12,6 +12,17 @@
     <span>
         <label for="id_cascadeRegistration">
         {{ form.cascadeRegistration.label }}
+        <a tabindex="0"
+        class="aristotle-popover"
+        role="button"
+        data-toggle="popover"
+        title="Associated Items Help"
+        data-content="Associated items can be components of another piece of metadata, or other items that have been linked together by a user.<br><br>
+        For example, the associated metadata for a Data Element would be it's Data Element Concept, Value Domain, Object Class and Property<br><br>
+        You can revew what other metadata items will be changed by clicking 'Review Changes' button"
+        data-html="true">
+        <i class="fa fa-2x fa-question-circle"></i>
+        </a>
         </label>
         {{ form.cascadeRegistration.errors }}
     </span>

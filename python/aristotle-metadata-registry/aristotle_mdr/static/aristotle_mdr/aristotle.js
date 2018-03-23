@@ -11,8 +11,10 @@ $(document).ready(function() {
         //console.log(x)
         x.remove()
     });
-});
 
+    // Initialize popovers
+    $('.aristotle-popover').popover()
+});
 
 $(document).ajaxSend(function(event, request, settings) {
     if (!suppressLoadingBlock) {
