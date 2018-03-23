@@ -191,6 +191,13 @@ class ChangeStatusBulkActionView(ReviewChangesView):
         self.set_review_var(step, data, files, 'change_state')
         return super().get_form(step, data, files)
 
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form, **kwargs)
+        if 'next' in self.request.session:
+            context.update({'next': self.request.session['next']})
+
+        return context
+
     def done(self, form_list, form_dict, **kwargs):
 
         self.register_changes_with_message(form_dict, 'change_state')
