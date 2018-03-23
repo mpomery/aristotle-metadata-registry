@@ -1,0 +1,42 @@
+<section>
+<div class="changeStatusDiv">
+    <span>
+        <label for="id_registrationDate">{{ wizard.form.registrationDate.label }}</label>:
+        {{ form.registrationDate.errors }}
+    </span>
+    <span class="pull-right">
+        {{ form.registrationDate }}
+    </span>
+</div>
+<div class="changeStatusDiv">
+    <span>
+        <label for="id_cascadeRegistration">
+        {{ form.cascadeRegistration.label }}
+        </label>
+        {{ form.cascadeRegistration.errors }}
+    </span>
+    <span class="pull-right">
+        {{ form.cascadeRegistration }}
+    </span>
+</div>
+<div id="changeStatus">
+    <div>
+        <span>
+            {{ form.state.label }}
+            {{ form.state.errors }}
+        </span>
+        <span>
+            {{ form.registrationAuthorities.label }}
+            {{ form.registrationAuthorities.errors }}
+        </span>
+    </div>
+    <div>
+        {{ form.state }}
+        {{ form.registrationAuthorities}}
+    </div>
+</div>
+<div class="status_change_description">
+    {{ form.changeDetails.label }} (optional):
+    {{ form.changeDetails }}
+</div>
+</section>

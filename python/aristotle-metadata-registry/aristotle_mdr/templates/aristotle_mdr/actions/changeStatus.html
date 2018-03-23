@@ -45,48 +45,7 @@
           {% trans 'Select a new state to see how the visibility of this item will change.' %}
           </span>
       </div>
-      <section>
-      <div class="changeStatusDiv">
-          <span>
-              <label for="id_registrationDate">{{ wizard.form.registrationDate.label }}</label>:
-              {{ wizard.form.registrationDate.errors }}
-          </span>
-          <span class="pull-right">
-              {{ wizard.form.registrationDate }}
-          </span>
-      </div>
-      <div class="changeStatusDiv">
-          <span>
-              <label for="id_cascadeRegistration">
-              {{ wizard.form.cascadeRegistration.label }}
-              </label>
-              {{ wizard.form.cascadeRegistration.errors }}
-          </span>
-          <span class="pull-right">
-              {{ wizard.form.cascadeRegistration }}
-          </span>
-      </div>
-      <div id="changeStatus">
-          <div>
-              <span>
-                  {{ wizard.form.state.label }}
-                  {{ wizard.form.state.errors }}
-              </span>
-              <span>
-                  {{ wizard.form.registrationAuthorities.label }}
-                  {{ wizard.form.registrationAuthorities.errors }}
-              </span>
-          </div>
-          <div>
-              {{ wizard.form.state }}
-              {{ wizard.form.registrationAuthorities}}
-          </div>
-      </div>
-      <div class="status_change_description">
-          {{ wizard.form.changeDetails.label }} (optional):
-          {{ wizard.form.changeDetails }}
-      </div>
-      </section>
+      {% include 'aristotle_mdr/helpers/changestatus.html' with form=wizard.form %}
 {% endblock %}
 
 {% block buttons %}
