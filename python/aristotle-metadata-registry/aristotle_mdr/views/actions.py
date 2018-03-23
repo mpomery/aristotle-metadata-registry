@@ -17,6 +17,7 @@ import reversion
 from aristotle_mdr import perms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.forms import actions
+from aristotle_mdr.forms.forms import ChangeStatusGenericForm
 from aristotle_mdr.views.utils import generate_visibility_matrix
 from aristotle_mdr.views import ReviewChangesView, display_review
 from aristotle_mdr.forms.forms import ReviewChangesForm
@@ -61,9 +62,15 @@ class SubmitForReviewView(ItemSubpageFormView):
         item = self.get_item()
 
         if form.is_valid():
-            review = form.save(commit=False)
-            review.requester = request.user
-            review.save()
+            review = MDR.ReviewRequest.objects.create(
+                registration_authority = form.cleaned_data['registrationAuthorities'],
+                message = form.cleaned_data['changeDetails'],
+                state = form.cleaned_data['state'],
+                registration_date = form.cleaned_data['registrationDate'],
+                cascade_registration = form.cleaned_data['cascadeRegistration'],
+                requester = request.user
+            )
+
             review.concepts.add(item)
             message = mark_safe(
                 _("<a href='{url}'>Review submitted, click to review</a>").format(url=reverse('aristotle_mdr:userReviewDetails', args=[review.pk]))
@@ -189,7 +196,7 @@ class ReviewAcceptView(ReviewChangesView):
     def get_items(self):
         return self.get_review().concepts.all()
 
-    def get_change_data(self):
+    def get_change_data(self, register=False):
         review = self.get_review()
 
         # Register status changes
@@ -200,6 +207,11 @@ class ReviewAcceptView(ReviewChangesView):
             'cascadeRegistration': review.cascade_registration,
             'changeDetails': review.message
         }
+
+        if register:
+            # If registering cascade needs to be a boolean
+            # This is done autmoatically on clean for the change status forms
+            change_data['cascadeRegistration'] = (review.cascade_registration == 1)
 
         return change_data
 

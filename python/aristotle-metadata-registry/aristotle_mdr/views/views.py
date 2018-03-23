@@ -320,7 +320,7 @@ class ReviewChangesView(SessionWizardView):
         if change_form:
             cleaned_data = form_dict[change_form].cleaned_data
         else:
-            cleaned_data = self.get_change_data()
+            cleaned_data = self.get_change_data(register=True)
 
         ras = cleaned_data['registrationAuthorities']
         state = cleaned_data['state']

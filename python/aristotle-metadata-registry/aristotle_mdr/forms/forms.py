@@ -99,7 +99,7 @@ class SupersedeForm(forms.Form):
         return item
 
 
-class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
+class ChangeStatusGenericForm(RegistrationAuthorityMixin, UserAwareForm):
     state = forms.ChoiceField(choices=MDR.STATES, widget=forms.RadioSelect)
     registrationDate = forms.DateField(
         required=False,
@@ -130,6 +130,8 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
             field_name="registrationAuthorities", qs=self.user.profile.registrarAuthorities
         )
 
+class ChangeStatusForm(ChangeStatusGenericForm):
+    
     def clean_cascadeRegistration(self):
         return self.cleaned_data['cascadeRegistration'] == "1"
 

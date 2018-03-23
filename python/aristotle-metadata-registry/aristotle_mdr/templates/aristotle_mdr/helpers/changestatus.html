@@ -1,7 +1,7 @@
 <section>
 <div class="changeStatusDiv">
     <span>
-        <label for="id_registrationDate">{{ wizard.form.registrationDate.label }}</label>:
+        <label for="id_registrationDate">{{ form.registrationDate.label }}</label>:
         {{ form.registrationDate.errors }}
     </span>
     <span class="pull-right">
@@ -47,8 +47,8 @@
         {% for val,label_text in form.registrationAuthorities.field.choices %}
         {% if val %}
             <li>
-                <input type="radio" id="{{ wizard.steps.current }}-registrationAuthorities_{{val}}" name="{{ wizard.steps.current }}-registrationAuthorities" value="{{val}}">
-                <label for="{{ wizard.steps.current }}-registrationAuthorities_{{val}}">{{label_text}}</label>
+                <input type="radio" id="{% if wizard %}{{ wizard.steps.current }}-{% endif %}registrationAuthorities_{{val}}" name="{% if wizard %}{{ wizard.steps.current }}-{% endif %}registrationAuthorities" value="{{val}}">
+                <label for="{% if wizard %}{{ wizard.steps.current }}-{% endif %}registrationAuthorities_{{val}}">{{label_text}}</label>
                 <a href="{% url 'aristotle_mdr:registrationAuthority' iid=val %}" title="Visit the registration authority page to learn more about state meanings for this authority" class="pull-right">
                     <i class="fa fa-fw fa-university"></i>
                 </a>
