@@ -215,19 +215,31 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
         extra_info = self.build_extra_info(queryset, ra, user)
 
         headers = {
+            'select': '',
+            'name': '',
             'old_reg_date': 'Old Registration Date',
-            'type': 'Type',
+            'type': '',
             'old': 'Old State',
             'new_state': 'New State',
             'new_reg_date': 'New Registration Date',
         }
-        order = ['type', 'old', 'old_reg_date', 'new_state', 'new_reg_date']
+
+        top_header = [
+            {'text': 'Select'},
+            {'text': 'Name'},
+            {'text': 'Type'},
+            {'text': 'Previous','colspan': 2},
+            {'text': 'New','colspan': 2}
+        ]
+        
+        order = ['select', 'name', 'type', 'old', 'old_reg_date', 'new_state', 'new_reg_date']
 
         self.widget = TableCheckboxSelect(
             extra_info=extra_info,
             static_info=static_content,
             attrs={'tableclass': 'table'},
             headers=headers,
+            top_header=top_header,
             order=order
         )
 

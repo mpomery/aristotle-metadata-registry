@@ -38,12 +38,13 @@ class RegistrationAuthoritySelect(forms.Select):
 
 class TableCheckboxSelect(CheckboxSelectMultiple):
 
-    def __init__(self, extra_info, static_info, headers, order, attrs=None, choices=(), **kwargs):
+    def __init__(self, extra_info, static_info, headers, top_header, order, attrs=None, choices=(), **kwargs):
         super().__init__(attrs, choices, **kwargs)
         self.extra_info = extra_info
         self.static_info = static_info
         self.order = order
         self.header_list = [headers[field] for field in order]
+        self.top_header = top_header
         self.badperms = False
 
     template_name = 'aristotle_mdr/widgets/table_checkbox_select.html'
@@ -55,6 +56,10 @@ class TableCheckboxSelect(CheckboxSelectMultiple):
         option_extra_list = []
 
         for field in self.order:
+
+            if field in ['select', 'name']:
+                continue
+                
             try:
                 value = option_extra[field]
             except KeyError:
@@ -79,5 +84,11 @@ class TableCheckboxSelect(CheckboxSelectMultiple):
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
 
-        context.update({'static_info': self.static_info, 'headers': self.header_list, 'badperms': self.badperms})
+        context.update({
+            'static_info': self.static_info,
+            'headers': self.header_list,
+            'badperms': self.badperms,
+            'top_header': self.top_header
+        })
+
         return context
