@@ -259,7 +259,8 @@ class ReviewChangesView(SessionWizardView):
             cascade = cleaned_data['cascadeRegistration']
             state = cleaned_data['state']
             ra = cleaned_data['registrationAuthorities']
-            state_name = str(MDR.STATES[state])
+
+            static_content = {'new_state': str(MDR.STATES[state]), 'new_reg_date': cleaned_data['registrationDate']}
             # Need to check wether cascaded was true here
 
             if cascade == 1:
@@ -274,7 +275,7 @@ class ReviewChangesView(SessionWizardView):
                 ids = [a.id for a in items]
                 queryset = MDR._concept.objects.filter(id__in=ids)
 
-            return {'queryset': queryset, 'new_state': state_name, 'ra': ra[0], 'user': self.request.user}
+            return {'queryset': queryset, 'static_content': static_content, 'ra': ra[0], 'user': self.request.user}
 
         return {}
 

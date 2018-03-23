@@ -147,11 +147,11 @@ class ChangeStatusForm(RegistrationAuthorityMixin, UserAwareForm):
 
 class ReviewChangesForm(forms.Form):
 
-    def __init__(self, queryset, new_state, ra, user, *args, **kwargs):
+    def __init__(self, queryset, static_content, ra, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['selected_list'] = ReviewChangesChoiceField(
             queryset=queryset,
-            new_state=new_state,
+            static_content=static_content,
             ra=ra,
             user=user,
             label=_("Select the items you would like to update")
@@ -210,21 +210,22 @@ class CompareConceptsForm(forms.Form):
 
 class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
-    def __init__(self, queryset, new_state, ra, user, **kwargs):
+    def __init__(self, queryset, static_content, ra, user, **kwargs):
 
-        extra_info = self.build_extra_info(queryset, new_state, ra, user)
+        extra_info = self.build_extra_info(queryset, ra, user)
 
         headers = {
-            'reg_date': 'Registration Date',
+            'old_reg_date': 'Old Registration Date',
             'type': 'Type',
             'old': 'Old State',
-            'new_state': 'New State'
+            'new_state': 'New State',
+            'new_reg_date': 'New Registration Date',
         }
-        order = ['type', 'old', 'reg_date', 'new_state']
+        order = ['type', 'old', 'old_reg_date', 'new_state', 'new_reg_date']
 
         self.widget = TableCheckboxSelect(
             extra_info=extra_info,
-            static_info={'new_state': new_state},
+            static_info=static_content,
             attrs={'tableclass': 'table'},
             headers=headers,
             order=order
@@ -232,7 +233,7 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
         super().__init__(queryset, **kwargs)
 
-    def build_extra_info(self, queryset, new_state, ra, user):
+    def build_extra_info(self, queryset, ra, user):
 
         extra_info = {}
         subclassed_queryset = queryset.select_subclasses()
@@ -259,7 +260,7 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
                 state_info = None
 
             if state_info:
-                innerdict.update({'old': state_info['name'], 'reg_date': state_info['reg_date']})
+                innerdict.update({'old': state_info['name'], 'old_reg_date': state_info['reg_date']})
 
             innerdict.update({'perm': perms.user_can_change_status(user, concept)})
 
