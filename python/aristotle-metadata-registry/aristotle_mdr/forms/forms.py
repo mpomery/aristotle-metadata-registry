@@ -13,6 +13,7 @@ from aristotle_mdr.utils import status_filter
 from aristotle_mdr import perms
 
 from django.forms.models import modelformset_factory
+from django.urls import reverse
 
 from .utils import RegistrationAuthorityMixin
 
@@ -212,7 +213,8 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
     def __init__(self, queryset, static_content, ra, user, **kwargs):
 
-        extra_info = self.build_extra_info(queryset, ra, user)
+        extra_info = self.build_extra_info(queryset, ra, user, static_content)
+        static_content.pop('new_state') # Added this to extra with a dynamic url attached
 
         headers = {
             'input': '',
@@ -245,7 +247,7 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
         super().__init__(queryset, **kwargs)
 
-    def build_extra_info(self, queryset, ra, user):
+    def build_extra_info(self, queryset, ra, user, static_content):
 
         extra_info = {}
         subclassed_queryset = queryset.select_subclasses()
@@ -262,6 +264,8 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
                 states_dict[status.concept.id] = {'name': state_name, 'reg_date': reg_date}
 
         for concept in subclassed_queryset:
+            url = reverse('aristotle:registrationHistory', kwargs={'iid': concept.id})
+
             innerdict = {}
             # Get class name
             innerdict.update({'type': concept.__class__.get_verbose_name()})
@@ -272,9 +276,10 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
                 state_info = None
 
             if state_info:
-                innerdict.update({'old': state_info['name'], 'old_reg_date': state_info['reg_date']})
+                innerdict.update({'old': {'url': url, 'text': state_info['name']}, 'old_reg_date': state_info['reg_date']})
 
             innerdict.update({'perm': perms.user_can_change_status(user, concept)})
+            innerdict.update({'new_state': {'url': url, 'text': static_content['new_state']}})
 
             extra_info.update({concept.id: innerdict})
 

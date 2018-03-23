@@ -7,7 +7,11 @@
     {% for option in options %}
     <tr {% if not option.permission %}class="danger"{% endif %}>{% include option.template_name with widget=option enabled=option.permission %}
       {% for item in option.extra %}
+      {% if item.url %}
+      <td><a href={{ item.url }}>{{ item.text }}</a></td>
+      {% else %}
       <td>{{ item }}</td>
+      {% endif %}
       {% endfor %}
     </tr>
     {% endfor %}{% if group %}
