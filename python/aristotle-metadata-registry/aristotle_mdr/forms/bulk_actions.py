@@ -11,6 +11,7 @@ from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 
 import aristotle_mdr.models as MDR
 from aristotle_mdr.forms import ChangeStatusForm
+from aristotle_mdr.forms.actions import RequestReviewForm as RequestReviewActionForm
 from aristotle_mdr.perms import (
     user_can_view,
     user_is_registrar,
@@ -199,44 +200,20 @@ class ChangeStateForm(ChangeStatusForm, BulkActionForm):
         return user_is_registrar(user)
 
 
-class RequestReviewForm(LoggedInBulkActionForm):
+class RequestReviewForm(LoggedInBulkActionForm, RequestReviewActionForm):
     confirm_page = "aristotle_mdr/actions/bulk_actions/request_review.html"
     classes="fa-flag"
     action_text = _('Request review')
     items_label = "These are the items that will be reviewed. Add or remove additional items with the autocomplete box."
 
-    registration_authority=forms.ModelChoiceField(
-        label="Registration Authority",
-        queryset=MDR.RegistrationAuthority.objects.all(),
-    )
-    registration_date = forms.DateField(
-        required=False,
-        label=_("Registration date"),
-        widget=BootstrapDateTimePicker(options={"format": "YYYY-MM-DD"}),
-        initial=timezone.now()
-    )
-    state = forms.ChoiceField(choices=MDR.STATES, widget=forms.RadioSelect)
-    cascade_registration = forms.ChoiceField(
-        choices=[(0, _('No')), (1, _('Yes'))],
-        help_text=_("Update the registration of associated items")
-    )
-    message = forms.CharField(
-        required=False,
-        label=_("Message for the reviewing registrar"),
-        widget=forms.Textarea
-    )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def make_changes(self):
         import reversion
-        ra = self.cleaned_data['registration_authority']
+        ra = self.cleaned_data['registrationAuthorities']
         state = self.cleaned_data['state']
         items = self.items_to_change
-        cascade = self.cleaned_data['cascade_registration']
-        registration_date = self.cleaned_data['registration_date']
-        message = self.cleaned_data['message']
+        cascade = self.cleaned_data['cascadeRegistration']
+        registration_date = self.cleaned_data['registrationDate']
+        message = self.cleaned_data['changeDetails']
 
         with transaction.atomic(), reversion.revisions.create_revision():
             reversion.revisions.set_user(self.user)
