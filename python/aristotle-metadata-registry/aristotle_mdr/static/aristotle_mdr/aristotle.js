@@ -12,6 +12,11 @@ $(document).ready(function() {
         x.remove()
     });
 
+    $('.modal').on('loaded.bs.modal', function() {
+        // Need to do this on modal show for newly added popovers
+        $('.aristotle-popover').popover()
+    });
+
     // Initialize popovers
     $('.aristotle-popover').popover()
 });
