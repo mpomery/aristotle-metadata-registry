@@ -241,7 +241,6 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         response = self.client.get(reverse('aristotle:userReviewDetails',args=[review.pk]))
         self.assertEqual(response.status_code,200)
 
-    @tag('changestatus')
     def registrar_can_accept_review(self, review_changes=False):
         self.login_registrar()
         other_ra = models.RegistrationAuthority.objects.create(name="A different ra")
@@ -417,8 +416,8 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.item1 = models.ObjectClass.objects.get(pk=self.item1.pk) # decache
         self.assertFalse(self.item1.is_public())
 
-    @tag('changestatus')
-    def test_registrar_can_accept_cascade_review(self):
+    # Function used by the 2 tests below
+    def registrar_can_accept_cascade_review(self, review_changes=True):
         self.login_registrar()
 
         review = models.ReviewRequest.objects.create(
@@ -434,7 +433,10 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         response = self.client.get(reverse('aristotle:userReviewAccept',args=[review.pk]))
         self.assertEqual(response.status_code,200)
 
-        button = 'submit_skip'
+        if review_changes:
+            button = 'submit_next'
+        else:
+            button = 'submit_skip'
 
         response = self.client.post(reverse('aristotle:userReviewAccept',args=[review.pk]),
             {
@@ -443,7 +445,22 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
                 button: 'value',
             })
 
-        self.assertEqual(response.status_code, 302)
+        if review_changes:
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.context['wizard']['steps'].step1, 2) # check we are now on second setep
+            selected_for_change = [self.item4.id, self.item5.id]
+            selected_for_change_strings = [str(a) for a in selected_for_change]
+
+            review_response = self.client.post(reverse('aristotle:userReviewAccept',args=[review.pk]),
+                {
+                    'review_changes-selected_list': selected_for_change_strings,
+                    'review_accept_view-current_step': 'review_changes'
+                })
+
+            self.assertRedirects(review_response,reverse('aristotle:userReadyForReview'))
+
+        else:
+            self.assertEqual(response.status_code, 302)
 
         review = models.ReviewRequest.objects.get(pk=review.pk) #decache
         self.assertEqual(review.response, "I can accept this!")
@@ -455,6 +472,14 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
         for item in [self.item4, self.item5]:
             self.check_item_status(item, review, True)
+
+    @tag('changestatus')
+    def test_registrar_can_accept_cascade_review_direct(self):
+        self.registrar_can_accept_review(review_changes=False)
+
+    @tag('changestatus')
+    def test_registrar_can_accept_cascade_review_revstep(self):
+        self.registrar_can_accept_review(review_changes=True)
 
     def test_user_can_cancel_review(self):
         self.login_editor()
