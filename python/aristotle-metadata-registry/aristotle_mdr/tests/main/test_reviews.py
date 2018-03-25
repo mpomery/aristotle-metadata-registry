@@ -21,6 +21,23 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.item2 = models.ObjectClass.objects.create(name="Test Item 2 (NOT visible to tested viewers)",definition="my definition",workgroup=self.wg2)
         self.item3 = models.ObjectClass.objects.create(name="Test Item 3 (only visible to the editor)",definition="my definition",workgroup=None,submitter=self.editor)
 
+        self.item4 = models.ValueDomain.objects.create(name='Test Value Domain', definition='my definition', workgroup=self.wg1)
+        self.item5 = models.DataElement.objects.create(name='Test data element', definition='my definition', workgroup=self.wg1, valueDomain=self.item4)
+
+    def check_item_status(self, item, review, updated):
+
+        self.assertEqual(item.is_public(), updated)
+        self.assertEqual(item.current_statuses().count() == 1, updated)
+
+        if updated:
+            state = item.current_statuses().first()
+
+            self.assertTrue(state.registrationAuthority == review.registration_authority)
+            self.assertTrue(state.state == review.state)
+            self.assertTrue(state.registrationDate == review.registration_date)
+        else:
+            self.assertTrue(item.current_statuses().count() == 0)
+
     def test_viewer_cannot_request_review_for_private_item(self):
         self.login_viewer()
 
@@ -224,6 +241,7 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         response = self.client.get(reverse('aristotle:userReviewDetails',args=[review.pk]))
         self.assertEqual(response.status_code,200)
 
+    @tag('changestatus')
     def registrar_can_accept_review(self, review_changes=False):
         self.login_registrar()
         other_ra = models.RegistrationAuthority.objects.create(name="A different ra")
@@ -326,17 +344,7 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
             else:
                 updated = False
 
-            self.assertEqual(item.is_public(), updated)
-            self.assertEqual(item.current_statuses().count() == 1, updated)
-
-            if updated:
-                state = item.current_statuses().first()
-
-                self.assertTrue(state.registrationAuthority == review.registration_authority)
-                self.assertTrue(state.state == review.state)
-                self.assertTrue(state.registrationDate == review.registration_date)
-            else:
-                self.assertTrue(item.current_statuses().count() == 0)
+            self.check_item_status(item, review, updated)
 
     @tag('changestatus')
     def test_registrar_can_accept_review_direct(self):
@@ -408,6 +416,45 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
         self.item1 = models.ObjectClass.objects.get(pk=self.item1.pk) # decache
         self.assertFalse(self.item1.is_public())
+
+    @tag('changestatus')
+    def test_registrar_can_accept_cascade_review(self):
+        self.login_registrar()
+
+        review = models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1),
+            cascade_registration=1,
+        )
+
+        review.concepts.add(self.item5)
+
+        response = self.client.get(reverse('aristotle:userReviewAccept',args=[review.pk]))
+        self.assertEqual(response.status_code,200)
+
+        button = 'submit_skip'
+
+        response = self.client.post(reverse('aristotle:userReviewAccept',args=[review.pk]),
+            {
+                'review_accept-response': "I can accept this!",
+                'review_accept_view-current_step': 'review_accept',
+                button: 'value',
+            })
+
+        self.assertEqual(response.status_code, 302)
+
+        review = models.ReviewRequest.objects.get(pk=review.pk) #decache
+        self.assertEqual(review.response, "I can accept this!")
+        self.assertEqual(review.status,models.REVIEW_STATES.accepted)
+        self.assertEqual(review.reviewer, self.registrar)
+
+        self.item4 = models.ValueDomain.objects.get(pk=self.item4.pk) # decache
+        self.item5 = models.DataElement.objects.get(pk=self.item5.pk) # decache
+
+        for item in [self.item4, self.item5]:
+            self.check_item_status(item, review, True)
 
     def test_user_can_cancel_review(self):
         self.login_editor()
