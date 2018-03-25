@@ -266,7 +266,14 @@ class ReviewChangesView(SessionWizardView):
             if cascade == 1:
                 all_ids = []
                 for item in items:
-                    cascaded_ids = [a.id for a in item.registry_cascade_items]
+
+                    # Can't cascade from _concept
+                    if isinstance(item, MDR._concept):
+                        cascade = item.item.registry_cascade_items
+                    else:
+                        cascade = item.registry_cascade_items
+
+                    cascaded_ids = [a.id for a in cascade]
                     cascaded_ids.append(item.id)
                     all_ids.extend(cascaded_ids)
 
@@ -353,7 +360,11 @@ class ReviewChangesView(SessionWizardView):
                     # Should only be 1 ra
                     # Need to check before enforcing
 
-                    arguments['item'] = item
+                    # Can't cascade from _concept
+                    if isinstance(item, MDR._concept):
+                        arguments['item'] = item.item
+                    else:
+                        arguments['item'] = item
 
                     if cascade:
                         register_method = ra.cascaded_register
