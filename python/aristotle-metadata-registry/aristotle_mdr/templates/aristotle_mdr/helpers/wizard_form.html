@@ -31,8 +31,7 @@
 {% endblock %}
 {% block content_footer %}
 {% if wizard.steps.prev %}
-<button class="btn btn-default" name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "First Step" %}</button>
-<button class="btn btn-default" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "Prev Step" %}</button>
+<button class="btn btn-default" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "Previous Step" %}</button>
 {% endif %}
 {% block buttons %}
 <input class="btn btn-primary" type="submit" value="{% trans "Submit" %}" />
