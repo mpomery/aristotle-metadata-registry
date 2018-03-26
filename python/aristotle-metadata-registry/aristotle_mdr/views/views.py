@@ -249,6 +249,10 @@ def display_review(wizard):
 class ReviewChangesView(SessionWizardView):
 
     items = None
+    display_review = None
+
+    # Override this
+    change_step_name = None
 
     def get_form_kwargs(self, step):
 
@@ -286,9 +290,14 @@ class ReviewChangesView(SessionWizardView):
 
         return {}
 
+    def get_form(self, step=None, data=None, files=None):
+
+        self.set_review_var(step, data, files, self.change_step_name)
+        return super().get_form(step, data, files)
+
     def get_change_data(self):
         # We override this when the change_data doesnt come form a form
-        return self.get_cleaned_data_for_step('change_status')
+        return self.get_cleaned_data_for_step(self.change_step_name)
 
     def set_review_var(self, step, data, files, change_step):
 
@@ -310,6 +319,16 @@ class ReviewChangesView(SessionWizardView):
 
     def get_template_names(self):
         return [self.templates[self.steps.current]]
+
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form, **kwargs)
+
+        if self.steps.current == 'review_changes':
+            data = self.get_cleaned_data_for_step(self.change_step_name)
+            if 'registrationAuthorities' in data:
+                context.update({'ra': data['registrationAuthorities'][0]})
+
+        return context
 
     def register_changes(self, form_dict, change_form=None, **kwargs):
 
@@ -410,6 +429,8 @@ class ReviewChangesView(SessionWizardView):
 
 class ChangeStatusView(ReviewChangesView):
 
+    change_step_name = 'change_status'
+
     form_list = [
         ('change_status', MDRForms.ChangeStatusForm),
         ('review_changes', MDRForms.ReviewChangesForm)
@@ -417,10 +438,11 @@ class ChangeStatusView(ReviewChangesView):
 
     templates = {
         'change_status': 'aristotle_mdr/actions/changeStatus.html',
-        'review_changes': 'aristotle_mdr/helpers/wizard_form.html'
+        'review_changes': 'aristotle_mdr/actions/review_state_changes.html'
     }
 
     condition_dict = {'review_changes': display_review}
+
     display_review = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -437,11 +459,6 @@ class ChangeStatusView(ReviewChangesView):
 
     def get_items(self):
         return [self.item]
-
-    def get_form(self, step=None, data=None, files=None):
-
-        self.set_review_var(step, data, files, 'change_status')
-        return super().get_form(step, data, files)
 
     def get_form_kwargs(self, step):
 

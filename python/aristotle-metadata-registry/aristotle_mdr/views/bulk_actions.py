@@ -147,6 +147,8 @@ def get_bulk_actions():
 
 class ChangeStatusBulkActionView(ReviewChangesView):
 
+    change_step_name = 'change_state'
+
     form_list = [
         ('change_state', ChangeStateForm),
         ('review_changes', ReviewChangesForm)
@@ -154,14 +156,11 @@ class ChangeStatusBulkActionView(ReviewChangesView):
 
     templates = {
         'change_state': 'aristotle_mdr/actions/bulk_actions/change_status.html',
-        'review_changes': 'aristotle_mdr/helpers/wizard_form.html'
+        'review_changes': 'aristotle_mdr/actions/review_state_changes.html'
     }
 
     condition_dict = {'review_changes': display_review}
     display_review = None
-
-    def get_change_data(self):
-        return self.get_cleaned_data_for_step('change_state')
 
     def get_items(self):
         return self.get_change_data()['items']
@@ -185,11 +184,6 @@ class ChangeStatusBulkActionView(ReviewChangesView):
                 initial.update({'items': bulk_items})
 
         return initial
-
-    def get_form(self, step=None, data=None, files=None):
-
-        self.set_review_var(step, data, files, 'change_state')
-        return super().get_form(step, data, files)
 
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form, **kwargs)

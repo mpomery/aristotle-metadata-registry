@@ -165,6 +165,8 @@ class ReviewRejectView(ReviewActionMixin, FormView):
 
 class ReviewAcceptView(ReviewChangesView):
 
+    change_step_name = 'review_accept'
+
     form_list = [
         ('review_accept', actions.RequestReviewAcceptForm),
         ('review_changes', ReviewChangesForm)
@@ -172,7 +174,7 @@ class ReviewAcceptView(ReviewChangesView):
 
     templates = {
         'review_accept': 'aristotle_mdr/user/user_request_accept.html',
-        'review_changes': 'aristotle_mdr/helpers/wizard_form.html'
+        'review_changes': 'aristotle_mdr/actions/review_state_changes.html'
     }
 
     condition_dict = {'review_changes': display_review}
@@ -229,11 +231,6 @@ class ReviewAcceptView(ReviewChangesView):
             return {'user': self.request.user}
 
         return kwargs
-
-    def get_form(self, step=None, data=None, files=None):
-
-        self.set_review_var(step, data, files, 'review_accept')
-        return super().get_form(step, data, files)
 
     def done(self, form_list, form_dict, **kwargs):
         review = self.get_review()
