@@ -27,8 +27,35 @@ class BulkActionsTest(utils.LoggedInViewPages):
         self.item4 = models.Property.objects.create(name="Prop4", definition="Prop4 definition", workgroup=self.wg2)
         self.item5 = models.Property.objects.create(name="Prop5", definition="Prop5 definition", workgroup=None, submitter=self.editor)
 
+        self.item6 = models.ValueDomain.objects.create(name='Test Value Domain', definition='my definition', workgroup=self.wg1)
+        self.item7 = models.DataElement.objects.create(name='Test data element', definition='my definition', workgroup=self.wg1, valueDomain=self.item6)
+        self.item8 = models.DataElement.objects.create(name='Test data element', definition='my definition', workgroup=self.wg1, valueDomain=self.item6)
+
 
 class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
+
+    # Util function
+    def perform_state_review(self, postdata, selected_for_change):
+        postdata.pop('submit_skip')
+        postdata['submit_next'] = 'value'
+
+        change_state_response = self.client.post(
+            reverse('aristotle:change_state_bulk_action'),
+            postdata
+        )
+
+        self.assertEqual(change_state_response.status_code, 200)
+        self.assertEqual(change_state_response.context['wizard']['steps'].step1, 2) # check we are now on second step
+
+        review_response = self.client.post(
+            reverse('aristotle:change_state_bulk_action'),
+            {
+                'review_changes-selected_list': selected_for_change,
+                'change_status_bulk_action_view-current_step': 'review_changes',
+            }
+        )
+
+        return review_response
 
     def test_bulk_add_favourite_on_permitted_items(self):
         self.login_editor()
@@ -216,28 +243,7 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(self.editor.profile.favourites.count(), 0)
 
-    # Util function
-    def perform_state_review(self, postdata, selected_for_change):
-        postdata.pop('submit_skip')
-        postdata['submit_next'] = 'value'
 
-        change_state_response = self.client.post(
-            reverse('aristotle:change_state_bulk_action'),
-            postdata
-        )
-
-        self.assertEqual(change_state_response.status_code, 200)
-        self.assertEqual(change_state_response.context['wizard']['steps'].step1, 2) # check we are now on second step
-
-        review_response = self.client.post(
-            reverse('aristotle:change_state_bulk_action'),
-            {
-                'review_changes-selected_list': selected_for_change,
-                'change_status_bulk_action_view-current_step': 'review_changes',
-            }
-        )
-
-        return review_response
 
     # Function used for the 2 tests below
     def bulk_status_change_on_permitted_items(self, review_changes):
@@ -315,6 +321,65 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
     @tag('changestatus')
     def test_bulk_status_change_on_permitted_items_with_review(self):
         self.bulk_status_change_on_permitted_items(review_changes=True)
+
+    @tag('changestatus')
+    def test_bulk_status_change_cascade_common_child(self):
+        # Test for changestatus with cascade  on 2 items with a common child
+        self.login_superuser()
+
+        items = [self.item7.id, self.item8.id]
+
+        response = self.client.post(
+            reverse('aristotle:bulk_action'),
+            {
+                'bulkaction': 'aristotle_mdr.forms.bulk_actions.ChangeStateForm',
+                'items': items,
+            }
+        )
+
+        self.assertRedirects(response, reverse('aristotle:change_state_bulk_action'))
+
+        change_state_get_response = self.client.get(reverse('aristotle:change_state_bulk_action'))
+        self.assertEqual(change_state_get_response.context['form'].initial['items'], [str(a) for a in items])
+
+        items_strings = [str(a) for a in items]
+        reg_date = datetime.date(2014,10,27)
+        new_state = self.ra.locked_state
+
+        postdata = {
+            'change_state-state': new_state,
+            'change_state-items': items_strings,
+            'change_state-registrationDate': reg_date,
+            'change_state-cascadeRegistration': 1,
+            'change_state-registrationAuthorities': [self.ra.id],
+            'submit_next': 'value',
+            'change_status_bulk_action_view-current_step': 'change_state',
+        }
+
+        change_response = self.client.post(reverse('aristotle:change_state_bulk_action'), postdata)
+
+        self.assertEqual(change_response.status_code, 200)
+        self.assertEqual(change_response.context['wizard']['steps'].step1, 2) # check we are now on second step
+
+        queryset = change_response.context['form'].fields['selected_list'].queryset
+        self.assertEqual(queryset.count(), 3) # Should not have multiples of the same item
+
+        cascade_items = [self.item6, self.item7, self.item8]
+        cascade_items_strings = [str(a.id) for a in cascade_items]
+
+        review_response = self.client.post(
+            reverse('aristotle:change_state_bulk_action'),
+            {
+                'review_changes-selected_list': cascade_items_strings,
+                'change_status_bulk_action_view-current_step': 'review_changes',
+            }
+        )
+
+        for item in cascade_items:
+
+            self.assertTrue(item.current_statuses().first().registrationDate == reg_date)
+            self.assertTrue(item.current_statuses().first().state == new_state)
+            self.assertTrue(item.current_statuses().first().registrationAuthority == self.ra)
 
     @tag('changestatus')
     def test_bulk_status_change_on_forbidden_items(self):
