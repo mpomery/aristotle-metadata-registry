@@ -44,7 +44,7 @@
 {% endblock %}
 
 {% block buttons %}
-<a class="btn btn-default" data-dismiss="modal">Cancel</a>
+<a class="btn btn-default" href="{% url 'aristotle:userReadyForReview' %}" data-dismiss="modal">Cancel</a>
 <input class="btn btn-success" type="submit" name="submit_next" value="{% trans 'Review Changes' %}" />
 <input class="btn btn-primary" type="submit" name="submit_skip" value="{% trans 'Update Status' %}" />
 {% endblock %}
