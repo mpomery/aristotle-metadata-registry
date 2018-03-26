@@ -1,5 +1,7 @@
 {% extends "aristotle_mdr/helpers/wizard_form.html" %}
 
+{% load i18n %}
+
 {% block title %}Review Changes{% endblock %}
 
 {% block content %}
@@ -10,6 +12,10 @@
   as well as the selected state and date.<p>
 <p>You can remove items from the selection by unselecting the check mark in the first box.
   If there are items you don't have permission to change the status for they will be highlighted and the checkbox unselected already.</p>
-<p>When you have completed your selection, click the "update status" button to complete this change.</p>
+<p>When you have completed your selection, click the "Update Status" button to complete this change.</p>
 {{ block.super }}
+{% endblock %}
+
+{% block buttons %}
+<input class="btn btn-primary" type="submit" value="{% trans "Update Status" %}" />
 {% endblock %}
