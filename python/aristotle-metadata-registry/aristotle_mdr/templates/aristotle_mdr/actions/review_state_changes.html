@@ -11,7 +11,7 @@
   {% if ra %}<a href="{% url 'aristotle_mdr:registrationAuthority' iid=ra.pk %}">{{ ra.name }}</a>{% endif %},
   as well as the selected state and date.<p>
 <p>You can remove items from the selection by unselecting the check mark in the first box.
-  If there are items you don't have permission to change the status for they will be highlighted and the checkbox unselected already.</p>
+  If there are items you don't have permission to change the status for, they will be highlighted and the checkbox unselected already.</p>
 <p>When you have completed your selection, click the "Update Status" button to complete this change.</p>
 {{ block.super }}
 {% endblock %}
