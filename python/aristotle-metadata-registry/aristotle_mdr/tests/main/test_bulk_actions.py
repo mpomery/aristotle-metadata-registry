@@ -513,10 +513,10 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
                 'bulkaction': 'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
                 'state': 1,
                 'items': [self.item1.id, self.item2.id],
-                'registration_authority': self.ra.id,
-                "registration_date": "2010-01-01",
-                "cascade_registration": 0,
-                "message": "review these plz",
+                'registrationAuthorities': self.ra.id,
+                "registrationDate": "2010-01-01",
+                "cascadeRegistration": 0,
+                "changeDetails": "review these plz",
                 'confirmed': 'confirmed',
             }
         )
@@ -542,11 +542,10 @@ class BulkWorkgroupActionsPage(BulkActionsTest, TestCase):
                 'bulkaction': 'aristotle_mdr.forms.bulk_actions.RequestReviewForm',
                 'state': 1,
                 'items': [self.item1.id, self.item4.id],
-                'registration_authority': self.ra.id,
-                'registration_date': datetime.date(2016,1,1),
-                "registration_date": "2010-01-01",
-                "cascade_registration": 0,
-                "message": "review these plz",
+                'registrationAuthorities': self.ra.id,
+                'registrationDate': datetime.date(2016,1,1),
+                "cascadeRegistration": 0,
+                "changeDetails": "review these plz",
                 'confirmed': 'confirmed',
             }
         )

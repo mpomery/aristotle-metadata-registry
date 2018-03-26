@@ -66,11 +66,11 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         response = self.client.post(
             reverse('aristotle:request_review',args=[self.item1.id]),
             {
-                'registration_authority': [str(self.ra.id)],
+                'registrationAuthorities': [str(self.ra.id)],
                 'state': self.ra.public_state,
-                'cascade_registration': 0,
-                'message': "Please review this",
-                'registration_date':datetime.date(2010,1,1)
+                'cascadeRegistration': 0,
+                'changeDetails': "Please review this",
+                'registrationDate':datetime.date(2010,1,1)
             }
         )
 
