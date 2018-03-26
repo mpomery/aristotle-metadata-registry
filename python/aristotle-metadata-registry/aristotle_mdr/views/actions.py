@@ -63,12 +63,12 @@ class SubmitForReviewView(ItemSubpageFormView):
 
         if form.is_valid():
             review = MDR.ReviewRequest.objects.create(
-                registration_authority = form.cleaned_data['registrationAuthorities'],
-                message = form.cleaned_data['changeDetails'],
-                state = form.cleaned_data['state'],
-                registration_date = form.cleaned_data['registrationDate'],
-                cascade_registration = form.cleaned_data['cascadeRegistration'],
-                requester = request.user
+                registration_authority=form.cleaned_data['registrationAuthorities'],
+                message=form.cleaned_data['changeDetails'],
+                state=form.cleaned_data['state'],
+                registration_date=form.cleaned_data['registrationDate'],
+                cascade_registration=form.cleaned_data['cascadeRegistration'],
+                requester=request.user
             )
 
             review.concepts.add(item)

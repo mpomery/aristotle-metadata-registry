@@ -130,6 +130,7 @@ class ChangeStatusGenericForm(RegistrationAuthorityMixin, UserAwareForm):
             field_name="registrationAuthorities", qs=self.user.profile.registrarAuthorities
         )
 
+
 class ChangeStatusForm(ChangeStatusGenericForm):
 
     def clean_cascadeRegistration(self):
@@ -216,7 +217,7 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
     def __init__(self, queryset, static_content, ra, user, **kwargs):
 
         extra_info = self.build_extra_info(queryset, ra, user, static_content)
-        static_content.pop('new_state') # Added this to extra with a dynamic url attached
+        static_content.pop('new_state')  # Added this to extra with a dynamic url attached
 
         headers = {
             'input': '',
@@ -232,8 +233,8 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
             {'text': 'Select', 'rowspan': 2},
             {'text': 'Name', 'rowspan': 2},
             {'text': 'Type', 'rowspan': 2},
-            {'text': 'Previous','colspan': 2},
-            {'text': 'New','colspan': 2}
+            {'text': 'Previous', 'colspan': 2},
+            {'text': 'New', 'colspan': 2}
         ]
 
         order = ['input', 'label', 'type', 'old', 'old_reg_date', 'new_state', 'new_reg_date']

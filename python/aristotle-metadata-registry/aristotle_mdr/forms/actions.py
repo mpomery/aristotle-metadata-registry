@@ -11,6 +11,7 @@ from django.contrib.auth import get_user_model
 from aristotle_mdr.contrib.autocomplete import widgets
 from .utils import RegistrationAuthorityMixin
 
+
 class RequestReviewForm(ChangeStatusGenericForm):
 
     def clean_registrationAuthorities(self):
