@@ -14,6 +14,12 @@ from .utils import RegistrationAuthorityMixin
 
 class RequestReviewForm(ChangeStatusGenericForm):
 
+    def __init__(self, *args, **kwargs):
+        super(ChangeStatusGenericForm, self).__init__(*args, **kwargs)
+        self.set_registration_authority_field(
+            field_name='registrationAuthorities'
+        )
+
     def clean_registrationAuthorities(self):
         value = self.cleaned_data['registrationAuthorities']
         return MDR.RegistrationAuthority.objects.get(id=int(value))
