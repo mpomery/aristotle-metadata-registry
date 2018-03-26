@@ -1,6 +1,11 @@
 {% if badperms %}<p>You do not have permission to update any items shown below in red</p>{% endif %}
 {% with id=widget.attrs.id %}<table{% if id %} id="{{ id }}"{% endif %}{% if widget.attrs.tableclass %} class="{{ widget.attrs.tableclass }}"{% endif %}>
-  {% if top_header %}<tr>{% for header in top_header %}<th {% if header.colspan %}colspan="{{ header.colspan }}"{% endif %}>{{ header.text }}</th>{% endfor %}</tr>{% endif %}
+  {% if top_header %}
+    <tr>{% for header in top_header %}
+    <th {% if header.colspan %}colspan="{{ header.colspan }}"{% endif %} {% if header.rowspan %}rowspan="{{ header.rowspan }}"{% endif %}>
+    {{ header.text }}</th>
+    {% endfor %}</tr>
+  {% endif %}
   <tr>{% for header in headers %}<th>{{ header }}</th>{% endfor %}<tr>
   {% for group, options, index in widget.optgroups %}{% if group %}
   <td>{{ group }}<table{% if id %} id="{{ id }}_{{ index }}"{% endif %}>{% endif %}

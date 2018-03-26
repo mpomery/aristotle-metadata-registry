@@ -43,7 +43,13 @@ class TableCheckboxSelect(CheckboxSelectMultiple):
         self.extra_info = extra_info
         self.static_info = static_info
         self.order = order
-        self.header_list = [headers[field] for field in order]
+        self.header_list = []
+
+        for field in order:
+            header = headers[field]
+            if header:
+                self.header_list.append(header)
+
         self.top_header = top_header
         self.badperms = False
 

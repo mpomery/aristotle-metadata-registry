@@ -131,7 +131,7 @@ class ChangeStatusGenericForm(RegistrationAuthorityMixin, UserAwareForm):
         )
 
 class ChangeStatusForm(ChangeStatusGenericForm):
-    
+
     def clean_cascadeRegistration(self):
         return self.cleaned_data['cascadeRegistration'] == "1"
 
@@ -229,9 +229,9 @@ class ReviewChangesChoiceField(ModelMultipleChoiceField):
         }
 
         top_header = [
-            {'text': 'Select'},
-            {'text': 'Name'},
-            {'text': 'Type'},
+            {'text': 'Select', 'rowspan': 2},
+            {'text': 'Name', 'rowspan': 2},
+            {'text': 'Type', 'rowspan': 2},
             {'text': 'Previous','colspan': 2},
             {'text': 'New','colspan': 2}
         ]
