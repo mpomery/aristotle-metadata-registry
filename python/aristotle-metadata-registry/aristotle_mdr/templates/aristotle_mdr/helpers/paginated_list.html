@@ -91,7 +91,7 @@ Showing {{ page.paginator.count }} results.
         <td>{{ item.modified }}</td>
         {% if delete %}
           <td>
-            <a class="btn btn-default delete-button" data-toggle="modal" href="{% url 'aristotle:sandbox_delete' %}?item={{ item.id }}" data-target="#delete-modal" data-item-id="{{ item.id }}">
+            <a class="btn btn-default delete-button" href="{% url 'aristotle:sandbox_delete' %}?item={{ item.id }}" data-item-id="{{ item.id }}">
               Delete
               <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
             </a>

@@ -6,21 +6,20 @@ $(document).ready(function() {
       $(this).removeAttr('href');
   })
 
-  $('#delete-modal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
+  $('.delete-button').on('click', function() {
+    var button = $(this);
     var item_id = button.data('item-id') // Extract info from data-* attributes
     var csrftoken = $("[name=csrfmiddlewaretoken]").val(); // Can do this since a token is already on the page
-    var modal = $(this);
-
-    // Set element name
     var element_name = button.closest('tr').find('.itemLink').text();
-    modal.find('#element-name').html($.trim(element_name));
+    submit_url = delete_submit_url; //submit_button.attr('submit-url');
 
-    submit_button = modal.find('#delete-submit-button');
-    submit_url = submit_button.attr('submit-url');
-    message_p = modal.find('#modal-message')
-
-    submit_button.on("click", function() {
+    bootbox.alert({ 
+      size: "small",
+      title: "Delete",
+      message: "Are you sure you want to delete <span id=\"element-name\">"+element_name+"</span>", 
+      callback: function() {
+        var modal=$(this);
+        var message_p = $(this).find('#modal-message');
         $.ajax({
           method: "POST",
           url: submit_url,
@@ -39,12 +38,9 @@ $(document).ready(function() {
               message_p.html("The item could not be deleted");
           }
         })
+      }
     })
+
   })
 
-  $('#delete-modal').on('hide.bs.modal', function(event) {
-    var modal = $(this);
-    submit_button = modal.find('#delete-submit-button');
-    submit_button.off("click") //Unbind the on click event
-  })
 })
