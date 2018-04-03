@@ -377,7 +377,7 @@ class PermissionSearchView(FacetedSearchView):
 
         try:
             rpp = self.form.cleaned_data['rpp']
-        except AttributeError:
+        except (AttributeError, KeyError):
             rpp = ''
 
         if rpp in self.results_per_page_values:
