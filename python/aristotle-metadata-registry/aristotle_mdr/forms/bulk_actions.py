@@ -167,7 +167,7 @@ class AddFavouriteForm(LoggedInBulkActionForm):
 
         message_text = "{0} items favourited.".format(len(items))
         if bad_items:
-            return _("{0} Some items failed, they had the id's: {1}".format(message_text, join(bad_items)))
+            return _("{0} Some items failed, they had the id's: {1}".format(message_text, ",".join(bad_items)))
         else:
             return _(message_text)
 
