@@ -2,10 +2,6 @@
 
 {% load i18n %}
 
-{% block extra_scripts_head %}
-
-{% endblock %}
-
 {% block title %}Review Changes{% endblock %}
 
 {% block content %}
@@ -17,8 +13,7 @@ This table includes the current registration status and date for the item in the
 
 <a tabindex="0" class="aristotle-popover" role="button" data-toggle="popover" title="Status change help"
   data-placement="bottom"
-  data-content="
-  <p>You can remove items from the selection by unselecting the check mark in the first box.
+  data-content="<p>You can remove items from the selection by unselecting the check mark in the first box.
   If there are items you don't have permission to change the status for, they will be highlighted and the checkbox unselected already.</p>
   <p>When you have completed your selection, click the 'Update Status' button to complete this change.</p>" data-html="true">
   <i class="fa fa-2x fa-question-circle"></i>
