@@ -2,27 +2,28 @@
 
 {% load i18n %}
 
+{% block extra_scripts_head %}
+
+{% endblock %}
+
 {% block title %}Review Changes{% endblock %}
 
 {% block content %}
 <h1>Review included items for status change</h1>
-<p>Below is a list of the items you have selected for a status change, including those linked to a parent item.
+<p>Below is a list of the items you have selected for a status change, including those linked to a parent item.<br>
+This table includes the current registration status and date for the item in the registration authority
+  {% if ra %}<strong><a href='{% url 'aristotle_mdr:registrationAuthority' iid=ra.pk %}'>{{ ra.name }}</a></strong>{% endif %},
+  as well as the selected state and date.
 
-<button class="btn btn-default btn-sm" type="button" data-toggle="collapse" data-target="#collapsed_help" aria-expanded="false" aria-controls="collapseExample">
-  Show more information <i class="fa fa-caret-square-o-down" aria-hidden="true"></i>
-</button>
-</p>
-
-<div class="collapse" id="collapsed_help">
-  <div class="well">
-<p>This table includes the current registration status and date for the item in the registration authority
-  {% if ra %}<a href="{% url 'aristotle_mdr:registrationAuthority' iid=ra.pk %}">{{ ra.name }}</a>{% endif %},
-  as well as the selected state and date.<p>
-<p>You can remove items from the selection by unselecting the check mark in the first box.
+<a tabindex="0" class="aristotle-popover" role="button" data-toggle="popover" title="Status change help"
+  data-placement="bottom"
+  data-content="
+  <p>You can remove items from the selection by unselecting the check mark in the first box.
   If there are items you don't have permission to change the status for, they will be highlighted and the checkbox unselected already.</p>
-<p>When you have completed your selection, click the "Update Status" button to complete this change.</p>
-  </div>
-</div>
+  <p>When you have completed your selection, click the 'Update Status' button to complete this change.</p>" data-html="true">
+  <i class="fa fa-2x fa-question-circle"></i>
+</a>
+</p>
 
 {{ block.super }}
 {% endblock %}
