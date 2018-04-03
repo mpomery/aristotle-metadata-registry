@@ -6,6 +6,8 @@
 {% block title %}My Dashboard{% endblock %}
 {% block extra_head_scripts %}
     <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.dashboard.less'|compile %}" />
+    {% block individual_scripts %}
+    {% endblock %}
 {% endblock %}
 
 {% block page %}

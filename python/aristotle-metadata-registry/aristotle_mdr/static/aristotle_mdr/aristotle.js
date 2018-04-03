@@ -5,11 +5,13 @@ var suppressLoadingBlock = false;
 $(document).ready(function() {
     $('.modal').on('hidden.bs.modal', function(e)
     {
-        //console.log(this)
-        $(this).removeData();
-        x = $(this).find('.modal-content > *');
-        //console.log(x)
-        x.remove()
+        if (!$(this).hasClass('exclude-scrap')) {
+          console.log(this)
+          $(this).removeData();
+          x = $(this).find('.modal-content > *');
+          //console.log(x)
+          x.remove()
+        }
     });
 
     $('.modal').on('loaded.bs.modal', function() {
@@ -20,6 +22,24 @@ $(document).ready(function() {
     // Initialize popovers
     $('.aristotle-popover').popover()
 });
+
+// getCookie function taken from django docs
+// Used to get csrf_token
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 $(document).ajaxSend(function(event, request, settings) {
     if (!suppressLoadingBlock) {
