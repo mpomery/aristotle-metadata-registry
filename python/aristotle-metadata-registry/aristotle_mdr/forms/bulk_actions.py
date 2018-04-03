@@ -164,13 +164,12 @@ class AddFavouriteForm(LoggedInBulkActionForm):
         bad_items = [str(i.id) for i in items if not user_can_view(self.user, i)]
         items = items.visible(self.user)
         self.user.profile.favourites.add(*items)
-        return _(
-            "%(num_items)s items favourited. \n"
-            "Some items failed, they had the id's: %(bad_ids)s"
-        ) % {
-            'num_items': len(items),
-            'bad_ids': ",".join(bad_items)
-        }
+
+        message_text = "{0} items favourited.".format(len(items))
+        if bad_items:
+            return _("{0} Some items failed, they had the id's: {1}".format(message_text, join(bad_items)))
+        else:
+            return _(message_text)
 
 
 class RemoveFavouriteForm(LoggedInBulkActionForm):
