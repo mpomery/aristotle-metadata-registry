@@ -18,6 +18,8 @@ Changelog
     - Value Meaning start and end dates are now shown on Value Domain and Conceptual Domain pages
     - Fixed bug where spaces in search facets showed blank pages
     - Search facet links now return to the first page to prevent 404s #763
+    - Items can now be deleted from the sandbox
+    - Added review page for any status changes
 
 - 1.6.5
   - Fixed regression where private methods showed up in creation wizards
@@ -46,7 +48,7 @@ Changelog
   - Fix regression when searching for help
 
 - 1.6.2
-  - Re-release of 1.6.1 due to upload error with PyPI 
+  - Re-release of 1.6.1 due to upload error with PyPI
 
 - 1.6.1
     - **Dependency note:** Version 1.6.0 will be the last minor version of Aristotle to support Python 2 and Django 1.8
@@ -82,7 +84,7 @@ Changelog
     - **Breaking change:** The Aristotle setting ``BULK_ACTION`` is now a list of python module strings. Update to 1.6.0 by removing keys and keeping the list of associated values
     - **Breaking change:** The PDF download library is no longer included by default,
         and must be installed from github - https://github.com/aristotle-mdr/aristotle-pdf-downloads
-    - **Breaking change:** Contrib URLs are no longer loaded automatically. Contrib apps now need 
+    - **Breaking change:** Contrib URLs are no longer loaded automatically. Contrib apps now need
         to have URLs loaded manually in a project urls.py
     - **Breaking change:** Removed the ``clone`` and ``adminLink`` template tags, performing these actions via the django admin pages
         will be deprecated in future versions
@@ -131,7 +133,7 @@ Changelog
     - Fix bug that listed unregistered metadata in downloads #659
 
 - 1.5.2
-    - Autocompletes now restrict via UUID 
+    - Autocompletes now restrict via UUID
     - Added `serialize_weak_entities` to ValueDomain and ConceptualDomain allow for codes to be transmitted via API
     - Fix slots in PDFs #635
 
