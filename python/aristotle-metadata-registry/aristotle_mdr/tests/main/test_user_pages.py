@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, tag
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.urls import reverse
@@ -6,6 +6,7 @@ from django.urls import reverse
 import aristotle_mdr.tests.utils as utils
 from aristotle_mdr import models
 import datetime
+import json
 
 from aristotle_mdr.utils import setup_aristotle_test_environment
 
@@ -41,6 +42,7 @@ class UserHomePages(utils.LoggedInViewPages, TestCase):
         response = self.client.get(reverse('aristotle:userMyReviewRequests',))
         self.assertEqual(response.status_code, 200)
 
+    @tag('sandbox')
     def test_user_can_view_sandbox(self):
         self.login_viewer()
         self.item1 = models.ObjectClass.objects.create(
@@ -52,6 +54,7 @@ class UserHomePages(utils.LoggedInViewPages, TestCase):
         self.assertTrue(self.item1.concept in response.context['page'])
         self.assertTrue(self.item2.concept not in response.context['page'])
 
+    @tag('sandbox')
     def test_user_cannot_view_registered_published_in_sandbox(self):
         self.login_viewer()
         self.item1 = models._concept.objects.create(
@@ -90,6 +93,77 @@ class UserHomePages(utils.LoggedInViewPages, TestCase):
         self.assertTrue(self.item1.concept in response.context['page'])
         self.assertTrue(self.item2.concept not in response.context['page'])
         self.assertTrue(self.item3.concept not in response.context['page'])
+
+    @tag('sandbox')
+    def test_user_can_delete_from_sandbox_ajax(self):
+        self.login_viewer()
+        self.item1 = models.ObjectClass.objects.create(
+            name="Test Item 1 (visible to tested viewers)",
+            definition="my definition",
+            submitter=self.viewer
+        )
+
+        response = self.client.post(reverse('aristotle_mdr:sandbox_delete'), {'item': self.item1.id}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(models.ObjectClass.objects.filter(id=self.item1.id).exists())
+        response_dict = json.loads(response.content)
+        self.assertEqual(response_dict['completed'], True)
+        self.assertFalse(models.ObjectClass.objects.filter(id=self.item1.id).exists())
+
+    @tag('sandbox')
+    def test_user_can_delete_from_sandbox_fallback(self):
+        self.login_viewer()
+        self.item1 = models.ObjectClass.objects.create(
+            name="Test Item 1 (visible to tested viewers)",
+            definition="my definition",
+            submitter=self.viewer
+        )
+
+        get_response = self.client.get(reverse('aristotle_mdr:sandbox_delete'))
+        self.assertTemplateUsed(get_response, 'aristotle_mdr/actions/delete_sandbox.html')
+
+        post_response = self.client.post(reverse('aristotle_mdr:sandbox_delete'), {'item': self.item1.id})
+        self.assertRedirects(post_response, reverse('aristotle_mdr:userSandbox'))
+        self.assertFalse(models.ObjectClass.objects.filter(id=self.item1.id).exists())
+
+    @tag('sandbox')
+    def test_delete_item_with_workgroup_sandbox(self):
+
+        # This will test the custom field validation on the DeleteSandboxForm
+
+        self.login_viewer()
+        self.item1 = models.ObjectClass.objects.create(
+            name="Test Item 1 (visible to tested viewers)",
+            definition="my definition",
+            submitter=self.viewer,
+            workgroup=self.wg1
+        )
+
+        post_response = self.client.post(reverse('aristotle_mdr:sandbox_delete'), {'item': self.item1.id}, follow=True)
+        self.assertTrue('item' in post_response.context['form'].errors)
+
+    @tag('sandbox')
+    def test_delete_non_owned_content_sandbox(self):
+        self.login_viewer()
+        self.item1 = models.ObjectClass.objects.create(
+            name="Test Item 1 (visible to tested viewers)",definition="my definition",submitter=self.su)
+
+        response = self.client.post(reverse('aristotle_mdr:sandbox_delete'), {'item': self.item1.id}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 200)
+        response_dict = json.loads(response.content)
+        self.assertEqual(response_dict['completed'], False)
+        self.assertTrue('message' in response_dict.keys())
+
+
+    @tag('sandbox')
+    def test_delete_non_existant_content_sandbox(self):
+        self.login_viewer()
+
+        response = self.client.post(reverse('aristotle_mdr:sandbox_delete'), {'item': 123456789}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 200)
+        response_dict = json.loads(response.content)
+        self.assertEqual(response_dict['completed'], False)
+        self.assertTrue('message' in response_dict.keys())
 
     def test_user_can_edit_own_details(self):
         self.login_viewer()

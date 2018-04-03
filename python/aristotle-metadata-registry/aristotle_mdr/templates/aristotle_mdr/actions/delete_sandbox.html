@@ -1,0 +1,10 @@
+{% extends 'aristotle_mdr/base.html' %}
+
+{% block content %}
+<form method="post" action="{% url 'aristotle:sandbox_delete' %}">
+{{ form.errors }}
+{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="Submit" />
+</form>
+{% endblock %}

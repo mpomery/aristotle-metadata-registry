@@ -3,10 +3,11 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.db import transaction
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import FormView, DetailView
+from django.views.generic import FormView, DetailView, View
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
@@ -18,6 +19,10 @@ from aristotle_mdr import perms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.forms import actions
 from aristotle_mdr.views.utils import generate_visibility_matrix
+from aristotle_mdr.perms import can_delete_metadata
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class ItemSubpageView(object):
@@ -280,3 +285,46 @@ class CheckCascadedStates(ItemSubpageView, DetailView):
         kwargs['known_states'] = states
         kwargs['state_matrix'] = state_matrix
         return kwargs
+
+
+class DeleteSandboxView(FormView):
+
+    form_class = actions.DeleteSandboxForm
+    template_name = "aristotle_mdr/actions/delete_sandbox.html"
+
+    def get_success_url(self):
+        return reverse('aristotle:userSandbox')
+
+    def get_form_kwargs(self):
+
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
+
+    def get_initial(self):
+        initial = super().get_initial()
+        item = self.request.GET.get('item', None)
+        if item:
+            initial.update({'item': item})
+
+        return initial
+
+    def form_invalid(self, form):
+
+        if self.request.is_ajax():
+            if 'item' in form.errors:
+                return JsonResponse({'completed': False, 'message': form.errors['item']})
+            else:
+                return JsonResponse({'completed': False, 'message': 'Invalid data'})
+
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+
+        item = form.cleaned_data['item']
+        item.delete()
+
+        if self.request.is_ajax():
+            return JsonResponse({'completed': True})
+
+        return super().form_valid(form)
