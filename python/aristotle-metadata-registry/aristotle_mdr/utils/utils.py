@@ -8,6 +8,8 @@ from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 from django.utils.text import get_text_list
 from django.utils.translation import ugettext as _
+from django.utils import timezone
+from django.db.models import Q
 
 import logging
 
@@ -288,3 +290,17 @@ def setup_aristotle_test_environment():
             pass
         else:
             raise
+
+
+def status_filter(qs, when=timezone.now().date()):
+    registered_before_now = Q(registrationDate__lte=when)
+    registration_still_valid = (
+        Q(until_date__gte=when) |
+        Q(until_date__isnull=True)
+    )
+
+    states = qs.filter(
+        registered_before_now & registration_still_valid
+    )
+
+    return states

@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 import aristotle_mdr.models as MDR
 from aristotle_mdr.forms.creation_wizards import UserAwareModelForm, UserAwareForm
+from aristotle_mdr.forms.forms import ChangeStatusGenericForm
 from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -14,34 +15,17 @@ from aristotle_mdr.models import _concept
 from .utils import RegistrationAuthorityMixin
 
 
-class RequestReviewForm(RegistrationAuthorityMixin, UserAwareModelForm):
-    registration_date = forms.DateField(
-        required=False,
-        label=_("Registration date"),
-        widget=BootstrapDateTimePicker(options={"format": "YYYY-MM-DD"}),
-        initial=timezone.now()
-    )
-    state = forms.ChoiceField(choices=MDR.STATES, widget=forms.RadioSelect)
-    cascadeRegistration = forms.ChoiceField(
-        initial=False,
-        required=False,
-        choices=[(0, _('No')), (1, _('Yes'))],
-        label=_("Do you want to update the registration of associated items?")
-    )
+class RequestReviewForm(ChangeStatusGenericForm):
 
     def __init__(self, *args, **kwargs):
-        # self.user = kwargs.pop('user')
-        super().__init__(*args, **kwargs)
+        super(ChangeStatusGenericForm, self).__init__(*args, **kwargs)
         self.set_registration_authority_field(
-            field_name="registration_authority"
+            field_name='registrationAuthorities'
         )
 
-    class Meta:
-        model = MDR.ReviewRequest
-        fields = [
-            'state', 'registration_authority', 'message',
-            'registration_date', 'cascade_registration'
-        ]
+    def clean_registrationAuthorities(self):
+        value = self.cleaned_data['registrationAuthorities']
+        return MDR.RegistrationAuthority.objects.get(id=int(value))
 
 
 class RequestReviewCancelForm(UserAwareModelForm):

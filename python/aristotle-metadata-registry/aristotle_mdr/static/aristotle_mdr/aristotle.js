@@ -13,10 +13,18 @@ $(document).ready(function() {
           x.remove()
         }
     });
+
+    $('.modal').on('loaded.bs.modal', function() {
+        // Need to do this on modal show for newly added popovers
+        $('.aristotle-popover').popover()
+    });
+
+    // Initialize popovers
+    $('.aristotle-popover').popover()
 });
 
 // getCookie function taken from django docs
-// User to get csrf_token
+// Used to get csrf_token
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie !== '') {

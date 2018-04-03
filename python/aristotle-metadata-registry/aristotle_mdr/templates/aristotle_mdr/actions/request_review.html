@@ -4,6 +4,7 @@
 {% load static from staticfiles %}
 
 {% block title %}Request review for {{ item.name }}{% endblock %}
+
 {% block content %}
 <form method="post" action="{% url 'aristotle:request_review' item.id %}">{% csrf_token %}
     <div class="modal-body">
@@ -32,62 +33,7 @@
         <div>
             {{form.errors}}
         </div>
-        <section>
-        <div id="changeStatusDate">
-            <span>
-                <label for="id_registration_date">{{ form.registration_date.label }}</label>:
-                {{ form.registration_date.errors }}
-            </span>
-            <span class="pull-right">
-                {{ form.registration_date }}
-            </span>
-        </div>
-        <div id="cascadeRegistration">
-            <span>
-                <label for="id_cascadeRegistration">
-                {{ form.cascade_registration.label }}
-                </label>
-                {{ form.cascade_registration.errors }}
-            </span>
-            <span class="pull-right">
-                {{ form.cascade_registration }}
-            </span>
-        </div>
-        <div id="changeStatus">
-            <div>
-                <span>
-                    {{ form.state.label }}
-                    {{ form.state.errors }}
-                </span>
-                <span>
-                    {{ form.registration_authority.label }}
-                    {{ form.registration_authority.errors }}
-                </span>
-            </div>
-            <div>
-                {{ form.state }}
-                <ul>
-                {% for val,label_text in form.registration_authority.field.choices %}
-                {% if val %}
-                    <li>
-                        <input type="radio" id="registration_authority_{{val}}" name="registration_authority" value="{{val}}">
-                        <label for="registration_authority_{{val}}">{{label_text}}</label>
-                        <a href="{% url 'aristotle_mdr:registrationAuthority' iid=val %}" title="Visit the registration authority page to learn more about state meanings for this authority" class="pull-right">
-                            <i class="fa fa-fw fa-university"></i>
-                        </a>
-                    </li>
-                {% endif %}
-                {% endfor %}
-                </ul>
-            </div>
-        </div>
-        <div class="status_change_description">
-            <label for='id_message'>{{ form.message.label }}:</label> {{ form.message.help_text }} 
-            {{ form.message }}
-        </div>
-        {% block save %}
-        {% endblock %}
-        </section>
+        {% include 'aristotle_mdr/helpers/changestatus.html' with form=form %}
     </div>
     <div class="modal-footer">
         {% if request.is_ajax %}
@@ -112,8 +58,5 @@
         "public":"{% trans 'public' %}"
     }
 </script>
-    {% block extra_head_scripts %}
-        {{ form.media }}
-        <script src="{% static 'aristotle_mdr/aristotle.status_change.js' %}"></script>
-    {% endblock %}
+<script src="{% static 'aristotle_mdr/aristotle.status_change.js' %}"></script>
 {% endblock %}

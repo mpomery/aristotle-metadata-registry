@@ -26,6 +26,7 @@ from aristotle_mdr.utils import (
     url_slugify_workgroup,
     url_slugify_registration_authoritity,
     url_slugify_organization,
+    status_filter,
 )
 from aristotle_mdr import comparators
 
@@ -307,6 +308,31 @@ class RegistrationAuthority(Organization):
             ('locked', locked),
             ('public', public)
         )
+
+    def register_many(self, items, state, user, *args, **kwargs):
+        # Change the registration status of many items
+        # the items argument should be a queryset
+
+        revision_message = _("Bulk registration of %i items\n") % (items.count())
+
+        revision_message = revision_message + kwargs.get('changeDetails', "")
+        seen_items = {'success': [], 'failed': []}
+
+        with transaction.atomic(), reversion.revisions.create_revision():
+            reversion.revisions.set_user(user)
+            reversion.revisions.set_comment(revision_message)
+
+            # can use bulk_create here when background reindex is setup
+            for child_item in items:
+                if perms.user_can_change_status(user, child_item):
+                    self._register(
+                        child_item, state, user, *args, **kwargs
+                    )
+                    seen_items['success'].append(child_item.id)
+                else:
+                    seen_items['failed'].append(child_item.id)
+
+        return seen_items
 
     def cascaded_register(self, item, state, user, *args, **kwargs):
         if not perms.user_can_change_status(user, item):
@@ -740,15 +766,9 @@ class _concept(baseAristotleObject):
             qs = self.statuses.all()
         if hasattr(when, 'date'):
             when = when.date()
-        registered_before_now = Q(registrationDate__lte=when)
-        registation_still_valid = (
-            Q(until_date__gte=when) |
-            Q(until_date__isnull=True)
-        )
 
-        states = qs.filter(
-            registered_before_now & registation_still_valid
-        ).order_by("registrationAuthority", "-registrationDate", "-created")
+        states = status_filter(qs, when)
+        states = states.order_by("registrationAuthority", "-registrationDate", "-created")
 
         from django.db import connection
         if connection.vendor == 'postgresql':
@@ -763,6 +783,7 @@ class _concept(baseAristotleObject):
                     seen_ras.append(ra)
             # We hit again so we can return this as a queryset
             states = states.filter(pk__in=current_ids)
+
         return states
 
     def get_download_items(self):

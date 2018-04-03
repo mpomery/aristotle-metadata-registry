@@ -15,6 +15,10 @@ from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
 from django.contrib.contenttypes.models import ContentType
+from formtools.wizard.views import SessionWizardView
+
+import json
+import copy
 
 import reversion
 from reversion_compare.views import HistoryCompareDetailView
@@ -235,55 +239,246 @@ def toggleFavourite(request, iid):
 
 # Actions
 
+def display_review(wizard):
+    if wizard.display_review is not None:
+        return wizard.display_review
+    else:
+        return True
 
-def changeStatus(request, iid):
-    item = get_object_or_404(MDR._concept, pk=iid).item
-    if not (item and user_can_change_status(request.user, item)):
-        if request.user.is_anonymous():
-            return redirect(reverse('friendly_login') + '?next=%s' % request.path)
+
+class ReviewChangesView(SessionWizardView):
+
+    items = None
+    display_review = None
+
+    # Override this
+    change_step_name = None
+
+    def get_form_kwargs(self, step):
+
+        if step == 'review_changes':
+            items = self.get_items()
+            # Check some values from last step
+            cleaned_data = self.get_change_data()
+            cascade = cleaned_data['cascadeRegistration']
+            state = cleaned_data['state']
+            ra = cleaned_data['registrationAuthorities']
+
+            static_content = {'new_state': str(MDR.STATES[state]), 'new_reg_date': cleaned_data['registrationDate']}
+            # Need to check wether cascaded was true here
+
+            if cascade == 1:
+                all_ids = []
+                for item in items:
+
+                    # Can't cascade from _concept
+                    if isinstance(item, MDR._concept):
+                        cascade = item.item.registry_cascade_items
+                    else:
+                        cascade = item.registry_cascade_items
+
+                    cascaded_ids = [a.id for a in cascade]
+                    cascaded_ids.append(item.id)
+                    all_ids.extend(cascaded_ids)
+
+                queryset = MDR._concept.objects.filter(id__in=all_ids)
+            else:
+                ids = [a.id for a in items]
+                queryset = MDR._concept.objects.filter(id__in=ids)
+
+            return {'queryset': queryset, 'static_content': static_content, 'ra': ra[0], 'user': self.request.user}
+
+        return {}
+
+    def get_form(self, step=None, data=None, files=None):
+
+        self.set_review_var(step, data, files, self.change_step_name)
+        return super().get_form(step, data, files)
+
+    def get_change_data(self):
+        # We override this when the change_data doesnt come form a form
+        return self.get_cleaned_data_for_step(self.change_step_name)
+
+    def set_review_var(self, step, data, files, change_step):
+
+        # Set step if it's None
+        if step is None:
+            step = self.steps.current
+
+        if step == change_step and data:
+            review = True
+            if data.get('submit_next'):
+                review = True
+            elif data.get('submit_skip'):
+                review = False
+
+            self.display_review = review
+
+    def get_items(self):
+        return self.items
+
+    def get_template_names(self):
+        return [self.templates[self.steps.current]]
+
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form, **kwargs)
+
+        if self.steps.current == 'review_changes':
+            data = self.get_cleaned_data_for_step(self.change_step_name)
+            if 'registrationAuthorities' in data:
+                context.update({'ra': data['registrationAuthorities'][0]})
+
+        return context
+
+    def register_changes(self, form_dict, change_form=None, **kwargs):
+
+        items = self.get_items()
+
+        try:
+            review_data = form_dict['review_changes'].cleaned_data
+        except KeyError:
+            review_data = None
+
+        if review_data:
+            selected_list = review_data['selected_list']
+
+        # process the data in form.cleaned_data as required
+        if change_form:
+            cleaned_data = form_dict[change_form].cleaned_data
         else:
-            raise PermissionDenied
-    # There would be an else here, but both branches above return,
-    # so we've chopped it out to prevent an arrow anti-pattern.
-    if request.method == 'POST':  # If the form has been submitted...
-        form = MDRForms.ChangeStatusForm(request.POST, user=request.user)  # A form bound to the POST data
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            ras = form.cleaned_data['registrationAuthorities']
-            state = form.cleaned_data['state']
-            regDate = form.cleaned_data['registrationDate']
-            cascade = form.cleaned_data['cascadeRegistration']
-            changeDetails = form.cleaned_data['changeDetails']
-            with transaction.atomic(), reversion.revisions.create_revision():
-                reversion.revisions.set_user(request.user)
+            cleaned_data = self.get_change_data(register=True)
+
+        ras = cleaned_data['registrationAuthorities']
+        state = cleaned_data['state']
+        regDate = cleaned_data['registrationDate']
+        cascade = cleaned_data['cascadeRegistration']
+        changeDetails = cleaned_data['changeDetails']
+
+        if changeDetails is None:
+            changeDetails = ""
+
+        success = []
+        failed = []
+
+        arguments = {
+            'state': state,
+            'user': self.request.user,
+            'changeDetails': changeDetails,
+            'registrationDate': regDate,
+        }
+
+        if review_data:
+            for ra in ras:
+                arguments['items'] = selected_list
+                status = ra.register_many(**arguments)
+                success.extend(status['success'])
+                failed.extend(status['failed'])
+        else:
+            for item in items:
                 for ra in ras:
+                    # Should only be 1 ra
+                    # Need to check before enforcing
+
+                    # Can't cascade from _concept
+                    if isinstance(item, MDR._concept):
+                        arguments['item'] = item.item
+                    else:
+                        arguments['item'] = item
+
                     if cascade:
                         register_method = ra.cascaded_register
                     else:
                         register_method = ra.register
 
-                    register_method(
-                        item,
-                        state,
-                        request.user,
-                        changeDetails=changeDetails,
-                        registrationDate=regDate,
-                    )
-                    # TODO: notification and message on success/failure
-            return HttpResponseRedirect(url_slugify_concept(item))
-    else:
-        form = MDRForms.ChangeStatusForm(user=request.user)
-    import json
+                    status = register_method(**arguments)
+                    success.extend(status['success'])
+                    failed.extend(status['failed'])
 
-    return render(
-        request,
-        "aristotle_mdr/actions/changeStatus.html",
-        {
-            "item": item,
-            "form": form,
-            "status_matrix": json.dumps(generate_visibility_matrix(request.user)),
-        }
-    )
+        return (success, failed)
+
+    def register_changes_with_message(self, form_dict, change_form=None, *args, **kwargs):
+
+        with transaction.atomic(), reversion.revisions.create_revision():
+            reversion.revisions.set_user(self.request.user)
+
+            success, failed = self.register_changes(form_dict, change_form)
+
+            bad_items = sorted([str(i.id) for i in failed])
+            count = self.get_items().count()
+
+            if failed:
+                message = _(
+                    "%(num_items)s items registered \n"
+                    "%(num_faileds)s items failed, they had the id's: %(bad_ids)s"
+                ) % {
+                    'num_items': count,
+                    'num_faileds': len(failed),
+                    'bad_ids': ",".join(bad_items)
+                }
+            else:
+                message = _(
+                    "%(num_items)s items registered\n"
+                ) % {
+                    'num_items': count,
+                }
+
+            reversion.revisions.set_comment(message)
+
+        return message
+
+
+class ChangeStatusView(ReviewChangesView):
+
+    change_step_name = 'change_status'
+
+    form_list = [
+        ('change_status', MDRForms.ChangeStatusForm),
+        ('review_changes', MDRForms.ReviewChangesForm)
+    ]
+
+    templates = {
+        'change_status': 'aristotle_mdr/actions/changeStatus.html',
+        'review_changes': 'aristotle_mdr/actions/review_state_changes.html'
+    }
+
+    condition_dict = {'review_changes': display_review}
+
+    display_review = None
+
+    def dispatch(self, request, *args, **kwargs):
+        # Check for keyError here
+        self.item = get_object_or_404(MDR._concept, pk=kwargs['iid']).item
+
+        if not (self.item and user_can_change_status(request.user, self.item)):
+            if request.user.is_anonymous():
+                return redirect(reverse('friendly_login') + '?next=%s' % request.path)
+            else:
+                raise PermissionDenied
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_items(self):
+        return [self.item]
+
+    def get_form_kwargs(self, step):
+
+        kwargs = super().get_form_kwargs(step)
+
+        if step == 'change_status':
+            return {'user': self.request.user}
+
+        return kwargs
+
+    def get_context_data(self, form, **kwargs):
+        item = self.item
+        status_matrix = json.dumps(generate_visibility_matrix(self.request.user))
+        context = super().get_context_data(form, **kwargs)
+        context.update({'item': item, 'status_matrix': status_matrix})
+        return context
+
+    def done(self, form_list, form_dict, **kwargs):
+        self.register_changes(form_dict, 'change_status')
+        return HttpResponseRedirect(url_slugify_concept(self.item))
 
 
 def supersede(request, iid):
@@ -377,7 +572,7 @@ class PermissionSearchView(FacetedSearchView):
 
         try:
             rpp = self.form.cleaned_data['rpp']
-        except AttributeError:
+        except (AttributeError, KeyError):
             rpp = ''
 
         if rpp in self.results_per_page_values:
