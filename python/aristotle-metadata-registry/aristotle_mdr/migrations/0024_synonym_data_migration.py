@@ -22,16 +22,18 @@ def add_slots(apps, schema_editor):
 
 def reverse_add_slots(apps, schema_editor):
 
-    try:
-        slot = apps.get_model('aristotle_mdr_slots', 'Slot')
-    except LookupError:
-        slot = None
-
-    if slot:
-        for s in slot.objects.all():
-            if s.name == 'Synonyms' and len(s.value) < 200:
-                s.concept.synonyms = s.value
-                s.concept.save()
+    pass
+    # try:
+    #     slot = apps.get_model('aristotle_mdr_slots', 'Slot')
+    # except LookupError:
+    #     slot = None
+    #
+    # print(slot)
+    # if slot:
+    #     for s in slot.objects.all():
+    #         if s.name == 'Synonyms' and len(s.value) < 200:
+    #             s.concept.synonyms = s.value
+    #             s.concept.save()
 
 class Migration(migrations.Migration):
 
