@@ -4,6 +4,17 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+def add_slots(apps, schema_editor):
+    if apps.is_installed('aristotle_mdr.contrib.slots'):
+        slot = apps.get_model('aristotle_mdr.contrib.slots', 'Slot')
+        _concept = apps.get_model('aristotle_mdr', '_concept')
+        for concept in _concept.objects.all():
+            if concept.synonyms:
+                slot.objects.create(
+                    name='Synonyms',
+                    concept=concept,
+                    value=concept.synonyms
+                )
 
 class Migration(migrations.Migration):
 
@@ -12,6 +23,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(add_slots),
         migrations.RemoveField(
             model_name='_concept',
             name='synonyms',
