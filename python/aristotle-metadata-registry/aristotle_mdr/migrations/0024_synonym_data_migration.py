@@ -1,5 +1,5 @@
 # Custom migration for synonym data
-from django.db import migrations
+from django.db import migrations, connection
 
 def add_slots(apps, schema_editor):
 
@@ -23,7 +23,6 @@ def add_slots(apps, schema_editor):
 
 def reverse_add_slots(apps, schema_editor):
 
-    # Reverse migration currently not working
     try:
         slot = apps.get_model('aristotle_mdr_slots', 'Slot')
     except LookupError:
@@ -41,8 +40,18 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('aristotle_mdr', '0023_auto_20180206_0332'),
+        ('aristotle_mdr_slots', '0004_switch_to_concept_relations')
     ]
 
     operations = [
         migrations.RunPython(add_slots, reverse_add_slots),
     ]
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+        if connection.settings_dict['ENGINE'].endswith('mysql'):
+            print('Running data migration non atomically')
+            self.operations = [
+                migrations.RunPython(add_slots, reverse_add_slots, atomic=False)
+            ]

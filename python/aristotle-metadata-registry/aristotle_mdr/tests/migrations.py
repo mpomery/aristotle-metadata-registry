@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.test.testcases import TransactionTestCase
 import unittest
 
+# This is an object so it is not run as a test. See usage in main.test_migrations
 @unittest.skipIf(connection.vendor in ['microsoft', 'mssql'], "MSSQL Doesn't support temporarily disabling foreign key constraints")
 class MigrationsTestCase(object):
     """
