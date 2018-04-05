@@ -35,7 +35,15 @@ def home(request):
 
     # recent = Version.objects.filter(revision__user=request.user).order_by('-revision__date_created')[0:10]
     recent = Revision.objects.filter(user=request.user).order_by('-date_created')[0:10]
-    page = render(request, "aristotle_mdr/user/userHome.html", {"item": request.user, 'recent': recent})
+    recentdata = []
+    for rev in recent:
+        revdata = {'revision': rev, 'versions': []}
+        for ver in rev.version_set.all():
+            revdata['versions'].append({'id': ver.object_id, 'text': ver.object_repr})
+            
+        recentdata.append(revdata)
+
+    page = render(request, "aristotle_mdr/user/userHome.html", {"item": request.user, 'recentdata': recentdata})
     return page
 
 

@@ -80,15 +80,12 @@
                     </a>
                 </div>
                 <ul class="list-group">
-                {% for revision in recent %}
+                {% for data in recentdata %}
                     <li class="list-group-item">
-                        <span>{{ revision.comment }} <small>({{revision.date_created}})</small></span>
+                        <span>{{ data.revision.comment }} <small>({{ data.revision.date_created }})</small></span>
                         <ul>
-                            {% for item in revision.version_set.all|unique_recent %}
-                                {% if item.object.get_absolute_url %}
-                                    {# things with a 'parentitem' are components and probably shouldn't be shown. #}
-                                    <li><a href="{{ item.object.get_absolute_url }}">{{ item }} ({{ item.object.id }})</a></li>
-                                {% endif %}
+                            {% for item in data.versions %}
+                                  <li><a href="url">{{ item.text }} ({{ item.id }})</a></li>
                             {% endfor %}
                         </ul>
                     </li>
