@@ -37,9 +37,6 @@
             {% if item.version %}
             <dt class="visible-xs">{% trans 'Version'%}</dt><dd class="visible-xs">{{ item.version }}</dd>
             {% endif %}
-            {% if item.synonyms %}
-            <dt class="visible-xs">{% trans 'Synonyms'%}</dt><dd class="visible-xs">{{ item.synonyms }}</dd>
-            {% endif %}
             {% if item.origin_URI %}
             <dt title="{{ item.origin_URI.help_text }}">{% trans 'Origin URI'%}</dt><dd><a title="This link will exit this site" href="{{ item.origin_URI }}">Jump to original <i class="fa fa-external-link"></i></a></dd>
             {% endif %}
@@ -48,11 +45,11 @@
             <dt>Included in</dt>
             {% block includes %}{% endblock %}
             {% endcomment %}
-            
+
             {% if item.registerable %}
             {% include "aristotle_mdr/infobox_statuses.html" with statuses=item.current_statuses %}
             {% endif %}
-            
+
             {% if item.publicationrecord and not item.current_statuses %}
                 {% include "aristotle_self_publish/concepts/publication_details.html" with item=item %}
             {% endif %}
