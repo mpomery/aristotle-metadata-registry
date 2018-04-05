@@ -1,0 +1,28 @@
+{% extends "aristotle_mdr/helpers/wizard_form.html" %}
+
+{% load i18n %}
+
+{% block title %}Review Changes{% endblock %}
+
+{% block content %}
+<h1>Review included items for status change</h1>
+<p>Below is a list of the items you have selected for a status change, including those linked to a parent item.<br>
+This table includes the current registration status and date for the item in the registration authority
+  {% if ra %}<strong><a href='{% url 'aristotle_mdr:registrationAuthority' iid=ra.pk %}'>{{ ra.name }}</a></strong>{% endif %},
+  as well as the selected state and date.
+
+<a tabindex="0" class="aristotle-popover" role="button" data-toggle="popover" title="Status change help"
+  data-placement="bottom"
+  data-content="<p>You can remove items from the selection by unselecting the check mark in the first box.
+  If there are items you don't have permission to change the status for, they will be highlighted and the checkbox unselected already.</p>
+  <p>When you have completed your selection, click the 'Update Status' button to complete this change.</p>" data-html="true">
+  <i class="fa fa-2x fa-question-circle"></i>
+</a>
+</p>
+
+{{ block.super }}
+{% endblock %}
+
+{% block buttons %}
+<input class="btn btn-primary" type="submit" value="{% trans "Update Status" %}" />
+{% endblock %}

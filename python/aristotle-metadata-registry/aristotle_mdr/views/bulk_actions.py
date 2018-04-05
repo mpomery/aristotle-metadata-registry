@@ -7,6 +7,9 @@ from django.views.generic import FormView
 
 from aristotle_mdr import exceptions as registry_exceptions
 from aristotle_mdr.utils import fetch_aristotle_settings
+from aristotle_mdr.views import ReviewChangesView, display_review
+from aristotle_mdr.forms.forms import ReviewChangesForm
+from aristotle_mdr.forms.bulk_actions import ChangeStateForm
 
 
 class BulkAction(FormView):
@@ -38,12 +41,29 @@ class BulkAction(FormView):
             # no action, messed up, redirect
             return HttpResponseRedirect(url)
         action_form = action['form']
+
+        if issubclass(action_form, ChangeStateForm):
+            # If the form is a change state form
+            # Put the items into the users session and redirect
+
+            items_list = self.request.POST.getlist('items')
+            if items_list:
+                self.request.session['bulkaction_items'] = items_list
+            else:
+                if 'bulkaction_items' in self.request.session:
+                    del self.request.session['bulkaction_items']
+
+            self.request.session['next'] = url
+
+            return HttpResponseRedirect(reverse('aristotle:change_state_bulk_action'))
+
         if action_form.confirm_page is None:
             # if there is no confirm page or extra details required, do the action and redirect
             form = action_form(request.POST, user=request.user, request=request)  # A form bound to the POST data
 
             if form.is_valid():
                 to_change = form.items_to_change
+
                 confirmed = request.POST.get("confirmed", None)
                 if to_change.count() > 10 and not confirmed:
                     new_form = request.POST.copy()
@@ -123,3 +143,61 @@ def get_bulk_actions():
             frm[prop] = getattr(f, prop, None)
         actions[action_name] = frm
     return actions
+
+
+class ChangeStatusBulkActionView(ReviewChangesView):
+
+    change_step_name = 'change_state'
+
+    form_list = [
+        ('change_state', ChangeStateForm),
+        ('review_changes', ReviewChangesForm)
+    ]
+
+    templates = {
+        'change_state': 'aristotle_mdr/actions/bulk_actions/change_status.html',
+        'review_changes': 'aristotle_mdr/actions/review_state_changes.html'
+    }
+
+    condition_dict = {'review_changes': display_review}
+    display_review = None
+
+    def get_items(self):
+        return self.get_change_data()['items']
+
+    def get_form_kwargs(self, step):
+
+        kwargs = super().get_form_kwargs(step)
+
+        if step == 'change_state':
+            kwargs.update({'user': self.request.user, 'form': None, 'request': self.request})
+
+        return kwargs
+
+    def get_form_initial(self, step):
+
+        initial = super().get_form_initial(step)
+
+        if step == 'change_state':
+            if 'bulkaction_items' in self.request.session:
+                bulk_items = self.request.session['bulkaction_items']
+                initial.update({'items': bulk_items})
+
+        return initial
+
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form, **kwargs)
+        if 'next' in self.request.session:
+            context.update({'next': self.request.session['next']})
+
+        return context
+
+    def done(self, form_list, form_dict, **kwargs):
+
+        self.register_changes_with_message(form_dict, 'change_state')
+
+        if 'next' in self.request.session:
+            url = self.request.session['next']
+        else:
+            url = '/'
+        return HttpResponseRedirect(url)

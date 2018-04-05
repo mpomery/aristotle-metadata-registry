@@ -1,0 +1,65 @@
+<section>
+<div class="changeStatusDiv">
+    <span>
+        <label for="id_registrationDate">{{ form.registrationDate.label }}</label>:
+        {{ form.registrationDate.errors }}
+    </span>
+    <span class="pull-right">
+        {{ form.registrationDate }}
+    </span>
+</div>
+<div class="changeStatusDiv">
+    <span>
+        <label for="id_cascadeRegistration">
+        {{ form.cascadeRegistration.label }}
+        <a tabindex="0"
+        class="aristotle-popover"
+        role="button"
+        data-toggle="popover"
+        title="Associated Items Help"
+        data-content="Associated items can be components of another piece of metadata, or other items that have been linked together by a user.<br><br>
+        For example, the associated metadata for a Data Element would be it's Data Element Concept, Value Domain, Object Class and Property<br><br>
+        You can review what other metadata items will be changed by clicking 'Review Changes' button"
+        data-html="true">
+        <i class="fa fa-2x fa-question-circle"></i>
+        </a>
+        </label>
+        {{ form.cascadeRegistration.errors }}
+    </span>
+    <span class="pull-right">
+        {{ form.cascadeRegistration }}
+    </span>
+</div>
+<div id="changeStatus">
+    <div>
+        <span>
+            {{ form.state.label }}
+            {{ form.state.errors }}
+        </span>
+        <span>
+            {{ form.registrationAuthorities.label }}
+            {{ form.registrationAuthorities.errors }}
+        </span>
+    </div>
+    <div>
+        {{ form.state }}
+        <ul>
+        {% for val,label_text in form.registrationAuthorities.field.choices %}
+        {% if val %}
+            <li>
+                <input type="radio" id="{% if wizard %}{{ wizard.steps.current }}-{% endif %}registrationAuthorities_{{val}}" name="{% if wizard %}{{ wizard.steps.current }}-{% endif %}registrationAuthorities" value="{{val}}">
+                <label for="{% if wizard %}{{ wizard.steps.current }}-{% endif %}registrationAuthorities_{{val}}">{{label_text}}</label>
+                <a href="{% url 'aristotle_mdr:registrationAuthority' iid=val %}" title="Visit the registration authority page to learn more about state meanings for this authority" class="pull-right">
+                    <i class="fa fa-fw fa-university"></i>
+                </a>
+            </li>
+        {% endif %}
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+<div class="status_change_description">
+    {{ form.changeDetails.label }} (optional):
+    {{ form.changeDetails }}
+</div>
+</section>

@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.urls import reverse
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, tag
 from django.utils import timezone
 from django.db.models.fields import CharField, TextField
 
@@ -819,6 +819,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.get(reverse('aristotle:toggleFavourite', args=[self.item1.id]))
         self.assertRedirects(response,reverse('friendly_login')+"?next="+reverse('aristotle:toggleFavourite', args=[self.item1.id]))
 
+    @tag('changestatus')
     def test_registrar_can_change_status(self):
         self.login_registrar()
 
@@ -844,10 +845,12 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.post(
             reverse('aristotle:changeStatus',args=[self.item1.id]),
             {
-                'registrationAuthorities': [str(self.ra.id)],
-                'state': self.ra.public_state,
-                'changeDetails': "testing",
-                'cascadeRegistration': 0, # no
+                'change_status-registrationAuthorities': [str(self.ra.id)],
+                'change_status-state': self.ra.public_state,
+                'change_status-changeDetails': "testing",
+                'change_status-cascadeRegistration': 0, # no
+                'submit_skip': 'value',
+                'change_status_view-current_step': 'change_status',
             }
         )
         self.assertRedirects(response,url_slugify_concept(self.item1))
@@ -857,6 +860,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         self.assertTrue(self.item1.is_registered)
         self.assertTrue(self.item1.is_public())
 
+    @tag('changestatus')
     def test_registrar_can_change_status_with_cascade(self):
         if not hasattr(self,"run_cascade_tests"):
             return
@@ -890,10 +894,12 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.post(
             reverse('aristotle:changeStatus',args=[self.item1.id]),
             {
-                'registrationAuthorities': [str(self.ra.id)],
-                'state': self.ra.public_state,
-                'changeDetails': "testing",
-                'cascadeRegistration': 1, # yes
+                'change_status-registrationAuthorities': [str(self.ra.id)],
+                'change_status-state': self.ra.public_state,
+                'change_status-changeDetails': "testing",
+                'change_status-cascadeRegistration': 1, # yes
+                'submit_skip': 'value',
+                'change_status_view-current_step': 'change_status',
             }
         )
         self.assertRedirects(response,url_slugify_concept(self.item1))
@@ -903,13 +909,13 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         self.assertTrue(self.item1.is_registered)
         self.assertTrue(self.item1.is_public())
         for sub_item in self.item1.registry_cascade_items:
-            if sub_item is not None and perms.user_can_change_status(self.registrar,sub_item) :
+            if sub_item is not None:
                 if not sub_item.is_registered: # pragma: no cover
                     # This is debug code, and should never happen
                     print(sub_item)
                 self.assertTrue(sub_item.is_registered)
 
-
+    @tag('changestatus')
     def test_registrar_cannot_use_faulty_statuses(self):
         self.login_registrar()
 
@@ -935,10 +941,12 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.post(
             reverse('aristotle:changeStatus', args=[self.item1.id]),
             {
-                'registrationAuthorities': [str(self.ra.id)],
-                'state': "Not a number", # obviously wrong
-                'changeDetails': "testing",
-                'cascadeRegistration': 0, # no
+                'change_status-registrationAuthorities': [str(self.ra.id)],
+                'change_status-state': "Not a number", # obviously wrong
+                'change_status-changeDetails': "testing",
+                'change_status-cascadeRegistration': 0, # no
+                'submit_skip': 'value',
+                'change_status_view-current_step': 'change_status',
             }
         )
         self.assertFormError(response, 'form', 'state', 'Select a valid choice. Not a number is not one of the available choices.')
@@ -946,27 +954,127 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         response = self.client.post(
             reverse('aristotle:changeStatus',args=[self.item1.id]),
             {
-                'registrationAuthorities': [str(self.ra.id)],
-                'state': "343434", # also wrong
-                'changeDetails': "testing",
-                'cascadeRegistration': 0, # no
+                'change_status-registrationAuthorities': [str(self.ra.id)],
+                'change_status-state': "343434", # also wrong
+                'change_status-changeDetails': "testing",
+                'change_status-cascadeRegistration': 0, # no
+                'submit_skip': 'value',
+                'change_status_view-current_step': 'change_status',
             }
         )
         self.assertFormError(response, 'form', 'state', 'Select a valid choice. 343434 is not one of the available choices.')
 
+    def registrar_can_change_status_with_review(self, cascade, check_bad_perms=False):
+        if not hasattr(self,"run_cascade_tests") and cascade:
+            return
+        self.login_registrar()
+
+        self.assertFalse(perms.user_can_view(self.registrar,self.item1))
+        self.item1.save()
+        self.item1 = self.itemType.objects.get(pk=self.item1.pk)
+
+        review = models.ReviewRequest.objects.create(
+            requester=self.su,registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+
+        review.concepts.add(self.item1)
+
+        self.assertTrue(perms.user_can_view(self.registrar,self.item1))
+        self.assertTrue(perms.user_can_change_status(self.registrar,self.item1))
+
+        response = self.client.get(reverse('aristotle:changeStatus',args=[self.item1.id]))
+        self.assertEqual(response.status_code,200)
+
+        self.assertEqual(self.item1.statuses.count(),0)
+        for sub_item in self.item1.registry_cascade_items:
+            if sub_item is not None:
+                self.assertEqual(sub_item.statuses.count(),0)
+            else:
+                pass
+
+        if cascade:
+            cascade_post = 1
+            if not check_bad_perms:
+                # add all cascade items to review
+                for item in self.item1.registry_cascade_items:
+                    review.concepts.add(item)
+        else:
+            cascade_post = 0
+
+        response = self.client.post(
+            reverse('aristotle:changeStatus',args=[self.item1.id]),
+            {
+                'change_status-registrationAuthorities': [str(self.ra.id)],
+                'change_status-state': self.ra.public_state,
+                'change_status-changeDetails': "testing",
+                'change_status-cascadeRegistration': cascade_post,
+                'submit_next': 'value',
+                'change_status_view-current_step': 'change_status',
+            }
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['wizard']['steps'].step1, 2) # check we are now on second setep
+        selected_for_change = [self.item1.id]
+
+        if cascade:
+            selected_for_change.append(self.item1.registry_cascade_items[0].id)
+
+        selected_for_change_strings = [str(a) for a in selected_for_change]
+
+        review_response = self.client.post(
+            reverse('aristotle:changeStatus',args=[self.item1.id]),
+            {
+                'review_changes-selected_list': selected_for_change_strings,
+                'change_status_view-current_step': 'review_changes',
+            }
+        )
+        self.assertRedirects(review_response,url_slugify_concept(self.item1))
+
+        self.item1 = self.itemType.objects.get(pk=self.item1.pk)
+        self.assertEqual(self.item1.statuses.count(),1)
+        self.assertTrue(self.item1.is_registered)
+        self.assertTrue(self.item1.is_public())
+        if cascade:
+            for sub_item in self.item1.registry_cascade_items:
+                if sub_item is not None:
+                    if sub_item.id in selected_for_change:
+                        if not check_bad_perms:
+                            self.assertTrue(sub_item.is_registered)
+                        else:
+                            self.assertFalse(sub_item.is_registered)
+                    else:
+                        self.assertFalse(sub_item.is_registered)
+
+    @tag('changestatus')
+    def test_registrar_can_change_status_with_review_cascade(self):
+        self.registrar_can_change_status_with_review(cascade=True)
+
+    @tag('changestatus')
+    def test_registrar_cant_update_cascaded_items_without_perm(self):
+        self.registrar_can_change_status_with_review(cascade=True, check_bad_perms=True)
+
+    @tag('changestatus')
+    def test_registrar_can_change_status_with_review_no_cascade(self):
+        self.registrar_can_change_status_with_review(cascade=False)
+
+    @tag('changestatus')
     def test_viewer_cannot_change_status(self):
         self.login_viewer()
 
         response = self.client.get(reverse('aristotle:changeStatus',args=[self.item1.id]))
         self.assertEqual(response.status_code,403)
 
-
+    @tag('changestatus')
     def test_anon_cannot_change_status(self):
         self.logout()
 
         response = self.client.get(reverse('aristotle:changeStatus',args=[self.item1.id]))
         self.assertRedirects(response,reverse('friendly_login')+"?next="+reverse('aristotle:changeStatus', args=[self.item1.id]))
 
+    @tag('changestatus')
     def test_cascade_action(self):
         self.logout()
         check_url = reverse('aristotle:check_cascaded_states', args=[self.item1.pk])
