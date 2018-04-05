@@ -5,8 +5,8 @@ from django.test import TestCase
 from django.test.testcases import TransactionTestCase
 import unittest
 
-# This is an object so it is not run as a test. See usage in main.test_migrations
-@unittest.skipIf(connection.vendor in ['microsoft', 'mssql'], "MSSQL Doesn't support temporarily disabling foreign key constraints")
+# This is an object so it is not run as a test itself. See usage in main.test_migrations
+@unittest.skipIf(connection.vendor in ['microsoft', 'mssql', 'mariadb', 'mysql'], "Migration tests are not supported by the current database")
 class MigrationsTestCase(object):
     """
     Thanks to: https://www.caktusgroup.com/blog/2016/02/02/writing-unit-tests-django-migrations/
