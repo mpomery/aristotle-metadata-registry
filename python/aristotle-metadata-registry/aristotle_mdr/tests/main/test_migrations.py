@@ -1,9 +1,9 @@
 from aristotle_mdr.tests.migrations import MigrationsTestCase
 from django.core.exceptions import FieldDoesNotExist
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 
-class TestSynonymMigration(MigrationsTestCase, TestCase):
+class TestSynonymMigration(MigrationsTestCase, TransactionTestCase):
 
     migrate_from = '0023_auto_20180206_0332'
     migrate_to = '0024_synonym_data_migration'

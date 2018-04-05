@@ -46,12 +46,3 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(add_slots, reverse_add_slots),
     ]
-
-    def __init__(self, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-        if connection.settings_dict['ENGINE'].endswith('mysql'):
-            print('Running data migration non atomically')
-            self.operations = [
-                migrations.RunPython(add_slots, reverse_add_slots, atomic=False)
-            ]
