@@ -23,6 +23,7 @@ def add_slots(apps, schema_editor):
 
 def reverse_add_slots(apps, schema_editor):
 
+    # Reverse migration currently not working
     try:
         slot = apps.get_model('aristotle_mdr_slots', 'Slot')
     except LookupError:
