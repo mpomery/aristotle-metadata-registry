@@ -31,19 +31,34 @@ def friendly_redirect_login(request):
 
 def home(request):
     from reversion.models import Revision
-    # recent = Revision.objects.filter(user=request.user)
 
-    # recent = Version.objects.filter(revision__user=request.user).order_by('-revision__date_created')[0:10]
     recent = Revision.objects.filter(user=request.user).order_by('-date_created')[0:10]
     recentdata = []
     for rev in recent:
         revdata = {'revision': rev, 'versions': []}
         seen_ver_ids = []
+
         for ver in rev.version_set.all():
 
-            object_data = json.loads(ver.serialized_data)
-            logger.debug(object_data[0]['model'])
-            if object_data[0]['model'] != 'aristotle_mdr.status' and ver.object_id not in seen_ver_ids:
+            seen = ver.object_id in seen_ver_ids
+            add_version = None
+
+            if ver.format == 'json':
+                object_data = json.loads(ver.serialized_data)
+
+                try:
+                    model = object_data[0]['model']
+                except KeyError:
+                    model = None
+
+                if model:
+                    add_version = (model != 'aristotle_mdr.status' and not seen)
+
+            if add_version is None:
+                # Fallback for if add_version could not be set, results in db query
+                add_version = (not isinstance(ver.object, MDR.Status) and not seen)
+
+            if add_version:
                 revdata['versions'].append({'id': ver.object_id, 'text': str(ver)})
 
             seen_ver_ids.append(ver.object_id)
