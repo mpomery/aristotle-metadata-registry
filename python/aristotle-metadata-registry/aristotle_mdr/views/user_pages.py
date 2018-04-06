@@ -19,6 +19,7 @@ from aristotle_mdr.utils import fetch_metadata_apps
 
 import json
 
+
 def friendly_redirect_login(request):
     if request.user.is_authenticated():
         if 'next' in request.GET:
