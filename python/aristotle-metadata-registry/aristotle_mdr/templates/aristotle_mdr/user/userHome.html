@@ -85,7 +85,7 @@
                         <span>{{ data.revision.comment }} <small>({{ data.revision.date_created }})</small></span>
                         <ul>
                             {% for item in data.versions %}
-                                  <li><a href="url">{{ item.text }} ({{ item.id }})</a></li>
+                                  <li><a href="{% url 'aristotle:item' item.id %}">{{ item.text }} ({{ item.id }})</a></li>
                             {% endfor %}
                         </ul>
                     </li>
