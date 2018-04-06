@@ -30,6 +30,7 @@ def friendly_redirect_login(request):
         return login(request)
 
 
+@login_required
 def home(request):
     from reversion.models import Revision
 
