@@ -12,12 +12,12 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, ListView, UpdateView
 
-
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.views.utils import paginated_list, paginated_workgroup_list
 from aristotle_mdr.utils import fetch_metadata_apps
 
+import json
 
 def friendly_redirect_login(request):
     if request.user.is_authenticated():
@@ -38,9 +38,16 @@ def home(request):
     recentdata = []
     for rev in recent:
         revdata = {'revision': rev, 'versions': []}
+        seen_ver_ids = []
         for ver in rev.version_set.all():
-            revdata['versions'].append({'id': ver.object_id, 'text': ver.object_repr})
-            
+
+            object_data = json.loads(ver.serialized_data)
+            logger.debug(object_data[0]['model'])
+            if object_data[0]['model'] != 'aristotle_mdr.status' and ver.object_id not in seen_ver_ids:
+                revdata['versions'].append({'id': ver.object_id, 'text': str(ver)})
+
+            seen_ver_ids.append(ver.object_id)
+
         recentdata.append(revdata)
 
     page = render(request, "aristotle_mdr/user/userHome.html", {"item": request.user, 'recentdata': recentdata})
