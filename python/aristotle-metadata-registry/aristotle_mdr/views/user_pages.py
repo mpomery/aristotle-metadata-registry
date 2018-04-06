@@ -61,7 +61,9 @@ def home(request):
                 add_version = (not isinstance(ver.object, MDR.Status) and not seen)
 
             if add_version:
-                revdata['versions'].append({'id': ver.object_id, 'text': str(ver)})
+                obj = ver.object
+                if hasattr(obj, 'get_absolute_url'):
+                    revdata['versions'].append({'id': ver.object_id, 'text': str(ver), 'url': obj.get_absolute_url})
 
             seen_ver_ids.append(ver.object_id)
 
