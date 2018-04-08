@@ -305,6 +305,7 @@ def status_filter(qs, when=timezone.now().date()):
 
     return states
 
+
 def get_aristotle_url(label, obj_id, obj_name=None):
 
     label_list = label.split('.')
