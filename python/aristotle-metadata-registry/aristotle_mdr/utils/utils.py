@@ -304,3 +304,43 @@ def status_filter(qs, when=timezone.now().date()):
     )
 
     return states
+
+def get_aristotle_url(label, obj_id, obj_name=None):
+
+    label_list = label.split('.')
+
+    app = label_list[0]
+    cname = label_list[1]
+
+    if obj_name:
+        name_slug = slugify(obj_name)[:50]
+    else:
+        name_slug = None
+
+    if app == 'aristotle_mdr':
+
+        if cname in ['organization', 'workgroup', 'registrationauthority'] and name_slug is None:
+            # Can't get these url's without name_slug
+            return None
+
+        if cname == '_concept':
+
+            return reverse('aristotle:item', args=[obj_id])
+
+        elif cname == 'organization':
+
+            return reverse('aristotle:organization', args=[obj_id, name_slug])
+
+        elif cname == 'workgroup':
+
+            return reverse('aristotle:workgroup', args=[obj_id, name_slug])
+
+        elif cname == 'registrationauthority':
+
+            return reverse('aristotle:registrationAuthority', args=[obj_id, name_slug])
+
+        elif cname == 'reviewrequest':
+
+            return reverse('aristotle:userReviewDetails', args=[obj_id])
+
+    return None
