@@ -117,8 +117,6 @@ INSTALLED_APPS = (
 
     'notifications',
     'organizations',
-
-    'improved_user.apps.ImprovedUserConfig'
 )
 
 USE_L10N = True
