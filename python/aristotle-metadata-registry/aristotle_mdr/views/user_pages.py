@@ -196,7 +196,7 @@ def get_cached_object_count(model_type):
 class EditView(LoginRequiredMixin, UpdateView):
 
     template_name = "aristotle_mdr/user/userEdit.html"
-    fields = ['first_name', 'last_name', 'email']
+    fields = ['email', 'full_name', 'short_name']
 
     def get_object(self, querySet=None):
         return self.request.user
