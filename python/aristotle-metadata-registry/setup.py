@@ -85,7 +85,7 @@ setup(
         'django-organizations',
 
         # Improved User Model
-        'django-improved-user==0.5.3'
+        'django-improved-user==1.0a2'
 
     ],
 
