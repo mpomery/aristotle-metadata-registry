@@ -9,6 +9,8 @@ from aristotle_mdr import utils
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
+import datetime
+
 setup_aristotle_test_environment()
 
 
