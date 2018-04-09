@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.admin.filters import RelatedFieldListFilter
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -23,6 +23,7 @@ reversion.revisions.register(MDR.Status)
 reversion.revisions.register(MDR._concept, follow=['statuses', 'workgroup', 'slots'])
 reversion.revisions.register(MDR.Workgroup)
 
+User = get_user_model()
 
 class StatusInline(admin.TabularInline):
     """
