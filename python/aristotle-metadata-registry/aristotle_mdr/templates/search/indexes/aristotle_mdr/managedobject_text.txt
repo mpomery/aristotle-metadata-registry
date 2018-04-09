@@ -1,6 +1,5 @@
 {{ object.name }} {{ object.version }}
 {{ object.short_name }}
-{{ object.synonyms }}
 {{ object.definition }}
 {{ object.comments }}
 {{ object.references }}

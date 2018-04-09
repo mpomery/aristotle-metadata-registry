@@ -104,7 +104,7 @@ class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
     form = MDRForms.admin.AdminConceptForm
     list_display = ['name', 'description_stub', 'created', 'modified', 'workgroup', 'is_public', 'is_locked']  # ,'status']
     list_filter = ['created', 'modified', ('workgroup', WorkgroupFilter)]  # , 'statuses']
-    search_fields = ['name', 'synonyms']
+    search_fields = ['name']
     inlines = [StatusInline]
 
     date_hierarchy = 'created'  # ,'modified']
@@ -113,7 +113,7 @@ class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
         (None, {'fields': ['name', 'definition', 'workgroup']}),
         ('Additional names', {
             'classes': ('grp-collapse grp-closed',),
-            'fields': ['synonyms', 'short_name', 'version']
+            'fields': ['short_name', 'version']
         }),
         # ('Registry', {'fields': ['workgroup']}),
         ('Relationships', {

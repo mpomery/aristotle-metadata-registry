@@ -9,10 +9,10 @@
       "is_staff": true,
       "last_login": null,
       "groups": [
-        
+
       ],
       "user_permissions": [
-        
+
       ],
       "password": "pbkdf2_sha256$20000$CJ6ocrxVoXPG$9uoqnqJwKEyV0ZL1rldu6MhIdsANRmJEiCXZ9Alo8FM=",
       "email": "",
@@ -31,10 +31,10 @@
       "is_staff": false,
       "last_login": null,
       "groups": [
-        
+
       ],
       "user_permissions": [
-        
+
       ],
       "password": "pbkdf2_sha256$20000$0nDJOwioyjht$XH+ixugS7lJOAjogazVN2KBBwxWwCfECErYtC0xUhTM=",
       "email": "",
@@ -53,10 +53,10 @@
       "is_staff": false,
       "last_login": null,
       "groups": [
-        
+
       ],
       "user_permissions": [
-        
+
       ],
       "password": "pbkdf2_sha256$20000$F36PABkRVv5h$LuM7HYM07CZpd1Gl4SbFVuz8zH5muC+l\/IrXHBwrz7I=",
       "email": "",
@@ -75,10 +75,10 @@
       "is_staff": false,
       "last_login": null,
       "groups": [
-        
+
       ],
       "user_permissions": [
-        
+
       ],
       "password": "pbkdf2_sha256$20000$39CwEUm8jmck$WXyqDA0xa8wBn1c4H366XVEb9yWCruU8WVupwcg7ILE=",
       "email": "",
@@ -97,10 +97,10 @@
       "is_staff": false,
       "last_login": null,
       "groups": [
-        
+
       ],
       "user_permissions": [
-        
+
       ],
       "password": "pbkdf2_sha256$20000$jv9IDRHZr973$kl+bOg0zYUOUych+KwuQVmjsjoPaQMUYN2PKnqFAV4s=",
       "email": "",
@@ -119,10 +119,10 @@
       "is_staff": false,
       "last_login": null,
       "groups": [
-        
+
       ],
       "user_permissions": [
-        
+
       ],
       "password": "pbkdf2_sha256$20000$5ogyHvSU2Lkj$GIzVYGH2l0KBdSN+7017YKd7H6SENEH3JzXt1+xesxo=",
       "email": "",
@@ -168,7 +168,7 @@
       "standard": "",
       "qualified": "",
       "registrars": [
-        
+
       ],
       "retired": "",
       "incomplete": ""
@@ -189,7 +189,7 @@
       "standard": "",
       "qualified": "",
       "registrars": [
-        
+
       ],
       "retired": "",
       "incomplete": ""
@@ -450,7 +450,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "",
       "version": "",
       "references": ""
     },
@@ -465,7 +464,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "People",
       "version": "",
       "references": ""
     },
@@ -480,7 +478,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "",
       "version": "",
       "references": ""
     },
@@ -495,7 +492,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "",
       "version": "",
       "references": ""
     },
@@ -510,7 +506,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "",
       "version": "",
       "references": ""
     },
@@ -525,7 +520,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "",
       "version": "",
       "references": ""
     },
@@ -541,7 +535,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "",
       "version": "",
       "references": "",
       "measure": 3
@@ -558,7 +551,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "",
       "version": "",
       "references": "",
       "measure": 3
@@ -577,7 +569,6 @@
       "comments": "",
       "origin_URI": "",
       "data_type": 4,
-      "synonyms": "",
       "version": "",
       "references": "",
       "maximum_length": 3,
@@ -598,7 +589,6 @@
       "comments": "",
       "origin_URI": "",
       "data_type": 4,
-      "synonyms": "",
       "version": "",
       "references": "",
       "maximum_length": 3,
@@ -669,7 +659,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "",
       "version": "",
       "references": "",
       "conceptualDomain": null,
@@ -687,7 +676,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "",
       "version": "",
       "references": "",
       "conceptualDomain": null,
@@ -705,7 +693,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "",
       "version": "",
       "references": "",
       "conceptualDomain": null,
@@ -723,7 +710,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "",
       "version": "",
       "references": "",
       "conceptualDomain": null,
@@ -740,7 +726,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "",
       "version": "",
       "references": "",
       "dataElementConcept": 21,
@@ -757,7 +742,6 @@
       "responsible_organisation": "",
       "comments": "",
       "origin_URI": "",
-      "synonyms": "",
       "version": "",
       "references": "",
       "dataElementConcept": 29,

@@ -33,14 +33,11 @@
     <div id="definition" class="definition">
         {{ item.definition | safe}}
     </div>
-    {% if item.short_name or item.synonyms %}
+    {% if item.short_name %}
     <h3>Alternate names:</h3>
     <dl id="alternate_names">
         {% if item.short_name %}
         <dt>{% trans 'Short name'%}</dt><dd>{{ item.short_name }}</dd>
-        {% endif %}
-        {% if item.synonyms %}
-        <dt>{% trans 'Synonyms'%}</dt><dd>{{ item.synonyms }}</dd>
         {% endif %}
     </dl>
     {% endif %}

@@ -604,7 +604,6 @@ class _concept(baseAristotleObject):
 
     short_name = models.CharField(max_length=100, blank=True)
     version = models.CharField(max_length=20, blank=True)
-    synonyms = models.CharField(max_length=200, blank=True)
     references = RichTextField(blank=True)
     origin_URI = models.URLField(
         blank=True,
