@@ -304,8 +304,17 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('email', 'full_name', 'short_name')
     ordering = ('email',)
 
+
+# TODO: Remove this code after Aristotle 2.1 is released
+from django.conf import settings
+if settings.AUTH_USER_MODEL != "auth.User":
+    BASE_FORM_CLASS = UserAdmin
+else:
+    BASE_FORM_CLASS = BaseUserAdmin
+
+
 # Define a new User admin
-class AristotleUserAdmin(UserAdmin):
+class AristotleUserAdmin(BASE_FORM_CLASS):
 
     def time_since_login(self, obj):
         from django.contrib.humanize.templatetags.humanize import naturaltime
