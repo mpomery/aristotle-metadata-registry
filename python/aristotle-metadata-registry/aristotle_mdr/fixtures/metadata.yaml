@@ -1,0 +1,1222 @@
+- model: aristotle_mdr.organization
+  pk: 1
+  fields:
+    created: 2016-05-03 03:23:10.181000+00:00
+    modified: 2016-05-03 03:23:10.181000+00:00
+    uuid: 20c278fc-45a1-11e7-af56-b6ec95721cb3
+    name: ISO/IEC
+    definition: ISO/IEC
+    uri: null
+    managers: []
+- model: aristotle_mdr.organization
+  pk: 2
+  fields:
+    created: 2016-05-03 03:23:11.550000+00:00
+    modified: 2016-05-03 03:23:11.550000+00:00
+    uuid: 219ebaa6-45a1-11e7-af56-b6ec95721cb3
+    name: Welfare
+    definition: Welfare Authority
+    uri: null
+    managers: []
+- model: aristotle_mdr.organization
+  pk: 3
+  fields:
+    created: 2016-05-03 03:23:11.562000+00:00
+    modified: 2016-05-03 03:23:11.562000+00:00
+    uuid: 219f6f28-45a1-11e7-af56-b6ec95721cb3
+    name: Health
+    definition: Health Authority
+    uri: null
+    managers: []
+- model: aristotle_mdr.organization
+  pk: 4
+  fields:
+    created: 2018-01-03 10:10:43.864789+00:00
+    modified: 2018-01-03 10:10:43.867134+00:00
+    uuid: 11656220-f03c-11e7-8489-ead1f1e8b28f
+    name: New registration authority
+    definition: <p>for a test</p>
+    uri: null
+    managers: []
+- model: aristotle_mdr.registrationauthority
+  pk: 1
+  fields:
+    locked_state: 2
+    public_state: 3
+    notprogressed: ''
+    incomplete: ''
+    candidate: ''
+    recorded: ''
+    qualified: ''
+    standard: ''
+    preferred: ''
+    superseded: ''
+    retired: ''
+    managers: []
+    registrars: []
+- model: aristotle_mdr.registrationauthority
+  pk: 2
+  fields:
+    locked_state: 2
+    public_state: 3
+    notprogressed: ''
+    incomplete: ''
+    candidate: ''
+    recorded: ''
+    qualified: ''
+    standard: ''
+    preferred: ''
+    superseded: ''
+    retired: ''
+    managers: []
+    registrars: [7]
+- model: aristotle_mdr.registrationauthority
+  pk: 3
+  fields:
+    locked_state: 2
+    public_state: 3
+    notprogressed: ''
+    incomplete: ''
+    candidate: ''
+    recorded: ''
+    qualified: ''
+    standard: ''
+    preferred: ''
+    superseded: ''
+    retired: ''
+    managers: []
+    registrars: []
+- model: aristotle_mdr.registrationauthority
+  pk: 4
+  fields:
+    locked_state: 2
+    public_state: 3
+    notprogressed: ''
+    incomplete: ''
+    candidate: ''
+    recorded: ''
+    qualified: ''
+    standard: ''
+    preferred: ''
+    superseded: ''
+    retired: ''
+    managers: []
+    registrars: []
+- model: aristotle_mdr.workgroup
+  pk: 3
+  fields:
+    created: 2016-05-03 03:23:10.720000+00:00
+    modified: 2016-05-03 03:23:12.039000+00:00
+    uuid: 21a1e834-45a1-11e7-af56-b6ec95721cb3
+    name: Possum Workgroup
+    definition: ''
+    archived: false
+    managers: [5]
+    viewers: [3]
+    submitters: [6]
+    stewards: [4]
+- model: aristotle_mdr.discussionpost
+  pk: 1
+  fields:
+    created: 2017-11-27 10:54:19.627028+00:00
+    modified: 2017-11-27 10:54:19.628105+00:00
+    body: Welcome to the workgroup. You can ask questions about items here.
+    author: 10
+    workgroup: 3
+    title: Welcome
+    closed: false
+    relatedItems: []
+- model: aristotle_mdr.discussioncomment
+  pk: 1
+  fields: {created: ! '2017-11-27 10:56:00.831647+00:00', modified: ! '2017-11-27
+      10:56:00.832989+00:00', body: 'How do I bulk submit my created items for review?',
+    author: 6, post: 1}
+- model: aristotle_mdr._concept
+  pk: 1
+  fields: {created: ! '2016-05-03 03:23:10.208000+00:00', modified: ! '2017-05-31
+      06:33:20.044406+00:00', uuid: 20c45fe6-45a1-11e7-af56-b6ec95721cb3, name: Boolean,
+    definition: A binary value expressed using a string (e.g. true or false)., workgroup: null,
+    submitter: null, _is_public: true, _is_locked: true, short_name: '', version: '',
+    references: '', origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 2
+  fields: {created: ! '2016-05-03 03:23:10.235000+00:00', modified: ! '2018-04-05
+      01:15:42.517613+00:00', uuid: 20c4fcf8-45a1-11e7-af56-b6ec95721cb3, name: Currency,
+    definition: A numeric value expressed using a particular medium of exchange.,
+    workgroup: null, submitter: null, _is_public: true, _is_locked: true, short_name: '',
+    version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 3
+  fields: {created: ! '2016-05-03 03:23:10.259000+00:00', modified: ! '2018-04-05
+      01:15:42.848247+00:00', uuid: 20c57250-45a1-11e7-af56-b6ec95721cb3, name: Date/Time,
+    definition: A specific instance of time expressed in numeric form., workgroup: null,
+    submitter: null, _is_public: true, _is_locked: true, short_name: '', version: '',
+    references: '', origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 4
+  fields: {created: ! '2016-05-03 03:23:10.284000+00:00', modified: ! '2018-04-05
+      01:15:42.882304+00:00', uuid: 20c5da7e-45a1-11e7-af56-b6ec95721cb3, name: Number,
+    definition: 'A sequence of numeric characters which may contain decimals, excluding
+      codes with ''leading'' characters e.g. ''01'',''02'',''03''. ', workgroup: null,
+    submitter: null, _is_public: true, _is_locked: true, short_name: '', version: '',
+    references: '', origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 5
+  fields: {created: ! '2016-05-03 03:23:10.308000+00:00', modified: ! '2018-04-05
+      01:15:42.913906+00:00', uuid: 20c642fc-45a1-11e7-af56-b6ec95721cb3, name: String,
+    definition: 'A sequence of alphabetic and/or numeric characters, including ''leading''
+      characters e.g. ''01'',''02'',''03''.', workgroup: null, submitter: null, _is_public: true,
+    _is_locked: true, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 6
+  fields: {created: ! '2016-05-03 03:23:10.359000+00:00', modified: ! '2018-04-05
+      01:15:42.939704+00:00', uuid: 20c6ac1a-45a1-11e7-af56-b6ec95721cb3, name: Centimetre,
+    definition: '', workgroup: null, submitter: null, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 7
+  fields: {created: ! '2016-05-03 03:23:10.379000+00:00', modified: ! '2018-04-05
+      01:15:42.964823+00:00', uuid: 20c71bfa-45a1-11e7-af56-b6ec95721cb3, name: Millimetre,
+    definition: '', workgroup: null, submitter: null, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 8
+  fields: {created: ! '2016-05-03 03:23:10.410000+00:00', modified: ! '2018-04-05
+      01:15:42.990553+00:00', uuid: 20c78748-45a1-11e7-af56-b6ec95721cb3, name: Degree,
+    definition: '', workgroup: null, submitter: null, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 9
+  fields: {created: ! '2016-05-03 03:23:10.443000+00:00', modified: ! '2018-04-05
+      01:15:43.015665+00:00', uuid: 20c7f75a-45a1-11e7-af56-b6ec95721cb3, name: Second,
+    definition: '', workgroup: null, submitter: null, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 10
+  fields: {created: ! '2016-05-03 03:23:10.460000+00:00', modified: ! '2018-04-05
+      01:15:43.040647+00:00', uuid: 20c8621c-45a1-11e7-af56-b6ec95721cb3, name: Minute,
+    definition: '', workgroup: null, submitter: null, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 11
+  fields: {created: ! '2016-05-03 03:23:10.479000+00:00', modified: ! '2018-04-05
+      01:15:43.065654+00:00', uuid: 20c8cee6-45a1-11e7-af56-b6ec95721cb3, name: Hour,
+    definition: '', workgroup: null, submitter: null, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 12
+  fields: {created: ! '2016-05-03 03:23:10.499000+00:00', modified: ! '2018-04-05
+      01:15:43.091300+00:00', uuid: 20c93728-45a1-11e7-af56-b6ec95721cb3, name: Day,
+    definition: '', workgroup: null, submitter: null, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 13
+  fields: {created: ! '2016-05-03 03:23:10.519000+00:00', modified: ! '2018-04-05
+      01:15:43.116544+00:00', uuid: 20c99eb6-45a1-11e7-af56-b6ec95721cb3, name: Year,
+    definition: '', workgroup: null, submitter: null, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 14
+  fields: {created: ! '2016-05-03 03:23:10.550000+00:00', modified: ! '2018-04-05
+      01:15:43.142529+00:00', uuid: 20ca0522-45a1-11e7-af56-b6ec95721cb3, name: Gram,
+    definition: '', workgroup: null, submitter: null, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 15
+  fields: {created: ! '2016-05-03 03:23:10.571000+00:00', modified: ! '2018-04-05
+      01:15:43.167764+00:00', uuid: 20ca6a1c-45a1-11e7-af56-b6ec95721cb3, name: Kilogram,
+    definition: '', workgroup: null, submitter: null, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 16
+  fields: {created: ! '2016-05-03 03:23:10.597000+00:00', modified: ! '2016-05-03
+      03:23:10.597000+00:00', uuid: 21a55d7a-45a1-11e7-af56-b6ec95721cb3, name: Hour
+      and minute, definition: '', workgroup: 3, submitter: null, _is_public: false,
+    _is_locked: false, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 17
+  fields: {created: ! '2016-05-03 03:23:10.612000+00:00', modified: ! '2016-05-03
+      03:23:10.612000+00:00', uuid: 21a60bd0-45a1-11e7-af56-b6ec95721cb3, name: Week,
+    definition: '', workgroup: 3, submitter: null, _is_public: false, _is_locked: false,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 18
+  fields: {created: ! '2016-05-03 03:23:11.253000+00:00', modified: ! '2016-05-03
+      03:23:11.947000+00:00', uuid: 21a686be-45a1-11e7-af56-b6ec95721cb3, name: Person,
+    definition: 'A human being, whether man or woman.', workgroup: 3, submitter: null,
+    _is_public: false, _is_locked: false, short_name: '', version: '', references: '',
+    origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 19
+  fields: {created: ! '2016-05-03 03:23:11.269000+00:00', modified: ! '2018-04-05
+      01:15:42.472325+00:00', uuid: 21a6f93c-45a1-11e7-af56-b6ec95721cb3, name: Person,
+    definition: 'A human being, whether man, woman or child.', workgroup: 3, submitter: null,
+    _is_public: true, _is_locked: true, short_name: '', version: '', references: '',
+    origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: 50}
+- model: aristotle_mdr._concept
+  pk: 20
+  fields: {created: ! '2016-05-03 03:23:11.315000+00:00', modified: ! '2016-05-03
+      03:23:11.315000+00:00', uuid: 21a76e4e-45a1-11e7-af56-b6ec95721cb3, name: Age,
+    definition: The length of life or existence., workgroup: 3, submitter: null, _is_public: false,
+    _is_locked: false, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 21
+  fields: {created: ! '2016-05-03 03:23:11.331000+00:00', modified: ! '2016-05-03
+      03:23:11.333000+00:00', uuid: 21a7e144-45a1-11e7-af56-b6ec95721cb3, name: Person-Age,
+    definition: The age of the person., workgroup: 3, submitter: null, _is_public: false,
+    _is_locked: false, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 22
+  fields: {created: ! '2016-05-03 03:23:11.352000+00:00', modified: ! '2016-05-03
+      03:23:11.353000+00:00', uuid: 21a85728-45a1-11e7-af56-b6ec95721cb3, name: Weight,
+    definition: The weight of an object., workgroup: 3, submitter: null, _is_public: false,
+    _is_locked: false, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 23
+  fields: {created: ! '2016-05-03 03:23:11.368000+00:00', modified: ! '2016-05-03
+      03:23:11.368000+00:00', uuid: 21a8c7da-45a1-11e7-af56-b6ec95721cb3, name: Height,
+    definition: 'The height of an object, usually measured from the ground to its
+      highest point.', workgroup: 3, submitter: null, _is_public: false, _is_locked: false,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 24
+  fields: {created: ! '2016-05-03 03:23:11.384000+00:00', modified: ! '2016-05-03
+      03:23:11.384000+00:00', uuid: 21a939a4-45a1-11e7-af56-b6ec95721cb3, name: Person-Weight,
+    definition: The weight of the person., workgroup: 3, submitter: null, _is_public: false,
+    _is_locked: false, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 25
+  fields: {created: ! '2016-05-03 03:23:11.400000+00:00', modified: ! '2016-05-03
+      03:23:11.400000+00:00', uuid: 21a9ad4e-45a1-11e7-af56-b6ec95721cb3, name: Person-Height,
+    definition: The height of the person., workgroup: 3, submitter: null, _is_public: false,
+    _is_locked: false, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 26
+  fields: {created: ! '2016-05-03 03:23:11.420000+00:00', modified: ! '2016-05-03
+      03:23:11.421000+00:00', uuid: 21aa1bf8-45a1-11e7-af56-b6ec95721cb3, name: 'Total
+      years N[NN]', definition: Total number of completed years., workgroup: 3, submitter: null,
+    _is_public: false, _is_locked: false, short_name: '', version: '', references: '',
+    origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 27
+  fields: {created: ! '2016-05-03 03:23:11.436000+00:00', modified: ! '2016-05-03
+      03:23:11.436000+00:00', uuid: 21aa8fd4-45a1-11e7-af56-b6ec95721cb3, name: 'Person-age,
+      total years N[NN]', definition: The age of the person in (completed) years at
+      a specific point in time., workgroup: 3, submitter: null, _is_public: false,
+    _is_locked: false, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 28
+  fields: {created: ! '2016-05-03 03:23:11.450000+00:00', modified: ! '2016-05-03
+      03:23:11.450000+00:00', uuid: 21aafe38-45a1-11e7-af56-b6ec95721cb3, name: Sex,
+    definition: A gender., workgroup: 3, submitter: null, _is_public: false, _is_locked: false,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 29
+  fields: {created: ! '2016-05-03 03:23:11.466000+00:00', modified: ! '2016-05-03
+      03:23:11.466000+00:00', uuid: 21ab6efe-45a1-11e7-af56-b6ec95721cb3, name: Person-Sex,
+    definition: The sex of the person., workgroup: 3, submitter: null, _is_public: false,
+    _is_locked: false, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 30
+  fields: {created: ! '2016-05-03 03:23:11.487000+00:00', modified: ! '2016-05-03
+      03:23:11.487000+00:00', uuid: 21abdf24-45a1-11e7-af56-b6ec95721cb3, name: Sex
+      Code, definition: A code for sex., workgroup: 3, submitter: null, _is_public: false,
+    _is_locked: false, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 31
+  fields: {created: ! '2016-05-03 03:23:11.524000+00:00', modified: ! '2016-05-03
+      03:23:12.021000+00:00', uuid: 21ac5c2e-45a1-11e7-af56-b6ec95721cb3, name: 'Person-sex,
+      Code N', definition: The sex of the person with a code., workgroup: 3, submitter: null,
+    _is_public: false, _is_locked: false, short_name: '', version: '', references: '',
+    origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 32
+  fields: {created: ! '2017-11-13 09:30:48.539918+00:00', modified: ! '2018-04-05
+      01:15:43.234385+00:00', uuid: 0a9a8c2c-c823-11e7-ac7f-9aca7859dafb, name: Age,
+    definition: '<p>The day, month and year a person was born determines their age</p>',
+    workgroup: 3, submitter: 10, _is_public: true, _is_locked: true, short_name: '',
+    version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 33
+  fields: {created: ! '2017-11-13 09:31:57.237034+00:00', modified: ! '2018-04-05
+      01:15:43.276161+00:00', uuid: 338ce5c6-c823-11e7-ac7f-9aca7859dafb, name: Age,
+    definition: '<p>The year, month and day a person was born determines their age.</p>',
+    workgroup: 3, submitter: 10, _is_public: true, _is_locked: true, short_name: '',
+    version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 34
+  fields: {created: ! '2017-11-15 06:30:08.193510+00:00', modified: ! '2018-04-05
+      01:15:43.320485+00:00', uuid: 22147564-c99c-11e7-882c-c6768188a9b3, name: Age,
+    definition: '<p>How old a person is, determined by what day, month, and year they
+      were born.</p>', workgroup: 3, submitter: 10, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 35
+  fields: {created: ! '2017-11-15 06:30:58.312930+00:00', modified: ! '2018-04-05
+      01:15:43.364183+00:00', uuid: 3ff40fa4-c99c-11e7-850c-c6768188a9b3, name: Age,
+    definition: '<p>How old a person is, determined by what day, month, and year a
+      person was born.</p>', workgroup: 3, submitter: 10, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 36
+  fields: {created: ! '2017-11-15 06:59:28.157673+00:00', modified: ! '2018-04-05
+      01:15:43.404179+00:00', uuid: 3b19adc8-c9a0-11e7-b8de-c2e15335f06f, name: Age,
+    definition: '<p>How old a person is, determined by what day, month, and year the
+      person was born.</p>', workgroup: 3, submitter: 10, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 37
+  fields: {created: ! '2017-11-15 07:17:49.698094+00:00', modified: ! '2018-04-05
+      01:15:43.442926+00:00', uuid: cbab64b0-c9a2-11e7-bfa5-c2e15335f06f, name: Education,
+    definition: <p>The highest level of systemic instruction a person has achieved.</p>,
+    workgroup: 3, submitter: 10, _is_public: true, _is_locked: true, short_name: '',
+    version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 38
+  fields: {created: ! '2017-11-15 07:18:53.589494+00:00', modified: ! '2018-04-05
+      01:15:43.488812+00:00', uuid: f1c0728a-c9a2-11e7-bfa5-c2e15335f06f, name: Position
+      Name, definition: <p>The title of what position a person holds at their place
+      of employment.</p>, workgroup: 3, submitter: 10, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 39
+  fields: {created: ! '2017-11-15 07:21:54.231100+00:00', modified: ! '2018-04-05
+      01:15:43.528381+00:00', uuid: 5d6cf2ba-c9a3-11e7-b8de-c2e15335f06f, name: Salary,
+    definition: <p>What wage a person/employee gets at their place of employment.</p>,
+    workgroup: 3, submitter: 10, _is_public: true, _is_locked: true, short_name: '',
+    version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 40
+  fields: {created: ! '2017-11-16 06:59:23.965637+00:00', modified: ! '2018-04-05
+      01:15:43.195594+00:00', uuid: 6303c386-ca69-11e7-bf06-ca22a3c4ad9d, name: 'Employee-Length
+      of Service, Days from Start Date, End Date', definition: '<p>The calculation
+      for deriving an employees length of service, from their first day of employment
+      to the last day of employment, or the current date if they are still employed.</p>',
+    workgroup: null, submitter: 10, _is_public: false, _is_locked: true, short_name: '',
+    version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 41
+  fields: {created: ! '2017-11-16 07:05:29.229246+00:00', modified: ! '2018-04-05
+      01:15:43.575297+00:00', uuid: 3cba9118-ca6a-11e7-bf06-ca22a3c4ad9d, name: Employee,
+    definition: <p>A person employeed at a business</p>, workgroup: 3, submitter: 10,
+    _is_public: true, _is_locked: true, short_name: '', version: '', references: '',
+    origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 42
+  fields: {created: ! '2017-11-16 07:05:29.232348+00:00', modified: ! '2018-04-05
+      01:15:43.619181+00:00', uuid: 3cbb085a-ca6a-11e7-bf06-ca22a3c4ad9d, name: First
+      day of employment, definition: <p>The first day on which a person was engaged
+      for paid work at a business</p>, workgroup: 3, submitter: 10, _is_public: true,
+    _is_locked: true, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 43
+  fields: {created: ! '2017-11-16 07:05:29.380645+00:00', modified: ! '2018-04-05
+      01:15:43.704698+00:00', uuid: 3cd1aaf6-ca6a-11e7-bf06-ca22a3c4ad9d, name: "Employee\u2013First
+      day of employment", definition: <p>The first day on which a person was engaged
+      for paid work at a business of a person employed at a business</p>, workgroup: 3,
+    submitter: 10, _is_public: true, _is_locked: true, short_name: '', version: '',
+    references: '', origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 44
+  fields: {created: ! '2017-11-16 07:05:29.386207+00:00', modified: ! '2018-04-05
+      01:15:43.659387+00:00', uuid: 3cd283fe-ca6a-11e7-bf06-ca22a3c4ad9d, name: YYYYMMDD,
+    definition: '<p>A date stored as an 8 digit string of numbers, with the first
+      4 being the full year, the next 2 being the number of the month and the last
+      being the day of the month.</p>', workgroup: 3, submitter: 10, _is_public: true,
+    _is_locked: true, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 45
+  fields: {created: ! '2017-11-16 07:05:30.734131+00:00', modified: ! '2018-04-05
+      01:15:43.742864+00:00', uuid: 3da033b2-ca6a-11e7-bf06-ca22a3c4ad9d, name: "Employee\u2013First
+      day of employment, YYYYMMDD", definition: '<p>The first day on which a person
+      was engaged for paid work at a business of a person employed at a business,
+      recorded as a date stored as an 8 digit string of numbers, with the first 4
+      being the full year, the next 2 being the number of the month and the last being
+      the day of the month.</p>', workgroup: 3, submitter: 10, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 46
+  fields: {created: ! '2017-11-22 07:44:39.584704+00:00', modified: ! '2018-04-05
+      01:15:43.782759+00:00', uuid: b420d8dc-cf26-11e7-a002-36e9818ad100, name: Last
+      day of employment, definition: <p>The last day a person works at their place
+      of employment</p>, workgroup: 3, submitter: 10, _is_public: true, _is_locked: true,
+    short_name: '', version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 47
+  fields: {created: ! '2017-11-22 07:44:39.614158+00:00', modified: ! '2018-04-05
+      01:15:43.822374+00:00', uuid: b4255772-cf26-11e7-a002-36e9818ad100, name: "Employee\u2013Last
+      day of employment", definition: "<p>The last day worked of a person employeed
+      at a business</p>\r\n\r\n<p>- This was an autogenerated definition.</p>", workgroup: 3,
+    submitter: 10, _is_public: true, _is_locked: true, short_name: '', version: '',
+    references: '', origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 48
+  fields: {created: ! '2017-11-22 07:44:39.836000+00:00', modified: ! '2018-04-05
+      01:15:43.866996+00:00', uuid: b4473072-cf26-11e7-a002-36e9818ad100, name: "Employee\u2013Last
+      day of employment, YYYYMMDD", definition: "<p>The last day worked of a person
+      employeed at a business, recorded as a date stored as an 8 digit string of numbers,
+      with the first 4 being the full year, the next 2 being the number of the month
+      and the last being the day of the month.</p>\r\n\r\n<p>&nbsp;</p>", workgroup: 3,
+    submitter: 10, _is_public: true, _is_locked: true, short_name: '', version: '',
+    references: '', origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 49
+  fields: {created: ! '2017-11-22 09:20:48.337453+00:00', modified: ! '2017-11-22
+      09:20:48.340481+00:00', uuid: 2292a8e2-cf34-11e7-a5e0-fea46ab58f77, name: Days
+      of the week code N, definition: <p>Days of the week represented by code N</p>,
+    workgroup: null, submitter: 10, _is_public: false, _is_locked: false, short_name: '',
+    version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 50
+  fields: {created: ! '2017-12-07 06:18:49.365388+00:00', modified: ! '2017-12-07
+      06:18:51.476494+00:00', uuid: 328e0122-dae4-11e7-b720-5a2e3e7ceca9, name: Person,
+    definition: '<p>A man, woman, or child</p>', workgroup: 3, submitter: 10, _is_public: false,
+    _is_locked: false, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 51
+  fields: {created: ! '2017-12-07 06:18:49.387822+00:00', modified: ! '2017-12-07
+      06:18:51.867019+00:00', uuid: 32916baa-dae4-11e7-b720-5a2e3e7ceca9, name: Height,
+    definition: <p>A measurement from the base to top</p>, workgroup: 3, submitter: 10,
+    _is_public: false, _is_locked: false, short_name: '', version: '', references: '',
+    origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 52
+  fields: {created: ! '2017-12-07 06:18:49.612046+00:00', modified: ! '2017-12-07
+      06:18:53.176618+00:00', uuid: 32b3a27e-dae4-11e7-b720-5a2e3e7ceca9, name: "Person\u2013Height",
+    definition: "<p>A measurement from the base to top of a man, woman, or child.</p>\r\n\r\n<p>&nbsp;</p>",
+    workgroup: 3, submitter: 10, _is_public: false, _is_locked: false, short_name: '',
+    version: '', references: '', origin_URI: '', comments: '', submitting_organisation: '',
+    responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 53
+  fields: {created: ! '2017-12-07 06:18:49.625409+00:00', modified: ! '2017-12-07
+      06:18:52.225427+00:00', uuid: 32b5ac36-dae4-11e7-b720-5a2e3e7ceca9, name: Centimeters,
+    definition: <p>A numerical value measurment</p>, workgroup: 3, submitter: 10,
+    _is_public: false, _is_locked: false, short_name: '', version: '', references: '',
+    origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 54
+  fields: {created: ! '2017-12-07 06:18:50.901829+00:00', modified: ! '2017-12-07
+      06:18:54.076203+00:00', uuid: 3378707c-dae4-11e7-b720-5a2e3e7ceca9, name: "Person\u2013Height,
+      Centimeters", definition: "<p>A measurement from the base to top of a man, woman,
+      or child, recorded as a numerical value.</p>\r\n\r\n<p>&nbsp;</p>", workgroup: 3,
+    submitter: 10, _is_public: false, _is_locked: false, short_name: '', version: '',
+    references: '', origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 55
+  fields: {created: ! '2017-12-08 06:21:51.971732+00:00', modified: ! '2017-12-08
+      06:21:51.975249+00:00', uuid: c9cf461c-dbad-11e7-8e96-6aa9b9dbfcd4, name: Country
+      of birth, definition: <p>The country where a person was born.</p>, workgroup: null,
+    submitter: 10, _is_public: false, _is_locked: false, short_name: '', version: '',
+    references: '', origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 56
+  fields: {created: ! '2017-12-08 06:24:30.232383+00:00', modified: ! '2017-12-08
+      06:24:30.239264+00:00', uuid: 2823ef24-dbae-11e7-9b1d-6aa9b9dbfcd4, name: 'Date,
+      DDMMYYYY', definition: '<p>A date, recorded as day, month, and year.</p>', workgroup: null,
+    submitter: 10, _is_public: false, _is_locked: false, short_name: '', version: '',
+    references: '', origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 57
+  fields: {created: ! '2017-12-08 06:27:00.873521+00:00', modified: ! '2017-12-08
+      06:28:05.760012+00:00', uuid: 81edf34c-dbae-11e7-be6b-6aa9b9dbfcd4, name: Gender
+      Code X, definition: <p>The gender of a person.</p>, workgroup: null, submitter: 10,
+    _is_public: false, _is_locked: false, short_name: '', version: '', references: '',
+    origin_URI: '', comments: '', submitting_organisation: '', responsible_organisation: '',
+    superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 58
+  fields: {created: ! '2017-12-08 06:29:05.290475+00:00', modified: ! '2017-12-08
+      06:29:05.297392+00:00', uuid: cc167584-dbae-11e7-9055-6aa9b9dbfcd4, name: Address,
+    definition: <p>A place of residence.</p>, workgroup: null, submitter: 10, _is_public: false,
+    _is_locked: false, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr._concept
+  pk: 59
+  fields: {created: ! '2018-01-22 01:19:11.284077+00:00', modified: ! '2018-01-22
+      01:19:11.288476+00:00', uuid: 40636fb0-ff12-11e7-a723-56a555e6eee9, name: Building,
+    definition: <p>A structure</p>, workgroup: null, submitter: 6, _is_public: false,
+    _is_locked: false, short_name: '', version: '', references: '', origin_URI: '',
+    comments: '', submitting_organisation: '', responsible_organisation: '', superseded_by: null}
+- model: aristotle_mdr.reviewrequest
+  pk: 1
+  fields:
+    created: 2017-11-22 07:51:15.820860+00:00
+    modified: 2017-11-22 07:54:22.947714+00:00
+    registration_authority: 2
+    requester: 10
+    message: Please review these items for registration
+    reviewer: 7
+    response: Review accepted
+    status: 10
+    state: 5
+    registration_date: 2017-11-20
+    cascade_registration: 0
+    concepts: [32, 33, 34, 35, 36, 37, 38, 39, 41, 42, 43, 44, 45, 46, 47, 48]
+- model: aristotle_mdr.reviewrequest
+  pk: 4
+  fields:
+    created: 2017-12-05 10:08:23.721169+00:00
+    modified: 2017-12-07 08:14:19.024451+00:00
+    registration_authority: 2
+    requester: 10
+    message: ''
+    reviewer: null
+    response: null
+    status: 5
+    state: 2
+    registration_date: 2017-12-04
+    cascade_registration: 0
+    concepts: []
+- model: aristotle_mdr.reviewrequest
+  pk: 5
+  fields:
+    created: 2017-12-05 10:18:06.270995+00:00
+    modified: 2017-12-07 08:14:13.688200+00:00
+    registration_authority: 2
+    requester: 10
+    message: ''
+    reviewer: null
+    response: null
+    status: 5
+    state: 2
+    registration_date: 2017-12-04
+    cascade_registration: 0
+    concepts: []
+- model: aristotle_mdr.reviewrequest
+  pk: 6
+  fields:
+    created: 2017-12-05 10:38:19.533069+00:00
+    modified: 2017-12-07 08:14:08.947821+00:00
+    registration_authority: 2
+    requester: 10
+    message: ''
+    reviewer: null
+    response: null
+    status: 5
+    state: 2
+    registration_date: 2017-12-04
+    cascade_registration: 0
+    concepts: []
+- model: aristotle_mdr.reviewrequest
+  pk: 7
+  fields:
+    created: 2017-12-06 07:45:12.271270+00:00
+    modified: 2017-12-07 08:14:04.845948+00:00
+    registration_authority: 2
+    requester: 10
+    message: ''
+    reviewer: null
+    response: null
+    status: 5
+    state: 5
+    registration_date: 2017-12-04
+    cascade_registration: 0
+    concepts: []
+- model: aristotle_mdr.reviewrequest
+  pk: 8
+  fields:
+    created: 2017-12-06 08:06:03.391401+00:00
+    modified: 2017-12-07 08:14:00.244392+00:00
+    registration_authority: 3
+    requester: 10
+    message: ''
+    reviewer: null
+    response: null
+    status: 5
+    state: 5
+    registration_date: 2017-12-04
+    cascade_registration: 0
+    concepts: []
+- model: aristotle_mdr.reviewrequest
+  pk: 9
+  fields:
+    created: 2017-12-06 08:06:48.886222+00:00
+    modified: 2017-12-07 08:13:54.192852+00:00
+    registration_authority: 2
+    requester: 10
+    message: ''
+    reviewer: null
+    response: null
+    status: 5
+    state: 5
+    registration_date: 2017-12-04
+    cascade_registration: 0
+    concepts: []
+- model: aristotle_mdr.reviewrequest
+  pk: 11
+  fields:
+    created: 2017-12-06 08:22:56.044294+00:00
+    modified: 2017-12-07 08:13:50.243885+00:00
+    registration_authority: 3
+    requester: 10
+    message: ''
+    reviewer: null
+    response: null
+    status: 5
+    state: 5
+    registration_date: 2017-12-04
+    cascade_registration: 0
+    concepts: []
+- model: aristotle_mdr.reviewrequest
+  pk: 12
+  fields:
+    created: 2017-12-08 06:30:53.822214+00:00
+    modified: 2017-12-08 06:30:53.822807+00:00
+    registration_authority: 3
+    requester: 10
+    message: Please review these items.
+    reviewer: null
+    response: null
+    status: 0
+    state: 5
+    registration_date: 2017-12-06
+    cascade_registration: 0
+    concepts: [56, 55]
+- model: aristotle_mdr.reviewrequest
+  pk: 13
+  fields:
+    created: 2018-01-22 01:19:50.450808+00:00
+    modified: 2018-01-22 01:21:03.703599+00:00
+    registration_authority: 3
+    requester: 6
+    message: Please make this item standard
+    reviewer: null
+    response: null
+    status: 5
+    state: 5
+    registration_date: 2018-01-21
+    cascade_registration: 0
+    concepts: [59]
+- model: aristotle_mdr.reviewrequest
+  pk: 14
+  fields:
+    created: 2018-01-22 01:21:33.751913+00:00
+    modified: 2018-01-22 01:21:33.752682+00:00
+    registration_authority: 2
+    requester: 6
+    message: Please make this item standard.
+    reviewer: null
+    response: null
+    status: 0
+    state: 5
+    registration_date: 2018-01-22
+    cascade_registration: 0
+    concepts: [59]
+- model: aristotle_mdr.status
+  pk: 1
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 19, registrationAuthority: 3, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 2
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 2, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 3
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 3, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 4
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 4, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 5
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 5, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 6
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 6, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 7
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 7, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 8
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 8, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 9
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 9, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 10
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 10, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 11
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 11, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 12
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 12, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 13
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 13, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 14
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 14, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 15
+  fields: {created: ! '2016-05-03 03:23:11.708000+00:00', modified: ! '2016-05-03
+      03:23:11.708000+00:00', concept: 15, registrationAuthority: 1, changeDetails: null,
+    state: 5, registrationDate: 2009-04-28, until_date: null}
+- model: aristotle_mdr.status
+  pk: 16
+  fields: {created: ! '2017-11-22 07:46:41.479628+00:00', modified: ! '2017-11-22
+      07:46:41.480594+00:00', concept: 40, registrationAuthority: 2, changeDetails: '',
+    state: 2, registrationDate: 2017-11-21, until_date: null}
+- model: aristotle_mdr.status
+  pk: 17
+  fields: {created: ! '2017-11-22 07:54:18.504990+00:00', modified: ! '2017-11-22
+      07:54:18.505655+00:00', concept: 32, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 18
+  fields: {created: ! '2017-11-22 07:54:18.821850+00:00', modified: ! '2017-11-22
+      07:54:18.822927+00:00', concept: 33, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 19
+  fields: {created: ! '2017-11-22 07:54:19.102173+00:00', modified: ! '2017-11-22
+      07:54:19.102741+00:00', concept: 34, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 20
+  fields: {created: ! '2017-11-22 07:54:19.315496+00:00', modified: ! '2017-11-22
+      07:54:19.316159+00:00', concept: 35, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 21
+  fields: {created: ! '2017-11-22 07:54:19.535169+00:00', modified: ! '2017-11-22
+      07:54:19.535674+00:00', concept: 36, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 22
+  fields: {created: ! '2017-11-22 07:54:19.790761+00:00', modified: ! '2017-11-22
+      07:54:19.791319+00:00', concept: 37, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 23
+  fields: {created: ! '2017-11-22 07:54:20.045613+00:00', modified: ! '2017-11-22
+      07:54:20.046513+00:00', concept: 38, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 24
+  fields: {created: ! '2017-11-22 07:54:20.361744+00:00', modified: ! '2017-11-22
+      07:54:20.362321+00:00', concept: 39, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 25
+  fields: {created: ! '2017-11-22 07:54:20.616207+00:00', modified: ! '2017-11-22
+      07:54:20.617037+00:00', concept: 41, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 26
+  fields: {created: ! '2017-11-22 07:54:20.869751+00:00', modified: ! '2017-11-22
+      07:54:20.870347+00:00', concept: 42, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 27
+  fields: {created: ! '2017-11-22 07:54:21.082154+00:00', modified: ! '2017-11-22
+      07:54:21.082608+00:00', concept: 44, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 28
+  fields: {created: ! '2017-11-22 07:54:21.285497+00:00', modified: ! '2017-11-22
+      07:54:21.286103+00:00', concept: 43, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 29
+  fields: {created: ! '2017-11-22 07:54:21.576798+00:00', modified: ! '2017-11-22
+      07:54:21.577599+00:00', concept: 45, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 30
+  fields: {created: ! '2017-11-22 07:54:21.986957+00:00', modified: ! '2017-11-22
+      07:54:21.987899+00:00', concept: 46, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 31
+  fields: {created: ! '2017-11-22 07:54:22.310976+00:00', modified: ! '2017-11-22
+      07:54:22.312063+00:00', concept: 47, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.status
+  pk: 32
+  fields: {created: ! '2017-11-22 07:54:22.585489+00:00', modified: ! '2017-11-22
+      07:54:22.586590+00:00', concept: 48, registrationAuthority: 2, changeDetails: Please
+      review these items for registration, state: 5, registrationDate: 2017-11-20,
+    until_date: null}
+- model: aristotle_mdr.objectclass
+  pk: 2
+  fields: {}
+- model: aristotle_mdr.objectclass
+  pk: 18
+  fields: {}
+- model: aristotle_mdr.objectclass
+  pk: 19
+  fields: {}
+- model: aristotle_mdr.objectclass
+  pk: 41
+  fields: {}
+- model: aristotle_mdr.objectclass
+  pk: 50
+  fields: {}
+- model: aristotle_mdr.objectclass
+  pk: 58
+  fields: {}
+- model: aristotle_mdr.objectclass
+  pk: 59
+  fields: {}
+- model: aristotle_mdr.property
+  pk: 20
+  fields: {}
+- model: aristotle_mdr.property
+  pk: 22
+  fields: {}
+- model: aristotle_mdr.property
+  pk: 23
+  fields: {}
+- model: aristotle_mdr.property
+  pk: 28
+  fields: {}
+- model: aristotle_mdr.property
+  pk: 42
+  fields: {}
+- model: aristotle_mdr.property
+  pk: 46
+  fields: {}
+- model: aristotle_mdr.property
+  pk: 51
+  fields: {}
+- model: aristotle_mdr.measure
+  pk: 1
+  fields: {created: ! '2016-05-03 03:23:10.344000+00:00', modified: ! '2016-05-03
+      03:23:10.344000+00:00', uuid: 212cee26-45a1-11e7-af56-b6ec95721cb3, name: Length,
+    definition: ''}
+- model: aristotle_mdr.measure
+  pk: 2
+  fields: {created: ! '2016-05-03 03:23:10.398000+00:00', modified: ! '2016-05-03
+      03:23:10.398000+00:00', uuid: 212d5db6-45a1-11e7-af56-b6ec95721cb3, name: Temperature,
+    definition: ''}
+- model: aristotle_mdr.measure
+  pk: 3
+  fields: {created: ! '2016-05-03 03:23:10.430000+00:00', modified: ! '2016-05-03
+      03:23:10.430000+00:00', uuid: 212daf6e-45a1-11e7-af56-b6ec95721cb3, name: Time,
+    definition: ''}
+- model: aristotle_mdr.measure
+  pk: 4
+  fields: {created: ! '2016-05-03 03:23:10.538000+00:00', modified: ! '2016-05-03
+      03:23:10.538000+00:00', uuid: 212e0144-45a1-11e7-af56-b6ec95721cb3, name: Weight,
+    definition: ''}
+- model: aristotle_mdr.unitofmeasure
+  pk: 6
+  fields: {measure: 1, symbol: cm}
+- model: aristotle_mdr.unitofmeasure
+  pk: 7
+  fields: {measure: 1, symbol: mm}
+- model: aristotle_mdr.unitofmeasure
+  pk: 8
+  fields: {measure: 2, symbol: Celsius}
+- model: aristotle_mdr.unitofmeasure
+  pk: 9
+  fields: {measure: 3, symbol: s}
+- model: aristotle_mdr.unitofmeasure
+  pk: 10
+  fields: {measure: 3, symbol: min}
+- model: aristotle_mdr.unitofmeasure
+  pk: 11
+  fields: {measure: 3, symbol: h}
+- model: aristotle_mdr.unitofmeasure
+  pk: 12
+  fields: {measure: 3, symbol: D}
+- model: aristotle_mdr.unitofmeasure
+  pk: 13
+  fields: {measure: 3, symbol: Y}
+- model: aristotle_mdr.unitofmeasure
+  pk: 14
+  fields: {measure: 4, symbol: g}
+- model: aristotle_mdr.unitofmeasure
+  pk: 15
+  fields: {measure: 4, symbol: Kg}
+- model: aristotle_mdr.unitofmeasure
+  pk: 16
+  fields: {measure: 3, symbol: ''}
+- model: aristotle_mdr.unitofmeasure
+  pk: 17
+  fields: {measure: 3, symbol: ''}
+- model: aristotle_mdr.datatype
+  pk: 1
+  fields: {}
+- model: aristotle_mdr.datatype
+  pk: 2
+  fields: {}
+- model: aristotle_mdr.datatype
+  pk: 3
+  fields: {}
+- model: aristotle_mdr.datatype
+  pk: 4
+  fields: {}
+- model: aristotle_mdr.datatype
+  pk: 5
+  fields: {}
+- model: aristotle_mdr.conceptualdomain
+  pk: 55
+  fields: {description: ''}
+- model: aristotle_mdr.valuedomain
+  pk: 26
+  fields: {data_type: 4, format: 'X[XX]', maximum_length: 3, unit_of_measure: 17,
+    conceptual_domain: null, description: ''}
+- model: aristotle_mdr.valuedomain
+  pk: 30
+  fields: {data_type: 4, format: X, maximum_length: 3, unit_of_measure: 17, conceptual_domain: null,
+    description: ''}
+- model: aristotle_mdr.valuedomain
+  pk: 44
+  fields: {data_type: null, format: '', maximum_length: null, unit_of_measure: null,
+    conceptual_domain: null, description: ''}
+- model: aristotle_mdr.valuedomain
+  pk: 49
+  fields: {data_type: null, format: '', maximum_length: null, unit_of_measure: null,
+    conceptual_domain: null, description: ''}
+- model: aristotle_mdr.valuedomain
+  pk: 53
+  fields: {data_type: null, format: '', maximum_length: null, unit_of_measure: null,
+    conceptual_domain: null, description: ''}
+- model: aristotle_mdr.valuedomain
+  pk: 56
+  fields: {data_type: null, format: '', maximum_length: null, unit_of_measure: null,
+    conceptual_domain: null, description: ''}
+- model: aristotle_mdr.valuedomain
+  pk: 57
+  fields: {data_type: null, format: '', maximum_length: null, unit_of_measure: null,
+    conceptual_domain: null, description: ''}
+- model: aristotle_mdr.permissiblevalue
+  pk: 1
+  fields: {value: '1', meaning: Male, value_meaning: null, valueDomain: 30, order: 1,
+    start_date: null, end_date: null}
+- model: aristotle_mdr.permissiblevalue
+  pk: 2
+  fields: {value: '2', meaning: Female, value_meaning: null, valueDomain: 30, order: 1,
+    start_date: null, end_date: null}
+- model: aristotle_mdr.permissiblevalue
+  pk: 3
+  fields: {value: '1', meaning: Male, value_meaning: null, valueDomain: 30, order: 1,
+    start_date: null, end_date: null}
+- model: aristotle_mdr.permissiblevalue
+  pk: 4
+  fields: {value: '2', meaning: Female, value_meaning: null, valueDomain: 30, order: 1,
+    start_date: null, end_date: null}
+- model: aristotle_mdr.permissiblevalue
+  pk: 5
+  fields: {value: M, meaning: Male, value_meaning: null, valueDomain: 57, order: 1,
+    start_date: null, end_date: null}
+- model: aristotle_mdr.permissiblevalue
+  pk: 6
+  fields: {value: F, meaning: Female, value_meaning: null, valueDomain: 57, order: 1,
+    start_date: null, end_date: null}
+- model: aristotle_mdr.permissiblevalue
+  pk: 7
+  fields: {value: O, meaning: Other, value_meaning: null, valueDomain: 57, order: 2,
+    start_date: null, end_date: null}
+- model: aristotle_mdr.dataelementconcept
+  pk: 21
+  fields: {objectClass: 19, property: 20, conceptualDomain: null}
+- model: aristotle_mdr.dataelementconcept
+  pk: 24
+  fields: {objectClass: 19, property: 22, conceptualDomain: null}
+- model: aristotle_mdr.dataelementconcept
+  pk: 25
+  fields: {objectClass: 19, property: 23, conceptualDomain: null}
+- model: aristotle_mdr.dataelementconcept
+  pk: 29
+  fields: {objectClass: 19, property: 28, conceptualDomain: null}
+- model: aristotle_mdr.dataelementconcept
+  pk: 43
+  fields: {objectClass: 41, property: 42, conceptualDomain: null}
+- model: aristotle_mdr.dataelementconcept
+  pk: 47
+  fields: {objectClass: 41, property: 46, conceptualDomain: null}
+- model: aristotle_mdr.dataelementconcept
+  pk: 52
+  fields: {objectClass: 50, property: 51, conceptualDomain: null}
+- model: aristotle_mdr.dataelement
+  pk: 27
+  fields: {dataElementConcept: 21, valueDomain: 26}
+- model: aristotle_mdr.dataelement
+  pk: 31
+  fields: {dataElementConcept: 29, valueDomain: 30}
+- model: aristotle_mdr.dataelement
+  pk: 32
+  fields: {dataElementConcept: null, valueDomain: null}
+- model: aristotle_mdr.dataelement
+  pk: 33
+  fields: {dataElementConcept: null, valueDomain: null}
+- model: aristotle_mdr.dataelement
+  pk: 34
+  fields: {dataElementConcept: null, valueDomain: null}
+- model: aristotle_mdr.dataelement
+  pk: 35
+  fields: {dataElementConcept: null, valueDomain: null}
+- model: aristotle_mdr.dataelement
+  pk: 36
+  fields: {dataElementConcept: null, valueDomain: null}
+- model: aristotle_mdr.dataelement
+  pk: 37
+  fields: {dataElementConcept: null, valueDomain: null}
+- model: aristotle_mdr.dataelement
+  pk: 38
+  fields: {dataElementConcept: null, valueDomain: null}
+- model: aristotle_mdr.dataelement
+  pk: 39
+  fields: {dataElementConcept: null, valueDomain: null}
+- model: aristotle_mdr.dataelement
+  pk: 45
+  fields: {dataElementConcept: 43, valueDomain: 44}
+- model: aristotle_mdr.dataelement
+  pk: 48
+  fields: {dataElementConcept: 47, valueDomain: 44}
+- model: aristotle_mdr.dataelement
+  pk: 54
+  fields: {dataElementConcept: 52, valueDomain: 53}
+- model: aristotle_mdr.dataelementderivation
+  pk: 40
+  fields:
+    derivation_rule: ''
+    derives: [48]
+    inputs: [45]
+- model: aristotle_mdr.possumprofile
+  pk: 1
+  fields:
+    user: 2
+    savedActiveWorkgroup: null
+    favourites: []
+- model: aristotle_mdr.possumprofile
+  pk: 2
+  fields:
+    user: 10
+    savedActiveWorkgroup: null
+    favourites: []
+- model: aristotle_mdr.possumprofile
+  pk: 3
+  fields:
+    user: 3
+    savedActiveWorkgroup: null
+    favourites: []
+- model: aristotle_mdr.possumprofile
+  pk: 4
+  fields:
+    user: 4
+    savedActiveWorkgroup: null
+    favourites: []
+- model: aristotle_mdr.possumprofile
+  pk: 5
+  fields:
+    user: 5
+    savedActiveWorkgroup: null
+    favourites: []
+- model: aristotle_mdr.possumprofile
+  pk: 6
+  fields:
+    user: 6
+    savedActiveWorkgroup: null
+    favourites: []
+- model: aristotle_mdr.possumprofile
+  pk: 7
+  fields:
+    user: 7
+    savedActiveWorkgroup: null
+    favourites: []
+- model: aristotle_mdr.possumprofile
+  pk: 8
+  fields:
+    user: 11
+    savedActiveWorkgroup: null
+    favourites: []
