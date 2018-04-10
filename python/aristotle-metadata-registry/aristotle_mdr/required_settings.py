@@ -249,7 +249,7 @@ STATIC_PRECOMPILER_COMPILERS = (
 ORGS_SLUGFIELD = 'autoslug.fields.AutoSlugField'
 
 # User Model
-AUTH_USER_MODEL = 'aristotle_mdr_user_management.AristotleUser'
+AUTH_USER_MODEL = os.environ.get('AUTH_USER_MODEL', 'aristotle_mdr_user_management.AristotleUser')
 
 AUTH_PREFIX = 'django.contrib.auth.password_validation.'
 AUTH_PASSWORD_VALIDATORS = [
