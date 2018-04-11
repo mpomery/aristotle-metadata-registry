@@ -42,9 +42,6 @@ class UserInvitationForm(FormRequestMixin, forms.Form):
 
 class AristotleUserRegistrationForm(UserRegistrationForm):
 
-    short_name = forms.CharField(max_length=50)
-    full_name = forms.CharField(max_length=200)
-
     def __init__(self, *args, **kwargs):
         super().__init__(self, *args, **kwargs)
 
