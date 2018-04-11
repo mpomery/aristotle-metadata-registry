@@ -8,7 +8,6 @@ from django.shortcuts import redirect, render
 from django.views.generic import FormView
 
 from organizations.backends.defaults import InvitationBackend
-from organizations.backends.forms import UserRegistrationForm
 
 from . import forms
 
@@ -30,7 +29,7 @@ class AristotleInvitationBackend(InvitationBackend):
     associated with a new organization.
     """
 
-    form_class = UserRegistrationForm
+    form_class = forms.AristotleUserRegistrationForm
 
     def get_success_url(self):
         return reverse('invitation_success')
