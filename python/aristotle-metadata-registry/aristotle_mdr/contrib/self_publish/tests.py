@@ -31,7 +31,6 @@ class TestSelfPublishing(utils.LoggedInViewPages, TestCase):
     def setUp(self):
         super().setUp()
         self.submitting_user = get_user_model().objects.create_user(
-            username="self-publisher",
             email="self@publisher.net",
             password="self-publisher")
         with reversion.create_revision():
@@ -82,7 +81,7 @@ class TestSelfPublishing(utils.LoggedInViewPages, TestCase):
 
     def login_publisher(self):
         self.logout()
-        return self.client.post(reverse('friendly_login'), {'username': 'self-publisher', 'password': 'self-publisher'})
+        return self.client.post(reverse('friendly_login'), {'email': 'self@publisher.net', 'password': 'self-publisher'})
 
     def test_submitter_can_self_publish(self):
         self.login_publisher()

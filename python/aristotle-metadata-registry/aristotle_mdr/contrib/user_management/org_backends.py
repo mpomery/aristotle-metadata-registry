@@ -68,7 +68,7 @@ class AristotleInvitationBackend(InvitationBackend):
             user.save()
             self.activate_organizations(user)
             user = authenticate(
-                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email'],
                 password=form.cleaned_data['password']
             )
             login(request, user)
@@ -90,7 +90,6 @@ class AristotleInvitationBackend(InvitationBackend):
             except User.DoesNotExist:
                 # TODO break out user creation process
                 user = User.objects.create(
-                    username=email,
                     email=email,
                     password=get_user_model().objects.make_random_password()
                 )
@@ -137,7 +136,7 @@ class AristotleInvitationBackend(InvitationBackend):
 
         subject = render(request, subject_template, kwargs)  # .strip()  # Remove stray newline characters
         body = render(request, body_template, kwargs)
-        logger.info("UserInvited: {email} invited to registry by {user}".format(email=user.email, user=request.user.username))
+        logger.info("UserInvited: {email} invited to registry by {inv_email}".format(email=user.email, inv_email=request.user.email))
         return message_class(subject, body, from_email, [user.email], headers=headers)
 
     def send_invitation(self, user, sender=None, **kwargs):
