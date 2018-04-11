@@ -301,6 +301,8 @@ class DataElementDerivationWizardPage(ConceptWizardPage,TestCase):
 class DataElementConceptWizardPage(ConceptWizardPage,TestCase):
     wizard_url_name="createDataElementConcept"
     wizard_form_name="data_element_concept_wizard"
+    model=models.DataElementConcept
+
     @property
     def wizard_url(self):
         return reverse('aristotle:%s'%self.wizard_url_name)
@@ -516,6 +518,8 @@ class DataElementConceptWizardPage(ConceptWizardPage,TestCase):
 class DataElementWizardPage(ConceptWizardPage,TestCase):
     wizard_url_name="createDataElement"
     wizard_form_name="data_element_wizard"
+    model=models.DataElement
+
     @property
     def wizard_url(self):
         return reverse('aristotle:%s'%self.wizard_url_name)
