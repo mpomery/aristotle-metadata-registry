@@ -42,7 +42,7 @@
                     <li>
                         <label>
                             <input type="radio" name="component_results-oc_options" value="{{id}}"></input>
-                            {% include "search/searchItem.html" with item=obj.object %}
+                            {% include "aristotle_mdr/create/wizard_search_result_item.html" with object=obj.object %}
                         </label>
                     </li>
                 {% endfor %}
@@ -91,7 +91,7 @@
                     <li>
                         <label>
                             <input type="radio" name="component_results-pr_options" value="{{id}}"></input>
-                            {% include "search/searchItem.html" with item=obj.object %}
+                            {% include "aristotle_mdr/create/wizard_search_result_item.html" with object=obj.object %}
                         </label>
                     </li>
                 {% endfor %}
@@ -140,7 +140,7 @@
                     <li>
                         <label>
                             <input type="radio" name="component_results-vd_options" value="{{id}}"></input>
-                            {% include "search/searchItem.html" with item=obj.object %}
+                            {% include "aristotle_mdr/create/wizard_search_result_item.html" with object=obj.object %}
                         </label>
                     </li>
                 {% endfor %}

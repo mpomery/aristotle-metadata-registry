@@ -20,6 +20,7 @@ Changelog
     - Search facet links now return to the first page to prevent 404s #763
     - Items can now be deleted from the sandbox
     - Added review page for any status changes
+    - Fixed Data Element Wizard incorrectly stating it was creating a "Data Element Concept"
 
 - 1.6.5
   - Fixed regression where private methods showed up in creation wizards

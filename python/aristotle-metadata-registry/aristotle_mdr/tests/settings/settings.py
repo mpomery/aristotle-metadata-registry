@@ -114,6 +114,13 @@ ARISTOTLE_SETTINGS['BULK_ACTIONS'] = ARISTOTLE_SETTINGS['BULK_ACTIONS'] + [
 ]
 ROOT_URLCONF = 'extension_test.urls'
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
 # disable
 LOGGING = {
     'version': 1,

@@ -242,7 +242,7 @@ class DataElementConceptWizardPage(ConceptWizardPage,TestCase):
         self.login_editor()
         from reversion.revisions import create_revision
         with create_revision():
-            ani = models.ObjectClass.objects.create(name="animagus",definition="my definition",workgroup=self.wg1)
+            ani = models.ObjectClass.objects.create(name="animagus",definition="my animagus definition",workgroup=self.wg1)
             at  = models.Property.objects.create(name="animal type",definition="my definition",workgroup=self.wg1)
 
         step_1_data = {
@@ -253,6 +253,7 @@ class DataElementConceptWizardPage(ConceptWizardPage,TestCase):
         # success!
 
         response = self.client.post(self.wizard_url, step_1_data)
+        self.assertContains(response, ani.definition)
         wizard = response.context['wizard']
         self.assertEqual(response.status_code, 200)
         self.assertEqual(wizard['steps'].current, 'component_results')

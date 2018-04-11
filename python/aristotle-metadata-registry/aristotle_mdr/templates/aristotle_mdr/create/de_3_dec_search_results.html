@@ -32,7 +32,7 @@
                 <li>
                     <label>
                         <input type="radio" name="find_dec_results-dec_options" value="{{id}}"></input>
-                        {% include "search/searchItem.html" with item=obj %}
+                        {% include "aristotle_mdr/create/wizard_search_result_item.html" with object=obj.object %}
                     </label>
                 </li>
             {% endfor %}
