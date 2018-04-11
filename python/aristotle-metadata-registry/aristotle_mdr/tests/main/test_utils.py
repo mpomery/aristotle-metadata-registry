@@ -57,7 +57,7 @@ class UtilsTests(TestCase):
         url = utils.get_aristotle_url(wg._meta.label_lower, wg.pk, wg.name)
         self.assertEqual(url, reverse('aristotle:workgroup', args=[wg.pk, wg.name]))
 
-        url = utils.get_aristotle_url(rr._meta.label_lower, rr.pk, rr.name)
+        url = utils.get_aristotle_url(rr._meta.label_lower, rr.pk)
         self.assertEqual(url, reverse('aristotle:userReviewDetails', args=[rr.pk]))
 
         url = utils.get_aristotle_url('aristotle_mdr.fake_model', 7, 'fake_name')

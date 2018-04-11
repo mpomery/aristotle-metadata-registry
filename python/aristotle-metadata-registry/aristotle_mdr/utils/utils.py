@@ -324,7 +324,10 @@ def get_aristotle_url(label, obj_id, obj_name=None):
             # Can't get these url's without name_slug
             return None
 
-        if cname == '_concept':
+        concepts = ['_concept', 'objectclass', 'property', 'unitofmeasure', 'datatype',
+            'conceptualdomain', 'valuedomain', 'dataelementconcept', 'dataelement', 'dataelementderivation']
+
+        if cname in concepts:
 
             return reverse('aristotle:item', args=[obj_id])
 
