@@ -306,6 +306,8 @@ def status_filter(qs, when=timezone.now().date()):
     return states
 
 
+# Given a models label, id and name, Return a url to that objects page
+# Used to avoid a database hit just to use get_absolute_url
 def get_aristotle_url(label, obj_id, obj_name=None):
 
     label_list = label.split('.')
@@ -324,8 +326,10 @@ def get_aristotle_url(label, obj_id, obj_name=None):
             # Can't get these url's without name_slug
             return None
 
-        concepts = ['_concept', 'objectclass', 'property', 'unitofmeasure', 'datatype',
-            'conceptualdomain', 'valuedomain', 'dataelementconcept', 'dataelement', 'dataelementderivation']
+        concepts = [
+            '_concept', 'objectclass', 'property', 'unitofmeasure', 'datatype',
+            'conceptualdomain', 'valuedomain', 'dataelementconcept', 'dataelement', 'dataelementderivation'
+        ]
 
         if cname in concepts:
 
