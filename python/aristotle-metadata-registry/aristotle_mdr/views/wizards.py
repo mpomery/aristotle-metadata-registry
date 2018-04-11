@@ -182,7 +182,7 @@ class ConceptWizard(PermissionWizard):
 
         q = PSQS().models(model).auto_query(
             self.search_terms['definition'] + " " + self.search_terms['name']
-        ).filter(statuses__in=[MDR.STATES[int(s)] for s in [MDR.STATES.standard, MDR.STATES.preferred]])
+        ).filter(statuses__in=[int(s) for s in [MDR.STATES.standard, MDR.STATES.preferred]])
 
         # .filter(states="Standard")
         similar = q

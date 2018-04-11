@@ -61,7 +61,7 @@ class ConceptWizard_TestInvalidUrls(utils.LoggedInViewPages,TestCase):
 
 
 class ConceptWizardPage(utils.LoggedInViewPages):
-    wizard_url_name="Harry Potter" # This will break if called without overriding the wizard_url_name. Plus its funny.
+    wizard_name="Harry Potter" # This used to be needed, now its not. We kept it cause its funny.
     wizard_form_name="dynamic_aristotle_wizard"
     def tearDown(self):
         call_command('clear_index', interactive=False, verbosity=0)
@@ -170,6 +170,74 @@ class ConceptWizardPage(utils.LoggedInViewPages):
         self.assertEqual(models._concept.objects.filter(name="Test Item").count(),1)
         item = models._concept.objects.filter(name="Test Item").first()
         self.assertRedirects(response,url_slugify_concept(item))
+
+    def test_editor_can_make_object__where_item_already_has_duplicate_name(self):
+        self.item_existing = self.model.objects.create(
+            name='Already exists',
+            definition="This item already exists",
+            workgroup=self.wg1
+        )
+        # Need to make sure its public
+        self.ra.register(
+            item=self.item_existing,
+            state=models.STATES.standard,
+            user=self.su
+        )
+        
+        self.login_editor()
+        self.assertTrue(self.item_existing.can_view(self.editor))
+        form_data = {
+            self.wizard_form_name+'-current_step': 'initial',
+            'initial-name':"Already exists",
+        }
+        # success!
+
+        response = self.client.post(self.wizard_url, form_data)
+        wizard = response.context['wizard']
+        self.assertTrue(len(wizard['form'].errors.keys()) == 0)
+        self.assertTrue(self.item_existing in response.context['duplicate_items'])
+        
+        # Existing item should show up in the "similar results page"
+        self.assertContains(response, self.item_existing.definition)
+
+    def test_editor_can_make_object__where_item_already_has_similar_details(self):
+        from reversion.revisions import create_revision
+        with create_revision():
+            # Need to wrap this in a revision to make sure the search is updated
+            self.item_existing = self.model.objects.create(
+                name='Almost the same',
+                definition="This item already exists",
+                workgroup=self.wg1
+            )
+            # Need to make sure its public
+            self.ra.register(
+                item=self.item_existing,
+                state=models.STATES.standard,
+                user=self.su
+            )
+        
+        self.login_editor()
+        self.assertTrue(self.item_existing.can_view(self.editor))
+        form_data = {
+            self.wizard_form_name+'-current_step': 'initial',
+            'initial-name':"Already exists",
+        }
+        # success!
+
+        response = self.client.post(self.wizard_url, form_data)
+        wizard = response.context['wizard']
+        self.assertTrue(len(wizard['form'].errors.keys()) == 0)
+        self.assertFalse('duplicate_items' in response.context.keys())
+        
+        self.assertTrue(
+            self.item_existing.pk in [
+                x.object.pk for x in response.context['similar_items']
+            ]
+        )
+        
+        # Existing item should show up in the "similar results page"
+        self.assertContains(response, self.item_existing.definition)
+
 
 class ObjectClassWizardPage(ConceptWizardPage,TestCase):
     model=models.ObjectClass
