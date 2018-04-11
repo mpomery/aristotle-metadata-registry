@@ -2,19 +2,19 @@
 {% load compile_static i18n %}
 {% load aristotle_tags %}
 
-{% block title %}Reactivate user {% firstof reactivate_user.get_full_name reactivate_user.email reactivate_user.username %}{% endblock %}
+{% block title %}Reactivate user {{ reactivate_user.get_full_name }}{% endblock %}
 {% block content %}
 <form method="post" action="{% url 'aristotle-user:reactivate_user' reactivate_user.pk %}">{% csrf_token %}
     <div class="modal-header">
-       <header class="modal-title">Reactivate user - {% firstof reactivate_user.get_full_name reactivate_user.email reactivate_user.username %}</header>
+       <header class="modal-title">Reactivate user - {{ reactivate_user.get_full_name }}</header>
     </div>
     <div class="modal-body">
       <p>
         <strong>
         You are about to reactivate the account of
-          <em>{% firstof reactivate_user.get_full_name reactivate_user.email reactivate_user.username %}</em>
+          <em>{{ reactivate_user.get_full_name }}</em>
         on this registry.
-        </strong> 
+        </strong>
         <ul>
         <li>This will reactivate their account.
         This user will be able to login to this registry.
