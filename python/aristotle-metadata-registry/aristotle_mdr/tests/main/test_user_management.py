@@ -1,6 +1,7 @@
-from django.test import TestCase
+from django.test import TestCase, tag, override_settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.core import mail
 
 import aristotle_mdr.tests.utils as utils
 
@@ -71,3 +72,80 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
 
         self.viewer = get_user_model().objects.get(pk=self.viewer.pk)
         self.assertTrue(self.viewer.is_active == True)
+
+    def test_send_invitation(self):
+
+        self.login_superuser()
+
+        response = self.client.get(reverse('aristotle-user:registry_invitations_create'))
+        self.assertEqual(response.status_code, 200)
+
+        # Test mail outbox empty
+        self.assertEqual(len(mail.outbox), 0)
+
+        data = {
+            'email_list': 'wow@example.com\nmetoo@example.com'
+        }
+
+        post_response = self.client.post(reverse('aristotle-user:registry_invitations_create'), data)
+        self.assertEqual(post_response.status_code, 302)
+
+        # Test that invitations were sent
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertTrue(mail.outbox[0].subject.startswith('You\'ve been invited'))
+
+    @tag('newtest')
+    @override_settings(SECURE_SSL_REDIRECT=False)
+    def test_accept_invitation(self):
+
+        self.login_superuser()
+        self.assertEqual(len(mail.outbox), 0)
+
+        data = {
+            'email_list': 'test@example.com'
+        }
+
+        post_response = self.client.post(reverse('aristotle-user:registry_invitations_create'), data)
+        self.assertEqual(post_response.status_code, 302)
+
+        # Test that invitations were sent
+        self.assertEqual(len(mail.outbox), 1)
+
+        self.logout()
+        message = mail.outbox[0].body
+        start = message.find('/account/')
+        end = message.find('\n', start)
+
+        accept_url = message[start:end]
+
+        accept_response = self.client.get(accept_url)
+
+        self.assertEqual(accept_response.status_code, 200)
+
+        formfields = accept_response.context['form'].fields.keys()
+        removed_fields = ['username', 'first_name', 'last_name']
+        added_fields = ['short_name', 'full_name']
+
+        for field in removed_fields:
+            self.assertFalse(field in formfields)
+
+        for field in added_fields:
+            self.assertTrue(field in formfields)
+
+        accept_data = {
+            'email': 'test@example.com',
+            'full_name': 'Test User',
+            'short_name': 'Test',
+            'password': 'verynice',
+            'password_confirm': 'verynice'
+        }
+
+        response = self.client.post(accept_url, accept_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'aristotle_mdr/users_management/newuser/register_success.html')
+
+        new_user = get_user_model().objects.get(email='test@example.com')
+        self.assertTrue(new_user.is_active)
+        self.assertTrue(new_user.password)
+        self.assertEqual(new_user.short_name, 'Test')
+        self.assertEqual(new_user.full_name, 'Test User')

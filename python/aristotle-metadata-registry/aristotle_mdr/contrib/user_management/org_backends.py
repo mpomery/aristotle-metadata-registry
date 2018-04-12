@@ -4,11 +4,12 @@ from django.conf.urls import url
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.generic import FormView
 from django.template import loader
 
 from organizations.backends.defaults import InvitationBackend
+from organizations.backends.tokens import RegistrationTokenGenerator
 
 from . import forms
 
@@ -33,16 +34,15 @@ class AristotleInvitationBackend(InvitationBackend):
     form_class = forms.AristotleUserRegistrationForm
 
     def get_success_url(self):
-        return reverse('invitation_success')
+        return reverse('aristotle-user:registration_success')
 
     def get_urls(self):
         return [
-            url(
-                r'^accept/(?P<token>.*)/$',
-                view=self.activate_view,
-                name="registry_invitations_register"
-            ),
+            url(r'^accept/(?P<user_id>[\d]+)-(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+                view=self.activate_view, name="registry_invitations_register"),
             url(r'^$', view=self.invite_view(), name="registry_invitations_create"),
+            url(r'^complete/$', view=self.success_view,
+                name="registration_success"),
         ]
 
     def invite_view(self):
@@ -50,6 +50,31 @@ class AristotleInvitationBackend(InvitationBackend):
         Initiates the organization and user account creation process
         """
         return InviteView.as_view(backend=self)
+
+    def activate_view(self, request, user_id, token):
+        """
+        View function that activates the given User by setting `is_active` to
+        true if the provided information is verified.
+        """
+        try:
+            user = self.user_model.objects.get(id=user_id, is_active=False)
+        except self.user_model.DoesNotExist:
+            raise Http404(_("Your URL may have expired."))
+        if not RegistrationTokenGenerator().check_token(user, token):
+            raise Http404(_("Your URL may have expired."))
+
+        form = self.get_form(data=request.POST or None, instance=user)
+        if form.is_valid():
+            form.instance.is_active = True
+            user = form.save()
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            self.activate_organizations(user)
+            user = authenticate(username=form.cleaned_data['email'],
+                    password=form.cleaned_data['password'])
+            login(request, user)
+            return redirect(self.get_success_url())
+        return render(request, self.registration_form_template, {'form': form})
 
     def success_view(self, request):
         return render(request, self.activation_success_template, {})
@@ -114,6 +139,7 @@ class AristotleInvitationBackend(InvitationBackend):
         token = self.get_token(user)
         kwargs.update({'token': token})
         kwargs.update({'sender': sender})
+        kwargs.update({'user_id': user.pk})
         self.email_message(user, self.invitation_subject, self.invitation_body, **kwargs).send()
         return True
 
@@ -132,6 +158,7 @@ class NewUserInvitationBackend(AristotleInvitationBackend):
 
 
 class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+
     form_class = forms.UserInvitationForm
     template_name = "aristotle_mdr/users_management/invite_user_to_registry.html"
     backend = None

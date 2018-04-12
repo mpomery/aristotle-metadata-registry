@@ -43,7 +43,8 @@ class UserInvitationForm(FormRequestMixin, forms.Form):
 class AristotleUserRegistrationForm(UserRegistrationForm):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
+
+        super().__init__(*args, **kwargs)
 
         self.fields.pop('first_name')
         self.fields.pop('last_name')
