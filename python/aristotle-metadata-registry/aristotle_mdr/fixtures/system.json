@@ -1,7 +1,7 @@
 [
   {
     "fields": {
-      "username": "aristotle",
+      "email": "aristotle@example.com",
       "first_name": "",
       "last_name": "",
       "is_active": false,

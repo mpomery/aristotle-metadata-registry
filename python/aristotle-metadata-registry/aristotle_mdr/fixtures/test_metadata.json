@@ -1,7 +1,7 @@
 [
   {
     "fields": {
-      "username": "possum",
+      "email": "possum@example.com",
       "first_name": "",
       "last_name": "",
       "is_active": true,
@@ -23,7 +23,7 @@
   },
   {
     "fields": {
-      "username": "vicky",
+      "email": "vicky@example.com",
       "first_name": "Vicky",
       "last_name": "Viewer",
       "is_active": true,
@@ -45,7 +45,7 @@
   },
   {
     "fields": {
-      "username": "stewie",
+      "email": "stewie@example.com",
       "first_name": "Stewie",
       "last_name": "Steward",
       "is_active": true,
@@ -67,7 +67,7 @@
   },
   {
     "fields": {
-      "username": "mandy",
+      "email": "mandy@example.com",
       "first_name": "Mandy",
       "last_name": "Manager",
       "is_active": true,
@@ -89,7 +89,7 @@
   },
   {
     "fields": {
-      "username": "suzie",
+      "email": "suzie@example.com",
       "first_name": "Suzie",
       "last_name": "Submitter",
       "is_active": true,
@@ -111,7 +111,7 @@
   },
   {
     "fields": {
-      "username": "reggie",
+      "email": "reggie@example.com",
       "first_name": "Reggie",
       "last_name": "Registrar",
       "is_active": true,
