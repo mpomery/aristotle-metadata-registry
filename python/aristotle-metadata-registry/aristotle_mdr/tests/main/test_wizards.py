@@ -11,6 +11,15 @@ from aristotle_mdr.utils import setup_aristotle_test_environment
 
 setup_aristotle_test_environment()
 
+class HaystackReindexMixin(object):
+    def tearDown(self):
+        call_command('clear_index', interactive=False, verbosity=0)
+
+    def setUp(self):
+        super().setUp()
+        import haystack
+        haystack.connections.reload('default')
+
 
 class CreateListPageTests(utils.LoggedInViewPages, TestCase):
     def test_create_list_active(self):
@@ -31,15 +40,7 @@ class CreateListPageTests(utils.LoggedInViewPages, TestCase):
         self.assertEqual(response.status_code,200)
 
 
-class ConceptWizard_TestInvalidUrls(utils.LoggedInViewPages, TestCase):
-    def tearDown(self):
-        call_command('clear_index', interactive=False, verbosity=0)
-
-    def setUp(self):
-        super().setUp()
-        import haystack
-        haystack.connections.reload('default')
-
+class ConceptWizard_TestInvalidUrls(HaystackReindexMixin, utils.LoggedInViewPages, TestCase):
     def test_invalid_model(self):
         url = reverse('aristotle:createItem',args=["invalid_model_name"])
         self.login_editor()
@@ -60,16 +61,16 @@ class ConceptWizard_TestInvalidUrls(utils.LoggedInViewPages, TestCase):
 
 
 
-class ConceptWizardPage(utils.LoggedInViewPages):
+class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
     wizard_name="Harry Potter" # This used to be needed, now its not. We kept it cause its funny.
     wizard_form_name="dynamic_aristotle_wizard"
-    def tearDown(self):
-        call_command('clear_index', interactive=False, verbosity=0)
+    # def tearDown(self):
+    #     call_command('clear_index', interactive=False, verbosity=0)
 
     def setUp(self):
         super().setUp()
-        import haystack
-        haystack.connections.reload('default')
+        # import haystack
+        # haystack.connections.reload('default')
 
 
         # Tests against bug #333
@@ -301,7 +302,7 @@ class DataElementDerivationWizardPage(ConceptWizardPage,TestCase):
         self.assertTrue(self.de1 in item.derives.all())
 
 
-class DataElementConceptAdvancedWizardPage(utils.LoggedInViewPages, TestCase):
+class DataElementConceptAdvancedWizardPage(HaystackReindexMixin, utils.LoggedInViewPages, TestCase):
     wizard_url_name="createDataElementConcept"
     wizard_form_name="data_element_concept_wizard"
     model=models.DataElementConcept
@@ -517,7 +518,7 @@ class DataElementConceptAdvancedWizardPage(utils.LoggedInViewPages, TestCase):
         self.assertRedirects(response,url_slugify_concept(item))
 
 
-class DataElementAdvancedWizardPage(utils.LoggedInViewPages, TestCase):
+class DataElementAdvancedWizardPage(HaystackReindexMixin, utils.LoggedInViewPages, TestCase):
     wizard_url_name="createDataElement"
     wizard_form_name="data_element_wizard"
     model=models.DataElement
