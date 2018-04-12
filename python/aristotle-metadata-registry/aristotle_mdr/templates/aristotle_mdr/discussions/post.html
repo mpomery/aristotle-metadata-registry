@@ -54,7 +54,7 @@
     </div>
 
 {% for comment in post.comments.all %}
-    {% if comment.author.username == 'aristotle' %}
+    {% if not comment.author %}
     <div class="comment panel panel-danger" id="comment_{{comment.id }}">
         <header class="panel-heading">
             <span class="author"><strong>System message: </strong></span>

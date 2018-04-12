@@ -7,10 +7,9 @@
     {% if result == request.user %}
     (You)
     {% endif %}
-    <div>{{ result.username|safe }}</div>
     <div>{{ result.highlight.email|safe }}</div>
 {% else %}
-    {% firstof result.highlight.email|safe result.highlight.username|safe %}
+    {{ firstof result.highlight.email|safe }}
     {% if result == request.user %}
     (You)
     {% endif %}

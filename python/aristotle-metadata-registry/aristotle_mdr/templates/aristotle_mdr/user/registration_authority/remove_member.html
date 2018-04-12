@@ -2,21 +2,21 @@
 {% load compile_static i18n %}
 {% load aristotle_tags %}
 
-{% block title %}Remove user from registation authority {% firstof user_to_change.get_full_name user_to_change.email user_to_change.username %}{% endblock %}
+{% block title %}Remove user from registation authority {% firstof user_to_change.get_full_name user_to_change.email %}{% endblock %}
 {% block content %}
 <form method="post" action="{% url 'aristotle:registrationauthority_member_remove' item.id user_to_change.pk %}">{% csrf_token %}
     {% if not request.is_ajax %}
     <div class="modal-header">
-       <header class="modal-title">Remove user from registation authority - {% firstof user_to_change.get_full_name user_to_change.email user_to_change.username %}</header>
+       <header class="modal-title">Remove user from registation authority - {% firstof user_to_change.get_full_name user_to_change.email %}</header>
     </div>
     {% endif %}
     <div class="modal-body">
       <p>
         <strong>
         You are about to remove the account of
-          <em>{% firstof user_to_change.get_full_name user_to_change.email user_to_change.username %}</em>
+          <em>{% firstof user_to_change.get_full_name user_to_change.email %}</em>
         from the registation authority <em>{{item.name}}</em>.
-        </strong> 
+        </strong>
         <ul>
         <li>
         This will remove all roles from the user in this registation authority,
