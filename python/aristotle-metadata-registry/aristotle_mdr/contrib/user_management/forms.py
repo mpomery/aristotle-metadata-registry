@@ -40,6 +40,7 @@ class UserInvitationForm(FormRequestMixin, forms.Form):
 
         self.emails = emails
 
+
 class AristotleUserRegistrationForm(UserRegistrationForm):
 
     def __init__(self, *args, **kwargs):

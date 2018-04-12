@@ -26,6 +26,7 @@ reversion.revisions.register(MDR.Workgroup)
 
 User = get_user_model()
 
+
 class StatusInline(admin.TabularInline):
     """
     Inline editor for registration status records
@@ -305,16 +306,8 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email',)
 
 
-# TODO: Remove this code after Aristotle 2.1 is released
-from django.conf import settings
-if settings.AUTH_USER_MODEL != "auth.User":
-    BASE_FORM_CLASS = UserAdmin
-else:
-    BASE_FORM_CLASS = BaseUserAdmin
-
-
 # Define a new User admin
-class AristotleUserAdmin(BASE_FORM_CLASS):
+class AristotleUserAdmin(UserAdmin):
 
     def time_since_login(self, obj):
         from django.contrib.humanize.templatetags.humanize import naturaltime

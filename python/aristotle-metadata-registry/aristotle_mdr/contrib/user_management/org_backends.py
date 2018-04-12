@@ -70,8 +70,10 @@ class AristotleInvitationBackend(InvitationBackend):
             user.set_password(form.cleaned_data['password'])
             user.save()
             self.activate_organizations(user)
-            user = authenticate(username=form.cleaned_data['email'],
-                    password=form.cleaned_data['password'])
+            user = authenticate(
+                username=form.cleaned_data['email'],
+                password=form.cleaned_data['password']
+            )
             login(request, user)
             return redirect(self.get_success_url())
         return render(request, self.registration_form_template, {'form': form})
