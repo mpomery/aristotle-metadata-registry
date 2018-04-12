@@ -455,7 +455,7 @@ class LoggedInViewPages(object):
         #RAFIX self.wg1.registrationAuthorities.add(self.ra)
         self.wg1.save()
 
-        self.su = get_user_model().objects.create_superuser('super', 'user')
+        self.su = get_user_model().objects.create_superuser('super@example.com', 'user')
         self.manager = get_user_model().objects.create_user('mandy@example.com', 'manager')
         self.manager.is_staff=True
         self.manager.save()
