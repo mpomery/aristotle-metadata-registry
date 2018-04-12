@@ -23,9 +23,8 @@ class RegistryOwnerUserList(LoginRequiredMixin, PermissionRequiredMixin, ListVie
         )
         if q:
             queryset = queryset.filter(
-                Q(username__icontains=q) |
-                Q(first_name__icontains=q) |
-                Q(last_name__icontains=q) |
+                Q(short_name__icontains=q) |
+                Q(full_name__icontains=q) |
                 Q(email__icontains=q)
             )
         return queryset
