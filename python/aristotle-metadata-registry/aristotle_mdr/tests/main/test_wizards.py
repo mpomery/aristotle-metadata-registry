@@ -12,7 +12,7 @@ from aristotle_mdr.utils import setup_aristotle_test_environment
 setup_aristotle_test_environment()
 
 
-class CreateListPageTests(utils.LoggedInViewPages,TestCase):
+class CreateListPageTests(utils.LoggedInViewPages, TestCase):
     def test_create_list_active(self):
         self.logout()
         response = self.client.get(reverse('aristotle:create_list'))
@@ -31,7 +31,7 @@ class CreateListPageTests(utils.LoggedInViewPages,TestCase):
         self.assertEqual(response.status_code,200)
 
 
-class ConceptWizard_TestInvalidUrls(utils.LoggedInViewPages,TestCase):
+class ConceptWizard_TestInvalidUrls(utils.LoggedInViewPages, TestCase):
     def tearDown(self):
         call_command('clear_index', interactive=False, verbosity=0)
 
@@ -194,6 +194,7 @@ class ConceptWizardPage(utils.LoggedInViewPages):
 
         response = self.client.post(self.wizard_url, form_data)
         wizard = response.context['wizard']
+        print(wizard['form'].errors)
         self.assertTrue(len(wizard['form'].errors.keys()) == 0)
         self.assertTrue(self.item_existing in response.context['duplicate_items'])
         
@@ -245,8 +246,10 @@ class PropertyWizardPage(ConceptWizardPage,TestCase):
     model=models.Property
 class ValueDomainWizardPage(ConceptWizardPage,TestCase):
     model=models.ValueDomain
-#class DataElementWizardPage(ConceptWizardPage,TestCase):
-#    model=models.DataElement
+class DataElementConceptWizardPage(ConceptWizardPage, TestCase):
+    model=models.DataElementConcept
+class DataElementWizardPage(ConceptWizardPage, TestCase):
+    model=models.DataElement
 
 
 class DataElementDerivationWizardPage(ConceptWizardPage,TestCase):
@@ -298,7 +301,7 @@ class DataElementDerivationWizardPage(ConceptWizardPage,TestCase):
         self.assertTrue(self.de1 in item.derives.all())
 
 
-class DataElementConceptWizardPage(ConceptWizardPage,TestCase):
+class DataElementConceptAdvancedWizardPage(utils.LoggedInViewPages, TestCase):
     wizard_url_name="createDataElementConcept"
     wizard_form_name="data_element_concept_wizard"
     model=models.DataElementConcept
@@ -306,8 +309,7 @@ class DataElementConceptWizardPage(ConceptWizardPage,TestCase):
     @property
     def wizard_url(self):
         return reverse('aristotle:%s'%self.wizard_url_name)
-    def test_editor_can_make_object(self):
-        pass
+
     def test_editor_can_make_object__has_prior_components(self):
         self.login_editor()
         from reversion.revisions import create_revision
@@ -515,7 +517,7 @@ class DataElementConceptWizardPage(ConceptWizardPage,TestCase):
         self.assertRedirects(response,url_slugify_concept(item))
 
 
-class DataElementWizardPage(ConceptWizardPage,TestCase):
+class DataElementAdvancedWizardPage(utils.LoggedInViewPages, TestCase):
     wizard_url_name="createDataElement"
     wizard_form_name="data_element_wizard"
     model=models.DataElement
@@ -523,8 +525,7 @@ class DataElementWizardPage(ConceptWizardPage,TestCase):
     @property
     def wizard_url(self):
         return reverse('aristotle:%s'%self.wizard_url_name)
-    def test_editor_can_make_object(self):
-        pass
+
     def test_editor_can_make_object__has_prior_components(self):
         self.login_editor()
 
