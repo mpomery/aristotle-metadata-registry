@@ -35,7 +35,7 @@ def new_comment_created(comment):
     if comment.author:
         author_name = comment.author.get_full_name() or comment.author
     else:
-        author_name = 'None'
+        author_name = 'System'
 
     notify.send(author_name, recipient=post.author, verb="commented on your post", target=post)
 
@@ -45,7 +45,7 @@ def new_post_created(post, recipient):
     if post.author:
         op_name = post.author.get_full_name() or post.author
     else:
-        op_name = 'None'
+        op_name = 'System'
 
     notify.send(op_name, recipient=recipient, verb="made a new post", target=post, action_object=post.workgroup)
 
