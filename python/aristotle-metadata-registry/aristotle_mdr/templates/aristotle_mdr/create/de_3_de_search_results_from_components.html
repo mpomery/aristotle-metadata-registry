@@ -30,7 +30,7 @@
             <ol class="searchResults">
                 {% for obj in de_matches %}
                 <li>
-                    {% include "search/searchItem.html" with item=obj %}
+                    {% include "aristotle_mdr/create/wizard_search_result_item.html" with object=obj.object %}
                 </li>
                 {% endfor %}
             </ol>

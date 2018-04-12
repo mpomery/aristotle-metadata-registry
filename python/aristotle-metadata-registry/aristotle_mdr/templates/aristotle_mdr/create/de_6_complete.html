@@ -1,4 +1,4 @@
-{% extends "aristotle_mdr/create/dec_template_wrapper.html" %}
+{% extends "aristotle_mdr/create/de_template_wrapper.html" %}
 {% load aristotle_tags i18n %}
 
 {% block formarea %}
@@ -15,7 +15,7 @@
         <ol class="searchResults">
             {% for obj in de_matches %}
             <li>
-                {% include "search/searchItem.html" with item=obj %}
+                {% include "aristotle_mdr/create/wizard_search_result_item.html" with object=obj %}
             </li>
             {% endfor %}
         </ol>

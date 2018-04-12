@@ -182,7 +182,7 @@ class ConceptWizard(PermissionWizard):
 
         q = PSQS().models(model).auto_query(
             self.search_terms['definition'] + " " + self.search_terms['name']
-        ).filter(statuses__in=[MDR.STATES[int(s)] for s in [MDR.STATES.standard, MDR.STATES.preferred]])
+        ).filter(statuses__in=[int(s) for s in [MDR.STATES.standard, MDR.STATES.preferred]])
 
         # .filter(states="Standard")
         similar = q
@@ -450,7 +450,7 @@ class DataElementConceptWizard(MultiStepAristotleWizard):
                 'made_dec': self.get_cleaned_data_for_step('find_dec_results'),
                 })
         context.update({
-            'template_name': 'aristotle_mdr/create/dec_template_wrapper.html',
+            'template_name': self.template_name,
             })
         return context
 
@@ -521,6 +521,7 @@ class DataElementWizard(MultiStepAristotleWizard):
     )
 
     model = MDR.DataElement
+    template_name = "aristotle_mdr/create/de_template_wrapper.html"
     templates = {
         "component_search": "aristotle_mdr/create/de_1_initial_search.html",
         "component_results": "aristotle_mdr/create/de_2_search_results.html",
@@ -665,7 +666,7 @@ class DataElementWizard(MultiStepAristotleWizard):
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form=form, **kwargs)
         context.update({
-            'template_name': 'aristotle_mdr/create/dec_template_wrapper.html',
+            'template_name': self.template_name,
             'next_button_text': _("Next")
             })
 
