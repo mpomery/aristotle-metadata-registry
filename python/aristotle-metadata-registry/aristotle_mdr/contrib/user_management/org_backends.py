@@ -4,8 +4,9 @@ from django.conf.urls import url
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.views.generic import FormView
+from django.template import loader
 
 from organizations.backends.defaults import InvitationBackend
 
@@ -97,9 +98,10 @@ class AristotleInvitationBackend(InvitationBackend):
         headers = {'Reply-To': reply_to}
         kwargs.update({'sender': sender, 'user': user})
 
-        subject = render(request, subject_template, kwargs)  # .strip()  # Remove stray newline characters
-        body = render(request, body_template, kwargs)
-        logger.info("UserInvited: {email} invited to registry by {inv_email}".format(email=user.email, inv_email=request.user.email))
+        subject_template = loader.get_template(subject_template)
+        body_template = loader.get_template(body_template)
+        subject = subject_template.render(kwargs).strip()  # Remove stray newline characters
+        body = body_template.render(kwargs)
         return message_class(subject, body, from_email, [user.email], headers=headers)
 
     def send_invitation(self, user, sender=None, **kwargs):
