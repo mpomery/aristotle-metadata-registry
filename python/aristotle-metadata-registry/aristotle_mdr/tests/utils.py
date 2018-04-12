@@ -62,11 +62,7 @@ def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
 
 
 def get_json_from_response(response):
-    if django_version > (1, 9):
-        return response.json()
-    else:
-        import json
-        return json.loads(response.content.decode('utf-8'))
+    return response.json()
 
 
 # Since all managed objects have the same rules, these can be used to cover everything
