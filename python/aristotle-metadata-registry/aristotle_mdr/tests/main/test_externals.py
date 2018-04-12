@@ -102,12 +102,12 @@ class AristotleAutocompletes(utils.LoggedInViewPages, TestCase):
         # tests.main.test_search.test_current_statuses_only_in_search_results_and_index
 
         from django.contrib.auth import get_user_model
-        self.registrar = get_user_model().objects.create_user('stryker','william.styker@weaponx.mil','mutantsMustDie')
+        self.registrar = get_user_model().objects.create_user('william.styker@weaponx.mil','mutantsMustDie')
         self.ra.giveRoleToUser('registrar',self.registrar)
 
         self.logout()
         response = self.client.post(reverse('friendly_login'),
-                    {'username': 'stryker', 'password': 'mutantsMustDie'})
+                    {'username': 'william.styker@weaponx.mil', 'password': 'mutantsMustDie'})
 
         self.assertEqual(response.status_code,302) # logged in
         self.assertTrue(perms.user_is_registrar(self.registrar,self.ra))

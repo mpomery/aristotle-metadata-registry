@@ -340,7 +340,7 @@ class ManagedObjectVisibility(object):
 
     def test_registrar_can_view(self):
         # make editor for wg1
-        r1 = get_user_model().objects.create_user('reggie', '', 'reg')
+        r1 = get_user_model().objects.create_user('reggie@example.com', 'reg')
 
         self.assertEqual(perms.user_can_view(r1, self.item), False)
         models.Status.objects.create(
@@ -359,12 +359,12 @@ class ManagedObjectVisibility(object):
     def test_object_submitter_can_view(self):
         # make editor for wg1
         wg1 = models.Workgroup.objects.create(name="Test WG 1")
-        e1 = get_user_model().objects.create_user('editor1', '', 'editor1')
+        e1 = get_user_model().objects.create_user('editor1@example.com', 'editor1')
         wg1.giveRoleToUser('submitter', e1)
 
         # make editor for wg2
         wg2 = models.Workgroup.objects.create(name="Test WG 2")
-        e2 = get_user_model().objects.create_user('editor2', '', 'editor2')
+        e2 = get_user_model().objects.create_user('editor2@example.com', 'editor2')
         wg2.giveRoleToUser('submitter', e2)
 
         #RAFIX wg1.registrationAuthorities.add(self.ra)
@@ -404,17 +404,17 @@ class ManagedObjectVisibility(object):
         self.assertEqual(perms.user_can_view(e2, self.item), True)
 
     def test_object_submitter_can_edit(self):
-        registrar = get_user_model().objects.create_user('registrar', '', 'registrar')
+        registrar = get_user_model().objects.create_user('registrar@example.com', 'registrar')
         self.ra.registrars.add(registrar)
 
         # make editor for wg1
         wg1 = models.Workgroup.objects.create(name="Test WG 1")
-        e1 = get_user_model().objects.create_user('editor1', '', 'editor1')
+        e1 = get_user_model().objects.create_user('editor1@example.com', 'editor1')
         wg1.giveRoleToUser('submitter', e1)
 
         # make editor for wg2
         wg2 = models.Workgroup.objects.create(name="Test WG 2")
-        e2 = get_user_model().objects.create_user('editor2', '', 'editor2')
+        e2 = get_user_model().objects.create_user('editor2@example.com', 'editor2')
         wg2.giveRoleToUser('submitter', e2)
 
         #RAFIX wg1.registrationAuthorities.add(self.ra)
@@ -459,18 +459,18 @@ class LoggedInViewPages(object):
         #RAFIX self.wg1.registrationAuthorities.add(self.ra)
         self.wg1.save()
 
-        self.su = get_user_model().objects.create_superuser('super', '', 'user')
-        self.manager = get_user_model().objects.create_user('mandy', '', 'manager')
+        self.su = get_user_model().objects.create_superuser('super', 'user')
+        self.manager = get_user_model().objects.create_user('mandy@example.com', 'manager')
         self.manager.is_staff=True
         self.manager.save()
-        self.editor = get_user_model().objects.create_user('eddie', '', 'editor')
+        self.editor = get_user_model().objects.create_user('eddie@example.com', 'editor')
         self.editor.is_staff=True
         self.editor.save()
-        self.viewer = get_user_model().objects.create_user('vicky', '', 'viewer')
-        self.registrar = get_user_model().objects.create_user('reggie', '', 'registrar')
-        self.ramanager = get_user_model().objects.create_user('rachael', '', 'ramanager')
+        self.viewer = get_user_model().objects.create_user('vicky@example.com', 'viewer')
+        self.registrar = get_user_model().objects.create_user('reggie@example.com', 'registrar')
+        self.ramanager = get_user_model().objects.create_user('rachael@example.com', 'ramanager')
 
-        self.regular = get_user_model().objects.create_user('regular', '', 'thanks_steve')
+        self.regular = get_user_model().objects.create_user('regular@example.com', 'thanks_steve')
 
         self.wg1.submitters.add(self.editor)
         self.wg1.managers.add(self.manager)
@@ -490,7 +490,7 @@ class LoggedInViewPages(object):
         self.assertEqual(self.editor.profile.editable_workgroups.count(), 1)
         self.assertTrue(self.wg1 in self.editor.profile.editable_workgroups.all())
 
-        self.newuser = get_user_model().objects.create_user('nathan','','noobie')
+        self.newuser = get_user_model().objects.create_user('nathan@example.com','noobie')
         self.newuser.save()
 
     def get_page(self, item):
@@ -501,62 +501,62 @@ class LoggedInViewPages(object):
 
     def login_superuser(self):
         self.logout()
-        response = self.client.post(reverse('friendly_login'), {'username': 'super', 'password': 'user'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'super@example.com', 'password': 'user'})
         self.assertEqual(response.status_code, 302)
         return response
 
     def login_regular_user(self):
         self.logout()
-        response = self.client.post(reverse('friendly_login'), {'username': 'regular', 'password': 'thanks_steve'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'regular@example.com', 'password': 'thanks_steve'})
         self.assertEqual(response.status_code, 302)
         return response
 
     def login_viewer(self):
         self.logout()
-        response = self.client.post(reverse('friendly_login'), {'username': 'vicky', 'password': 'viewer'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'vicky@example.com', 'password': 'viewer'})
         self.assertEqual(response.status_code, 302)
         return response
 
     def login_registrar(self):
         self.logout()
-        response = self.client.post(reverse('friendly_login'), {'username': 'reggie', 'password': 'registrar'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'reggie@example.com', 'password': 'registrar'})
         self.assertEqual(response.status_code, 302)
         return response
 
     def login_ramanager(self):
         self.logout()
-        response = self.client.post(reverse('friendly_login'), {'username': 'rachael', 'password': 'ramanager'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'rachael@example.com', 'password': 'ramanager'})
         self.assertEqual(response.status_code, 302)
         return response
 
     def login_editor(self):
         self.logout()
-        response = self.client.post(reverse('friendly_login'), {'username': 'eddie', 'password': 'editor'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'eddie@example.com', 'password': 'editor'})
         self.assertEqual(response.status_code, 302)
         return response
 
     def login_manager(self):
         self.logout()
-        response = self.client.post(reverse('friendly_login'), {'username': 'mandy', 'password': 'manager'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'mandy@example.com', 'password': 'manager'})
         self.assertEqual(response.status_code, 302)
         return response
 
     def test_logins(self):
         # Failed logins reutrn 200, not 401
         # See http://stackoverflow.com/questions/25839434/
-        response = self.client.post(reverse('friendly_login'), {'username': 'super', 'password': 'the_wrong_password'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'super@example.com', 'password': 'the_wrong_password'})
         self.assertEqual(response.status_code, 200)
         # Success redirects to the homepage, so its 302 not 200
-        response = self.client.post(reverse('friendly_login'), {'username': 'super', 'password': 'user'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'super@example.com', 'password': 'user'})
         self.assertEqual(response.status_code, 302)
         self.logout()
-        response = self.client.post(reverse('friendly_login'), {'username': 'eddie', 'password': 'editor'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'eddie@example.com', 'password': 'editor'})
         self.assertEqual(response.status_code, 302)
         self.logout()
-        response = self.client.post(reverse('friendly_login'), {'username': 'vicky', 'password': 'viewer'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'vicky@example.com', 'password': 'viewer'})
         self.assertEqual(response.status_code, 302)
         self.logout()
-        response = self.client.post(reverse('friendly_login'), {'username': 'reggie', 'password': 'registrar'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'reggie@example.com', 'password': 'registrar'})
         self.assertEqual(response.status_code, 302)
         self.logout()
 

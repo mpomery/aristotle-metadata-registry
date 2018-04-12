@@ -15,13 +15,13 @@ setup_aristotle_test_environment()
 class WorkgroupMembership(TestCase):
     def test_userInWorkgroup(self):
         wg = models.Workgroup.objects.create(name="Test WG 1")
-        user = get_user_model().objects.create_user('editor1','','editor1')
+        user = get_user_model().objects.create_user('editor1@example.com','editor1')
         wg.viewers.add(user)
         self.assertTrue(perms.user_in_workgroup(user,wg))
     def test_RemoveUserFromWorkgroup(self):
         # Does removing a user from a workgroup remove their permissions? It should!
         wg = models.Workgroup.objects.create(name="Test WG 1")
-        user = get_user_model().objects.create_user('editor1','','editor1')
+        user = get_user_model().objects.create_user('editor1@example.com','editor1')
         wg.managers.add(user)
         # Caching issue, refresh from DB with correct permissions
         user = get_user_model().objects.get(pk=user.pk)
@@ -33,8 +33,8 @@ class WorkgroupMembership(TestCase):
         self.assertFalse(perms.user_is_workgroup_manager(user,wg))
     def test_managersCanEditWorkgroups(self):
         wg = models.Workgroup.objects.create(name="Test WG 1")
-        user1 = get_user_model().objects.create_user('manager','','manager')
-        user2 = get_user_model().objects.create_user('viewer','','viewer')
+        user1 = get_user_model().objects.create_user('manager@example.com','manager')
+        user2 = get_user_model().objects.create_user('viewer@example.com','viewer')
         wg.managers.add(user1)
         wg.viewers.add(user2)
         wg.save()
@@ -61,7 +61,7 @@ class WorkgroupMembership(TestCase):
         wg1 = models.Workgroup.objects.create(name="Test WG 1")
         wg2 = models.Workgroup.objects.create(name="Test WG 2")
         wg3 = models.Workgroup.objects.create(name="Test WG 3")
-        editor = get_user_model().objects.create_user('editor','','editor')
+        editor = get_user_model().objects.create_user('editor@example.com','editor')
         wg1.stewards.add(editor)
         wg1.submitters.add(editor)
         wg1.viewers.add(editor)
@@ -415,7 +415,7 @@ class WorkgroupMemberTests(utils.LoggedInViewPages,TestCase):
         self.assertRedirects(response,n+reverse('aristotle:workgroupItems',args=[self.wg1.id]),302,200)
 
         # Logged in non-member can't see workgroup pages
-        response = self.client.post(reverse('friendly_login'), {'username': 'nathan', 'password': 'noobie'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'nathan@example.com', 'password': 'noobie'})
         response = self.client.get(reverse('aristotle:workgroup',args=[self.wg1.id]))
         self.assertEqual(response.status_code,403)
 
