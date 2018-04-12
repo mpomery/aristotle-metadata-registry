@@ -27,7 +27,6 @@ def concept_saved(message):
                 messages.workgroup_item_updated(recipient=user, obj=instance)
     try:
         # This will fail during first load, and if admins delete aristotle.
-        system = get_user_model().objects.get(username="aristotle")
         for post in instance.relatedDiscussions.all():
             DiscussionComment.objects.create(
                 post=post,
@@ -37,7 +36,7 @@ def concept_saved(message):
                     iid=instance.id,
                     url=reverse("aristotle:item", args=[instance.id])
                 ),
-                author=system,
+                author=None,
             )
     except:
         pass
