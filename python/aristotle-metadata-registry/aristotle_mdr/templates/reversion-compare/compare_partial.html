@@ -5,7 +5,7 @@
     {% trans "Edit comment:" %} -
     {{version}}
     {% if object.version.revision.user %}
-        {{ action.revision.user.get_full_name }}
+        {% firstof action.revision.user.get_full_name  action.revision.user.email %}
     {% endif %}
 </header>
 <p>{{ version2.revision.comment|default:"(no comment exists)" }}</p>

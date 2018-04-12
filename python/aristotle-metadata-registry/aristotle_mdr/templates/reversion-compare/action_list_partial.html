@@ -44,7 +44,7 @@
                 </th>
                 <td>
                     {% if action.revision.user %}
-                        {{ action.revision.user.get_full_name }}
+                        {% firstof action.revision.user.get_full_name  action.revision.user.email %}
                     {% endif %}
                 </td>
                 <td>{{action.revision.comment|default:""}}</td>

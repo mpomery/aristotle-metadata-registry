@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block page %}
-<h1><a href="#">My Dashboard</a> <small>- {{ user.get_full_name }}</small></h1>
+<h1><a href="#">My Dashboard</a> <small>- {% firstof user.get_full_name user.email %}</small></h1>
     <div class='row'>
         <section class="col-md-8">
             <div class='panel-body'>
