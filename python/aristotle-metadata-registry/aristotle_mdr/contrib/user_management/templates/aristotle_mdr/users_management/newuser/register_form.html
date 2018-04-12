@@ -48,8 +48,8 @@
 		</div>
 
 		<div class="col-sm-6 form-group">
-			<label for="{{form.first_name.id_for_label}}">Short Name</label>
-			<input name="{{ form.first_name.name }}"  value="{{ form.first_name.value|default:"" }}" type="text" class="form-control">
+			<label for="{{form.short_name.id_for_label}}">Short Name</label>
+			<input name="{{ form.short_name.name }}"  value="{{ form.short_name.value|default:"" }}" type="text" class="form-control">
             {% if form.short_name.errors %}
             <div class="alert alert-danger">{{ form.short_name.errors }}</div>
             {% endif %}
@@ -57,10 +57,10 @@
                 We use your first name to personalise your interaction with the site.
             </p>
 		</div>
-    
+
 		<div class="col-sm-6 form-group">
-			<label for="{{form.last_name.id_for_label}}">Full Name</label>
-			<input name="{{ form.last_name.name }}"  value="{{ form.last_name.value|default:"" }}" type="text"  class="form-control">
+			<label for="{{form.full_name.id_for_label}}">Full Name</label>
+			<input name="{{ form.last_name.name }}"  value="{{ form.full_name.value|default:"" }}" type="text"  class="form-control">
             {% if form.full_name.errors %}
             <div class="alert alert-danger">{{ form.full_name.errors }}</div>
             {% endif %}

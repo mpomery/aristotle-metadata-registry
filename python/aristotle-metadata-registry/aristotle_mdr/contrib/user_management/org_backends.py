@@ -121,11 +121,11 @@ class AristotleInvitationBackend(InvitationBackend):
 
         if sender:
             import email.utils
-            from_email = "%s %s <%s>" % (
-                sender.first_name, sender.last_name,
+            from_email = "%s <%s>" % (
+                sender.full_name,
                 email.utils.parseaddr(settings.DEFAULT_FROM_EMAIL)[1]
             )
-            reply_to = "%s %s <%s>" % (sender.first_name, sender.last_name, sender.email)
+            reply_to = "%s <%s>" % (sender.full_name, sender.email)
         else:
             from_email = settings.DEFAULT_FROM_EMAIL
             reply_to = from_email

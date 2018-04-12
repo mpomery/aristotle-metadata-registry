@@ -18,14 +18,6 @@ from django.urls import reverse
 from .utils import RegistrationAuthorityMixin
 
 
-class UserSelfEditForm(forms.Form):
-    template = "aristotle_mdr/userEdit.html"
-
-    first_name = forms.CharField(required=False, label=_('First Name'))
-    last_name = forms.CharField(required=False, label=_('Last Name'))
-    email = forms.EmailField(required=False, label=_('Email Address'))
-
-
 # For stating that an item deprecates other items.
 class DeprecateForm(forms.Form):
     olderItems = forms.ModelMultipleChoiceField(
