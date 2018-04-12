@@ -74,7 +74,7 @@ class LoggedInUserAutocompletes(utils.LoggedInViewPages, TestCase):
         self.dwarves = ["Doc","Grumpy","Happy","Sleepy","Bashful","Sneezy","Dopey"]
 
         self.dwarf_users = [
-            get_user_model().objects.create(username=dwarf, email="%s@dwarves.mine"%dwarf.lower())
+            get_user_model().objects.create(email="%s@dwarves.mine"%dwarf.lower())
             for dwarf in self.dwarves
         ]
 
