@@ -36,10 +36,11 @@ class AristotleInvitationBackend(InvitationBackend):
 
     def get_urls(self):
         return [
-            # url(r'^accept/(?P<token>[0-9A-Za-z\-]{1,50})/$',
-            url(r'^accept/(?P<token>.*)/$',
-                view=self.activate_view, name="registry_invitations_register"),
-            # url(r'^complete$', view=self.invite_view(), name="registry_invitations_complete"),
+            url(
+                r'^accept/(?P<token>.*)/$',
+                view=self.activate_view,
+                name="registry_invitations_register"
+            ),
             url(r'^$', view=self.invite_view(), name="registry_invitations_create"),
         ]
 
@@ -51,29 +52,6 @@ class AristotleInvitationBackend(InvitationBackend):
 
     def success_view(self, request):
         return render(request, self.activation_success_template, {})
-
-    def activate_view(self, request, token):
-        """
-        View function that activates the given User by setting `is_active` to
-        true if the provided information is verified.
-        """
-        user = self.check_token(token)
-
-        form = self.get_form(data=request.POST or None, instance=user)
-        if form.is_valid():
-            form.instance.is_active = True
-            user = form.save()
-            user.set_password(form.cleaned_data['password'])
-            user.save()
-            self.activate_organizations(user)
-            user = authenticate(
-                email=form.cleaned_data['email'],
-                password=form.cleaned_data['password']
-            )
-            login(request, user)
-            self.delete_token(token)
-            return redirect("/")  # self.get_success_url())
-        return render(request, self.registration_form_template, {'form': form})
 
     def invite_by_emails(self, emails, sender=None, request=None, **kwargs):
         """Creates an inactive user with the information we know and then sends
@@ -97,20 +75,6 @@ class AristotleInvitationBackend(InvitationBackend):
             self.send_invitation(user, sender, request=request, **kwargs)
             users.append(user)
         return users
-
-    def _get_token(self, user, message, **kwargs):
-        """Returns a unique token for the given user"""
-        from django.core.cache import caches
-        import uuid
-        cache = caches['aristotle-mdr-invitations']
-        token = str(uuid.uuid4())
-        cache.set(token, message)
-        return token
-
-    def delete_token(self, token):
-        from django.core.cache import caches
-        cache = caches['aristotle-mdr-invitations']
-        cache.delete(token)
 
     def email_message(self, user, subject_template, body_template, request, sender=None, message_class=EmailMessage, **kwargs):
         """
@@ -163,25 +127,6 @@ class NewUserInvitationBackend(AristotleInvitationBackend):
 
     registration_form_template = 'aristotle_mdr/users_management/newuser/register_form.html'
     activation_success_template = 'aristotle_mdr/users_management/newuser/register_success.html'
-
-    def get_token(self, user, **kwargs):
-        message = {'user_email': user.email, 'invited_to': "__registry__"}
-        return self._get_token(user, message)
-
-    def check_token(self, token):
-        from django.core.cache import caches
-        cache = caches['aristotle-mdr-invitations']
-        obj = cache.get(token)
-
-        if not obj or obj.get('invited_to') != "__registry__" or 'user_email' not in obj.keys():
-            raise Http404(_("Your invitation may have expired."))
-
-        try:
-            user = get_user_model().objects.get(email=obj.get('user_email'), is_active=False)
-        except get_user_model().DoesNotExist:
-            raise Http404(_("Your URL may have expired."))
-
-        return user
 
 
 class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
