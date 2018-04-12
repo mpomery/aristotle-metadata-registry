@@ -94,8 +94,6 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.assertEqual(len(mail.outbox), 2)
         self.assertTrue(mail.outbox[0].subject.startswith('You\'ve been invited'))
 
-    @tag('newtest')
-    @override_settings(SECURE_SSL_REDIRECT=False)
     def test_accept_invitation(self):
 
         self.login_superuser()
