@@ -16,7 +16,7 @@ setup_aristotle_test_environment()
 class SuperuserPermissions(TestCase):
     # All of the below are called with None as a Superuser, by definition *must* be able to edit, view and managed everything. Since a is_superuser chcek is cheap is should be called first, so calling with None checks that there is no other database calls going on.
     def setUp(self):
-        self.su=get_user_model().objects.create_superuser('super','','user')
+        self.su=get_user_model().objects.create_superuser('super@example.com','user')
 
     def test_user_can_alter_comment(self):
         self.assertTrue(perms.user_can_alter_comment(self.su,None))
@@ -184,7 +184,7 @@ class CustomConceptQuerySetTest(TestCase):
         wg.save()
         oc1 = models.ValueDomain.objects.create(name="Test OC1",workgroup=wg)
         oc2 = models.ValueDomain.objects.create(name="Test OC2",workgroup=wg)
-        user = get_user_model().objects.create_superuser('super','','user')
+        user = get_user_model().objects.create_superuser('super@example.com','user')
 
         # Assert no public items
         self.assertEqual(len(models.ValueDomain.objects.all().public()),0)
@@ -219,7 +219,7 @@ class CustomConceptQuerySetTest(TestCase):
 
 class RegistryCascadeTest(TestCase):
     def test_superuser_DataElementConceptCascade(self):
-        user = get_user_model().objects.create_superuser('super','','user')
+        user = get_user_model().objects.create_superuser('super@example.com','user')
         self.ra = models.RegistrationAuthority.objects.create(name="Test RA - cascading")
         self.wg = models.Workgroup.objects.create(name="Setup WG")
         self.wg.save()
@@ -253,7 +253,7 @@ class RegistryCascadeTest(TestCase):
         self.assertEqual(self.dec.current_statuses()[0].state,state)
 
     def test_superuser_DataElementCascade(self):
-        user = get_user_model().objects.create_superuser('super','','user')
+        user = get_user_model().objects.create_superuser('super@example.com','user')
         self.ra = models.RegistrationAuthority.objects.create(name="Test RA")
         self.wg = models.Workgroup.objects.create(name="Setup WG")
         self.wg.save()
