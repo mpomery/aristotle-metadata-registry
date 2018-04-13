@@ -6,12 +6,12 @@ from django.contrib.auth import views
 from django.contrib import admin
 from django.views.generic.base import RedirectView
 
-from aristotle_mdr.views.user_pages import friendly_redirect_login
+from aristotle_mdr.views.user_pages import FriendlyLoginView
 
 admin.autodiscover()
 
 urlpatterns = [
-    url(r'^login/?$', friendly_redirect_login, name='friendly_login'),
+    url(r'^login/?$', FriendlyLoginView.as_view(), name='friendly_login'),
     url(r'^logout/?$', views.logout, {'next_page': 'aristotle:home'}, name='logout'),
     url(r'^django/admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^django/admin/', include(admin.site.urls)),

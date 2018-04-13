@@ -2,7 +2,7 @@ import datetime
 from django.apps import apps
 from django.contrib.auth.decorators import login_required
 from braces.views import LoginRequiredMixin
-from django.contrib.auth.views import login
+from django.contrib.auth.views import LoginView
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
@@ -11,7 +11,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, ListView, UpdateView
-
+from django.utils.http import is_safe_url
 
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
@@ -19,15 +19,19 @@ from aristotle_mdr.views.utils import paginated_list, paginated_workgroup_list
 from aristotle_mdr.utils import fetch_metadata_apps
 
 
-def friendly_redirect_login(request):
-    if request.user.is_authenticated():
-        if 'next' in request.GET:
-            return HttpResponseRedirect(request.GET.get('next'))
-        else:
-            return HttpResponseRedirect(reverse('aristotle:userHome'))
-    else:
-        return login(request)
+class FriendlyLoginView(LoginView):
 
+    template_name='aristotle_mdr/friendly_login.html'
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        if self.request.GET.get('welcome', '') == 'true':
+            context.update({'welcome': True})
+
+        return context
+        
 
 def home(request):
     from reversion.models import Revision
