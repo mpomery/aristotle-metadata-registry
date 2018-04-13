@@ -202,6 +202,7 @@ class CompareConceptsForm(forms.Form):
             widget=widgets.ConceptAutocompleteSelect()
         )
 
+
 class EditUserForm(ModelForm):
 
     class Meta:
