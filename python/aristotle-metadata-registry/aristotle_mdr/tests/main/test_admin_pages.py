@@ -92,7 +92,7 @@ class AdminPage(utils.LoggedInViewPages,TestCase):
         response = self.client.post(
             reverse("admin:aristotle_mdr_user_management_user_add"),
             {
-                'username':"newuser",'password1':"test",'password2':"test",
+                'email':"newuser@example.com",'password1':"test",'password2':"test",
                 'profile-TOTAL_FORMS': 1, 'profile-INITIAL_FORMS': 0, 'profile-MAX_NUM_FORMS': 1,
                 'profile-0-workgroup_manager_in': [self.wg1.id],
                 'profile-0-steward_in': [self.wg1.id],
@@ -104,7 +104,7 @@ class AdminPage(utils.LoggedInViewPages,TestCase):
             }
         )
         self.assertResponseStatusCodeEqual(response,302)
-        new_user = get_user_model().objects.get(username='newuser')
+        new_user = get_user_model().objects.get(email='newuser@example.com')
         self.assertEqual(new_user.profile.workgroups.count(),1)
         self.assertEqual(new_user.profile.workgroups.first(),self.wg1)
         self.assertEqual(new_user.profile.registrarAuthorities.count(),1)
