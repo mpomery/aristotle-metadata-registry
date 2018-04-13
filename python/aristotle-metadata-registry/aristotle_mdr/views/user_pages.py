@@ -12,11 +12,13 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, ListView, UpdateView
 
-
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.views.utils import paginated_list, paginated_workgroup_list
 from aristotle_mdr.utils import fetch_metadata_apps
+from aristotle_mdr.utils import get_aristotle_url
+
+import json
 
 
 def friendly_redirect_login(request):
@@ -29,13 +31,59 @@ def friendly_redirect_login(request):
         return login(request)
 
 
+@login_required
 def home(request):
     from reversion.models import Revision
-    # recent = Revision.objects.filter(user=request.user)
 
-    # recent = Version.objects.filter(revision__user=request.user).order_by('-revision__date_created')[0:10]
     recent = Revision.objects.filter(user=request.user).order_by('-date_created')[0:10]
-    page = render(request, "aristotle_mdr/user/userHome.html", {"item": request.user, 'recent': recent})
+    recentdata = []
+    for rev in recent:
+        revdata = {'revision': rev, 'versions': []}
+        seen_ver_ids = []
+
+        for ver in rev.version_set.all():
+
+            seen = ver.object_id in seen_ver_ids
+            add_version = None
+            url = None
+
+            if ver.format == 'json':
+                object_data = json.loads(ver.serialized_data)
+
+                try:
+                    model = object_data[0]['model']
+                except KeyError:
+                    model = None
+
+                if model:
+                    add_version = (model != 'aristotle_mdr.status' and not seen)
+
+                try:
+                    name = object_data[0]['fields']['name']
+                except KeyError:
+                    name = None
+
+                url = get_aristotle_url(object_data[0]['model'], object_data[0]['pk'], name)
+
+            if add_version is None:
+                # Fallback for if add_version could not be set, results in db query
+                add_version = (not isinstance(ver.object, MDR.Status) and not seen)
+
+            if add_version:
+
+                if url:
+                    revdata['versions'].append({'id': ver.object_id, 'text': str(ver), 'url': url})
+                else:
+                    # Fallback, results in db query
+                    obj = ver.object
+                    if hasattr(obj, 'get_absolute_url'):
+                        revdata['versions'].append({'id': ver.object_id, 'text': str(ver), 'url': obj.get_absolute_url})
+
+            seen_ver_ids.append(ver.object_id)
+
+        recentdata.append(revdata)
+
+    page = render(request, "aristotle_mdr/user/userHome.html", {"item": request.user, 'recentdata': recentdata})
     return page
 
 
