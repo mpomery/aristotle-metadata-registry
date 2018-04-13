@@ -140,7 +140,8 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
 
         response = self.client.post(accept_url, accept_data, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'aristotle_mdr/users_management/newuser/register_success.html')
+        self.assertTemplateUsed(response, 'aristotle_mdr/friendly_login.html')
+        self.assertTrue('welcome' in response.context.keys())
 
         new_user = get_user_model().objects.get(email='test@example.com')
         self.assertTrue(new_user.is_active)

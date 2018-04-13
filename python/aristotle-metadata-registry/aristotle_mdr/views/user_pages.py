@@ -22,6 +22,8 @@ from aristotle_mdr.utils import fetch_metadata_apps
 class FriendlyLoginView(LoginView):
 
     template_name='aristotle_mdr/friendly_login.html'
+    redirect_field_name = 'next'
+    redirect_authenticated_user = True
 
     def get_context_data(self, **kwargs):
 

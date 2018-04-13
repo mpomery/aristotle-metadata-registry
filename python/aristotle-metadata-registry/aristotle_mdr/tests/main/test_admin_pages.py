@@ -83,14 +83,14 @@ class AdminPage(utils.LoggedInViewPages,TestCase):
     def test_su_can_view_users_list(self):
         self.login_superuser()
         response = self.client.get(
-            reverse('admin:%s_%s_changelist' % ('auth','user')),
+            reverse('admin:%s_%s_changelist' % ('aristotle_mdr_user_management','user')),
         )
         self.assertContains(response,'Last login')
 
     def test_su_can_add_new_user(self):
         self.login_superuser()
         response = self.client.post(
-            reverse("admin:auth_user_add"),
+            reverse("admin:aristotle_mdr_user_management_user_add"),
             {
                 'username':"newuser",'password1':"test",'password2':"test",
                 'profile-TOTAL_FORMS': 1, 'profile-INITIAL_FORMS': 0, 'profile-MAX_NUM_FORMS': 1,
