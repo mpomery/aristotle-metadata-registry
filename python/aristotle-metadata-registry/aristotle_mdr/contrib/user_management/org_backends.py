@@ -34,15 +34,13 @@ class AristotleInvitationBackend(InvitationBackend):
     form_class = forms.AristotleUserRegistrationForm
 
     def get_success_url(self):
-        return reverse('aristotle-user:registration_success')
+        return reverse('friendly_login') + '?welcome=true'
 
     def get_urls(self):
         return [
             url(r'^accept/(?P<user_id>[\d]+)-(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
                 view=self.activate_view, name="registry_invitations_register"),
             url(r'^$', view=self.invite_view(), name="registry_invitations_create"),
-            url(r'^complete/$', view=self.success_view,
-                name="registration_success"),
         ]
 
     def invite_view(self):
@@ -70,16 +68,8 @@ class AristotleInvitationBackend(InvitationBackend):
             user.set_password(form.cleaned_data['password'])
             user.save()
             self.activate_organizations(user)
-            user = authenticate(
-                username=form.cleaned_data['email'],
-                password=form.cleaned_data['password']
-            )
-            login(request, user)
             return redirect(self.get_success_url())
         return render(request, self.registration_form_template, {'form': form})
-
-    def success_view(self, request):
-        return render(request, self.activation_success_template, {})
 
     def invite_by_emails(self, emails, sender=None, request=None, **kwargs):
         """Creates an inactive user with the information we know and then sends
@@ -156,7 +146,6 @@ class NewUserInvitationBackend(AristotleInvitationBackend):
     reminder_body = 'aristotle_mdr/users_management/newuser/email/reminder_body.html'
 
     registration_form_template = 'aristotle_mdr/users_management/newuser/register_form.html'
-    activation_success_template = 'aristotle_mdr/users_management/newuser/register_success.html'
 
 
 class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
