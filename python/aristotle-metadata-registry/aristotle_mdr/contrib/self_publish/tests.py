@@ -81,7 +81,7 @@ class TestSelfPublishing(utils.LoggedInViewPages, TestCase):
 
     def login_publisher(self):
         self.logout()
-        response =  self.client.post(reverse('friendly_login'), {'username': 'self@publisher.net', 'password': 'self-publisher'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'self@publisher.net', 'password': 'self-publisher'})
         self.assertEqual(response.status_code, 302)
         return response
 
