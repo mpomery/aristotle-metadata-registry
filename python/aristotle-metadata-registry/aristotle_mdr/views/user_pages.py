@@ -31,7 +31,7 @@ class FriendlyLoginView(LoginView):
             context.update({'welcome': True})
 
         return context
-        
+
 
 def home(request):
     from reversion.models import Revision
@@ -200,7 +200,7 @@ def get_cached_object_count(model_type):
 class EditView(LoginRequiredMixin, UpdateView):
 
     template_name = "aristotle_mdr/user/userEdit.html"
-    fields = ['email', 'full_name', 'short_name']
+    form_class = MDRForms.EditUserForm
 
     def get_object(self, querySet=None):
         return self.request.user

@@ -48,7 +48,7 @@
 		</div>
 
 		<div class="col-sm-6 form-group">
-			<label for="{{form.short_name.id_for_label}}">Short Name</label>
+			<label for="{{form.short_name.id_for_label}}">Display Name</label>
 			<input name="{{ form.short_name.name }}"  value="{{ form.short_name.value|default:"" }}" type="text" class="form-control">
             {% if form.short_name.errors %}
             <div class="alert alert-danger">{{ form.short_name.errors }}</div>

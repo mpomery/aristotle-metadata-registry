@@ -2,6 +2,8 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.forms.models import ModelMultipleChoiceField
+from django.contrib.auth import get_user_model
+from django.forms import ModelForm
 
 from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 from aristotle_mdr.widgets.widgets import TableCheckboxSelect
@@ -199,6 +201,16 @@ class CompareConceptsForm(forms.Form):
             required=True,
             widget=widgets.ConceptAutocompleteSelect()
         )
+
+class EditUserForm(ModelForm):
+
+    class Meta:
+
+        model = get_user_model()
+        fields = ('email', 'full_name', 'short_name')
+        labels = {
+            'short_name': 'Display Name'
+        }
 
 
 # ------------ Form Fields ------------
