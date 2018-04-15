@@ -2,8 +2,8 @@
   {
     "fields": {
       "email": "aristotle@example.com",
-      "first_name": "",
-      "last_name": "",
+      "short_name": "",
+      "full_name": "",
       "is_active": false,
       "is_superuser": false,
       "is_staff": false,
@@ -18,7 +18,7 @@
       "email": "",
       "date_joined": "2016-05-02T22:23:10.136Z"
     },
-    "model": "arisotlte_mdr_user_management.user",
+    "model": "aristotle_mdr_user_management.user",
     "pk": 1
   }
 ]
