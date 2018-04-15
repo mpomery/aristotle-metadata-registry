@@ -117,7 +117,7 @@ class LoggedInUserAutocompletes(utils.LoggedInViewPages, TestCase):
         data = get_json_from_response(response)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data['results']), 1)
-        self.assertEqual(data['results'][0]['title'], 'Grumpy')
+        self.assertEqual(data['results'][0]['title'], 'grumpy@dwarves.mine')
 
         response = self.client.get(
             reverse("aristotle-autocomplete:user")+"?q=grumpy@dwarves.mine",
@@ -150,7 +150,7 @@ class LoggedInUserAutocompletes(utils.LoggedInViewPages, TestCase):
         data = get_json_from_response(response)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data['results']), 1)
-        self.assertEqual(data['results'][0]['title'], 'Grumpy')
+        self.assertEqual(data['results'][0]['title'], 'grumpy@dwarves.mine')
 
         response = self.client.get(
             reverse("aristotle-autocomplete:user")+"?q=grumpy@dwarves.mine",
@@ -158,7 +158,7 @@ class LoggedInUserAutocompletes(utils.LoggedInViewPages, TestCase):
         data = get_json_from_response(response)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data['results']), 1)
-        self.assertEqual(data['results'][0]['title'], 'Grumpy')
+        self.assertEqual(data['results'][0]['title'], 'grumpy@dwarves.mine')
 
 
     def test_user_autocomplete_superuser(self):
@@ -177,7 +177,7 @@ class LoggedInUserAutocompletes(utils.LoggedInViewPages, TestCase):
         data = get_json_from_response(response)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data['results']), 1)
-        self.assertEqual(data['results'][0]['title'], 'Grumpy')
+        self.assertEqual(data['results'][0]['title'], 'grumpy@dwarves.mine')
 
         response = self.client.get(
             reverse("aristotle-autocomplete:user")+"?q=Grumpy",
@@ -185,7 +185,7 @@ class LoggedInUserAutocompletes(utils.LoggedInViewPages, TestCase):
         data = get_json_from_response(response)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data['results']), 1)
-        self.assertEqual(data['results'][0]['title'], 'Grumpy')
+        self.assertEqual(data['results'][0]['title'], 'grumpy@dwarves.mine')
 
         response = self.client.get(
             reverse("aristotle-autocomplete:user")+"?q=grumpy@dwarves.mine",
@@ -193,7 +193,7 @@ class LoggedInUserAutocompletes(utils.LoggedInViewPages, TestCase):
         data = get_json_from_response(response)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(data['results']), 1)
-        self.assertEqual(data['results'][0]['title'], 'Grumpy')
+        self.assertEqual(data['results'][0]['title'], 'grumpy@dwarves.mine')
 
         response = self.client.get(
             reverse("aristotle-autocomplete:user")+"?q=@dwarves.mine",
