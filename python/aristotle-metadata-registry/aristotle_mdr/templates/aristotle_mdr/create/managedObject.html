@@ -24,7 +24,7 @@
             {% for obj in similarObjects %}
             <li>
             {# <a href="{% url 'aristotle:item' obj.object.id %}">{{ obj.name }}</a> - #}
-                    {% include "search/searchItem.html" with result=obj %}
+                {% include "aristotle_mdr/create/wizard_search_result_item.html" with object=obj.object %}
             </li>
             {% endfor %}
         </ul>

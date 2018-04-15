@@ -304,3 +304,51 @@ def status_filter(qs, when=timezone.now().date()):
     )
 
     return states
+
+
+# Given a models label, id and name, Return a url to that objects page
+# Used to avoid a database hit just to use get_absolute_url
+def get_aristotle_url(label, obj_id, obj_name=None):
+
+    label_list = label.split('.')
+
+    app = label_list[0]
+    cname = label_list[1]
+
+    if obj_name:
+        name_slug = slugify(obj_name)[:50]
+    else:
+        name_slug = None
+
+    if app == 'aristotle_mdr':
+
+        if cname in ['organization', 'workgroup', 'registrationauthority'] and name_slug is None:
+            # Can't get these url's without name_slug
+            return None
+
+        concepts = [
+            '_concept', 'objectclass', 'property', 'unitofmeasure', 'datatype',
+            'conceptualdomain', 'valuedomain', 'dataelementconcept', 'dataelement', 'dataelementderivation'
+        ]
+
+        if cname in concepts:
+
+            return reverse('aristotle:item', args=[obj_id])
+
+        elif cname == 'organization':
+
+            return reverse('aristotle:organization', args=[obj_id, name_slug])
+
+        elif cname == 'workgroup':
+
+            return reverse('aristotle:workgroup', args=[obj_id, name_slug])
+
+        elif cname == 'registrationauthority':
+
+            return reverse('aristotle:registrationAuthority', args=[obj_id, name_slug])
+
+        elif cname == 'reviewrequest':
+
+            return reverse('aristotle:userReviewDetails', args=[obj_id])
+
+    return None

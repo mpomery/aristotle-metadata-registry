@@ -31,7 +31,7 @@
                     {% for obj in duplicate_items %}
                     <li>
                         {# <input type='checkbox'> #}
-                        {% include "search/searchItem.html" with item=obj %}
+                        {% include "aristotle_mdr/create/wizard_search_result_item.html" with object=obj %}
                     </li>
                     {% endfor %}
                 </ol>
@@ -54,7 +54,7 @@
                     {% for obj in similar_items %}
                     <li>
                         {# <input type='checkbox'> #}
-                        {% include "search/searchItem.html" with item=obj.object %}
+                        {% include "aristotle_mdr/create/wizard_search_result_item.html" with object=obj.object %}
                     </li>
                     {% endfor %}
                 </ol>

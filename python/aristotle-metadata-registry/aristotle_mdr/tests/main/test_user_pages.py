@@ -317,7 +317,7 @@ class UserDashRecentItems(utils.LoggedInViewPages, TestCase):
 
         response = self.client.get(reverse('aristotle:userHome',))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context['recent']), 0)
+        self.assertEqual(len(response.context['recentdata']), 0)
 
         wizard_url = reverse('aristotle:createItem', args=['aristotle_mdr', 'objectclass'])
         wizard_form_name = "dynamic_aristotle_wizard"
@@ -345,7 +345,7 @@ class UserDashRecentItems(utils.LoggedInViewPages, TestCase):
         response = self.client.get(reverse('aristotle:userHome'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            len(response.context['recent']),
+            len(response.context['recentdata']),
             Revision.objects.filter(user=self.editor).count()
         )
 
@@ -358,6 +358,6 @@ class UserDashRecentItems(utils.LoggedInViewPages, TestCase):
 
         response = self.client.get(reverse('aristotle:userHome',))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context['recent']), Revision.objects.filter(user=self.editor).count())
+        self.assertEqual(len(response.context['recentdata']), Revision.objects.filter(user=self.editor).count())
 
         self.assertContains(response, "Changed name")

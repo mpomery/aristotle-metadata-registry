@@ -11,8 +11,17 @@ from aristotle_mdr.utils import setup_aristotle_test_environment
 
 setup_aristotle_test_environment()
 
+class HaystackReindexMixin(object):
+    def tearDown(self):
+        call_command('clear_index', interactive=False, verbosity=0)
 
-class CreateListPageTests(utils.LoggedInViewPages,TestCase):
+    def setUp(self):
+        super().setUp()
+        import haystack
+        haystack.connections.reload('default')
+
+
+class CreateListPageTests(utils.LoggedInViewPages, TestCase):
     def test_create_list_active(self):
         self.logout()
         response = self.client.get(reverse('aristotle:create_list'))
@@ -31,15 +40,7 @@ class CreateListPageTests(utils.LoggedInViewPages,TestCase):
         self.assertEqual(response.status_code,200)
 
 
-class ConceptWizard_TestInvalidUrls(utils.LoggedInViewPages,TestCase):
-    def tearDown(self):
-        call_command('clear_index', interactive=False, verbosity=0)
-
-    def setUp(self):
-        super().setUp()
-        import haystack
-        haystack.connections.reload('default')
-
+class ConceptWizard_TestInvalidUrls(HaystackReindexMixin, utils.LoggedInViewPages, TestCase):
     def test_invalid_model(self):
         url = reverse('aristotle:createItem',args=["invalid_model_name"])
         self.login_editor()
@@ -60,16 +61,16 @@ class ConceptWizard_TestInvalidUrls(utils.LoggedInViewPages,TestCase):
 
 
 
-class ConceptWizardPage(utils.LoggedInViewPages):
-    wizard_url_name="Harry Potter" # This will break if called without overriding the wizard_url_name. Plus its funny.
+class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
+    wizard_name="Harry Potter" # This used to be needed, now its not. We kept it cause its funny.
     wizard_form_name="dynamic_aristotle_wizard"
-    def tearDown(self):
-        call_command('clear_index', interactive=False, verbosity=0)
+    # def tearDown(self):
+    #     call_command('clear_index', interactive=False, verbosity=0)
 
     def setUp(self):
         super().setUp()
-        import haystack
-        haystack.connections.reload('default')
+        # import haystack
+        # haystack.connections.reload('default')
 
 
         # Tests against bug #333
@@ -171,14 +172,85 @@ class ConceptWizardPage(utils.LoggedInViewPages):
         item = models._concept.objects.filter(name="Test Item").first()
         self.assertRedirects(response,url_slugify_concept(item))
 
+    def test_editor_can_make_object__where_item_already_has_duplicate_name(self):
+        self.item_existing = self.model.objects.create(
+            name='Already exists',
+            definition="This item already exists",
+            workgroup=self.wg1
+        )
+        # Need to make sure its public
+        self.ra.register(
+            item=self.item_existing,
+            state=models.STATES.standard,
+            user=self.su
+        )
+        
+        self.login_editor()
+        self.assertTrue(self.item_existing.can_view(self.editor))
+        form_data = {
+            self.wizard_form_name+'-current_step': 'initial',
+            'initial-name':"Already exists",
+        }
+        # success!
+
+        response = self.client.post(self.wizard_url, form_data)
+        wizard = response.context['wizard']
+        print(wizard['form'].errors)
+        self.assertTrue(len(wizard['form'].errors.keys()) == 0)
+        self.assertTrue(self.item_existing in response.context['duplicate_items'])
+        
+        # Existing item should show up in the "similar results page"
+        self.assertContains(response, self.item_existing.definition)
+
+    def test_editor_can_make_object__where_item_already_has_similar_details(self):
+        from reversion.revisions import create_revision
+        with create_revision():
+            # Need to wrap this in a revision to make sure the search is updated
+            self.item_existing = self.model.objects.create(
+                name='Almost the same',
+                definition="This item already exists",
+                workgroup=self.wg1
+            )
+            # Need to make sure its public
+            self.ra.register(
+                item=self.item_existing,
+                state=models.STATES.standard,
+                user=self.su
+            )
+        
+        self.login_editor()
+        self.assertTrue(self.item_existing.can_view(self.editor))
+        form_data = {
+            self.wizard_form_name+'-current_step': 'initial',
+            'initial-name':"Already exists",
+        }
+        # success!
+
+        response = self.client.post(self.wizard_url, form_data)
+        wizard = response.context['wizard']
+        self.assertTrue(len(wizard['form'].errors.keys()) == 0)
+        self.assertFalse('duplicate_items' in response.context.keys())
+        
+        self.assertTrue(
+            self.item_existing.pk in [
+                x.object.pk for x in response.context['similar_items']
+            ]
+        )
+        
+        # Existing item should show up in the "similar results page"
+        self.assertContains(response, self.item_existing.definition)
+
+
 class ObjectClassWizardPage(ConceptWizardPage,TestCase):
     model=models.ObjectClass
 class PropertyWizardPage(ConceptWizardPage,TestCase):
     model=models.Property
 class ValueDomainWizardPage(ConceptWizardPage,TestCase):
     model=models.ValueDomain
-#class DataElementWizardPage(ConceptWizardPage,TestCase):
-#    model=models.DataElement
+class DataElementConceptWizardPage(ConceptWizardPage, TestCase):
+    model=models.DataElementConcept
+class DataElementWizardPage(ConceptWizardPage, TestCase):
+    model=models.DataElement
 
 
 class DataElementDerivationWizardPage(ConceptWizardPage,TestCase):
@@ -230,19 +302,20 @@ class DataElementDerivationWizardPage(ConceptWizardPage,TestCase):
         self.assertTrue(self.de1 in item.derives.all())
 
 
-class DataElementConceptWizardPage(ConceptWizardPage,TestCase):
+class DataElementConceptAdvancedWizardPage(HaystackReindexMixin, utils.LoggedInViewPages, TestCase):
     wizard_url_name="createDataElementConcept"
     wizard_form_name="data_element_concept_wizard"
+    model=models.DataElementConcept
+
     @property
     def wizard_url(self):
         return reverse('aristotle:%s'%self.wizard_url_name)
-    def test_editor_can_make_object(self):
-        pass
+
     def test_editor_can_make_object__has_prior_components(self):
         self.login_editor()
         from reversion.revisions import create_revision
         with create_revision():
-            ani = models.ObjectClass.objects.create(name="animagus",definition="my definition",workgroup=self.wg1)
+            ani = models.ObjectClass.objects.create(name="animagus",definition="my animagus definition",workgroup=self.wg1)
             at  = models.Property.objects.create(name="animal type",definition="my definition",workgroup=self.wg1)
 
         step_1_data = {
@@ -253,6 +326,7 @@ class DataElementConceptWizardPage(ConceptWizardPage,TestCase):
         # success!
 
         response = self.client.post(self.wizard_url, step_1_data)
+        self.assertContains(response, ani.definition)
         wizard = response.context['wizard']
         self.assertEqual(response.status_code, 200)
         self.assertEqual(wizard['steps'].current, 'component_results')
@@ -444,14 +518,15 @@ class DataElementConceptWizardPage(ConceptWizardPage,TestCase):
         self.assertRedirects(response,url_slugify_concept(item))
 
 
-class DataElementWizardPage(ConceptWizardPage,TestCase):
+class DataElementAdvancedWizardPage(HaystackReindexMixin, utils.LoggedInViewPages, TestCase):
     wizard_url_name="createDataElement"
     wizard_form_name="data_element_wizard"
+    model=models.DataElement
+
     @property
     def wizard_url(self):
         return reverse('aristotle:%s'%self.wizard_url_name)
-    def test_editor_can_make_object(self):
-        pass
+
     def test_editor_can_make_object__has_prior_components(self):
         self.login_editor()
 
