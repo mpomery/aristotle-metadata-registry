@@ -89,7 +89,7 @@ INSTALLED_APPS = (
     'aristotle_mdr.contrib.slots',
     'aristotle_mdr.contrib.identifiers',
     'aristotle_mdr.contrib.browse',
-    'aristotle_mdr_user_management',
+    'aristotle_mdr.contrib.user_management',
 
     'channels',
     'haystack_channels',
