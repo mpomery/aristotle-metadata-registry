@@ -89,7 +89,7 @@ INSTALLED_APPS = (
     'aristotle_mdr.contrib.slots',
     'aristotle_mdr.contrib.identifiers',
     'aristotle_mdr.contrib.browse',
-    'aristotle_mdr.contrib.user_management',
+    'aristotle_mdr_user_management',
 
     'channels',
     'haystack_channels',
@@ -249,7 +249,7 @@ STATIC_PRECOMPILER_COMPILERS = (
 ORGS_SLUGFIELD = 'autoslug.fields.AutoSlugField'
 
 # User Model
-AUTH_USER_MODEL = 'aristotle_mdr_user_management.User'
+AUTH_USER_MODEL = os.environ.get('AUTH_USER_MODEL', 'aristotle_mdr_user_management.User')
 
 AUTH_PREFIX = 'django.contrib.auth.password_validation.'
 AUTH_PASSWORD_VALIDATORS = [
