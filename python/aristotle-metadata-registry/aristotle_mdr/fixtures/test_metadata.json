@@ -15,7 +15,6 @@
 
       ],
       "password": "pbkdf2_sha256$20000$CJ6ocrxVoXPG$9uoqnqJwKEyV0ZL1rldu6MhIdsANRmJEiCXZ9Alo8FM=",
-      "email": "",
       "date_joined": "2016-05-02T22:23:10.627Z"
     },
     "model": "aristotle_mdr_user_management.user",
@@ -37,7 +36,6 @@
 
       ],
       "password": "pbkdf2_sha256$20000$0nDJOwioyjht$XH+ixugS7lJOAjogazVN2KBBwxWwCfECErYtC0xUhTM=",
-      "email": "",
       "date_joined": "2016-05-02T22:23:10.734Z"
     },
     "model": "aristotle_mdr_user_management.user",
@@ -59,7 +57,6 @@
 
       ],
       "password": "pbkdf2_sha256$20000$F36PABkRVv5h$LuM7HYM07CZpd1Gl4SbFVuz8zH5muC+l\/IrXHBwrz7I=",
-      "email": "",
       "date_joined": "2016-05-02T22:23:10.862Z"
     },
     "model": "aristotle_mdr_user_management.user",
@@ -81,7 +78,6 @@
 
       ],
       "password": "pbkdf2_sha256$20000$39CwEUm8jmck$WXyqDA0xa8wBn1c4H366XVEb9yWCruU8WVupwcg7ILE=",
-      "email": "",
       "date_joined": "2016-05-02T22:23:10.989Z"
     },
     "model": "aristotle_mdr_user_management.user",
@@ -103,7 +99,6 @@
 
       ],
       "password": "pbkdf2_sha256$20000$jv9IDRHZr973$kl+bOg0zYUOUych+KwuQVmjsjoPaQMUYN2PKnqFAV4s=",
-      "email": "",
       "date_joined": "2016-05-02T22:23:11.113Z"
     },
     "model": "aristotle_mdr_user_management.user",
@@ -125,7 +120,6 @@
 
       ],
       "password": "pbkdf2_sha256$20000$5ogyHvSU2Lkj$GIzVYGH2l0KBdSN+7017YKd7H6SENEH3JzXt1+xesxo=",
-      "email": "",
       "date_joined": "2016-05-02T22:23:11.603Z"
     },
     "model": "aristotle_mdr_user_management.user",
