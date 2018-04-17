@@ -3,7 +3,7 @@
 
 <span class="autocomplete-item block" data-value="{{ result.pk|unlocalize }}">
 {% if result.get_full_name %}
-    {{ result.highlight.get_full_name|safe }}
+    {{ result.highlight.full_name|safe }}
     {% if result == request.user %}
     (You)
     {% endif %}
