@@ -124,11 +124,11 @@
                             <i class="fa fa-user-md fa-2x"></i> {% trans 'Admin only' %}
                         </li>
                         <li>
-                            <a class="su_action" href="{% url 'admin:aristotle_mdr_workgroup_add'%}">
+                            <a class="su_action" href="{% url 'aristotle:workgroup_create' %}">
                                 <i class="fa fa-users fa-fw"></i> {% trans 'Workgroup' %}</a>
                         </li>
                         <li>
-                            <a class="su_action" href="{% url 'admin:aristotle_mdr_user_management_user_add' %}">
+                            <a class="su_action" href="{% url 'aristotle-user:registry_invitations_create' %}">
                                 <i class="fa fa-user-plus fa-fw"></i> {% trans 'User' %}
                             </a>
                         </li>
