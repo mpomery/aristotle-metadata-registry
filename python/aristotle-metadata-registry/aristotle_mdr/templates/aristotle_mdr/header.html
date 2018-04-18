@@ -54,7 +54,7 @@
                     {% else %}
                         <i class="fa fa-user fa-lg"></i>
                     {% endif %}
-                    {{ user.get_short_name }}
+                    {% firstof user.get_short_name user.email %}
                 </a>
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="{% url 'aristotle:userHome' %}">
