@@ -1,10 +1,10 @@
 from django.db.models import Q
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.admin.filters import RelatedFieldListFilter
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 import aristotle_mdr.models as MDR
 import aristotle_mdr.forms as MDRForms
@@ -15,6 +15,7 @@ from aristotle_mdr.search_indexes import conceptIndex
 from haystack import indexes
 
 import reversion
+from improved_user.forms import UserChangeForm, UserCreationForm
 
 from aristotle_mdr.register import register_concept
 from aristotle_mdr.utils import fetch_aristotle_settings
@@ -22,6 +23,8 @@ from aristotle_mdr.utils import fetch_aristotle_settings
 reversion.revisions.register(MDR.Status)
 reversion.revisions.register(MDR._concept, follow=['statuses', 'workgroup', 'slots'])
 reversion.revisions.register(MDR.Workgroup)
+
+User = get_user_model()
 
 
 class StatusInline(admin.TabularInline):
@@ -281,6 +284,28 @@ class AristotleProfileInline(admin.StackedInline):
     verbose_name_plural = 'Membership details'
 
 
+class UserAdmin(BaseUserAdmin):
+    """Admin panel for Improved User, mimics Django's default"""
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        (_('Personal info'), {'fields': ('full_name', 'short_name')}),
+        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',
+                                       'groups', 'user_permissions')}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'short_name', 'password1', 'password2'),
+        }),
+    )
+    form = UserChangeForm
+    add_form = UserCreationForm
+    list_display = ('email', 'full_name', 'short_name', 'is_staff')
+    search_fields = ('email', 'full_name', 'short_name')
+    ordering = ('email',)
+
+
 # Define a new User admin
 class AristotleUserAdmin(UserAdmin):
 
@@ -292,7 +317,7 @@ class AristotleUserAdmin(UserAdmin):
     time_since_login.short_description = _('Last login')
 
     inlines = [AristotleProfileInline]
-    list_display = ['username', 'first_name', 'last_name', 'time_since_login', 'date_joined']
+    list_display = ['email', 'full_name', 'short_name', 'time_since_login', 'date_joined']
 
     def save_formset(self, request, form, formset, change):
         super().save_formset(request, form, formset, change)

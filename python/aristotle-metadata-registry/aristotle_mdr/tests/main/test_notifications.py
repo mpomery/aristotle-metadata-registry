@@ -38,7 +38,7 @@ class TestNotifications(utils.LoggedInViewPages, TestCase):
         )
 
     def test_subscriber_is_notified_of_supersede(self):
-        user1 = get_user_model().objects.create_user('subscriber','subscriber')
+        user1 = get_user_model().objects.create_user('subscriber@example.com','subscriber')
         user1.profile.favourites.add(self.item1)
         self.assertTrue(user1.profile in self.item1.favourited_by.all())
 
@@ -55,7 +55,7 @@ class TestNotifications(utils.LoggedInViewPages, TestCase):
         self.assertTrue('favourited item has been superseded' in user1.notifications.first().verb )
 
     def test_subscriber_is_notified_of_supersede_via_deprecate_page(self):
-        user1 = get_user_model().objects.create_user('subscriber','subscriber')
+        user1 = get_user_model().objects.create_user('subscriber@example.com','subscriber')
         user1.profile.favourites.add(self.item1)
         self.assertTrue(user1.profile in self.item1.favourited_by.all())
 

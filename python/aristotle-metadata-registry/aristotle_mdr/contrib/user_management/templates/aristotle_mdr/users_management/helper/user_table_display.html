@@ -1,5 +1,5 @@
 {% if user.get_full_name %}
-    <a href="">{{user.get_full_name}}</a>
+    <a href="">{{ user.get_full_name }}</a>
     {% if user == request.user %}
     (You)
     {% endif %}
@@ -7,7 +7,7 @@
     <div>{{ user.email }}</div>
 {% else %}
     <a href="">
-    {% firstof user.email user.username %}
+    {{ user.email }}
     </a>
     {% if user == request.user %}
     (You)

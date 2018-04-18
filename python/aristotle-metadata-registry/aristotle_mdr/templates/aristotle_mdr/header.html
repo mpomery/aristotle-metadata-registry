@@ -54,7 +54,7 @@
                     {% else %}
                         <i class="fa fa-user fa-lg"></i>
                     {% endif %}
-                    {% firstof user.get_short_name user.get_username %}
+                    {% firstof user.get_short_name user.email %}
                 </a>
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="{% url 'aristotle:userHome' %}">
@@ -128,7 +128,7 @@
                                 <i class="fa fa-users fa-fw"></i> {% trans 'Workgroup' %}</a>
                         </li>
                         <li>
-                            <a class="su_action" href="{% url 'admin:auth_user_add'%}">
+                            <a class="su_action" href="{% url 'admin:aristotle_mdr_user_management_user_add' %}">
                                 <i class="fa fa-user-plus fa-fw"></i> {% trans 'User' %}
                             </a>
                         </li>

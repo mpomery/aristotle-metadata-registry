@@ -4,8 +4,8 @@
 </dt>
 <dd>
     {% with record=item.publicationrecord %}
-    <span>{{record.user.username}}
-    
+    <span>{{record.user.email}}
+
     ({{record.get_visibility_display}})
     </span>
     {% endwith %}

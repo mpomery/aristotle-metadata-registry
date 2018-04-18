@@ -535,7 +535,10 @@ class Workgroup(registryGroup):
 
 class discussionAbstract(TimeStampedModel):
     body = models.TextField()
-    author = models.ForeignKey(settings.AUTH_USER_MODEL)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True
+    )
 
     class Meta:
         abstract = True

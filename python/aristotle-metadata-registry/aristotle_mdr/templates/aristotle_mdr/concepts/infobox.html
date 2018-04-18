@@ -72,8 +72,8 @@
                     </time>
                 {% endif %}
                 {% if request.user.is_superuser or request.user.is_active and item.workgroup in request.user.workgroups %}
-                <span style="display:inline-block">By {% with name=last_edit.revision.user.get_username %}
-                        {% if name %}{{ name }}{% else %}<em title="{% trans 'This may have been added during an import.'%}">{% trans 'Unknown' context "Unknown import user"%}</em>{% endif %}
+                <span style="display:inline-block">By {% with email=last_edit.revision.user.email %}
+                        {% if email %}{{ email }}{% else %}<em title="{% trans 'This may have been added during an import.'%}">{% trans 'Unknown' context "Unknown import user"%}</em>{% endif %}
                         {% endwith %}
                 </span>
                 {% endif %}

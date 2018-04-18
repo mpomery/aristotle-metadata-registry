@@ -10,7 +10,6 @@ from django.db.models import Q
 import datetime
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from django.contrib.auth.models import User
 
 from django.utils.text import slugify
 from aristotle_dse import models as DSE
@@ -44,7 +43,7 @@ def super_intelligent_hueristics(resource,data):
             count = -1
             vd = ValueDomain.objects.create(name="Value Domain for %s"%name, description="Auto-generated", maximum_length=max_length)
             de = DataElement.objects.create(name=name,definition="Auto-generated data element for resource '%s'"%resource['name'],valueDomain=vd)
-            
+
             if 'date' in name.lower() or re.search(r'(_?|\b)dt(\b|_)?', name):
                 # If it has a dt on its own or surrounded by a word boundary or underscore
                 # Probably a date/time, lets hope so
@@ -60,16 +59,16 @@ def super_intelligent_hueristics(resource,data):
                 except:
                     vd.data_type=MDR.DataType.objects.filter(name__icontains='string').first()
                     vd.save()
-            
+
             #elif set(data[1:]) < 15:
-                
-                
+
+
         else:
             count = de.all().count()
             de = de.first()
             print " %s is like %s and %s others" %(name, de.name, count-1)
         data_elements.append([name, de, count])
-    
+
     return data_elements
 
 
@@ -123,7 +122,7 @@ class Command(BaseCommand):
         )
 
     def vprint(self, *args, **kwargs):
-        verbosity = kwargs.pop('verbosity', 0) or kwargs.pop('v', 0) 
+        verbosity = kwargs.pop('verbosity', 0) or kwargs.pop('v', 0)
         std = kwargs.pop('std', 'out')
 
         if self.verbosity >= verbosity:
@@ -221,7 +220,7 @@ class Command(BaseCommand):
             return -1
         ckan = json.loads(ckan.text)
         num_results = int(ckan['result']['count'])
-        
+
         self.vprint("Found this many results -- %s" %(num_results),v = 1)
         num_per_query = 25
         for offset in range(0,num_results, num_per_query):
@@ -256,7 +255,7 @@ class Command(BaseCommand):
             return self.load_ckan_all(force_reload)
         else:
             return self.load_ckan_some(force_reload)
-    
+
         self.vprint("got ckan", v=1)
         self.vprint(ckan.keys(), v=1)
 

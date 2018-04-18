@@ -7,6 +7,8 @@ from django.core.exceptions import ValidationError
 from aristotle_mdr.forms.utils import FormRequestMixin
 from aristotle_mdr.utils import fetch_aristotle_settings
 
+from organizations.backends.forms import UserRegistrationForm
+
 
 class UserInvitationForm(FormRequestMixin, forms.Form):
     email_list = forms.CharField(
@@ -37,3 +39,14 @@ class UserInvitationForm(FormRequestMixin, forms.Form):
         self.cleaned_data['email_list'] = "\n".join(emails)
 
         self.emails = emails
+
+
+class AristotleUserRegistrationForm(UserRegistrationForm):
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.fields.pop('first_name')
+        self.fields.pop('last_name')
+        self.initial.pop('username')
