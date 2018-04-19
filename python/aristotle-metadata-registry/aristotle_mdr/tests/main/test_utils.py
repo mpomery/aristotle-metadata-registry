@@ -30,8 +30,8 @@ class UtilsTests(TestCase):
     def test_get_aristotle_url(self):
 
         user = get_user_model().objects.create(
-            username='user',
-            password='user'
+            email='user@example.com',
+            password='verysecure'
         )
 
         item = models.ObjectClass.objects.create(name="tname",definition="my definition",submitter=None)

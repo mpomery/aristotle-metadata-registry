@@ -12,7 +12,7 @@
 <h1>
 Change user roles in
 <em><a href="{% url 'aristotle:registrationauthority_details' item.id %}">{{item.name}}</a></em>
-for user <em>"{% firstof user_to_change.get_full_name user_to_change.email user_to_change.username %}"</em>
+for user <em>"{% firstof user_to_change.get_full_name user_to_change.email %}"</em>
 </h1>
 {% endif %}
 <div class="modal-body">

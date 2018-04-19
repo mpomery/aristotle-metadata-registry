@@ -20,7 +20,7 @@ class AdminPage(utils.LoggedInViewPages,TestCase):
         super().setUp()
 
     def test_workgroup_list(self):
-        new_editor = get_user_model().objects.create_user('new_eddie','','editor')
+        new_editor = get_user_model().objects.create_user('new_eddie@example.com','editor')
         new_editor.is_staff=True
         new_editor.save()
 
@@ -49,7 +49,7 @@ class AdminPage(utils.LoggedInViewPages,TestCase):
         self.assertTrue(wg_nw in new_editor.profile.editable_workgroups.all())
 
         self.logout()
-        response = self.client.post(reverse('friendly_login'), {'username': 'new_eddie', 'password': 'editor'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'new_eddie@example.com', 'password': 'editor'})
         self.assertEqual(response.status_code,302)
 
         t = models.ObjectClass
@@ -83,16 +83,16 @@ class AdminPage(utils.LoggedInViewPages,TestCase):
     def test_su_can_view_users_list(self):
         self.login_superuser()
         response = self.client.get(
-            reverse('admin:%s_%s_changelist' % ('auth','user')),
+            reverse('admin:%s_%s_changelist' % ('aristotle_mdr_user_management','user')),
         )
         self.assertContains(response,'Last login')
 
     def test_su_can_add_new_user(self):
         self.login_superuser()
         response = self.client.post(
-            reverse("admin:auth_user_add"),
+            reverse("admin:aristotle_mdr_user_management_user_add"),
             {
-                'username':"newuser",'password1':"test",'password2':"test",
+                'email':"newuser@example.com",'password1':"test",'password2':"test",
                 'profile-TOTAL_FORMS': 1, 'profile-INITIAL_FORMS': 0, 'profile-MAX_NUM_FORMS': 1,
                 'profile-0-workgroup_manager_in': [self.wg1.id],
                 'profile-0-steward_in': [self.wg1.id],
@@ -104,7 +104,7 @@ class AdminPage(utils.LoggedInViewPages,TestCase):
             }
         )
         self.assertResponseStatusCodeEqual(response,302)
-        new_user = get_user_model().objects.get(username='newuser')
+        new_user = get_user_model().objects.get(email='newuser@example.com')
         self.assertEqual(new_user.profile.workgroups.count(),1)
         self.assertEqual(new_user.profile.workgroups.first(),self.wg1)
         self.assertEqual(new_user.profile.registrarAuthorities.count(),1)
@@ -123,14 +123,14 @@ class AdminPage(utils.LoggedInViewPages,TestCase):
         self.assertEqual(new_user.registrar_in.first(),self.ra)
 
         response = self.client.post(
-            reverse("admin:auth_user_add"),
+            reverse("admin:aristotle_mdr_user_management_user_add"),
             {
-                'username':"newuser_with_none",'password1':"test",'password2':"test",
+                'email':"newuser_with_none@example.com",'password1':"test",'password2':"test",
                 'profile-TOTAL_FORMS': 1, 'profile-INITIAL_FORMS': 0, 'profile-MAX_NUM_FORMS': 1,
             }
         )
         self.assertResponseStatusCodeEqual(response,302)
-        new_user = get_user_model().objects.get(username='newuser_with_none')
+        new_user = get_user_model().objects.get(email='newuser_with_none@example.com')
         self.assertEqual(new_user.profile.workgroups.count(),0)
         self.assertEqual(new_user.profile.registrarAuthorities.count(),0)
         for rel in [new_user.workgroup_manager_in,

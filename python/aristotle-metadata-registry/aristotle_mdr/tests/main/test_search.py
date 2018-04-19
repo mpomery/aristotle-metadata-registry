@@ -32,7 +32,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         self.ra = models.RegistrationAuthority.objects.create(name="Kelly Act")
         self.ra1 = models.RegistrationAuthority.objects.create(name="Superhuman Registration Act") # Anti-registration!
-        self.registrar = get_user_model().objects.create_user('stryker','william.styker@weaponx.mil','mutantsMustDie')
+        self.registrar = get_user_model().objects.create_user('william.styker@weaponx.mil','mutantsMustDie')
         self.ra.giveRoleToUser('registrar',self.registrar)
         self.assertTrue(perms.user_is_registrar(self.registrar,self.ra))
         xmen = "professorX cyclops iceman angel beast phoenix wolverine storm nightcrawler"
@@ -124,7 +124,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
     def test_registrar_search_has_valid_facets(self):
         response = self.client.post(reverse('friendly_login'),
-                    {'username': 'stryker', 'password': 'mutantsMustDie'})
+                    {'username': 'william.styker@weaponx.mil', 'password': 'mutantsMustDie'})
 
         self.assertEqual(response.status_code,302) # logged in
 
@@ -144,7 +144,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertNotContains(response, 'Add Favourite')
 
         response = self.client.post(reverse('friendly_login'),
-                    {'username': 'stryker', 'password': 'mutantsMustDie'})
+                    {'username': 'william.styker@weaponx.mil', 'password': 'mutantsMustDie'})
 
         self.assertEqual(response.status_code,302) # logged in
 
@@ -162,7 +162,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
     def test_registrar_search_after_adding_new_status_request(self):
         self.logout()
         response = self.client.post(reverse('friendly_login'),
-                    {'username': 'stryker', 'password': 'mutantsMustDie'})
+                    {'username': 'william.styker@weaponx.mil', 'password': 'mutantsMustDie'})
 
         steve_rogers = models.ObjectClass.objects.get(name="captainAmerica")
         self.assertFalse(perms.user_can_view(self.registrar,steve_rogers))
@@ -192,11 +192,11 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
     def test_workgroup_member_search(self):
         self.logout()
-        self.viewer = get_user_model().objects.create_user('charles.xavier','charles@schoolforgiftedyoungsters.edu','equalRightsForAll')
+        self.viewer = get_user_model().objects.create_user('charles@schoolforgiftedyoungsters.edu','equalRightsForAll')
         self.weaponx_wg = models.Workgroup.objects.create(name="WeaponX")
 
         response = self.client.post(reverse('friendly_login'),
-                    {'username': 'charles.xavier', 'password': 'equalRightsForAll'})
+                    {'username': 'charles@schoolforgiftedyoungsters.edu', 'password': 'equalRightsForAll'})
 
         self.assertEqual(response.status_code,302) # logged in
 
@@ -256,9 +256,9 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
     def test_workgroup_member_search_has_valid_facets(self):
         self.logout()
-        self.viewer = get_user_model().objects.create_user('charles.xavier','charles@schoolforgiftedyoungsters.edu','equalRightsForAll')
+        self.viewer = get_user_model().objects.create_user('charles@schoolforgiftedyoungsters.edu','equalRightsForAll')
         response = self.client.post(reverse('friendly_login'),
-                    {'username': 'charles.xavier', 'password': 'equalRightsForAll'})
+                    {'username': 'charles@schoolforgiftedyoungsters.edu', 'password': 'equalRightsForAll'})
 
         self.assertEqual(response.status_code,302) # logged in
 
@@ -266,7 +266,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.weaponx_wg = models.Workgroup.objects.create(name="WeaponX")
 
         response = self.client.post(reverse('friendly_login'),
-                    {'username': 'charles.xavier', 'password': 'equalRightsForAll'})
+                    {'username': 'charles@schoolforgiftedyoungsters.edu', 'password': 'equalRightsForAll'})
 
         self.assertEqual(response.status_code,302) # logged in
 
@@ -296,7 +296,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         # See issue #327
         self.logout()
         response = self.client.post(reverse('friendly_login'),
-                    {'username': 'stryker', 'password': 'mutantsMustDie'})
+                    {'username': 'william.styker@weaponx.mil', 'password': 'mutantsMustDie'})
 
         self.assertEqual(response.status_code,302) # logged in
         self.assertTrue(perms.user_is_registrar(self.registrar,self.ra))
@@ -341,7 +341,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         self.assertNotContains(response, 'Restriction')
 
         response = self.client.post(reverse('friendly_login'),
-                    {'username': 'stryker', 'password': 'mutantsMustDie'})
+                    {'username': 'william.styker@weaponx.mil', 'password': 'mutantsMustDie'})
 
         self.assertEqual(response.status_code,302) # logged in
         self.assertTrue(perms.user_is_registrar(self.registrar,self.ra))
@@ -669,10 +669,10 @@ class TestTokenSearch(TestCase):
         import haystack
         haystack.connections.reload('default')
 
-        self.su = get_user_model().objects.create_superuser('super','','user')
+        self.su = get_user_model().objects.create_superuser('super@example.com','user')
 
         self.ra = models.RegistrationAuthority.objects.create(name="Kelly Act")
-        self.registrar = get_user_model().objects.create_user('stryker','william.styker@weaponx.mil','mutantsMustDie')
+        self.registrar = get_user_model().objects.create_user('william.styker@weaponx.mil','mutantsMustDie')
         self.ra.giveRoleToUser('registrar',self.registrar)
         xmen = "wolverine professorX cyclops iceman angel beast phoenix storm nightcrawler"
         self.xmen_wg = models.Workgroup.objects.create(name="X Men")

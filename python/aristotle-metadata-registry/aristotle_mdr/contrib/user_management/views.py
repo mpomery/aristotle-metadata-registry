@@ -19,13 +19,12 @@ class RegistryOwnerUserList(LoginRequiredMixin, PermissionRequiredMixin, ListVie
     def get_queryset(self):
         q = self.request.GET.get('q', None)
         queryset = get_user_model().objects.all().order_by(
-            '-is_active', 'first_name', 'last_name', 'email', 'username'
+            '-is_active', 'full_name', 'short_name', 'email'
         )
         if q:
             queryset = queryset.filter(
-                Q(username__icontains=q) |
-                Q(first_name__icontains=q) |
-                Q(last_name__icontains=q) |
+                Q(short_name__icontains=q) |
+                Q(full_name__icontains=q) |
                 Q(email__icontains=q)
             )
         return queryset

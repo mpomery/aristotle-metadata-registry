@@ -20,7 +20,7 @@ class CachingForRawPermissions(TestCase):
         self.wg = models.Workgroup.objects.create(name="Test WG 1")
         self.wg.registrationAuthorities=[self.ra]
         self.wg.save()
-        self.submitter = get_user_model().objects.create_user('suzie', '', 'submitter')
+        self.submitter = get_user_model().objects.create_user('suzie@example.com', 'submitter')
         self.wg.submitters.add(self.submitter)
         self.item = models.ObjectClass.objects.create(name="Test OC1", workgroup=self.wg)
 
@@ -44,7 +44,7 @@ class CachingForRawPermissions(TestCase):
         self.assertFalse(perms.user_can_edit(self.submitter, self.item))
 
     def test_can_view_cache(self):
-        self.viewer = get_user_model().objects.create_user('vicky', '', 'viewer')  # Don't need to assign any workgroups
+        self.viewer = get_user_model().objects.create_user('vicky@example.com', 'viewer')  # Don't need to assign any workgroups
 
         self.assertTrue(perms.user_can_view(self.submitter, self.item))
         self.assertFalse(perms.user_can_view(self.viewer, self.item))

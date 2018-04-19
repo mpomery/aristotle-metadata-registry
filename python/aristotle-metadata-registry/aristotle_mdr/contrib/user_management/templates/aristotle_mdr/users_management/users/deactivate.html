@@ -2,19 +2,19 @@
 {% load compile_static i18n %}
 {% load aristotle_tags %}
 
-{% block title %}Deactivate user {% firstof deactivate_user.get_full_name deactivate_user.email deactivate_user.username %}{% endblock %}
+{% block title %}Deactivate user {% firstof deactivate_user.get_full_name  deactivate_user.email %}{% endblock %}
 {% block content %}
 <form method="post" action="{% url 'aristotle-user:deactivate_user' deactivate_user.pk %}">{% csrf_token %}
     <div class="modal-header">
-       <header class="modal-title">Deactivate user - {% firstof deactivate_user.get_full_name deactivate_user.email deactivate_user.username %}</header>
+       <header class="modal-title">Deactivate user - {% firstof deactivate_user.get_full_name  deactivate_user.email %}</header>
     </div>
     <div class="modal-body">
       <p>
         <strong>
         You are about to deactivate the account of
-          <em>{% firstof deactivate_user.get_full_name deactivate_user.email deactivate_user.username %}</em>
+          <em>{% firstof deactivate_user.get_full_name  deactivate_user.email %}</em>
         on this registry.
-        </strong> 
+        </strong>
         <ul>
         <li>
         This will deactivate their account and remove all roles in this registry,

@@ -2,6 +2,8 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.forms.models import ModelMultipleChoiceField
+from django.contrib.auth import get_user_model
+from django.forms import ModelForm
 
 from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 from aristotle_mdr.widgets.widgets import TableCheckboxSelect
@@ -16,14 +18,6 @@ from django.forms.models import modelformset_factory
 from django.urls import reverse
 
 from .utils import RegistrationAuthorityMixin
-
-
-class UserSelfEditForm(forms.Form):
-    template = "aristotle_mdr/userEdit.html"
-
-    first_name = forms.CharField(required=False, label=_('First Name'))
-    last_name = forms.CharField(required=False, label=_('Last Name'))
-    email = forms.EmailField(required=False, label=_('Email Address'))
 
 
 # For stating that an item deprecates other items.
@@ -207,6 +201,17 @@ class CompareConceptsForm(forms.Form):
             required=True,
             widget=widgets.ConceptAutocompleteSelect()
         )
+
+
+class EditUserForm(ModelForm):
+
+    class Meta:
+
+        model = get_user_model()
+        fields = ('email', 'full_name', 'short_name')
+        labels = {
+            'short_name': 'Display Name'
+        }
 
 
 # ------------ Form Fields ------------

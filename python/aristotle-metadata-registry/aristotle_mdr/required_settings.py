@@ -247,3 +247,17 @@ STATIC_PRECOMPILER_COMPILERS = (
 )
 
 ORGS_SLUGFIELD = 'autoslug.fields.AutoSlugField'
+
+# User Model
+AUTH_USER_MODEL = 'aristotle_mdr_user_management.User'
+
+AUTH_PREFIX = 'django.contrib.auth.password_validation.'
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': AUTH_PREFIX + 'UserAttributeSimilarityValidator',
+        'OPTIONS': {
+            'user_attributes': ('email', 'full_name', 'short_name')
+        },
+    },
+    # include other password validators here
+]

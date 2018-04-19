@@ -111,9 +111,8 @@ class UserAutocomplete(GenericAutocomplete):
 
         if self.q:
             qs = self.model.objects.filter(is_active=True).filter(
-                Q(username__icontains=self.q) |
                 Q(email__icontains=self.q) |
-                Q(first_name__icontains=self.q) | Q(last_name__icontains=self.q)
+                Q(short_name__icontains=self.q) | Q(full_name__icontains=self.q)
             )
         else:
             if self.request.user.is_superuser:
@@ -128,7 +127,7 @@ class UserAutocomplete(GenericAutocomplete):
 
         template = get_template(self.template_name)
         result.highlight = {}
-        for f in ['username', 'email', 'get_full_name']:
+        for f in ['email', 'full_name']:
             field = getattr(result, f, None)
             if callable(field):
                 field = field()

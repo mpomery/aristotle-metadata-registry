@@ -782,7 +782,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         self.login_viewer()
         self.assertTrue(perms.user_can_view(self.viewer,self.item1))
 
-        response = self.client.post(reverse('friendly_login'), {'username': 'vicky', 'password': 'viewer'})
+        response = self.client.post(reverse('friendly_login'), {'username': 'vicky@example.com', 'password': 'viewer'})
         self.assertEqual(response.status_code,302)
         self.assertEqual(self.viewer.profile.favourites.count(),0)
 

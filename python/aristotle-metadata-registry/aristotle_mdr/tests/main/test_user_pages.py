@@ -170,8 +170,8 @@ class UserHomePages(utils.LoggedInViewPages, TestCase):
         new_email = 'my_new@email.com'
         response = self.client.post(reverse('aristotle:userEdit'),
             {
-                'first_name':self.viewer.first_name,
-                'last_name':self.viewer.last_name,
+                'short_name':self.viewer.short_name,
+                'full_name':self.viewer.full_name,
                 'email': new_email,
             })
         self.assertEqual(response.status_code,302)

@@ -2,7 +2,7 @@ import datetime
 from django.apps import apps
 from django.contrib.auth.decorators import login_required
 from braces.views import LoginRequiredMixin
-from django.contrib.auth.views import login
+from django.contrib.auth.views import LoginView
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
@@ -21,14 +21,20 @@ from aristotle_mdr.utils import get_aristotle_url
 import json
 
 
-def friendly_redirect_login(request):
-    if request.user.is_authenticated():
-        if 'next' in request.GET:
-            return HttpResponseRedirect(request.GET.get('next'))
-        else:
-            return HttpResponseRedirect(reverse('aristotle:userHome'))
-    else:
-        return login(request)
+class FriendlyLoginView(LoginView):
+
+    template_name='aristotle_mdr/friendly_login.html'
+    redirect_field_name = 'next'
+    redirect_authenticated_user = True
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        if self.request.GET.get('welcome', '') == 'true':
+            context.update({'welcome': True})
+
+        return context
 
 
 @login_required
@@ -244,7 +250,7 @@ def get_cached_object_count(model_type):
 class EditView(LoginRequiredMixin, UpdateView):
 
     template_name = "aristotle_mdr/user/userEdit.html"
-    fields = ['first_name', 'last_name', 'email']
+    form_class = MDRForms.EditUserForm
 
     def get_object(self, querySet=None):
         return self.request.user
