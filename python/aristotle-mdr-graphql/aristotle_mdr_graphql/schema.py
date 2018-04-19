@@ -1,3 +1,4 @@
+import graphene
 from graphene import relay
 from graphene_django.types import DjangoObjectType
 from graphene_django import DjangoFilterConnectionField
@@ -13,3 +14,5 @@ class ConecptNode(DjangoObjectType):
 class Query(object):
 
     all_metadata = DjangoFilterConnectionField(ContentType)
+
+schema = graphene.Schema(query=Query)
