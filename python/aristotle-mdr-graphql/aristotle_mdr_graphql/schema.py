@@ -1,18 +1,22 @@
 import graphene
 from graphene import relay
 from graphene_django.types import DjangoObjectType
-from graphene_django import DjangoFilterConnectionField
+from graphene_django.filter import DjangoFilterConnectionField
 
 from aristotle_mdr import models as mdr_models
 
-class ConecptNode(DjangoObjectType):
+class ConceptNode(DjangoObjectType):
 
     class Meta:
         model = mdr_models._concept
         interfaces = (relay.Node, )
+        filter_fields = '__all__'
 
 class Query(object):
 
-    all_metadata = DjangoFilterConnectionField(ContentType)
+    all_metadata = DjangoFilterConnectionField(ConceptNode)
 
-schema = graphene.Schema(query=Query)
+class AristotleQuery(Query, graphene.ObjectType):
+    pass
+
+schema = graphene.Schema(query=AristotleQuery)
