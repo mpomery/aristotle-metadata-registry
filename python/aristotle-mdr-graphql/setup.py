@@ -28,7 +28,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
     install_requires = [
-        'graphene-django>2',
+        'graphene-django>=2.0.0',
         'django-filter'
     ]
 
