@@ -4,6 +4,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 from aristotle_mdr import models as mdr_models
 from django.db import models
 import django_filters
+from aristotle_mdr_graphql.fields import AristotleFilterConnectionField
 
 class ConceptNode(DjangoObjectType):
 
@@ -11,6 +12,21 @@ class ConceptNode(DjangoObjectType):
         model = mdr_models._concept
         interfaces = (relay.Node, )
         filter_fields = '__all__'
+
+    @classmethod
+    def get_node(cls, info, id):
+
+        print("The info is {0}".format(info))
+        return None
+
+        try:
+            metaitem = cls._meta.model.objects.get(id=id)
+        except cls._meta.model.DoesNotExist:
+            return None
+
+        print("The user requesting this is {0}".format(context.user))
+
+        return None
 
 
 class WorkgroupNode(DjangoObjectType):
@@ -176,7 +192,7 @@ class DataElementDerivationNode(DjangoObjectType):
 class Query(object):
 
     metadata = DjangoFilterConnectionField(ConceptNode)
-    #metadata = relay.Node.Field(ConceptNode)
+    meta = relay.Node.Field(ConceptNode)
     workgroups = DjangoFilterConnectionField(WorkgroupNode)
     organizations = DjangoFilterConnectionField(OrganizationNode)
     registration_authorities = DjangoFilterConnectionField(RegistrationAuthorityNode)
@@ -190,6 +206,6 @@ class Query(object):
     data_types = DjangoFilterConnectionField(DataTypeNode)
     conceptual_domains = DjangoFilterConnectionField(ConceptualDomainNode)
     value_domains = DjangoFilterConnectionField(ValueDomainNode)
-    data_element_concepts = DjangoFilterConnectionField(DataElementConceptNode)
-    data_elements = DjangoFilterConnectionField(DataElementNode)
+    data_element_concepts = AristotleFilterConnectionField(DataElementConceptNode)
+    data_elements = AristotleFilterConnectionField(DataElementNode)
     data_element_derivations = DjangoFilterConnectionField(DataElementDerivationNode)
