@@ -2,6 +2,8 @@ from graphene import relay
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from aristotle_mdr import models as mdr_models
+from django.db import models
+import django_filters
 
 class ConceptNode(DjangoObjectType):
 
@@ -35,20 +37,20 @@ class RegistrationAuthorityNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class DiscussionPostNode(DjangoObjectType):
-
-    class Meta:
-        model=mdr_models.DiscussionPost
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
-
-
-class DiscussionCommentNode(DjangoObjectType):
-
-    class Meta:
-        model=mdr_models.DiscussionComment
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
+# class DiscussionPostNode(DjangoObjectType):
+#
+#     class Meta:
+#         model=mdr_models.DiscussionPost
+#         interfaces=interfaces = (relay.Node, )
+#         filter_fields = '__all__'
+#
+#
+# class DiscussionCommentNode(DjangoObjectType):
+#
+#     class Meta:
+#         model=mdr_models.DiscussionComment
+#         interfaces=interfaces = (relay.Node, )
+#         filter_fields = '__all__'
 
 
 class ReviewRequestNode(DjangoObjectType):
@@ -178,10 +180,9 @@ class Query(object):
     workgroups = DjangoFilterConnectionField(WorkgroupNode)
     organizations = DjangoFilterConnectionField(OrganizationNode)
     registration_authorities = DjangoFilterConnectionField(RegistrationAuthorityNode)
-    discussion_posts = DjangoFilterConnectionField(DiscussionPostNode)
-    discussion_comments = DjangoFilterConnectionField(DiscussionCommentNode)
+    #discussion_posts = DjangoFilterConnectionField(DiscussionPostNode)
+    #discussion_comments = DjangoFilterConnectionField(DiscussionCommentNode)
     review_requests = DjangoFilterConnectionField(ReviewRequestNode)
-    status = DjangoFilterConnectionField(StatusNode)
     object_classes = DjangoFilterConnectionField(ObjectClassNode)
     properties = DjangoFilterConnectionField(PropertyNode)
     measures = DjangoFilterConnectionField(MeasureNode)
@@ -189,8 +190,6 @@ class Query(object):
     data_types = DjangoFilterConnectionField(DataTypeNode)
     conceptual_domains = DjangoFilterConnectionField(ConceptualDomainNode)
     value_domains = DjangoFilterConnectionField(ValueDomainNode)
-    permissible_values = DjangoFilterConnectionField(PermissibleValueNode)
-    supplementary_values = DjangoFilterConnectionField(SupplementaryValueNode)
     data_element_concepts = DjangoFilterConnectionField(DataElementConceptNode)
     data_elements = DjangoFilterConnectionField(DataElementNode)
     data_element_derivations = DjangoFilterConnectionField(DataElementDerivationNode)
