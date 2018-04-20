@@ -10,7 +10,7 @@
 {% block content %}
 <div class="jumbotron">
   <div class="container">
-    <p>
+    <p class="text-center">
     The Aristotle Metadata API provides direct access to metadata using a versioned REST API.
     </p>
   </div>
@@ -22,8 +22,12 @@ The following versions of the API are available on this server:
   <li class="list-group-item">
     <strong><a href='{% url "aristotle_api_root" %}/v3'>API v3</a></strong>
     <p>
-      Version 3 replaced database identifiers with UUIDs as the primary method for
-      identifiying metadata.
+      About Version 3:
+      <ul>
+      <li>replaced database identifiers with UUIDs as the primary method for
+        identifiying metadata.</li>
+      <li>Added the <code>/about/</code> route to give basic public details about the registry</li>
+      </ul>
     </p>
     <a href='{% url "aristotle_api_root" %}/v2/schemas'>View the schema for the v3 endpoint</a>
   </li>
