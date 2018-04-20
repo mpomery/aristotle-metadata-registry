@@ -2,6 +2,7 @@ from django.conf.urls import include, url
 from rest_framework.documentation import include_docs_urls
 from rest_framework_swagger.views import get_swagger_view
 from django.utils.module_loading import import_string
+from .views import APIRootView
 
 import re
 
@@ -31,11 +32,10 @@ urlpatterns = [
     url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
     # url(r'^docs/', include_docs_urls(title=API_TITLE, description=API_DESCRIPTION)),
 
-    url(r'^(?P<version>(v1|v2|v3)?)/schemas/', version_schema),
+    url(r'^(?P<version>(v2|v3)?)/schemas/', version_schema),
     url(r'^schemas/', get_swagger_view(title='Aristotle API')),
+    url(r'^$', APIRootView.as_view(), name="aristotle_api_root"),
 
-    url(r'^v1/', include('aristotle_mdr_api.v1.urls', namespace='aristotle_mdr_api.v1')),
     url(r'^v2/', include('aristotle_mdr_api.v2.urls', namespace='aristotle_mdr_api.v2')),
     url(r'^v3/', include('aristotle_mdr_api.v3.urls', namespace='aristotle_mdr_api.v3')),
-    # url(r'^edge/', include('aristotle_mdr_api.v3.urls', namespace='aristotle_mdr_api.v3')),
 ]
