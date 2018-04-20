@@ -1,15 +1,7 @@
-import graphene
 from graphene import relay
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
-
 from aristotle_mdr import models as mdr_models
-
-# class BaseMeta:
-#     model = mdr_models._concept
-#     interfaces = (relay.Node, )
-#     filter_fields = '__all__'
-
 
 class ConceptNode(DjangoObjectType):
 
@@ -184,8 +176,21 @@ class Query(object):
     metadata = DjangoFilterConnectionField(ConceptNode)
     #metadata = relay.Node.Field(ConceptNode)
     workgroups = DjangoFilterConnectionField(WorkgroupNode)
-
-class AristotleQuery(Query, graphene.ObjectType):
-    pass
-
-schema = graphene.Schema(query=AristotleQuery)
+    organizations = DjangoFilterConnectionField(OrganizationNode)
+    registration_authorities = DjangoFilterConnectionField(RegistrationAuthorityNode)
+    discussion_posts = DjangoFilterConnectionField(DiscussionPostNode)
+    discussion_comments = DjangoFilterConnectionField(DiscussionCommentNode)
+    review_requests = DjangoFilterConnectionField(ReviewRequestNode)
+    status = DjangoFilterConnectionField(StatusNode)
+    object_classes = DjangoFilterConnectionField(ObjectClassNode)
+    properties = DjangoFilterConnectionField(PropertyNode)
+    measures = DjangoFilterConnectionField(MeasureNode)
+    unit_of_measures = DjangoFilterConnectionField(UnitOfMeasureNode)
+    data_types = DjangoFilterConnectionField(DataTypeNode)
+    conceptual_domains = DjangoFilterConnectionField(ConceptualDomainNode)
+    value_domains = DjangoFilterConnectionField(ValueDomainNode)
+    permissible_values = DjangoFilterConnectionField(PermissibleValueNode)
+    supplementary_values = DjangoFilterConnectionField(SupplementaryValueNode)
+    data_element_concepts = DjangoFilterConnectionField(DataElementConceptNode)
+    data_elements = DjangoFilterConnectionField(DataElementNode)
+    data_element_derivations = DjangoFilterConnectionField(DataElementDerivationNode)

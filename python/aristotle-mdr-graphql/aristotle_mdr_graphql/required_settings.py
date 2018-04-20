@@ -1,3 +1,3 @@
 GRAPHENE = {
-    'SCHEMA': 'aristotle_mdr_graphql.schema'
+    'SCHEMA': 'aristotle_mdr_graphql.schema.schema'
 }
