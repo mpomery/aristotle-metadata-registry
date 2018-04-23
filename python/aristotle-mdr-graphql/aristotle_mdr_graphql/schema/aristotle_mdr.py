@@ -7,12 +7,12 @@ from aristotle_mdr import models as mdr_models
 from django.db import models
 import django_filters
 from aristotle_mdr_graphql.fields import AristotleFilterConnectionField
-from django.db.models import Model
+from aristotle_mdr_graphql.types import AristotleObjectType
 
 import logging
 logger = logging.getLogger(__name__)
 
-class ConceptNode(DjangoObjectType):
+class ConceptNode(AristotleObjectType):
 
     class Meta:
         model = mdr_models._concept
@@ -20,7 +20,7 @@ class ConceptNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class WorkgroupNode(DjangoObjectType):
+class WorkgroupNode(AristotleObjectType):
 
     class Meta:
         model = mdr_models.Workgroup
@@ -28,7 +28,7 @@ class WorkgroupNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class OrganizationNode(DjangoObjectType):
+class OrganizationNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.Organization
@@ -36,7 +36,7 @@ class OrganizationNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class RegistrationAuthorityNode(DjangoObjectType):
+class RegistrationAuthorityNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.RegistrationAuthority
@@ -44,7 +44,7 @@ class RegistrationAuthorityNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-# class DiscussionPostNode(DjangoObjectType):
+# class DiscussionPostNode(AristotleObjectType):
 #
 #     class Meta:
 #         model=mdr_models.DiscussionPost
@@ -52,7 +52,7 @@ class RegistrationAuthorityNode(DjangoObjectType):
 #         filter_fields = '__all__'
 #
 #
-# class DiscussionCommentNode(DjangoObjectType):
+# class DiscussionCommentNode(AristotleObjectType):
 #
 #     class Meta:
 #         model=mdr_models.DiscussionComment
@@ -60,7 +60,7 @@ class RegistrationAuthorityNode(DjangoObjectType):
 #         filter_fields = '__all__'
 
 
-class ReviewRequestNode(DjangoObjectType):
+class ReviewRequestNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.ReviewRequest
@@ -68,7 +68,7 @@ class ReviewRequestNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class StatusNode(DjangoObjectType):
+class StatusNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.Status
@@ -76,7 +76,7 @@ class StatusNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class ObjectClassNode(DjangoObjectType):
+class ObjectClassNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.ObjectClass
@@ -84,7 +84,7 @@ class ObjectClassNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class PropertyNode(DjangoObjectType):
+class PropertyNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.Property
@@ -92,7 +92,7 @@ class PropertyNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class MeasureNode(DjangoObjectType):
+class MeasureNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.Measure
@@ -100,7 +100,7 @@ class MeasureNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class UnitOfMeasureNode(DjangoObjectType):
+class UnitOfMeasureNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.UnitOfMeasure
@@ -108,7 +108,7 @@ class UnitOfMeasureNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class DataTypeNode(DjangoObjectType):
+class DataTypeNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.DataType
@@ -116,7 +116,7 @@ class DataTypeNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class ConceptualDomainNode(DjangoObjectType):
+class ConceptualDomainNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.ConceptualDomain
@@ -124,7 +124,7 @@ class ConceptualDomainNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class ValueMeaningNode(DjangoObjectType):
+class ValueMeaningNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.ValueMeaning
@@ -132,7 +132,7 @@ class ValueMeaningNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class ValueDomainNode(DjangoObjectType):
+class ValueDomainNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.ValueDomain
@@ -140,7 +140,7 @@ class ValueDomainNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class PermissibleValueNode(DjangoObjectType):
+class PermissibleValueNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.PermissibleValue
@@ -148,7 +148,7 @@ class PermissibleValueNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class SupplementaryValueNode(DjangoObjectType):
+class SupplementaryValueNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.SupplementaryValue
@@ -156,42 +156,23 @@ class SupplementaryValueNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-class DataElementConceptNode(DjangoObjectType):
+class DataElementConceptNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.DataElementConcept
         interfaces=interfaces = (relay.Node, )
         filter_fields = '__all__'
 
-def aristotle_resolver(source, info, **args):
 
-    name = info.field_name
-    property = getattr(source, name, None)
-    if callable(property):
-        retprop = property()
-    else:
-        retprop = property
-
-    if isinstance(retprop, Model):
-
-        if retprop.can_view(info.context.user):
-            return retprop
-        else:
-            return None
-
-    return retprop
-
-class DataElementNode(DjangoObjectType):
-
-    dataElementConcept = Field(DataElementConceptNode, required=False, resolver=aristotle_resolver)
+class DataElementNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.DataElement
         interfaces=interfaces = (relay.Node, )
-        filter_fields = ['name', 'uuid', 'dataElementConcept']
+        filter_fields = '__all__'
 
 
-class DataElementDerivationNode(DjangoObjectType):
+class DataElementDerivationNode(AristotleObjectType):
 
     class Meta:
         model=mdr_models.DataElementDerivation
