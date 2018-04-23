@@ -19,21 +19,6 @@ class ConceptNode(DjangoObjectType):
         interfaces = (relay.Node, )
         filter_fields = '__all__'
 
-    @classmethod
-    def get_node(cls, info, id):
-
-        print("The info is {0}".format(info))
-        return None
-
-        try:
-            metaitem = cls._meta.model.objects.get(id=id)
-        except cls._meta.model.DoesNotExist:
-            return None
-
-        print("The user requesting this is {0}".format(context.user))
-
-        return None
-
 
 class WorkgroupNode(DjangoObjectType):
 
@@ -179,12 +164,8 @@ class DataElementConceptNode(DjangoObjectType):
         filter_fields = '__all__'
 
 def aristotle_resolver(source, info, **args):
-    logger.debug('source type is {}'.format(type(source)))
-    logger.debug('info is {}'.format(info))
-    logger.debug('args are {}'.format(args))
-    logger.debug('context is {}'.format(info.context))
+
     name = info.field_name
-    logger.debug('name is {}'.format(name))
     property = getattr(source, name, None)
     if callable(property):
         retprop = property()
@@ -192,7 +173,7 @@ def aristotle_resolver(source, info, **args):
         retprop = property
 
     if isinstance(retprop, Model):
-        logger.debug('its a model')
+
         if retprop.can_view(info.context.user):
             return retprop
         else:
@@ -218,53 +199,9 @@ class DataElementDerivationNode(DjangoObjectType):
         filter_fields = '__all__'
 
 
-def decs_qs(request):
-
-    if request is None:
-        logger.debug('returning the none one')
-        return mdr_models.DataElementConcept.objects.none()
-
-    logger.debug('returning the good one')
-    logger.debug(request.user)
-    qs = mdr_models.DataElementConcept.objects.visible(request.user)
-    for item in qs:
-        logger.debug(item.name)
-    return qs
-
-
-# class DataElementFilter(django_filters.FilterSet):
-#
-#     #dataElementConcept = django_filters.filters.ModelChoiceFilter(queryset=decs_qs)
-#
-#     class Meta:
-#         model=mdr_models.DataElement
-#         fields = ['__all__']
-#
-#     @property
-#     def qs(self):
-#         logger.debug('de qs')
-#         parent = super(DataElementFilter, self).qs
-#         logger.debug(parent.query)
-#         return parent
-#
-# class DataElementConceptFilter(django_filters.FilterSet):
-#
-#     class Meta:
-#         model=mdr_models.DataElementConcept
-#         fields = '__all__'
-#
-#     @property
-#     def qs(self):
-#         logger.debug('dec qs')
-#         parent = super(DataElementConceptFilter, self).qs
-#         #logger.debug(parent.query)
-#         return parent
-
-
 class Query(object):
 
     metadata = DjangoFilterConnectionField(ConceptNode)
-    #meta = relay.Node.Field(ConceptNode)
     workgroups = DjangoFilterConnectionField(WorkgroupNode)
     organizations = DjangoFilterConnectionField(OrganizationNode)
     registration_authorities = DjangoFilterConnectionField(RegistrationAuthorityNode)
@@ -279,7 +216,5 @@ class Query(object):
     conceptual_domains = DjangoFilterConnectionField(ConceptualDomainNode)
     value_domains = DjangoFilterConnectionField(ValueDomainNode)
     data_element_concepts = AristotleFilterConnectionField(DataElementConceptNode)
-    #decs = relay.Node.Field(DataElementConceptNode)
     data_elements = AristotleFilterConnectionField(DataElementNode)
-    #dems = relay.Node.Field(DataElementNode)
     data_element_derivations = DjangoFilterConnectionField(DataElementDerivationNode)
