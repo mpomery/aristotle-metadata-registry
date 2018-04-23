@@ -3,7 +3,7 @@ from aristotle_mdr import models as mdr_models
 from graphene import relay
 from django.db.models import Model
 from django.db.models.manager import Manager
-from django.db.models.query import Queryset
+from django.db.models.query import QuerySet
 
 import logging
 logger = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ def aristotle_resolver(attname, default_value, root, info, **args):
         # Can safely return restricted queryset
         return retval.get_queryset().visible(info.context.user)
 
-    elif isinstance(retval, Queryset):
+    elif isinstance(retval, QuerySet):
 
         # In case a queryset is returned
         return retval.visible(info.context.user)
