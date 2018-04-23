@@ -8,15 +8,12 @@ from aristotle_mdr.utils import fetch_aristotle_settings
 
 class About(APIView):
     """
-    View to list all users in the system.
-
-    * Requires token authentication.
-    * Only admin users are able to access this view.
+    Gives basic details about the registry
     """
 
     def get(self, request, format=None):
         """
-        Return a list of all users.
+        Gives basic details about the registry
         """
         
         settings = fetch_aristotle_settings()
