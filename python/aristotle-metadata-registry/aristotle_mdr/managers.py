@@ -31,6 +31,7 @@ class MetadataItemManager(InheritanceManager):
 
 
 class ConceptQuerySet(MetadataItemQuerySet):
+
     def visible(self, user):
         """
         Returns a queryset that returns all items that the given user has
