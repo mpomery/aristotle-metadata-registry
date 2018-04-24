@@ -4,6 +4,8 @@ from graphene_django.utils import maybe_queryset
 from django.db import models
 import django_filters
 
+from aristotle_mdr_graphql.filterset import AristotleFilterSet
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -25,10 +27,12 @@ class AristotleFilterConnectionField(DjangoFilterConnectionField):
                         'lookup_expr': 'iexact'
                     }
                  }
-            }
+            },
+            'filterset_base_class': AristotleFilterSet
         }
-        
+
         kwargs.update({'extra_filter_meta': extrameta})
+
         super().__init__(*args, **kwargs)
 
     @classmethod
