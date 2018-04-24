@@ -14,20 +14,6 @@ class AristotleFilterConnectionField(DjangoFilterConnectionField):
     def __init__(self, *args, **kwargs):
 
         extrameta = {
-            'filter_overrides': {
-                models.CharField: {
-                     'filter_class': django_filters.CharFilter,
-                     'extra': lambda f: {
-                         'lookup_expr': 'iexact'
-                     }
-                 },
-                 models.TextField: {
-                    'filter_class': django_filters.CharFilter,
-                    'extra': lambda f: {
-                        'lookup_expr': 'iexact'
-                    }
-                 }
-            },
             'filterset_base_class': AristotleFilterSet
         }
 

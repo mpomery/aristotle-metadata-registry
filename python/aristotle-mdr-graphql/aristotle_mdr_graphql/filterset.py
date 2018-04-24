@@ -1,10 +1,10 @@
-from django_filters.filterset import BaseFilterSet, FilterSetMetaclass
+from django_filters.filterset import FilterSet
 from django_filters.constants import ALL_FIELDS
 from django_filters.utils import get_all_model_fields
 
 from django.db import models
 
-class AristotleFilterSet(BaseFilterSet, metaclass=FilterSetMetaclass):
+class AristotleFilterSet(FilterSet):
 
     @classmethod
     def get_fields(cls):
@@ -29,7 +29,7 @@ class AristotleFilterSet(BaseFilterSet, metaclass=FilterSetMetaclass):
                 dbfield = model._meta.get_field(field)
 
                 if isinstance(dbfield, models.CharField) or isinstance(dbfield, models.TextField):
-                    field_dict[field] = ['exact', 'icontains']
+                    field_dict[field] = ['exact', 'icontains', 'iexact']
                 else:
                     field_dict[field] = ['exact']
 
