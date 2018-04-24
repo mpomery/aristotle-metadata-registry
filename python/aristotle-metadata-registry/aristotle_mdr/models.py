@@ -655,6 +655,28 @@ class _concept(baseAristotleObject):
         return _concept.objects.filter(pk=self.pk).editable(user).exists()
 
     def can_view(self, user):
+
+        if user.is_superuser:
+            return True
+
+        if user.is_anonymous:
+            return self._is_public
+
+        if not user.is_active:
+            return False
+
+        extra_q = fetch_aristotle_settings().get('EXTRA_CONCEPT_QUERYSETS', {}).get('visible', None)
+
+        if user.profile and extra_q is None:
+
+            if self.workgroup in user.profile.workgroups:
+                return True
+            elif not user.is_registrar:
+                # If workgroup not in user workgroups and user isnt a registrar
+                return False
+
+        # If user has no profile or is registrar or extra_q is set
+        # We need to query db
         return _concept.objects.filter(pk=self.pk).visible(user).exists()
 
     @property
