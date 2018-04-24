@@ -27,7 +27,6 @@ class BaseGraphqlTestCase(utils.LoggedInViewPages):
 @override_settings(SECURE_SSL_REDIRECT=False)
 class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
 
-
     def test_get_metadata(self):
         mdr_models.ObjectClass.objects.create(
             name="Test Object Class",
@@ -76,7 +75,7 @@ class GraphqlPermissionsTests(BaseGraphqlTestCase, TestCase):
 
     def test_query_workgroup_items(self):
 
-        self.login_editor()
+        self.login_editor() # Editor is in wg1
         json_response = self.post_query('{ metadata { edges { node { name } } } }')
         self.assertEqual(len(json_response['data']['metadata']['edges']), 3)
 
@@ -86,3 +85,19 @@ class GraphqlPermissionsTests(BaseGraphqlTestCase, TestCase):
         self.assertEqual(edges[0]['node']['name'], 'Test Data Element')
         self.assertEqual(edges[0]['node']['dataElementConcept']['name'], 'Test Data Element Concept')
         self.assertEqual(edges[0]['node']['valueDomain']['name'], 'Test Value Domain')
+
+    def test_anon_request_toplevel(self):
+
+        self.client.logout()
+        self.vd._is_public = True
+        self.vd.save()
+
+        json_response = self.post_query('{ dataElements { edges { node { name } } } }')
+        self.assertEqual(len(json_response['data']['dataElements']['edges']), 0)
+
+        json_response = self.post_query('{ dataElementConcepts { edges { node { name } } } }')
+        self.assertEqual(len(json_response['data']['dataElementConcepts']['edges']), 0)
+
+        json_response = self.post_query('{ valueDomains { edges { node { name } } } }')
+        self.assertEqual(len(json_response['data']['valueDomains']['edges']), 1)
+        self.assertEqual(json_response['data']['valueDomains']['edges'][0]['node']['name'], 'Test Value Domain')
