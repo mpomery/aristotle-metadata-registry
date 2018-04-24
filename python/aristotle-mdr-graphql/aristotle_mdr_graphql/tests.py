@@ -14,14 +14,14 @@ class BaseGraphqlTestCase(utils.LoggedInViewPages):
         self.client = Client()
         self.apiurl = reverse('aristotle_graphql:graphql_api')
 
-    def post_query(self, qstring):
+    def post_query(self, qstring, expected_code=200):
         postdata = {
             'query': qstring
         }
 
         jsondata = json.dumps(postdata)
         response = self.client.post(self.apiurl, jsondata, 'application/json')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, expected_code)
         response_json = json.loads(response.content)
         return response_json
 
@@ -181,3 +181,10 @@ class GraphqlPermissionsTests(BaseGraphqlTestCase, TestCase):
 
         for item in concept_edges:
             self.assertNotEqual(item['node']['name'], 'Test Value Domain')
+
+    def test_non_registered_item(self):
+        # Test requesting an object without a defined node e.g. User
+
+        json_response = self.post_query('{ metadata { submitter } }', 400)
+        self.assertTrue('errors' in json_response.keys())
+        self.assertFalse('data' in json_response.keys())
