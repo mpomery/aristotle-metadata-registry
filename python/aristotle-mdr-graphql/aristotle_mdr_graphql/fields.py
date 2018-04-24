@@ -1,11 +1,35 @@
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django.fields import DjangoConnectionField
 from graphene_django.utils import maybe_queryset
+from django.db import models
+import django_filters
 
 import logging
 logger = logging.getLogger(__name__)
 
 class AristotleFilterConnectionField(DjangoFilterConnectionField):
+
+    def __init__(self, *args, **kwargs):
+
+        extrameta = {
+            'filter_overrides': {
+                models.CharField: {
+                     'filter_class': django_filters.CharFilter,
+                     'extra': lambda f: {
+                         'lookup_expr': 'iexact'
+                     }
+                 },
+                 models.TextField: {
+                    'filter_class': django_filters.CharFilter,
+                    'extra': lambda f: {
+                        'lookup_expr': 'iexact'
+                    }
+                 }
+            }
+        }
+        
+        kwargs.update({'extra_filter_meta': extrameta})
+        super().__init__(*args, **kwargs)
 
     @classmethod
     def connection_resolver(cls, resolver, connection, default_manager, max_limit,
