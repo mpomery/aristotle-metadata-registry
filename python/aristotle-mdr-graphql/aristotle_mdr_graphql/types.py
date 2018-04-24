@@ -4,6 +4,7 @@ from graphene import relay
 from django.db.models import Model
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
+from aristotle_mdr import perms
 
 import logging
 logger = logging.getLogger(__name__)
@@ -16,18 +17,11 @@ def aristotle_resolver(attname, default_value, root, info, **args):
     # If object is a django model
     if isinstance(retval, Model):
 
-        # If model has can_view method
-        if hasattr(retval, 'can_view'):
-
-            # Use can_view to determine if we display
-            if retval.can_view(info.context.user):
-                return retval
-            else:
-                return None
-        else:
-
-            # If no can_view method return value
+        # Use user_can_view to determine if we display
+        if perms.user_can_view(info.context.user, retval):
             return retval
+        else:
+            return None
 
     elif isinstance(retval, Manager):
 
