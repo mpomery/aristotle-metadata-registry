@@ -6,9 +6,6 @@ import django_filters
 
 from aristotle_mdr_graphql.filterset import AristotleFilterSet
 
-import logging
-logger = logging.getLogger(__name__)
-
 class AristotleFilterConnectionField(DjangoFilterConnectionField):
 
     def __init__(self, *args, **kwargs):
