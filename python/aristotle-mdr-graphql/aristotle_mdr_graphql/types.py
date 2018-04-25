@@ -6,8 +6,6 @@ from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from aristotle_mdr import perms
 
-import logging
-logger = logging.getLogger(__name__)
 
 def aristotle_resolver(attname, default_value, root, info, **args):
     retval = getattr(root, attname, default_value)

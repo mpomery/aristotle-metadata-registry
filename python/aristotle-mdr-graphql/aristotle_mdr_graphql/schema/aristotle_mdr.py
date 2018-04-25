@@ -9,8 +9,6 @@ import django_filters
 from aristotle_mdr_graphql.fields import AristotleFilterConnectionField
 from aristotle_mdr_graphql.types import AristotleObjectType
 
-import logging
-logger = logging.getLogger(__name__)
 
 class ConceptNode(AristotleObjectType):
 
