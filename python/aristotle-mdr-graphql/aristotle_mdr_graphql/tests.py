@@ -2,6 +2,8 @@ from django.test import TestCase, Client, override_settings, tag
 from django.urls import reverse
 from aristotle_mdr.tests import utils
 from aristotle_mdr import models as mdr_models
+from aristotle_dse import models as dse_models
+from comet import models as comet_models
 
 import json
 import datetime
@@ -28,12 +30,17 @@ class BaseGraphqlTestCase(utils.LoggedInViewPages):
 @override_settings(SECURE_SSL_REDIRECT=False)
 class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
 
-    def test_get_metadata(self):
-        mdr_models.ObjectClass.objects.create(
-            name="Test Object Class",
-            definition="test defn",
+    def setUp(self):
+
+        super().setUp()
+
+        self.oc = mdr_models.ObjectClass.objects.create(
+            name='Test Object Class',
+            definition='Test Defn',
             workgroup=self.wg1
         )
+
+    def test_query_all_metadata(self):
 
         self.login_editor()
         response_json = self.post_query('{ metadata { edges { node { name } } } }')
@@ -46,6 +53,67 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         response = self.client.get(self.apiurl, HTTP_ACCEPT='text/html')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed('graphene/graphiql.html')
+
+    def test_query_by_uuid(self):
+
+        self.login_editor()
+
+        uuid = self.oc.uuid
+        querytext = '{{ metadata (uuid: "{}") {{ edges {{ node {{ name }} }} }} }}'.format(uuid)
+        json_response = self.post_query(querytext)
+        edges = json_response['data']['metadata']['edges']
+
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['name'], self.oc.name)
+
+    def test_query_icontains(self):
+
+        self.login_editor()
+        response_json = self.post_query('{ metadata (name_Icontains: \"test\") { edges { node { name } } } }')
+        edges = response_json['data']['metadata']['edges']
+
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['name'], self.oc.name)
+
+    def test_query_iexact(self):
+
+        self.login_editor()
+        response_json = self.post_query('{ metadata (name_Iexact: \"test object class\") { edges { node { name } } } }')
+        edges = response_json['data']['metadata']['edges']
+
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['name'], self.oc.name)
+
+    def test_dse_query(self):
+
+        self.login_editor()
+        dse_models.Dataset.objects.create(
+            name='Test Dataset',
+            definition='Test Defn',
+            workgroup=self.wg1
+        )
+
+        response_json = self.post_query('{ datasets { edges { node { name } } } }')
+        edges = response_json['data']['datasets']['edges']
+
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['name'], 'Test Dataset')
+
+    def test_comet_query(self):
+
+        self.login_editor()
+        comet_models.IndicatorSet.objects.create(
+            name='Test Indicator Set',
+            definition='Test Defn',
+            workgroup=self.wg1
+        )
+
+        response_json = self.post_query('{ indicatorSets { edges { node { name } } } }')
+        edges = response_json['data']['indicatorSets']['edges']
+
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['name'], 'Test Indicator Set')
+
 
 @override_settings(SECURE_SSL_REDIRECT=False)
 class GraphqlPermissionsTests(BaseGraphqlTestCase, TestCase):
@@ -182,7 +250,7 @@ class GraphqlPermissionsTests(BaseGraphqlTestCase, TestCase):
         for item in concept_edges:
             self.assertNotEqual(item['node']['name'], 'Test Value Domain')
 
-    def test_non_registered_item(self):
+    def test_query_non_registered_item(self):
         # Test requesting an object without a defined node e.g. User
 
         json_response = self.post_query('{ metadata { submitter } }', 400)
