@@ -27,7 +27,7 @@ class BaseGraphqlTestCase(utils.LoggedInViewPages):
         response_json = json.loads(response.content)
         return response_json
 
-@override_settings(SECURE_SSL_REDIRECT=False)
+
 class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
 
     def setUp(self):
@@ -115,7 +115,6 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         self.assertEqual(edges[0]['node']['name'], 'Test Indicator Set')
 
 
-@override_settings(SECURE_SSL_REDIRECT=False)
 class GraphqlPermissionsTests(BaseGraphqlTestCase, TestCase):
 
     def setUp(self):
