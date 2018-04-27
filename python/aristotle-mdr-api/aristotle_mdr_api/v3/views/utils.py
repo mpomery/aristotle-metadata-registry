@@ -1,5 +1,6 @@
 from django.conf import settings
 from rest_framework import serializers, pagination, viewsets
+from aristotle_mdr.utils.utils import fetch_aristotle_settings
 
 class DescriptionStubSerializerMixin(object):
     definition = serializers.SerializerMethodField()
