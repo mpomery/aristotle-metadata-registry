@@ -250,6 +250,34 @@ class GraphqlPermissionsTests(BaseGraphqlTestCase, TestCase):
         for item in concept_edges:
             self.assertNotEqual(item['node']['name'], 'Test Value Domain')
 
+    def test_reviewrequest_query_perms(self):
+
+        allowed_rr = mdr_models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            status=0,
+            state=1,
+            registration_date=datetime.date.today(),
+            cascade_registration=0
+        )
+
+        disallowed_rr = mdr_models.ReviewRequest.objects.create(
+            requester=self.viewer,
+            registration_authority=self.ra,
+            status=0,
+            state=0,
+            registration_date=datetime.date.today(),
+            cascade_registration=0
+        )
+
+        self.login_editor()
+
+        json_response = self.post_query('{ reviewRequests { edges { node { id state } } } }')
+        edges = json_response['data']['reviewRequests']['edges']
+
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['state'], 'A_1')
+
     def test_query_non_registered_item(self):
         # Test requesting an object without a defined node e.g. User
 
