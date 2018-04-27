@@ -6,6 +6,6 @@ from graphene_django.debug import DjangoDebug
 
 class AristotleQuery(AristotleMDRQuery, AristotleDSEQuery, CometQuery, graphene.ObjectType):
 
-    debug = graphene.Field(DjangoDebug, name='__debug')
+    #debug = graphene.Field(DjangoDebug, name='__debug')
 
 schema = graphene.Schema(query=AristotleQuery)
