@@ -23,7 +23,7 @@ class MultiSerializerViewSetMixin(viewsets.ReadOnlyModelViewSet):
         return self.serializers.get(self.action,self.serializers['default'])
 
 
-aristotle_apps = getattr(settings, 'ARISTOTLE_SETTINGS', {}).get('CONTENT_EXTENSIONS',[])
+aristotle_apps = fetch_aristotle_settings().get('CONTENT_EXTENSIONS', [])
 aristotle_apps += ["aristotle_mdr"]
 
 api_excluded_fields = [
