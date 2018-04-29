@@ -44,5 +44,10 @@ class AristotleObjectType(DjangoObjectType):
 
     @classmethod
     def __init_subclass_with_meta__(cls, *args, **kwargs):
-        kwargs.update({'default_resolver': aristotle_resolver})
+        
+        kwargs.update({
+            'default_resolver': aristotle_resolver,
+            'interfaces': (relay.Node, ),
+            'filter_fields': '__all__'
+        })
         super().__init_subclass_with_meta__(*args, **kwargs)

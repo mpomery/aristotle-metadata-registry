@@ -7,50 +7,36 @@ class DataCatalogNode(AristotleObjectType):
 
     class Meta:
         model=dse_models.DataCatalog
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 class DatasetNode(AristotleObjectType):
 
     class Meta:
         model=dse_models.Dataset
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 class DistributionNode(AristotleObjectType):
 
     class Meta:
         model=dse_models.Distribution
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 class DistributionDataElementPathNode(AristotleObjectType):
 
     class Meta:
         model=dse_models.DistributionDataElementPath
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 class DataSetSpecificationNode(AristotleObjectType):
 
     class Meta:
         model=dse_models.DataSetSpecification
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 class DSSDEInclusionNode(AristotleObjectType):
 
     class Meta:
         model=dse_models.DSSDEInclusion
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 class DSSClusterInclusionNode(AristotleObjectType):
 
     class Meta:
         model=dse_models.DSSClusterInclusion
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 
 class Query(object):

@@ -7,50 +7,36 @@ class IndicatorTypeNode(AristotleObjectType):
 
     class Meta:
         model=comet_models.IndicatorType
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 class IndicatorNode(AristotleObjectType):
 
     class Meta:
         model=comet_models.Indicator
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 class IndicatorSetTypeNode(AristotleObjectType):
 
     class Meta:
         model=comet_models.IndicatorSetType
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 class IndicatorSetNode(AristotleObjectType):
 
     class Meta:
         model=comet_models.IndicatorSet
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 class OutcomeAreaNode(AristotleObjectType):
 
     class Meta:
         model=comet_models.OutcomeArea
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 class QualityStatementNode(AristotleObjectType):
 
     class Meta:
         model=comet_models.QualityStatement
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 class FrameworkNode(AristotleObjectType):
 
     class Meta:
         model=comet_models.Framework
-        interfaces=interfaces = (relay.Node, )
-        filter_fields = '__all__'
 
 
 class Query(object):
