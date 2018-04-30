@@ -90,20 +90,23 @@ def setup_mdr(name="", extensions=[], force_install=False, dry_install=False):
         if not do_install:
             print("Performing dry run, no requirements installed.")
             print(PIP_MSG)
-            return 0
-    try:
-        install_reqs(name)
-    except:
-        print("Installing requirements failed.")
-        print(PIP_MSG)
-        raise
 
-    if not dry_install and do_install:
-        print("Running django command to fetch all required static files")
-        collect_static(name)
+    if do_install:
+        try:
+            install_reqs(name)
+        except:
+            print("Installing requirements failed.")
+            print(PIP_MSG)
+            raise
 
+    do_manage = 'y' == valid_input("Ready to run setup commands? (y/n): ", yn).lower()
+
+    if not dry_install and do_manage:
+        print("Running django management commands")
+        result = manage_commands(name)
         print("You can now locally test your installed registry by running the command './manage.py runserver'")
 
+    print('Done!')
 
 def generate_secret_key(name):
     key = "Change-this-key-as-soon-as-you-can"
@@ -129,10 +132,11 @@ def install_reqs(name):
     return call
 
 
-def collect_static(name):
-    call(["./%s/manage.py" % name, 'migrate'])
-    call(["./%s/manage.py" % name, 'collectstatic'])
-    return call
+def manage_commands(name):
+    migrate = call(["python3", "./%s/manage.py" % name, 'migrate'])
+    cstatic = call(["python3", "./%s/manage.py" % name, 'collectstatic'])
+    cctable = call(["python3", "./%s/manage.py" % name, 'createcachetable'])
+    return (migrate, cstatic, cctable)
 
 
 def download_example_mdr():
