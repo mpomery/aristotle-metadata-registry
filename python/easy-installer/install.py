@@ -14,7 +14,6 @@ Command line options:
 from __future__ import unicode_literals, print_function
 
 
-import getopt
 import os
 import re
 import sys
@@ -22,6 +21,7 @@ from subprocess import call
 from random import getrandbits
 import hashlib
 import shutil
+import argparse
 
 
 BASE_DIR = os.path.dirname(__file__)
@@ -51,11 +51,13 @@ def valid_input(prompt, match):
     raise Exception
 
 
-def setup_mdr(name="", extensions=[], force_install=False, dry_install=False):
+def setup_mdr(args):
     name_regex = '^[a-z][a-z_]*$'
-    if not re.match(name_regex, name):
+    if args.name and not re.match(name_regex, args.name):
         name = valid_input("Enter the system name for your registry (lowercase letters and underscores ONLY): ", name_regex)
 
+    directory = args.directory
+    
     try:
         copy_example_mdr()
     except:
@@ -79,11 +81,11 @@ def setup_mdr(name="", extensions=[], force_install=False, dry_install=False):
     # Update the settings key
     generate_secret_key(name)
 
-    if dry_install:
+    if args.dry_install:
         print("Performing dry run, no requirements installed.")
         print(PIP_MSG)
         return 0
-    elif force_install:
+    elif args.force_install:
         print("Installing from requirements.txt")
     else:
         do_install = 'y' == valid_input("Ready to install requirements? (y/n): ", yn).lower()
@@ -101,7 +103,7 @@ def setup_mdr(name="", extensions=[], force_install=False, dry_install=False):
 
     do_manage = 'y' == valid_input("Ready to run setup commands? (y/n): ", yn).lower()
 
-    if not dry_install and do_manage:
+    if not args.dry_install and do_manage:
         print("Running django management commands")
         result = manage_commands(name)
         print("You can now locally test your installed registry by running the command './manage.py runserver'")
@@ -146,6 +148,7 @@ def download_example_mdr():
     call(["svn", command, arg])
     return call
 
+
 def copy_example_mdr():
     print("Copying in example metadata registry")
     CWD = os.getcwd()
@@ -179,47 +182,17 @@ def find_and_remove(mydir, extensions):
                 with open(fpath, "w") as f:
                     f.write(s)
 
-
-class Usage(Exception):
-    def __init__(self, msg):
-        self.msg = msg
-
-
-def is_opt(opts, *args):
-    for a in args:
-        if a in opts.keys():
-            return True
-    return False
-
-
 def main(argv=None):
 
-    if argv is None:
-        argv = sys.argv
-    try:
-        try:
-            opts, args = getopt.getopt(argv[1:], "n:dfh", ["dry", "force", "help", "name=", ])
-            opts = dict(opts)
-        except getopt.error as msg:
-            raise Usage(msg)
-        # more code, unchanged
-    except Usage as err:
-        print(err.msg, file=sys.stderr)
-        print("for help use --help", file=sys.stderr)
-        return 2
-    if is_opt(opts, '-h', '--help'):
-        print(__doc__)
-        return 0
-    kwargs = {}
-    if is_opt(opts, '-n', '--name'):
-        kwargs['name']=opts.get('-n', opts.get('--name'))
-    if is_opt(opts, '-d', '--dry'):
-        kwargs['dry_install']=True
-    if is_opt(opts, '-f', '--force'):
-        kwargs['force_install']=True
+    parser = argparse.ArgumentParser(description='Install Aristotle Example Registry')
+    parser.add_argument('name', nargs=1, default='', type=str, help='Registry Name')
+    parser.add_argument('-f', '--force', action='store_true', default=False, dest='force_install', help='Force Install')
+    parser.add_argument('-d', '--dry', action='store_true', default=False, dest='dry_install', help='Dry Install')
+    parser.add_argument('directory', nargs=1, default='.', help='Directory to install the registry')
 
-    return setup_mdr(**kwargs)
+    args = parser.parse_args()
 
+    return setup_mdr(args)
 
 if __name__ == "__main__":
     sys.exit(main())
