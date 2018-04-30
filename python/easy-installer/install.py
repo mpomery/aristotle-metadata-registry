@@ -69,9 +69,8 @@ def setup_mdr(args):
             raise
 
     if not copied:
-        if not args.force_dl:
-            print('Copying Registry Failed, Downloading registry')
-
+        # if not args.force_dl:
+        #     print('Copying Registry Failed, Downloading registry')
         download_example_mdr(directory)
 
     rename_example_mdr(name, directory)
