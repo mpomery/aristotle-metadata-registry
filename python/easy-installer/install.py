@@ -53,33 +53,41 @@ def valid_input(prompt, match):
 
 def setup_mdr(args):
     name_regex = '^[a-z][a-z_]*$'
-    if args.name and not re.match(name_regex, args.name):
-        name = valid_input("Enter the system name for your registry (lowercase letters and underscores ONLY): ", name_regex)
 
-    directory = args.directory
-    
+    if not args.name or not re.match(name_regex, args.name[0]):
+        name = valid_input("Enter the system name for your registry (lowercase letters and underscores ONLY): ", name_regex)
+    else:
+        name = args.name
+
+    if not args.directory or args.directory[0] == '.':
+        directory = os.getcwd()
+    else:
+        directory = args.directory[0]
+
     try:
-        copy_example_mdr()
+        copy_example_mdr(directory)
     except:
         print("Copying Example registy failed")
         raise
 
-    rename_example_mdr(name)
+    rename_example_mdr(name, directory)
+
+    extensions = []
 
     yn = '^[YyNn]?$'  # yes/no regex
-    if not extensions:
-        do_install = valid_input("Do you wish to install any additional Aristotle modules? (y/n): ", yn).lower()
-        if do_install == 'y':
-            print("Select extensions to install (y/n)")
-            for display, ext_token in optional_modules:
-                do_ext = valid_input("  %s: " % display, yn).lower()
-                if do_ext == 'y':
-                    extensions.append(ext_token)
+    do_install = valid_input("Do you wish to install any additional Aristotle modules? (y/n): ", yn).lower()
+    if do_install == 'y':
+        print("Select extensions to install (y/n)")
+        for display, ext_token in optional_modules:
+            do_ext = valid_input("  %s: " % display, yn).lower()
+            if do_ext == 'y':
+                extensions.append(ext_token)
+
     if extensions:
-        find_and_remove(name, extensions)
+        find_and_remove(directory, extensions)
 
     # Update the settings key
-    generate_secret_key(name)
+    generate_secret_key(name, directory)
 
     if args.dry_install:
         print("Performing dry run, no requirements installed.")
@@ -95,7 +103,7 @@ def setup_mdr(args):
 
     if do_install:
         try:
-            install_reqs(name)
+            install_reqs(name, directory)
         except:
             print("Installing requirements failed.")
             print(PIP_MSG)
@@ -105,39 +113,44 @@ def setup_mdr(args):
 
     if not args.dry_install and do_manage:
         print("Running django management commands")
-        result = manage_commands(name)
+        result = manage_commands(name, directory)
         print("You can now locally test your installed registry by running the command './manage.py runserver'")
 
-    print('Done!')
+    print('Done! Your registry was installed in %s' % directory)
 
-def generate_secret_key(name):
+def generate_secret_key(name, directory):
     key = "Change-this-key-as-soon-as-you-can"
     # This is probably not cryptographically secure, not for production.
     gen_key = hashlib.sha224(str(getrandbits(128)).encode('utf-8')).hexdigest()
-    fname = './%s/%s/settings.py' % (name, name)
-    with open(fname) as f:
+    fname = '%s/%s/settings.py' % (name, name)
+    fpath = os.path.join(directory, fname)
+    with open(fpath) as f:
         s = f.read()
     s = s.replace(key, gen_key)
-    with open(fname, "w") as f:
+    with open(fpath, "w") as f:
         f.write(s)
 
 
-def rename_example_mdr(name):
-    os.rename('example_mdr', name)
-    os.rename(os.path.join(name, 'example_mdr'), os.path.join(name, name))
-    find_and_replace(name, 'example_mdr', name)
+def rename_example_mdr(name, directory):
+    startpath = os.path.join(directory, 'example_mdr')
+
+    os.rename(os.path.join(startpath, 'example_mdr'), os.path.join(startpath, name))
+    os.rename(startpath, os.path.join(directory, name))
+    find_and_replace(directory, 'example_mdr', name)
 
 
-def install_reqs(name):
+def install_reqs(name, dir):
     # pip.main(['install', package])
-    call(["pip", 'install', '-r%s/requirements.txt' % name])
-    return call
+    reqfile = os.path.join(dir, '%s/requirements.txt' % name)
+    result = call(["pip", 'install', '-r%s' % reqfile])
+    return result
 
 
-def manage_commands(name):
-    migrate = call(["python3", "./%s/manage.py" % name, 'migrate'])
-    cstatic = call(["python3", "./%s/manage.py" % name, 'collectstatic'])
-    cctable = call(["python3", "./%s/manage.py" % name, 'createcachetable'])
+def manage_commands(name, dir):
+    manage_path = os.path.join(dir, '%s/manage.py' % name)
+    migrate = call(["python3", manage_path, 'migrate'])
+    cstatic = call(["python3", manage_path, 'collectstatic'])
+    cctable = call(["python3", manage_path, 'createcachetable'])
     return (migrate, cstatic, cctable)
 
 
@@ -145,15 +158,14 @@ def download_example_mdr():
     print("Attempting to retrieve example registry")
     command = "export"
     arg = "https://github.com/aristotle-mdr/aristotle-metadata-registry/trunk/aristotle_mdr/install/example_mdr/"
-    call(["svn", command, arg])
-    return call
+    result = call(["svn", command, arg])
+    return result
 
 
-def copy_example_mdr():
+def copy_example_mdr(dir):
     print("Copying in example metadata registry")
-    CWD = os.getcwd()
     source = os.path.join(BASE_DIR, 'example_mdr')
-    dest = os.path.join(CWD, 'example_mdr')
+    dest = os.path.join(dir, 'example_mdr')
     shutil.copytree(source, dest)
 
 
@@ -185,10 +197,10 @@ def find_and_remove(mydir, extensions):
 def main(argv=None):
 
     parser = argparse.ArgumentParser(description='Install Aristotle Example Registry')
-    parser.add_argument('name', nargs=1, default='', type=str, help='Registry Name')
+    parser.add_argument('-n', '--name', nargs=1, default='', type=str, dest='name', help='Registry Name')
     parser.add_argument('-f', '--force', action='store_true', default=False, dest='force_install', help='Force Install')
     parser.add_argument('-d', '--dry', action='store_true', default=False, dest='dry_install', help='Dry Install')
-    parser.add_argument('directory', nargs=1, default='.', help='Directory to install the registry')
+    parser.add_argument('--dir', nargs=1, default='.', dest='directory', help='Directory to install the registry')
 
     args = parser.parse_args()
 
