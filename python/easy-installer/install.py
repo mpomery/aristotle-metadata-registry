@@ -3,13 +3,7 @@ Aristotle Easy Installer
 
 This script guides you through the setup of the Aristotle Metadata Registry.
 
-Command line options:
- -d --dry   -- Dry run: Run as normal, configures settings and requirements, but
-               does not install them
- -f --force -- Forces install of requirements without confirmation
- -h --help  -- Prints this message
- -n --name  -- The system name for your registry
-               eg. --name=registry or -nregistry
+Run install --help for help text
 """
 from __future__ import unicode_literals, print_function
 
