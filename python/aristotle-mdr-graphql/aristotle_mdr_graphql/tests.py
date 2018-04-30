@@ -16,6 +16,26 @@ class BaseGraphqlTestCase(utils.LoggedInViewPages):
         self.client = Client()
         self.apiurl = reverse('aristotle_graphql:graphql_api')
 
+        self.dec = mdr_models.DataElementConcept.objects.create(
+            name='Test Data Element Concept',
+            definition='Test Defn',
+            workgroup=self.wg1
+        )
+
+        self.vd = mdr_models.ValueDomain.objects.create(
+            name='Test Value Domain',
+            definition='Test Defn',
+            workgroup=self.wg1
+        )
+
+        self.de = mdr_models.DataElement.objects.create(
+            name='Test Data Element',
+            definition='Test Defn',
+            workgroup=self.wg1,
+            dataElementConcept=self.dec,
+            valueDomain=self.vd
+        )
+
     def post_query(self, qstring, expected_code=200):
         postdata = {
             'query': qstring
@@ -114,32 +134,57 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         self.assertEqual(len(edges), 1)
         self.assertEqual(edges[0]['node']['name'], 'Test Indicator Set')
 
+    def test_query_related_foreign_key(self):
+
+        self.login_editor()
+        json_response = self.post_query('{ dataElements { edges { node { name dataElementConcept { name } valueDomain { name } } } } }')
+        edges = json_response['data']['dataElements']['edges']
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['name'], 'Test Data Element')
+        self.assertEqual(edges[0]['node']['dataElementConcept']['name'], 'Test Data Element Concept')
+        self.assertEqual(edges[0]['node']['valueDomain']['name'], 'Test Value Domain')
+
+    def test_query_related_set(self):
+
+        self.login_editor()
+        json_response = self.post_query('{ valueDomains { edges { node { name dataelementSet { edges { node { name } } } } } } }')
+        edges = json_response['data']['valueDomains']['edges']
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['name'], 'Test Value Domain')
+        self.assertEqual(len(edges[0]['node']['dataelementSet']['edges']), 1)
+        self.assertEqual(edges[0]['node']['dataelementSet']['edges'][0]['node']['name'], 'Test Data Element')
+
+    def test_query_related_m2m(self):
+
+        rr = mdr_models.ReviewRequest.objects.create(
+            requester=self.editor,
+            registration_authority=self.ra,
+            status=0,
+            state=0,
+            registration_date=datetime.date.today(),
+            cascade_registration=0
+        )
+
+        rr.concepts.add(self.de)
+        rr.concepts.add(self.dec)
+        rr.concepts.add(self.vd)
+
+        self.login_editor()
+
+        json_response = self.post_query('{ reviewRequests { edges { node { concepts { edges { node { name } } } } } } }')
+        edges = json_response['data']['reviewRequests']['edges']
+        self.assertEqual(len(edges), 1)
+
+        concept_edges = edges[0]['node']['concepts']['edges']
+        self.assertEqual(len(concept_edges), 3)
+
+        item_names = [self.de.name, self.dec.name, self.vd.name]
+
+        for item in concept_edges:
+            self.assertTrue(item['node']['name'] in item_names)
+
 
 class GraphqlPermissionsTests(BaseGraphqlTestCase, TestCase):
-
-    def setUp(self):
-
-        super().setUp()
-
-        self.dec = mdr_models.DataElementConcept.objects.create(
-            name='Test Data Element Concept',
-            definition='Test Defn',
-            workgroup=self.wg1
-        )
-
-        self.vd = mdr_models.ValueDomain.objects.create(
-            name='Test Value Domain',
-            definition='Test Defn',
-            workgroup=self.wg1
-        )
-
-        self.de = mdr_models.DataElement.objects.create(
-            name='Test Data Element',
-            definition='Test Defn',
-            workgroup=self.wg1,
-            dataElementConcept=self.dec,
-            valueDomain=self.vd
-        )
 
     def test_query_workgroup_items(self):
         # Test querying items in the users workgroup
