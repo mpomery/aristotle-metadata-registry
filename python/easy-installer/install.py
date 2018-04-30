@@ -158,9 +158,12 @@ def manage_commands(name, dir):
 
 
 def download_example_mdr(directory):
+
     try:
         import requests
     except ImportError:
+        print('requests must be installed to download the example registry')
+        print('run \"pip install requests\" to install')
         raise
 
     print("Attempting to retrieve example registry")
