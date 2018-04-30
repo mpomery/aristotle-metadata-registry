@@ -183,6 +183,22 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         for item in concept_edges:
             self.assertTrue(item['node']['name'] in item_names)
 
+    @tag('runthis')
+    def test_query_table_inheritance(self):
+
+        self.login_editor()
+
+        json_response = self.post_query('{{ metadata (uuid: "{}") {{ edges {{ node {{ name dataelement {{ id valueDomain {{ name }} }} }} }} }} }}'.format(self.de.uuid))
+        edges = json_response['data']['metadata']['edges']
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['name'], self.de.name)
+        self.assertEqual(edges[0]['node']['dataelement']['valueDomain']['name'], self.de.valueDomain.name)
+
+        json_response = self.post_query('{{ metadata (uuid: "{}") {{ edges {{ node {{ name dataelement {{ id }} }} }} }} }}'.format(self.dec.uuid))
+        edges = json_response['data']['metadata']['edges']
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['name'], self.dec.name)
+        self.assertEqual(edges[0]['node']['dataelement'], None)
 
 class GraphqlPermissionsTests(BaseGraphqlTestCase, TestCase):
 
