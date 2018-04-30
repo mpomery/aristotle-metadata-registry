@@ -21,9 +21,10 @@ import sys
 from subprocess import call
 from random import getrandbits
 import hashlib
+import shutil
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(__file__)
 name = "newly created"  # Forward-declaration placeholder
 PIP_MSG = "You can finish installing by running - pip install -r requirements.txt - from the %s directory" % name
 
@@ -56,12 +57,9 @@ def setup_mdr(name="", extensions=[], force_install=False, dry_install=False):
         name = valid_input("Enter the system name for your registry (lowercase letters and underscores ONLY): ", name_regex)
 
     try:
-        download_example_mdr()
+        copy_example_mdr()
     except:
-        print("Downloading of example settings failed, this script requires subversion to be installed and executable from the command line.")
-        print("Try running the script again, if this continues to fail, try:")
-        print("   1. manually downloading the folder to this directory and ALL its contents from github: https://github.com/aristotle-mdr/aristotle-metadata-registry/tree/master/example_mdr")
-        print("   2. creating a new project using the django-admin tools and manually setting up a project")
+        print("Copying Example registy failed")
         raise
 
     rename_example_mdr(name)
@@ -144,6 +142,13 @@ def download_example_mdr():
     call(["svn", command, arg])
     return call
 
+def copy_example_mdr():
+    print("Copying in example metadata registry")
+    CWD = os.getcwd()
+    source = os.path.join(BASE_DIR, 'example_mdr')
+    dest = os.path.join(CWD, 'example_mdr')
+    shutil.copytree(source, dest)
+
 
 def find_and_replace(mydir, old, new):
     """Really naive find and replace lovingly borrowed from stack overflow - http://stackoverflow.com/a/4205918/764357"""
@@ -184,6 +189,7 @@ def is_opt(opts, *args):
 
 
 def main(argv=None):
+
     if argv is None:
         argv = sys.argv
     try:

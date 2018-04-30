@@ -97,6 +97,7 @@ HAYSTACK_CONNECTIONS = {
         'INCLUDE_SPELLING':True,
     },
 }
+
 ARISTOTLE_SETTINGS.update({
     'SITE_NAME': 'Example Metadata Registry', # 'The main title for the site.'
     'SITE_BRAND': '/static/aristotle_mdr/images/aristotle_small.png', # URL for the Site-wide logo
