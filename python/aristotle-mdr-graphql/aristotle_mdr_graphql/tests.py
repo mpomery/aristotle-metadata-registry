@@ -135,6 +135,7 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         self.assertEqual(edges[0]['node']['name'], 'Test Indicator Set')
 
     def test_query_related_foreign_key(self):
+        # Test a query on an items fk relation
 
         self.login_editor()
         json_response = self.post_query('{ dataElements { edges { node { name dataElementConcept { name } valueDomain { name } } } } }')
@@ -145,6 +146,7 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         self.assertEqual(edges[0]['node']['valueDomain']['name'], 'Test Value Domain')
 
     def test_query_related_set(self):
+        # Test a query on an items related_set
 
         self.login_editor()
         json_response = self.post_query('{ valueDomains { edges { node { name dataelementSet { edges { node { name } } } } } } }')
@@ -155,6 +157,7 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         self.assertEqual(edges[0]['node']['dataelementSet']['edges'][0]['node']['name'], 'Test Data Element')
 
     def test_query_related_m2m(self):
+        # Test a query on an items many to many relation
 
         rr = mdr_models.ReviewRequest.objects.create(
             requester=self.editor,
@@ -183,8 +186,8 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         for item in concept_edges:
             self.assertTrue(item['node']['name'] in item_names)
 
-    @tag('runthis')
     def test_query_table_inheritance(self):
+        # Test a query of a table inheritance property (from metadata to dataelement)
 
         self.login_editor()
 
