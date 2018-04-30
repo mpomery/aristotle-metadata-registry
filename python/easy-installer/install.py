@@ -95,6 +95,7 @@ def setup_mdr(args):
         return 0
     elif args.force_install:
         print("Installing from requirements.txt")
+        do_install = True
     else:
         do_install = 'y' == valid_input("Ready to install requirements? (y/n): ", yn).lower()
         if not do_install:
@@ -109,9 +110,7 @@ def setup_mdr(args):
             print(PIP_MSG)
             raise
 
-    do_manage = 'y' == valid_input("Ready to run setup commands? (y/n): ", yn).lower()
-
-    if not args.dry_install and do_manage:
+    if not args.dry_install:
         print("Running django management commands")
         result = manage_commands(name, directory)
         print("You can now locally test your installed registry by running the command './manage.py runserver'")
@@ -198,9 +197,9 @@ def main(argv=None):
 
     parser = argparse.ArgumentParser(description='Install Aristotle Example Registry')
     parser.add_argument('-n', '--name', nargs=1, default='', type=str, dest='name', help='Registry Name')
-    parser.add_argument('-f', '--force', action='store_true', default=False, dest='force_install', help='Force Install')
-    parser.add_argument('-d', '--dry', action='store_true', default=False, dest='dry_install', help='Dry Install')
-    parser.add_argument('--dir', nargs=1, default='.', dest='directory', help='Directory to install the registry')
+    parser.add_argument('-f', '--force', action='store_true', default=False, dest='force_install', help='Force Requirements Install (instead of asking)')
+    parser.add_argument('-d', '--dry', action='store_true', default=False, dest='dry_install', help='Dry Install (do dependancies installed or management commands run)')
+    parser.add_argument('--dir', nargs=1, default='.', dest='directory', help='Directory to install the registry (default: current directory)')
 
     args = parser.parse_args()
 
