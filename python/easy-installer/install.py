@@ -16,6 +16,7 @@ from random import getrandbits
 import hashlib
 import shutil
 import argparse
+import zipfile
 
 
 BASE_DIR = os.path.dirname(__file__)
@@ -58,11 +59,20 @@ def setup_mdr(args):
     else:
         directory = args.directory[0]
 
-    try:
-        copy_example_mdr(directory)
-    except:
-        print("Copying Example registy failed")
-        raise
+    if args.force_dl:
+        copied = False
+    else:
+        try:
+            copied = copy_example_mdr(directory)
+        except:
+            print("Copying Example registy failed")
+            raise
+
+    if not copied:
+        if not args.force_dl:
+            print('Copying Registry Failed, Downloading registry')
+
+        download_example_mdr(directory)
 
     rename_example_mdr(name, directory)
 
@@ -147,19 +157,36 @@ def manage_commands(name, dir):
     return (migrate, cstatic, cctable)
 
 
-def download_example_mdr():
+def download_example_mdr(directory):
+    try:
+        import requests
+    except ImportError:
+        raise
+
     print("Attempting to retrieve example registry")
-    command = "export"
-    arg = "https://github.com/aristotle-mdr/aristotle-metadata-registry/trunk/aristotle_mdr/install/example_mdr/"
-    result = call(["svn", command, arg])
-    return result
+    url = "https://s3-ap-southeast-2.amazonaws.com/aristotle-mdr/example_mdr.zip"
+    response = requests.get(url)
+    dest = os.path.join(directory, 'example_mdr.zip')
+    with open(dest, 'wb') as f:
+        f.write(response.content)
+
+    zip = zipfile.ZipFile(dest)
+    zip.extractall(directory)
+    os.remove(dest)
+
+    return True
 
 
 def copy_example_mdr(dir):
     print("Copying in example metadata registry")
     source = os.path.join(BASE_DIR, 'example_mdr')
     dest = os.path.join(dir, 'example_mdr')
-    shutil.copytree(source, dest)
+
+    if os.path.isdir(source):
+        shutil.copytree(source, dest)
+        return True
+
+    return False
 
 
 def find_and_replace(mydir, old, new):
@@ -193,6 +220,7 @@ def main(argv=None):
     parser.add_argument('-n', '--name', nargs=1, default='', type=str, dest='name', help='Registry Name')
     parser.add_argument('-f', '--force', action='store_true', default=False, dest='force_install', help='Force Requirements Install (instead of asking)')
     parser.add_argument('-d', '--dry', action='store_true', default=False, dest='dry_install', help='Dry Install (do dependancies installed or management commands run)')
+    parser.add_argument('--dl', '--download', action='store_true', default=False, dest='force_dl', help='Force the registry to be downloaded instead of copied from package')
     parser.add_argument('--dir', nargs=1, default='.', dest='directory', help='Directory to install the registry (default: current directory)')
 
     args = parser.parse_args()
