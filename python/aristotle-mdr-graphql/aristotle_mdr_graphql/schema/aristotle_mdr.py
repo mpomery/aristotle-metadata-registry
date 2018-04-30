@@ -8,132 +8,28 @@ from django.db import models
 import django_filters
 from aristotle_mdr_graphql.fields import AristotleFilterConnectionField
 from aristotle_mdr_graphql.types import AristotleObjectType
+from aristotle_mdr_graphql.utils import type_from_model
 
 
-class ConceptNode(AristotleObjectType):
-
-    class Meta:
-        model = mdr_models._concept
-
-
-class WorkgroupNode(AristotleObjectType):
-
-    class Meta:
-        model = mdr_models.Workgroup
-
-
-class OrganizationNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.Organization
-
-
-class RegistrationAuthorityNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.RegistrationAuthority
-
-
-# class DiscussionPostNode(AristotleObjectType):
-#
-#     class Meta:
-#         model=mdr_models.DiscussionPost
-#
-#
-# class DiscussionCommentNode(AristotleObjectType):
-#
-#     class Meta:
-#         model=mdr_models.DiscussionComment'
-
-
-class ReviewRequestNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.ReviewRequest
-
-
-class StatusNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.Status
-
-
-class ObjectClassNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.ObjectClass
-
-
-class PropertyNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.Property
-
-
-class MeasureNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.Measure
-
-
-class UnitOfMeasureNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.UnitOfMeasure
-
-
-class DataTypeNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.DataType
-
-
-class ConceptualDomainNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.ConceptualDomain
-
-
-class ValueMeaningNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.ValueMeaning
-
-
-class ValueDomainNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.ValueDomain
-
-
-class PermissibleValueNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.PermissibleValue
-
-
-class SupplementaryValueNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.SupplementaryValue
-
-
-class DataElementConceptNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.DataElementConcept
-
-
-class DataElementNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.DataElement
-
-
-class DataElementDerivationNode(AristotleObjectType):
-
-    class Meta:
-        model=mdr_models.DataElementDerivation
+ConceptNode = type_from_model(mdr_models._concept)
+WorkgroupNode = type_from_model(mdr_models.Workgroup)
+OrganizationNode = type_from_model(mdr_models.Organization)
+RegistrationAuthorityNode = type_from_model(mdr_models.RegistrationAuthority)
+ReviewRequestNode = type_from_model(mdr_models.ReviewRequest)
+StatusNode = type_from_model(mdr_models.Status)
+ObjectClassNode = type_from_model(mdr_models.ObjectClass)
+PropertyNode = type_from_model(mdr_models.Property)
+MeasureNode = type_from_model(mdr_models.Measure)
+UnitOfMeasureNode = type_from_model(mdr_models.UnitOfMeasure)
+DataTypeNode = type_from_model(mdr_models.DataType)
+ConceptualDomainNode = type_from_model(mdr_models.ConceptualDomain)
+ValueMeaningNode = type_from_model(mdr_models.ValueMeaning)
+ValueDomainNode = type_from_model(mdr_models.ValueDomain)
+PermissibleValueNode = type_from_model(mdr_models.PermissibleValue)
+SupplementaryValueNode = type_from_model(mdr_models.SupplementaryValue)
+DataElementConceptNode = type_from_model(mdr_models.DataElementConcept)
+DataElementNode = type_from_model(mdr_models.DataElement)
+DataElementDerivationNode = type_from_model(mdr_models.DataElementDerivation)
 
 
 class Query(object):
