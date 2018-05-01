@@ -48,6 +48,7 @@ def valid_input(prompt, match):
 
 def setup_mdr(args):
     name_regex = '^[a-z][a-z_]*$'
+    yn = '^[YyNn]?$'  # yes/no regex
 
     if not args.name or not re.match(name_regex, args.name[0]):
         name = valid_input("Enter the system name for your registry (lowercase letters and underscores ONLY): ", name_regex)
@@ -59,25 +60,29 @@ def setup_mdr(args):
     else:
         directory = args.directory[0]
 
-    if args.force_dl:
-        copied = False
-    else:
-        try:
-            copied = copy_example_mdr(directory)
-        except:
-            print("Copying Example registy failed")
-            raise
 
-    if not copied:
-        # if not args.force_dl:
-        #     print('Copying Registry Failed, Downloading registry')
-        download_example_mdr(directory)
+    use_existing_files = check_example_exists(directory, name, yn)
 
-    rename_example_mdr(name, directory)
+    if not use_existing_files:
+
+        if args.force_dl:
+            copied = False
+        else:
+            try:
+                copied = copy_example_mdr(directory)
+            except:
+                print("Copying Example registy failed")
+                raise
+
+        if not copied:
+            # if not args.force_dl:
+            #     print('Copying Registry Failed, Downloading registry')
+            download_example_mdr(directory)
+
+        rename_example_mdr(name, directory)
 
     extensions = []
 
-    yn = '^[YyNn]?$'  # yes/no regex
     do_install = valid_input("Do you wish to install any additional Aristotle modules? (y/n): ", yn).lower()
     if do_install == 'y':
         print("Select extensions to install (y/n)")
@@ -155,6 +160,25 @@ def manage_commands(name, dir):
     cctable = call(["python3", manage_path, 'createcachetable'])
     return (migrate, cstatic, cctable)
 
+def check_example_exists(dir, name, yn):
+
+    dest = os.path.join(dir, name)
+    if os.path.isdir(dest):
+        print('The example_mdr folder is already at %s' % dest)
+        use_existing = 'y' == valid_input("Would you like to use the existing files? They will be deleted otherwise (y/n): ", yn).lower()
+        if use_existing:
+            return True
+        else:
+            you_sure = 'y' == valid_input("Are you sure you want to delete the directory at %s (y/n):" % dest, yn).lower()
+            if you_sure:
+                print('Deleting existing example_mdr')
+                shutil.rmtree(dest)
+                return False
+            else:
+                print('Using existing files')
+                return True
+
+    return False
 
 def download_example_mdr(directory):
 
