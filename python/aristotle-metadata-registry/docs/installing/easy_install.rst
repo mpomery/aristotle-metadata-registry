@@ -11,14 +11,14 @@ of the installing agency.
 For more information on configuring a more complete installation review the help article
 :doc:`/installing/integrate_with_django_project`.
 
-1. Make sure you have a server setup for hosting the project with an appropriate
+#. Make sure you have a server setup for hosting the project with an appropriate
    WSGI web server configured. If the server is only used for development, the inbuilt
    django server can be accessed by running the ``./manage.py runserver`` command.
 
    `PythonAnywhere also provides a free python server suitable for development and low
    traffic sites <http://www.PythonAnywhere.com>`_.
 
-2. (Optional but recommended) Configure a ``virtualenv`` for your server, so that the dependancies
+#. (Optional but recommended) Configure a ``virtualenv`` for your server, so that the dependancies
    for Aristotle-MDR do conflict any other software you may be running. If you are running
    Aristotle on an isolated server with root privileges you may skip this step.
 
@@ -26,38 +26,44 @@ For more information on configuring a more complete installation review the help
    `installing virtualenv <https://www.pythonanywhere.com/wiki/InstallingVirtualenvWrapper>`_
    and `configuring a new virtualenv <https://www.pythonanywhere.com/wiki/VirtualEnvForNewerDjango>`_.
 
-3. Fetch the example metadata registry stored within the
-   `Aristotle-MDR GitHub repository <https://github.com/aristotle-mdr/aristotle-metadata-registry>`_.
+#. Fetch the example metadata registry stored within the
+   `Aristotle-MDR GitHub repository <https://github.com/aristotle-mdr/python/easy-installer/install.py>`_.
 
    On a linux machine, this can be done with the command::
 
-      pip install aristotle-metadata-registry
-      python -m aristotle_mdr.install.easy
+      curl https://raw.githubusercontent.com/aristotle-mdr/aristotle-metadata-registry/easyinstall/python/easy-installer/install.py
 
-4. Run the easy installer: ``aristotle_mdr.install.easy``. There are a number of command line arguments
+#. Run the easy installer: ``python install.py``. There are a number of command line arguments
    that are explained in the help documentation which can be accessed from the command line::
 
-    python -m aristotle_mdr.install.easy --help
+    python install.py --help
+
+   If you do not have the example registry folder in the same directory as the installer it will download it for you
+   however you will need to install the requests library for this to work. You can install it with ``pip install requests``
+
+   Alternatively the folder is available here https://github.com/aristotle-mdr/aristotle-metadata-registry/python/easy-installer/example_mdr
+
+   To install your registry in a different directory use the --dir option ``python install.py --dir ./myregistry``
 
    This will setup an example registry, and will prompt you for a new name, ask for a few
    additional settings, install requirements, setup a database and set up the static files.
 
-5. If required, browse to the directory of your project that was named in the above directory,
+#. If required, browse to the directory of your project that was named in the above directory,
    and edit the ``settings.py`` files to meet your requirements.
-   Although the installer generates a pseudo-random hash for the ``SECRET_KEY``, 
+   Although the installer generates a pseudo-random hash for the ``SECRET_KEY``,
    **It is strongly recommmended you generate a fresh** ``SECRET_KEY``. Also consider which
    customisations to implement using the options in the ``ARISTOTLE_SETTINGS``
    dictionary - details of which can be found under :doc:`/installing/settings`.
-   
+
    The example registry includes commented out lines for some useful Aristotle-MDR extensions.
    If you wish to use these, remove the comments as directed by the documentation in ``settings.py``.
 
-6. If you are using a WSGI server (such as PythonAnywhere) you'll need to either point your server to
+#. If you are using a WSGI server (such as PythonAnywhere) you'll need to either point your server to
    the projects ``wsgi.py`` file or update your WSGI configuration.
 
    For more information on `configuring the PythonAnywhere WSGI server review their documentation <https://www.pythonanywhere.com/wiki/DjangoTutorial>`_.
 
-7. Start (or restart) the development server and visit its address.
+#. Start (or restart) the development server and visit its address.
    In the case of a local development server this will likely be ``127.0.0.1``.
 
 Using a different database
