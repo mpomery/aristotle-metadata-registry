@@ -64,7 +64,8 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
 
         self.login_editor()
         response_json = self.post_query('{ metadata { edges { node { name } } } }')
-        self.assertEqual(response_json['data']['metadata']['edges'][0]['node']['name'], 'Test Object Class')
+        edges = response_json['data']['metadata']['edges']
+        self.assertEqual(len(edges), 4)
 
     def test_load_graphiql(self):
 
@@ -89,7 +90,7 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
     def test_query_icontains(self):
 
         self.login_editor()
-        response_json = self.post_query('{ metadata (name_Icontains: \"test\") { edges { node { name } } } }')
+        response_json = self.post_query('{ metadata (name_Icontains: \"object\") { edges { node { name } } } }')
         edges = response_json['data']['metadata']['edges']
 
         self.assertEqual(len(edges), 1)
