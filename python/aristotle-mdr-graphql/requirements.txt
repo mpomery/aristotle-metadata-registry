@@ -2,5 +2,5 @@
 
 -e .
 -e ../aristotle-metadata-registry/.
--e ../aristotle-dse/.
+-e ../aristotle-dataset-extensions/.
 -e ../comet-indicator-registry/.
