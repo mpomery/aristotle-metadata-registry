@@ -5,3 +5,5 @@ INSTALLED_APPS = (
     'comet',
     'aristotle_mdr_graphql'
 ) + INSTALLED_APPS
+
+ROOT_URLCONF = 'aristotle_mdr_graphql.tests.urls'
