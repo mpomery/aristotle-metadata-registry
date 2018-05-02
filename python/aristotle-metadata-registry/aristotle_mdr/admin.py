@@ -408,8 +408,8 @@ class aristotle_mdr_DataElementDerivationSearchIndex(conceptIndex, indexes.Index
 
 register_concept(
     MDR.DataElementDerivation,
-    extra_fieldsets=[('Derivation', {'fields': ['derivation_rule', 'derives', 'inputs']})],
-    custom_search_index=aristotle_mdr_DataElementDerivationSearchIndex
+    # extra_fieldsets=[('Derivation', {'fields': ['derivation_rule', 'derives', 'inputs']})],
+    # custom_search_index=aristotle_mdr_DataElementDerivationSearchIndex
 )
 
 register_concept(

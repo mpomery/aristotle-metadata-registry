@@ -1314,6 +1314,7 @@ class DataElementDerivation(concept):
 
     derives = ConceptManyToManyField(  # 11.5.3.5
         DataElement,
+        through='DedDerivesThrough',
         related_name="derived_from",
         blank=True,
         null=True,
@@ -1321,6 +1322,7 @@ class DataElementDerivation(concept):
     )
     inputs = ConceptManyToManyField(  # 11.5.3.4
         DataElement,
+        through='DedInputsThrough',
         related_name="input_to_derivation",
         blank=True,
         help_text=_("binds one or more input Data_Element(s) with a Data_Element_Derivation.")
@@ -1329,6 +1331,28 @@ class DataElementDerivation(concept):
         blank=True,
         help_text=_("text of a specification of a data element Derivation_Rule")
     )
+
+
+class DedBaseThrough(models.Model):
+    """
+    Abstract Class for Data Element Derivation Manay to Many through tables with ordering
+    """
+
+    data_element_derivation = models.ForeignKey(DataElementDerivation, on_delete=models.CASCADE)
+    date_element = models.ForeignKey(DataElement, on_delete=models.CASCADE)
+    order = models.PositiveSmallIntegerField("Position")
+
+    class Meta:
+        abstract = True
+        ordering = ['order']
+
+
+class DedDerivesThrough(DedBaseThrough):
+    pass
+
+
+class DedInputsThrough(DedBaseThrough):
+    pass
 
 
 # Create a 1-1 user profile so we don't need to extend user
