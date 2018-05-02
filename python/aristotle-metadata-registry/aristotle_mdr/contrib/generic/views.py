@@ -271,6 +271,17 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
         through_model = self.model_base._meta.get_field(self.model_base_field).remote_field.through
         logger.debug('through model is {}'.format(through_model))
 
+        base_through_field = None
+        related_trhough_field = None
+        for field in through_model._meta.get_fields():
+            if field.is_relation:
+                if field.related_model == self.model_base:
+                    base_through_field = field.name
+                elif field.related_model == self.model_to_add:
+                    related_through_field = field.name
+
+        logger.debug('base field: {} mta field: {}'.format(base_through_field, related_through_field))
+
         if filled_formset.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
 
