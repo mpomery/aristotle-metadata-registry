@@ -11,6 +11,7 @@ import aristotle_mdr.models as models
 from aristotle_mdr.contrib.generic.views import (
     GenericAlterOneToManyView,
     GenericAlterManyToManyView,
+    GenericAlterManyToManyOrderView,
     generic_foreign_key_factory_view
 )
 
@@ -59,7 +60,7 @@ urlpatterns=[
             form_title=_('Change Value Meanings')
         ), name='value_meanings_edit'),
     url(r'^item/(?P<iid>\d+)/dataelementderivation/change_inputs/?$',
-        GenericAlterManyToManyView.as_view(
+        GenericAlterManyToManyOrderView.as_view(
             model_base=models.DataElementDerivation,
             model_to_add=models.DataElement,
             model_base_field='inputs'

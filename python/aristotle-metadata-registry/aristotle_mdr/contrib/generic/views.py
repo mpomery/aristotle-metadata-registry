@@ -3,6 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.db import transaction
 from django.forms.models import modelformset_factory
+from django.forms import formset_factory
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
@@ -223,6 +224,41 @@ class GenericAlterManyToManyView(GenericAlterManyToSomethingFormView):
         self.item.__setattr__(self.model_base_field, form.cleaned_data['items_to_add'])
         self.item.save()
         return HttpResponseRedirect(self.get_success_url())
+
+
+class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
+
+    template_name = "aristotle_mdr/generic/actions/alter_many_to_many_order.html"
+
+    def get_form_class(self):
+        class M2MOrderForm(forms.Form):
+            items_to_add = forms.ModelChoiceField(
+                queryset=self.model_to_add.objects.visible(self.request.user),
+                label="Attach",
+                required=False,
+                widget=widgets.ConceptAutocompleteSelect(
+                    model=self.model_to_add
+                )
+            )
+        return M2MOrderForm
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        formset = self.get_formset()
+        context.update({
+            'formset': formset,
+            'form_add_another_text': _('Add Another')
+        })
+        return context
+
+    def get_formset(self):
+
+        formclass = self.get_form_class()
+        return formset_factory(formclass, can_order=True, can_delete=True)
+
+    def post(self):
+        formset = self.get_formset()
+        return Http404()
 
 
 class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
