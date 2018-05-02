@@ -15,7 +15,8 @@ from aristotle_mdr.perms import user_can_edit, user_can_view
 from aristotle_mdr.utils import construct_change_message
 from aristotle_mdr.contrib.generic.forms import (
     one_to_many_formset_factory, one_to_many_formset_save,
-    one_to_many_formset_excludes, one_to_many_formset_filters
+    one_to_many_formset_excludes, one_to_many_formset_filters,
+    HiddenOrderFormset
 )
 import reversion
 
@@ -232,7 +233,7 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
 
     def get_form_class(self):
         class M2MOrderForm(forms.Form):
-            items_to_add = forms.ModelChoiceField(
+            item_to_add = forms.ModelChoiceField(
                 queryset=self.model_to_add.objects.visible(self.request.user),
                 label="Attach",
                 required=False,
@@ -244,21 +245,41 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        formset = self.get_formset()
+        num_items = getattr(self.item, self.model_base_field).count()
+        formset = self.formset or self.get_formset()(
+            queryset=getattr(self.item, self.model_base_field).all(),
+            initial=[{'ORDER': num_items + 1}]
+            )
         context.update({
             'formset': formset,
             'form_add_another_text': _('Add Another')
         })
         return context
 
+    def get_form(self):
+        return None
+
     def get_formset(self):
 
         formclass = self.get_form_class()
-        return formset_factory(formclass, can_order=True, can_delete=True)
+        return formset_factory(formclass, formset=HiddenOrderFormset, can_order=True, can_delete=True)
 
     def post(self):
         formset = self.get_formset()
-        return Http404()
+
+        filled_formset = formset(self.request.POST, self.request.FILES)
+        if filled_formset.is_valid():
+            with transaction.atomic(), reversion.revisions.create_revision():
+
+                for form in formset.ordered_forms:
+                    to_add = form.cleaned_data['item_to_add']
+
+                reversion.revisions.set_user(request.user)
+                reversion.revisions.set_comment(construct_change_message(request, None, [filled_formset]))
+
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            return self.form_invalid(None)
 
 
 class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):

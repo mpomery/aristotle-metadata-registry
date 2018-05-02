@@ -4,6 +4,7 @@ from aristotle_mdr.models import _concept, ValueDomain, ValueMeaning
 from aristotle_mdr.contrib.autocomplete import widgets
 from django.forms.models import modelformset_factory
 from django.forms import ModelChoiceField, CharField
+from django.forms.formsets import BaseFormSet
 from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 from django.db.models import DateField
 from aristotle_mdr.models import AbstractValue
@@ -20,6 +21,13 @@ datePickerOptions = {
         "vertical": "auto"
     }
 }
+
+
+class HiddenOrderFormset(BaseFormSet):
+
+    def add_fields(self, form, index):
+        super().add_fields(form, index)
+        form.fields["ORDER"].widget = forms.HiddenInput()
 
 
 class HiddenOrderModelFormSet(BaseModelFormSet):
