@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.db import transaction
 from django.forms.models import modelformset_factory
 from django.forms import formset_factory
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, TemplateView, View
@@ -19,6 +19,9 @@ from aristotle_mdr.contrib.generic.forms import (
     HiddenOrderFormset
 )
 import reversion
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 def generic_foreign_key_factory_view(request, **kwargs):
@@ -246,10 +249,7 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         num_items = getattr(self.item, self.model_base_field).count()
-        formset = self.formset or self.get_formset()(
-            queryset=getattr(self.item, self.model_base_field).all(),
-            initial=[{'ORDER': num_items + 1}]
-            )
+        formset = self.get_formset()
         context.update({
             'formset': formset,
             'form_add_another_text': _('Add Another')
@@ -264,16 +264,19 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
         formclass = self.get_form_class()
         return formset_factory(formclass, formset=HiddenOrderFormset, can_order=True, can_delete=True)
 
-    def post(self):
+    def post(self, request, *args, **kwargs):
         formset = self.get_formset()
 
         filled_formset = formset(self.request.POST, self.request.FILES)
+        through_model = self.model_base._meta.get_field(self.model_base_field).remote_field.through
+        logger.debug('through model is {}'.format(through_model))
+
         if filled_formset.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
 
                 for form in formset.ordered_forms:
                     to_add = form.cleaned_data['item_to_add']
-
+                    #through_model.objects.create()
                 reversion.revisions.set_user(request.user)
                 reversion.revisions.set_comment(construct_change_message(request, None, [filled_formset]))
 
