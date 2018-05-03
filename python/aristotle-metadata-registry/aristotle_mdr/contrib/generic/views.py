@@ -317,8 +317,6 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
         formset = self.get_formset()
         filled_formset = formset(self.request.POST)
 
-        current_items = getattr(self.item, self.model_base_field).all()
-
         if filled_formset.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
 
@@ -336,37 +334,19 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
                         'order': form.cleaned_data['ORDER']
                     }
 
-                    if to_add not in current_items:
-                        model_arglist.append(model_args)
-                        change_message.append('Added {} to {} {}'.format(to_add.name, self.item.name, self.model_base_field))
-                    else:
-                        model_arglist_update.append(model_args)
-                        change_message.append('Updated {} on {} {}'.format(to_add.name, self.item.name, self.model_base_field))
+                    model_arglist.append(model_args)
+                    change_message.append('Added {} to {} {}'.format(to_add.name, self.item.name, self.model_base_field))
 
+                # Delete existing links
+
+                through_args = {
+                    self.base_through_field: self.item
+                }
+                self.through_model.objects.filter(**through_args).delete()
+
+                # Create new links
                 for model_args in model_arglist:
                     self.through_model.objects.create(**model_args)
-
-                for model_args in model_arglist_update:
-                    order = model_args.pop('order')
-                    item = self.through_model.get(**model_args)
-                    item.order = order
-                    item.save()
-
-                for form in filled_formset.deleted_forms:
-                    to_add = form.cleaned_data['item_to_add']
-
-                    for form in filled_formset.deleted_forms:
-                        to_delete = form.cleaned_data['item_to_add']
-
-                        model_args = {
-                            self.base_through_field: self.item,
-                            self.related_through_field: to_delete,
-                        }
-
-                        change_message.append('Deleted {} from {} {}'.format(to_delete.name, self.item.name, self.model_base_field))
-
-                        item = self.through_model.get(**model_args)
-                        item.delete()
 
                 reversion.revisions.set_user(request.user)
                 reversion.revisions.set_comment(change_message)
