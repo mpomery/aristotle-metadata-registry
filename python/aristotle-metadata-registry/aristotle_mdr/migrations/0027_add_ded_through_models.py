@@ -6,6 +6,24 @@ from django.db import migrations, models
 import django.db.models.deletion
 import aristotle_mdr.fields
 
+def add_through(apps, schema_editor):
+
+    try:
+        ded = apps.get_model('aristotle_mdr', 'DataElementDerivation')
+        ded_derives_through = apps.get_model('aristotle_mdr', 'DedDerivesThrough')
+        ded_inputs_through = apps.get_model('aristotle_mdr', 'DedInputsThrough')
+    except LookupError:
+        pass
+
+    for ded_obj in ded.objects.all():
+        count = 0
+        for through_obj in ded.derives.through.objects.filter(_from=ded_obj):
+            ded_derives_through.objects.create(
+                data_element_derivation=ded_obj,
+                data_element=through_obj.to,
+                order=count
+            )
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -35,6 +53,7 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
         ),
+        migrations.RunPython(add_through, reverse_add_through),
         migrations.RemoveField(
             model_name='dataelementderivation',
             name='derives',
