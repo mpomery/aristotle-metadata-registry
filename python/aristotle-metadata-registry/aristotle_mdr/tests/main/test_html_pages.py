@@ -1580,6 +1580,13 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
 
         self.login_editor()
 
+        management_form = {
+            'form-INITIAL_FORMS': 0,
+            'form-TOTAL_FORMS': 1,
+            'form-MIN_NUM_FORMS': 0,
+            'form-MAX_NUM_FORMS': 1000
+        }
+
         self.assertFalse(self.de2.can_view(self.editor))
 
         response = self.client.get(
@@ -1587,13 +1594,20 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         )
         self.assertEqual(response.status_code,200)
 
+        postdata = management_form
+        postdata['form-0-item_to_add'] = self.de2.pk
+        postdata['form-0-ORDER'] = 0
+        #postdata['form-TOTAL_FORMS'] = 2
+
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
-            {'items_to_add': [self.de2.pk]}
+            postdata
         )
         self.item1 = self.itemType.objects.get(pk=self.item1.pk)
         self.assertTrue(self.de2 not in getattr(self.item1, attr).all())
         self.assertEqual(response.status_code,200)
+        #self.assertTrue('error_message' in response.context)
+        print(response.context['formset'].errors)
         self.assertContains(response, 'Select a valid choice')
 
         response = self.client.post(
@@ -1623,6 +1637,7 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         self.assertEqual(response.status_code,302)
         self.assertRedirects(response, self.item1.get_absolute_url())
 
+    @tag('ded')
     def test_derivation_derives_concepts_save(self):
         self.derivation_m2m_concepts_save(
             url="aristotle_mdr:dataelementderivation_change_derives",

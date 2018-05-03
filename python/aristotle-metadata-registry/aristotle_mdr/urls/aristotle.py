@@ -66,7 +66,7 @@ urlpatterns=[
             model_base_field='inputs'
         ), name='dataelementderivation_change_inputs'),
     url(r'^item/(?P<iid>\d+)/dataelementderivation/change_derives/?$',
-        GenericAlterManyToManyView.as_view(
+        GenericAlterManyToManyOrderView.as_view(
             model_base=models.DataElementDerivation,
             model_to_add=models.DataElement,
             model_base_field='derives'

@@ -29,6 +29,11 @@
             {{formset.errors}}
         </div>
         {% endif %}
+        {% if error_message %}
+        <div class="alert alert-danger">
+            {{ error_message }}
+        </div>
+        {% endif %}
 
     {% csrf_token %}
     {{ formset.management_form }}

@@ -250,12 +250,18 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
         context = super().get_context_data(*args, **kwargs)
         num_items = getattr(self.item, self.model_base_field).count()
 
-        formset_initial = self.get_formset_initial()
-        formset = self.get_formset()(initial=formset_initial)
-        context.update({
-            'formset': formset,
-            'form_add_another_text': _('Add Another')
-        })
+        context['form_add_another_text'] = _('Add Another')
+
+        if 'formset' in kwargs:
+            context['formset'] = kwargs['formset']
+        else:
+            formset_initial = self.get_formset_initial()
+            formset = self.get_formset()(initial=formset_initial)
+            context['formset'] = formset
+
+        if 'message' in kwargs:
+            context['error_message'] = kwargs['message']
+
         return context
 
     def get_form(self):
@@ -311,22 +317,36 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
 
         return initial
 
+    def error_with_message(self, message):
+        return self.render_to_response(self.get_context_data(message=message))
+
+    def formset_invalid(self, formset):
+        return self.render_to_response(self.get_context_data(formset=formset))
+
     def post(self, request, *args, **kwargs):
 
         formset = self.get_formset()
-        filled_formset = formset(self.request.POST, self.request.FILES)
+        filled_formset = formset(self.request.POST)
 
         if filled_formset.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
 
-                for form in formset.ordered_forms:
+                model_arglist = []
+
+                for form in filled_formset.ordered_forms:
                     to_add = form.cleaned_data['item_to_add']
+
+                    # if not user_can_view(request.user, to_add):
+                    #     return self.error_with_message('You don\'t have permission to attach {}'.format(to_add.name))
 
                     model_args = {
                         self.base_through_field: self.item,
-                        self.related_trhough_field: to_add,
-                        order: form.cleaned_data['ORDER']
+                        self.related_through_field: to_add,
+                        'order': form.cleaned_data['ORDER']
                     }
+                    model_arglist.append(model_args)
+
+                for model_args in model_arglist:
                     self.through_model.objects.create(**model_args)
 
                 reversion.revisions.set_user(request.user)
@@ -334,7 +354,7 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
 
             return HttpResponseRedirect(self.get_success_url())
         else:
-            return self.form_invalid(None)
+            return self.formset_invalid(filled_formset)
 
 
 class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
