@@ -1339,7 +1339,7 @@ class DedBaseThrough(models.Model):
     """
 
     data_element_derivation = models.ForeignKey(DataElementDerivation, on_delete=models.CASCADE)
-    date_element = models.ForeignKey(DataElement, on_delete=models.CASCADE)
+    data_element = models.ForeignKey(DataElement, on_delete=models.CASCADE)
     order = models.PositiveSmallIntegerField("Position")
 
     class Meta:
