@@ -1666,6 +1666,107 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
             attr='inputs',
         )
 
+    def derivation_m2m_formset(self, url, attr):
+
+        self.de1 = models.DataElement.objects.create(name='DE1 - visible',definition="my definition",workgroup=self.wg1)
+        self.de2 = models.DataElement.objects.create(name='DE2 - visible',definition="my definition",workgroup=self.wg1)
+        self.de3 = models.DataElement.objects.create(name='DE3 - visible',definition="my definition",workgroup=self.wg1)
+
+        self.login_editor()
+
+        management_form = {
+            'form-INITIAL_FORMS': 0,
+            'form-TOTAL_FORMS': 1,
+            'form-MIN_NUM_FORMS': 0,
+            'form-MAX_NUM_FORMS': 1000
+        }
+
+        # Post 3 items
+        postdata = management_form.copy()
+        postdata['form-0-item_to_add'] = self.de3.pk
+        postdata['form-0-ORDER'] = 0
+        postdata['form-1-item_to_add'] = self.de1.pk
+        postdata['form-1-ORDER'] = 1
+        postdata['form-2-item_to_add'] = self.de2.pk
+        postdata['form-2-ORDER'] = 2
+        postdata['form-TOTAL_FORMS'] = 3
+
+        response = self.client.post(
+            reverse(url, args=[self.item1.pk]),
+            postdata
+        )
+
+        self.assertRedirects(response, self.item1.get_absolute_url())
+
+        items = getattr(self.item1, attr).all()
+        self.assertTrue(self.de1 in items)
+        self.assertTrue(self.de2 in items)
+        self.assertTrue(self.de3 in items)
+
+        # Load page to check loading of existing data and preserved order
+
+        response = self.client.get(reverse(url, args=[self.item1.pk]))
+
+        formset_initial = response.context['formset'].initial
+
+        self.assertEqual(len(formset_initial), 3)
+        for data in formset_initial:
+            self.assertTrue(data['ORDER'] in [0,1,2])
+            if data['ORDER'] == 0:
+                self.assertEqual(data['item_to_add'], self.de3)
+            elif data['ORDER'] == 1:
+                self.assertEqual(data['item_to_add'], self.de1)
+            elif data['ORDER'] == 2:
+                self.assertEqual(data['item_to_add'], self.de2)
+
+        # Change order and delete
+        postdata = management_form.copy()
+        postdata['form-0-item_to_add'] = self.de3.pk
+        postdata['form-0-ORDER'] = 0
+        postdata['form-0-DELETE'] = 'checked'
+        postdata['form-1-item_to_add'] = self.de2.pk
+        postdata['form-1-ORDER'] = 1
+        postdata['form-2-item_to_add'] = self.de1.pk
+        postdata['form-2-ORDER'] = 2
+        postdata['form-TOTAL_FORMS'] = 3
+
+        response = self.client.post(
+            reverse(url, args=[self.item1.pk]),
+            postdata
+        )
+
+        self.assertRedirects(response, self.item1.get_absolute_url())
+
+        items = getattr(self.item1, attr).all()
+        self.assertTrue(self.de1 in items)
+        self.assertTrue(self.de2 in items)
+        self.assertFalse(self.de3 in items)
+
+        # Load page to check order
+
+        response = self.client.get(reverse(url, args=[self.item1.pk]))
+        formset_initial = response.context['formset'].initial
+
+        self.assertEqual(len(formset_initial), 2)
+        for data in formset_initial:
+            self.assertTrue(data['ORDER'] in [1,2])
+            if data['ORDER'] == 1:
+                self.assertEqual(data['item_to_add'], self.de2)
+            elif data['ORDER'] == 2:
+                self.assertEqual(data['item_to_add'], self.de1)
+
+    def test_derivation_inputs_formset(self):
+        self.derivation_m2m_formset(
+            url="aristotle_mdr:dataelementderivation_change_inputs",
+            attr='inputs',
+        )
+
+    def test_derivation_derives_formset(self):
+        self.derivation_m2m_formset(
+            url="aristotle_mdr:dataelementderivation_change_derives",
+            attr='derives',
+        )
+
 
 class LoggedInViewUnmanagedPages(utils.LoggedInViewPages):
     defaults = {}
