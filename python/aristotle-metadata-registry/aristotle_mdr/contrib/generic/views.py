@@ -16,7 +16,7 @@ from aristotle_mdr.utils import construct_change_message
 from aristotle_mdr.contrib.generic.forms import (
     one_to_many_formset_factory, one_to_many_formset_save,
     one_to_many_formset_excludes, one_to_many_formset_filters,
-    HiddenOrderFormset
+    HiddenOrderFormset, HiddenOrderModelFormSet
 )
 import reversion
 
@@ -249,7 +249,9 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         num_items = getattr(self.item, self.model_base_field).count()
-        formset = self.get_formset()
+
+        formset_initial = self.get_formset_initial()
+        formset = self.get_formset()(initial=formset_initial)
         context.update({
             'formset': formset,
             'form_add_another_text': _('Add Another')
@@ -259,35 +261,74 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
     def get_form(self):
         return None
 
+    def dispatch(self, request, *args, **kwargs):
+
+        self.through_model = self.model_base._meta.get_field(self.model_base_field).remote_field.through
+        logger.debug('through model is {}'.format(self.through_model))
+
+        self.base_through_field = None
+        self.related_through_field = None
+        for field in self.through_model._meta.get_fields():
+            if field.is_relation:
+                if field.related_model == self.model_base:
+                    self.base_through_field = field.name
+                elif field.related_model == self.model_to_add:
+                    self.related_through_field = field.name
+
+        # Check if either is None
+
+        logger.debug('base field: {} mta field: {}'.format(self.base_through_field, self.related_through_field))
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get_formset(self):
 
         formclass = self.get_form_class()
         return formset_factory(formclass, formset=HiddenOrderFormset, can_order=True, can_delete=True)
 
+        # return modelformset_factory(
+        #     self.model_base,
+        #     formset=HiddenOrderModelFormSet,
+        #     fields=[self.model_base_field],
+        #     can_order=True,
+        #     can_delete=True,
+        #     widgets={
+        #         self.model_base_field: widgets.ConceptAutocompleteSelect(model=self.model_to_add)
+        #     }
+        # )
+
+    def get_formset_initial(self):
+        # Build initial
+        filter_args = {self.base_through_field: self.item}
+        through_items = self.through_model.objects.filter(**filter_args).order_by('-order')
+
+        initial = []
+        for item in through_items:
+            initial.append({
+                'item_to_add': getattr(item, self.related_through_field),
+                'ORDER': item.order
+            })
+
+        return initial
+
     def post(self, request, *args, **kwargs):
+
         formset = self.get_formset()
-
         filled_formset = formset(self.request.POST, self.request.FILES)
-        through_model = self.model_base._meta.get_field(self.model_base_field).remote_field.through
-        logger.debug('through model is {}'.format(through_model))
-
-        base_through_field = None
-        related_trhough_field = None
-        for field in through_model._meta.get_fields():
-            if field.is_relation:
-                if field.related_model == self.model_base:
-                    base_through_field = field.name
-                elif field.related_model == self.model_to_add:
-                    related_through_field = field.name
-
-        logger.debug('base field: {} mta field: {}'.format(base_through_field, related_through_field))
 
         if filled_formset.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
 
                 for form in formset.ordered_forms:
                     to_add = form.cleaned_data['item_to_add']
-                    #through_model.objects.create()
+
+                    model_args = {
+                        self.base_through_field: self.item,
+                        self.related_trhough_field: to_add,
+                        order: form.cleaned_data['ORDER']
+                    }
+                    self.through_model.objects.create(**model_args)
+
                 reversion.revisions.set_user(request.user)
                 reversion.revisions.set_comment(construct_change_message(request, None, [filled_formset]))
 
