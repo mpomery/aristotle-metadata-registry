@@ -1594,7 +1594,7 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         )
         self.assertEqual(response.status_code,200)
 
-        postdata = management_form
+        postdata = management_form.copy()
         postdata['form-0-item_to_add'] = self.de2.pk
         postdata['form-0-ORDER'] = 0
         #postdata['form-TOTAL_FORMS'] = 2
@@ -1606,13 +1606,18 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         self.item1 = self.itemType.objects.get(pk=self.item1.pk)
         self.assertTrue(self.de2 not in getattr(self.item1, attr).all())
         self.assertEqual(response.status_code,200)
-        #self.assertTrue('error_message' in response.context)
-        print(response.context['formset'].errors)
         self.assertContains(response, 'Select a valid choice')
+
+        postdata = management_form.copy()
+        postdata['form-0-item_to_add'] = self.de1.pk
+        postdata['form-0-ORDER'] = 0
+        postdata['form-1-item_to_add'] = self.de2.pk
+        postdata['form-1-ORDER'] = 1
+        postdata['form-TOTAL_FORMS'] = 2
 
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
-            {'items_to_add': [self.de1.pk, self.de2.pk]},
+            postdata,
             follow=True
         )
         self.assertTrue(self.de2 not in getattr(self.item1, attr).all())
@@ -1620,24 +1625,35 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         self.assertEqual(response.status_code,200)
 
         # user can see OC1, but its the wrong type so expect failure
+
+        postdata = management_form.copy()
+        postdata['form-0-item_to_add'] = self.de1.pk
+        postdata['form-0-ORDER'] = 0
+        postdata['form-1-item_to_add'] = self.oc1.pk
+        postdata['form-1-ORDER'] = 1
+        postdata['form-TOTAL_FORMS'] = 2
+
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
-            {'items_to_add': [self.de1.pk, self.oc1.pk]},
+            postdata,
             follow=True
         )
         self.assertTrue(self.de2 not in getattr(self.item1, attr).all())
         self.assertContains(response, 'Select a valid choice')
         self.assertEqual(response.status_code,200)
 
+        postdata = management_form.copy()
+        postdata['form-0-item_to_add'] = self.de1.pk
+        postdata['form-0-ORDER'] = 0
+
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
-            {'items_to_add': [self.de1.pk]},
+            postdata
         )
         self.assertTrue(self.de1 in getattr(self.item1, attr).all())
         self.assertEqual(response.status_code,302)
         self.assertRedirects(response, self.item1.get_absolute_url())
 
-    @tag('ded')
     def test_derivation_derives_concepts_save(self):
         self.derivation_m2m_concepts_save(
             url="aristotle_mdr:dataelementderivation_change_derives",
