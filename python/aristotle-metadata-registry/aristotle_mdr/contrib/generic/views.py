@@ -292,21 +292,10 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
         formclass = self.get_form_class()
         return formset_factory(formclass, formset=HiddenOrderFormset, can_order=True, can_delete=True)
 
-        # return modelformset_factory(
-        #     self.model_base,
-        #     formset=HiddenOrderModelFormSet,
-        #     fields=[self.model_base_field],
-        #     can_order=True,
-        #     can_delete=True,
-        #     widgets={
-        #         self.model_base_field: widgets.ConceptAutocompleteSelect(model=self.model_to_add)
-        #     }
-        # )
-
     def get_formset_initial(self):
         # Build initial
         filter_args = {self.base_through_field: self.item}
-        through_items = self.through_model.objects.filter(**filter_args).order_by('-order')
+        through_items = self.through_model.objects.filter(**filter_args).order_by('order')
 
         initial = []
         for item in through_items:
@@ -328,29 +317,59 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
         formset = self.get_formset()
         filled_formset = formset(self.request.POST)
 
+        current_items = getattr(self.item, self.model_base_field).all()
+
         if filled_formset.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
 
                 model_arglist = []
+                model_arglist_update = []
+                model_arglist_delete = []
+                change_message = []
 
                 for form in filled_formset.ordered_forms:
                     to_add = form.cleaned_data['item_to_add']
-
-                    # if not user_can_view(request.user, to_add):
-                    #     return self.error_with_message('You don\'t have permission to attach {}'.format(to_add.name))
 
                     model_args = {
                         self.base_through_field: self.item,
                         self.related_through_field: to_add,
                         'order': form.cleaned_data['ORDER']
                     }
-                    model_arglist.append(model_args)
+
+                    if to_add not in current_items:
+                        model_arglist.append(model_args)
+                        change_message.append('Added {} to {} {}'.format(to_add.name, self.item.name, self.model_base_field))
+                    else:
+                        model_arglist_update.append(model_args)
+                        change_message.append('Updated {} on {} {}'.format(to_add.name, self.item.name, self.model_base_field))
 
                 for model_args in model_arglist:
                     self.through_model.objects.create(**model_args)
 
+                for model_args in model_arglist_update:
+                    order = model_args.pop('order')
+                    item = self.through_model.get(**model_args)
+                    item.order = order
+                    item.save()
+
+                for form in filled_formset.deleted_forms:
+                    to_add = form.cleaned_data['item_to_add']
+
+                    for form in filled_formset.deleted_forms:
+                        to_delete = form.cleaned_data['item_to_add']
+
+                        model_args = {
+                            self.base_through_field: self.item,
+                            self.related_through_field: to_delete,
+                        }
+
+                        change_message.append('Deleted {} from {} {}'.format(to_delete.name, self.item.name, self.model_base_field))
+
+                        item = self.through_model.get(**model_args)
+                        item.delete()
+
                 reversion.revisions.set_user(request.user)
-                reversion.revisions.set_comment(construct_change_message(request, None, [filled_formset]))
+                reversion.revisions.set_comment(change_message)
 
             return HttpResponseRedirect(self.get_success_url())
         else:
