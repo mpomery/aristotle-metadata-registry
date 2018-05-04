@@ -16,6 +16,8 @@ import datetime
 
 from aristotle_mdr.utils import setup_aristotle_test_environment
 
+from aristotle_mdr.templatetags.aristotle_tags import get_dataelements_from_m2m
+
 
 setup_aristotle_test_environment()
 
@@ -1766,6 +1768,40 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
             url="aristotle_mdr:dataelementderivation_change_derives",
             attr='derives',
         )
+
+    def test_derivation_item_page(self):
+
+        de1 = models.DataElement.objects.create(name='DE1 Name',definition="my definition",workgroup=self.wg1)
+        de2 = models.DataElement.objects.create(name='DE2 Name',definition="my definition",workgroup=self.wg1)
+        de3 = models.DataElement.objects.create(name='DE3 Name',definition="my definition",workgroup=self.wg1)
+        ded = models.DataElementDerivation.objects.create(name='DED Name', definition='my definition', workgroup=self.wg1)
+
+        ded_derives_1 = models.DedDerivesThrough.objects.create(data_element_derivation=ded, data_element=de1, order=0)
+        ded_derives_2 = models.DedDerivesThrough.objects.create(data_element_derivation=ded, data_element=de2, order=1)
+        ded_derives_3 = models.DedDerivesThrough.objects.create(data_element_derivation=ded, data_element=de3, order=2)
+
+        ded_inputs_1 = models.DedInputsThrough.objects.create(data_element_derivation=ded, data_element=de3, order=0)
+        ded_inputs_1 = models.DedInputsThrough.objects.create(data_element_derivation=ded, data_element=de2, order=1)
+        ded_inputs_1 = models.DedInputsThrough.objects.create(data_element_derivation=ded, data_element=de1, order=2)
+
+        self.login_editor()
+        response = self.client.get(reverse("aristotle:item", args=[ded.pk]), follow=True)
+
+        self.assertEqual(response.status_code, 200)
+
+        # Check the template tag that was used returned the correct data
+
+        item = response.context['item']
+
+        des = get_dataelements_from_m2m(item, "inputs")
+        self.assertEqual(des[0].pk, de3.pk)
+        self.assertEqual(des[1].pk, de2.pk)
+        self.assertEqual(des[2].pk, de1.pk)
+
+        des = get_dataelements_from_m2m(item, "derives")
+        self.assertEqual(des[0].pk, de1.pk)
+        self.assertEqual(des[1].pk, de2.pk)
+        self.assertEqual(des[2].pk, de3.pk)
 
 
 class LoggedInViewUnmanagedPages(utils.LoggedInViewPages):
