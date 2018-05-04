@@ -8,6 +8,31 @@ import aristotle_mdr.fields
 
 def add_through(apps, schema_editor):
 
+    ded = apps.get_model('aristotle_mdr', 'DataElementDerivation')
+    ded_derives_through = apps.get_model('aristotle_mdr', 'DedDerivesThrough')
+    ded_inputs_through = apps.get_model('aristotle_mdr', 'DedInputsThrough')
+
+    for ded_obj in ded.objects.all():
+        count = 0
+        for through_obj in ded.derives.through.objects.filter(dataelementderivation=ded_obj):
+            ded_derives_through.objects.create(
+                data_element_derivation=ded_obj,
+                data_element=through_obj.dataelement,
+                order=count
+            )
+            count += 1
+
+        count = 0
+        for through_obj in ded.inputs.through.objects.filter(dataelementderivation=ded_obj):
+            ded_inputs_through.objects.create(
+                data_element_derivation=ded_obj,
+                data_element=through_obj.dataelement,
+                order=count
+            )
+            count += 1
+
+def add_through_reverse(apps, schema_editor):
+
     try:
         ded = apps.get_model('aristotle_mdr', 'DataElementDerivation')
         ded_derives_through = apps.get_model('aristotle_mdr', 'DedDerivesThrough')
@@ -15,14 +40,20 @@ def add_through(apps, schema_editor):
     except LookupError:
         pass
 
-    for ded_obj in ded.objects.all():
-        count = 0
-        for through_obj in ded.derives.through.objects.filter(_from=ded_obj):
-            ded_derives_through.objects.create(
-                data_element_derivation=ded_obj,
-                data_element=through_obj.to,
-                order=count
-            )
+    new_derives_through = ded.derives.through
+    new_inputs_through = ded.inputs.through
+
+    for through_obj in ded_derives_through.objects.all():
+        new_derives_through.objects.create(
+            dataelementderivation=through_obj.data_element_derivation,
+            dataelement=through_obj.data_element
+        )
+
+    for through_obj in ded_inputs_through.objects.all():
+        new_inputs_through.objects.create(
+            dataelementderivation=through_obj.data_element_derivation,
+            dataelement=through_obj.data_element
+        )
 
 class Migration(migrations.Migration):
 
@@ -53,15 +84,6 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
         ),
-        migrations.RunPython(add_through, reverse_add_through),
-        migrations.RemoveField(
-            model_name='dataelementderivation',
-            name='derives',
-        ),
-        migrations.RemoveField(
-            model_name='dataelementderivation',
-            name='inputs',
-        ),
         migrations.AddField(
             model_name='dedinputsthrough',
             name='data_element_derivation',
@@ -82,14 +104,5 @@ class Migration(migrations.Migration):
             name='data_element',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='aristotle_mdr.DataElement'),
         ),
-        migrations.AddField(
-            model_name='dataelementderivation',
-            name='derives',
-            field=aristotle_mdr.fields.ConceptManyToManyField(blank=True, help_text='binds with one or more output Data_Elements that are the result of the application of the Data_Element_Derivation.', null=True, related_name='derived_from', through='aristotle_mdr.DedDerivesThrough', to='aristotle_mdr.DataElement'),
-        ),
-        migrations.AddField(
-            model_name='dataelementderivation',
-            name='inputs',
-            field=aristotle_mdr.fields.ConceptManyToManyField(blank=True, help_text='binds one or more input Data_Element(s) with a Data_Element_Derivation.', related_name='input_to_derivation', through='aristotle_mdr.DedInputsThrough', to='aristotle_mdr.DataElement'),
-        ),
+        migrations.RunPython(add_through, add_through_reverse)
     ]
