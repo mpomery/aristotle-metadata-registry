@@ -405,10 +405,22 @@ class aristotle_mdr_DataElementDerivationSearchIndex(conceptIndex, indexes.Index
             Q(dataelementconcept__dataelement__derived_from=obj) | Q(dataelementconcept__dataelement__input_to_derivation=obj)
         ).values_list('name', flat=True))
 
+class DedDerivesInline(admin.TabularInline):
+
+    model = MDR.DedDerivesThrough
+    verbose_name = "Derive"
+    verbose_name_plural = "Derives"
+
+class DedInputsInline(admin.TabularInline):
+
+    model = MDR.DedInputsThrough
+    verbose_name = "Input"
+    verbose_name_plural = "Inputs"
 
 register_concept(
     MDR.DataElementDerivation,
-    extra_fieldsets=[('Derivation', {'fields': ['derivation_rule', 'derives', 'inputs']})],
+    extra_fieldsets=[('Derivation', {'fields': ['derivation_rule']})],
+    extra_inlines=[DedDerivesInline, DedInputsInline],
     custom_search_index=aristotle_mdr_DataElementDerivationSearchIndex
 )
 
