@@ -44,7 +44,7 @@
             <div class="panel-body">
                 <ul>
                 {% for output in item|get_dataelements_from_m2m:"derives" %}
-                    {% if input|can_view:request.user %}
+                    {% if output|can_view:request.user %}
                       <li>{% include "aristotle_mdr/helpers/inlineDetails.html" with item=output %}</li>
                     {% endif %}
                 {% endfor %}
