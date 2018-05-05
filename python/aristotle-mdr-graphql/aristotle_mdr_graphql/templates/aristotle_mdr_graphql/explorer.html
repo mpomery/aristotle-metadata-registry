@@ -1,0 +1,19 @@
+{% extends 'aristotle_mdr/base.html' %}
+{% load staticfiles %}
+
+{% block extra_block_scripts %}
+{% endblock %}
+
+{% block title %}Aristotle GraphQL Explorer{% endblock %} 
+
+
+{% block content %}
+<h1>Aristotle GraphQL Explorer</h1>
+<div class="alert alert-warning">
+Heads up! The Aristotle GraphQL Explorer makes use of your real, live, production data.
+Learn more about <a href="https://graphql.org/">GraphQL on the specification website.</a>
+</div>
+<iframe style="width:100%;min-height:715px;" src="{% url 'aristotle_graphql:graphql_api' %}?noexplorer">
+    
+</iframe>
+{% endblock %}
