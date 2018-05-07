@@ -132,6 +132,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
                         if formset.is_valid():
 
                             one_to_many_formset_save(formset, self.item, through['item_fields'][0], 'order')
+                            changed_formset.append(formset)
 
                         else:
 
@@ -226,7 +227,6 @@ class EditItemView(ConceptEditFormView, UpdateView):
                                     item_fields.append(through_field.name)
                         through_list.append({'field_name': field.name, 'model': through, 'item_fields': item_fields})
 
-        logger.debug(through_list)
         return through_list
 
     def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None, weak_formset=None):

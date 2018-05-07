@@ -1,6 +1,7 @@
 jQuery(function($) {
 
     $('.draggableTable').each(function(){
+      var thistable = $(this)
       $(this).sortable({
           // Only make the .panel-heading child elements support dragging.
           // Omit this to make the entire <li>...</li> draggable.
@@ -14,7 +15,7 @@ jQuery(function($) {
           },
 
           update: function() {
-              reorderRows();
+              reorderRows(thistable);
           }
       });
 
