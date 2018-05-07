@@ -180,7 +180,20 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
     def get_order_formset(self, through):
         excludes = ['order'] + through['item_fields']
-        return through_formset_factory(through['model'], excludes)
+        formset = through_formset_factory(through['model'], excludes)
+
+        if len(through['item_fields']) == 1:
+            through_filter = {through['item_fields'][0]: self.item}
+            formset_instance = formset(
+                prefix=through['field_name'],
+                queryset=through['model'].objects.filter(**through_filter)
+            )
+        else:
+            formset_instance = formset(
+                prefix=through['field_name']
+            )
+
+        return formset_instance
 
     def get_m2m_through(self, item):
         through_list = []
@@ -266,10 +279,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
         through_formsets = []
         for through in through_list:
             formset = self.get_order_formset(through)
-            formset_instance = formset(
-                prefix=through['field_name']
-            )
-            through_formsets.append({'formset': formset_instance, 'title': through['field_name'].title()})
+            through_formsets.append({'formset': formset, 'title': through['field_name'].title()})
 
         context['through_formsets'] = through_formsets
 
