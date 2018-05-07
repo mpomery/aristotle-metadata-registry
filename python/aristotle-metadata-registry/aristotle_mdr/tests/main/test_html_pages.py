@@ -1668,7 +1668,7 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
             attr='inputs',
         )
 
-    def derivation_m2m_formset(self, url, attr):
+    def derivation_m2m_formset(self, url, attr, prefix='form'):
 
         self.de1 = models.DataElement.objects.create(name='DE1 - visible',definition="my definition",workgroup=self.wg1)
         self.de2 = models.DataElement.objects.create(name='DE2 - visible',definition="my definition",workgroup=self.wg1)
@@ -1677,21 +1677,21 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         self.login_editor()
 
         management_form = {
-            'form-INITIAL_FORMS': 0,
-            'form-TOTAL_FORMS': 1,
-            'form-MIN_NUM_FORMS': 0,
-            'form-MAX_NUM_FORMS': 1000
+            '{}-INITIAL_FORMS'.format(prefix): 0,
+            '{}-TOTAL_FORMS'.format(prefix): 1,
+            '{}-MIN_NUM_FORMS'.format(prefix): 0,
+            '{}-MAX_NUM_FORMS'.format(prefix): 1000
         }
 
         # Post 3 items
         postdata = management_form.copy()
-        postdata['form-0-item_to_add'] = self.de3.pk
-        postdata['form-0-ORDER'] = 0
-        postdata['form-1-item_to_add'] = self.de1.pk
-        postdata['form-1-ORDER'] = 1
-        postdata['form-2-item_to_add'] = self.de2.pk
-        postdata['form-2-ORDER'] = 2
-        postdata['form-TOTAL_FORMS'] = 3
+        postdata['{}-0-item_to_add'.format(prefix)] = self.de3.pk
+        postdata['{}-0-ORDER'.format(prefix)] = 0
+        postdata['{}-1-item_to_add'.format(prefix)] = self.de1.pk
+        postdata['{}-1-ORDER'.format(prefix)] = 1
+        postdata['{}-2-item_to_add'.format(prefix)] = self.de2.pk
+        postdata['{}-2-ORDER'.format(prefix)] = 2
+        postdata['{}-TOTAL_FORMS'.format(prefix)] = 3
 
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
@@ -1723,14 +1723,14 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
 
         # Change order and delete
         postdata = management_form.copy()
-        postdata['form-0-item_to_add'] = self.de3.pk
-        postdata['form-0-ORDER'] = 0
-        postdata['form-0-DELETE'] = 'checked'
-        postdata['form-1-item_to_add'] = self.de2.pk
-        postdata['form-1-ORDER'] = 1
-        postdata['form-2-item_to_add'] = self.de1.pk
-        postdata['form-2-ORDER'] = 2
-        postdata['form-TOTAL_FORMS'] = 3
+        postdata['{}-0-item_to_add'.format(prefix)] = self.de3.pk
+        postdata['{}-0-ORDER'.format(prefix)] = 0
+        postdata['{}-0-DELETE'.format(prefix)] = 'checked'
+        postdata['{}-1-item_to_add'.format(prefix)] = self.de2.pk
+        postdata['{}-1-ORDER'.format(prefix)] = 1
+        postdata['{}-2-item_to_add'.format(prefix)] = self.de1.pk
+        postdata['{}-2-ORDER'.format(prefix)] = 2
+        postdata['{}-TOTAL_FORMS'.format(prefix)] = 3
 
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
