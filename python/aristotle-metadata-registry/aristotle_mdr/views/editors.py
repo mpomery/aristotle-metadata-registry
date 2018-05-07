@@ -73,6 +73,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
         form = self.get_form()
         slot_formset = None
         self.object = self.item
+        through_list = self.get_m2m_through(self.item)
 
         if form.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
@@ -122,6 +123,20 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                         else:
                             return self.form_invalid(form, weak_formset=weak_formset)
+
+                if through_list:
+                    # If there are through formsets
+                    for through in through_list:
+                        formset = self.get_order_formset(through)(request.POST)
+
+                        if formset.is_valid():
+
+                            one_to_many_formset_save(formset, self.item, through['item_fields'][0], 'order')
+
+                        else:
+
+                            return self.form_invalid(form, through_formset=through_formset)
+
 
                 # save the change comments
                 if not has_change_comments:
@@ -247,6 +262,11 @@ class EditItemView(ConceptEditFormView, UpdateView):
                 title = 'Edit ' + weak_formset.model.__name__
                 formsets = [{'formset': weak_formset, 'title': title}]
                 context['weak_formsets'] = formsets
+            elif kwargs.get('through_formset', None):
+                through_formset = kwargs.get('through_formset')
+                title = through_formset.model.__name__.title()
+                formsets = [{'formset': weak_formset, 'title': title}]
+                context['through_formsets'] = formsets
             else:
                 weak = self.item.serialize_weak_entities
                 formsets = []
