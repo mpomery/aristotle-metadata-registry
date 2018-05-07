@@ -20,7 +20,8 @@ import logging
 
 from aristotle_mdr.contrib.generic.forms import (
     one_to_many_formset_factory, one_to_many_formset_save,
-    one_to_many_formset_excludes, one_to_many_formset_filters
+    one_to_many_formset_excludes, one_to_many_formset_filters,
+    through_formset_factory
 )
 import re
 
@@ -177,6 +178,29 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
         return formset_info
 
+    def get_order_formset(self, through):
+        excludes = ['order'] + through['item_fields']
+        return through_formset_factory(through['model'], excludes)
+
+    def get_m2m_through(self, item):
+        through_list = []
+
+        for field in item._meta.get_fields():
+            if field.many_to_many:
+                if hasattr(field.remote_field, 'through'):
+                    through = field.remote_field.through
+                    if not through._meta.auto_created:
+                        item_fields = []
+                        for through_field in through._meta.get_fields():
+                            if through_field.is_relation:
+                                logger.debug('realted model is {}'.format(through_field.related_model))
+                                if through_field.related_model == self.item.__class__:
+                                    item_fields.append(through_field.name)
+                        through_list.append({'field_name': field.name, 'model': through, 'item_fields': item_fields})
+
+        logger.debug(through_list)
+        return through_list
+
     def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None, weak_formset=None):
         """
         If the form is invalid, re-render the context data with the
@@ -237,6 +261,17 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
         context['show_slots_tab'] = self.slots_active
         context['show_id_tab'] = self.identifiers_active
+
+        through_list = self.get_m2m_through(self.item)
+        through_formsets = []
+        for through in through_list:
+            formset = self.get_order_formset(through)
+            formset_instance = formset(
+                prefix=through['field_name']
+            )
+            through_formsets.append({'formset': formset_instance, 'title': through['field_name'].title()})
+
+        context['through_formsets'] = through_formsets
 
         return context
 

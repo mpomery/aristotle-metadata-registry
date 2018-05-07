@@ -64,35 +64,42 @@ def one_to_many_formset_filters(formset, item):
     return formset
 
 
+def get_aristotle_widgets(model):
+
+    _widgets = {}
+    for f in model._meta.fields:
+     foreign_model = model._meta.get_field(f.name).related_model
+     if foreign_model and issubclass(foreign_model, _concept):
+         _widgets.update({
+             f.name: widgets.ConceptAutocompleteSelect(
+                 model=foreign_model
+             )
+         })
+
+     if isinstance(model._meta.get_field(f.name), DateField):
+         _widgets.update({
+             f.name: BootstrapDateTimePicker(options=datePickerOptions)
+         })
+
+    for f in model._meta.many_to_many:
+     foreign_model = model._meta.get_field(f.name).related_model
+     if foreign_model and issubclass(foreign_model, _concept):
+         _widgets.update({
+             f.name: widgets.ConceptAutocompleteSelectMultiple(
+                 model=foreign_model
+             )
+         })
+
+    return _widgets
+
 def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field, extra_excludes=[]):
     # creates a one to many formset
     # model_to_add is weak entity class, model_to_add_field is the foriegn key field name
-    _widgets = {}
+
     exclude_fields = [model_to_add_field, ordering_field]
     exclude_fields += extra_excludes
 
-    for f in model_to_add._meta.fields:
-        foreign_model = model_to_add._meta.get_field(f.name).related_model
-        if foreign_model and issubclass(foreign_model, _concept):
-            _widgets.update({
-                f.name: widgets.ConceptAutocompleteSelect(
-                    model=foreign_model
-                )
-            })
-
-        if isinstance(model_to_add._meta.get_field(f.name), DateField):
-            _widgets.update({
-                f.name: BootstrapDateTimePicker(options=datePickerOptions)
-            })
-
-    for f in model_to_add._meta.many_to_many:
-        foreign_model = model_to_add._meta.get_field(f.name).related_model
-        if foreign_model and issubclass(foreign_model, _concept):
-            _widgets.update({
-                f.name: widgets.ConceptAutocompleteSelectMultiple(
-                    model=foreign_model
-                )
-            })
+    _widgets = get_aristotle_widgets(model_to_add)
 
     return modelformset_factory(
         model_to_add,
@@ -124,3 +131,18 @@ def one_to_many_formset_save(formset, item, model_to_add_field, ordering_field):
     for obj in formset.deleted_objects:
         obj.delete()
     formset.save_m2m()
+
+
+def through_formset_factory(model, excludes=[]):
+
+    _widgets = get_aristotle_widgets(model)
+
+    return modelformset_factory(
+        model,
+        formset=HiddenOrderModelFormSet,
+        can_order=True,  # we assign this back to the ordering field
+        can_delete=True,
+        exclude=excludes,
+        extra=1,
+        widgets=_widgets
+    )

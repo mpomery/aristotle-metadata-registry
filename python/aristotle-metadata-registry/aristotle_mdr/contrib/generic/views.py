@@ -283,8 +283,6 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
 
         # Check if either is None
 
-        logger.debug('base field: {} mta field: {}'.format(self.base_through_field, self.related_through_field))
-
         return super().dispatch(request, *args, **kwargs)
 
     def get_formset(self):
