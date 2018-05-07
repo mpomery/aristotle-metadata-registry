@@ -127,7 +127,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
                 if through_list:
                     # If there are through formsets
                     for through in through_list:
-                        formset = self.get_order_formset(through)(request.POST)
+                        formset = self.get_order_formset(through, request.POST)
 
                         if formset.is_valid():
 
@@ -193,20 +193,20 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
         return formset_info
 
-    def get_order_formset(self, through):
+    def get_order_formset(self, through, postdata=None):
         excludes = ['order'] + through['item_fields']
         formset = through_formset_factory(through['model'], excludes)
 
+        fsargs = {'prefix': through['field_name']}
+
         if len(through['item_fields']) == 1:
             through_filter = {through['item_fields'][0]: self.item}
-            formset_instance = formset(
-                prefix=through['field_name'],
-                queryset=through['model'].objects.filter(**through_filter)
-            )
-        else:
-            formset_instance = formset(
-                prefix=through['field_name']
-            )
+            fsargs.update({'queryset': through['model'].objects.filter(**through_filter)})
+
+        if postdata:
+            fsargs.update({'data': postdata})
+
+        formset_instance = formset(**fsargs)
 
         return formset_instance
 

@@ -67,28 +67,29 @@ def one_to_many_formset_filters(formset, item):
 def get_aristotle_widgets(model):
 
     _widgets = {}
-    for f in model._meta.fields:
-     foreign_model = model._meta.get_field(f.name).related_model
-     if foreign_model and issubclass(foreign_model, _concept):
-         _widgets.update({
-             f.name: widgets.ConceptAutocompleteSelect(
-                 model=foreign_model
-             )
-         })
 
-     if isinstance(model._meta.get_field(f.name), DateField):
-         _widgets.update({
-             f.name: BootstrapDateTimePicker(options=datePickerOptions)
-         })
+    for f in model._meta.fields:
+        foreign_model = model._meta.get_field(f.name).related_model
+        if foreign_model and issubclass(foreign_model, _concept):
+            _widgets.update({
+                f.name: widgets.ConceptAutocompleteSelect(
+                    model=foreign_model
+                )
+            })
+
+        if isinstance(model._meta.get_field(f.name), DateField):
+            _widgets.update({
+                f.name: BootstrapDateTimePicker(options=datePickerOptions)
+            })
 
     for f in model._meta.many_to_many:
-     foreign_model = model._meta.get_field(f.name).related_model
-     if foreign_model and issubclass(foreign_model, _concept):
-         _widgets.update({
-             f.name: widgets.ConceptAutocompleteSelectMultiple(
-                 model=foreign_model
-             )
-         })
+        foreign_model = model._meta.get_field(f.name).related_model
+        if foreign_model and issubclass(foreign_model, _concept):
+            _widgets.update({
+                f.name: widgets.ConceptAutocompleteSelectMultiple(
+                    model=foreign_model
+                )
+            })
 
     return _widgets
 
@@ -136,6 +137,7 @@ def one_to_many_formset_save(formset, item, model_to_add_field, ordering_field):
 def through_formset_factory(model, excludes=[]):
 
     _widgets = get_aristotle_widgets(model)
+    logger.debug('widgets are {}'.format(_widgets))
 
     return modelformset_factory(
         model,
