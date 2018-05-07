@@ -1312,6 +1312,8 @@ class DataElementDerivation(concept):
     output :model:`aristotle_mdr.DataElement`\s (3.2.33)
     """
 
+    edit_page_excludes = ['inputs', 'derives']
+
     derives = ConceptManyToManyField(  # 11.5.3.5
         DataElement,
         through='DedDerivesThrough',
