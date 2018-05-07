@@ -132,7 +132,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
                         if formset.is_valid():
 
                             one_to_many_formset_save(formset, self.item, through['item_fields'][0], 'order')
-                            changed_formset.append(formset)
+                            changed_formsets.append(formset)
 
                         else:
 

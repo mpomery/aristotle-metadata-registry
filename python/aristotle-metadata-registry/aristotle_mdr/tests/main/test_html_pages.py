@@ -1668,7 +1668,7 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
             attr='inputs',
         )
 
-    def derivation_m2m_formset(self, url, attr, prefix='form'):
+    def derivation_m2m_formset(self, url, attr, prefix='form', item_add_field='item_to_add', added_post={}):
 
         self.de1 = models.DataElement.objects.create(name='DE1 - visible',definition="my definition",workgroup=self.wg1)
         self.de2 = models.DataElement.objects.create(name='DE2 - visible',definition="my definition",workgroup=self.wg1)
@@ -1683,13 +1683,16 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
             '{}-MAX_NUM_FORMS'.format(prefix): 1000
         }
 
+        if added_post:
+            management_form.update(added_post)
+
         # Post 3 items
         postdata = management_form.copy()
-        postdata['{}-0-item_to_add'.format(prefix)] = self.de3.pk
+        postdata['{}-0-{}'.format(prefix, item_add_field)] = self.de3.pk
         postdata['{}-0-ORDER'.format(prefix)] = 0
-        postdata['{}-1-item_to_add'.format(prefix)] = self.de1.pk
+        postdata['{}-1-{}'.format(prefix, item_add_field)] = self.de1.pk
         postdata['{}-1-ORDER'.format(prefix)] = 1
-        postdata['{}-2-item_to_add'.format(prefix)] = self.de2.pk
+        postdata['{}-2-{}'.format(prefix, item_add_field)] = self.de2.pk
         postdata['{}-2-ORDER'.format(prefix)] = 2
         postdata['{}-TOTAL_FORMS'.format(prefix)] = 3
 
@@ -1709,35 +1712,53 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
 
         response = self.client.get(reverse(url, args=[self.item1.pk]))
 
-        formset_initial = response.context['formset'].initial
+        if prefix == 'form':
+            # If m2m specific form
+            formset_initial = response.context['formset'].initial
 
-        self.assertEqual(len(formset_initial), 3)
-        for data in formset_initial:
-            self.assertTrue(data['ORDER'] in [0,1,2])
-            if data['ORDER'] == 0:
-                self.assertEqual(data['item_to_add'], self.de3)
-            elif data['ORDER'] == 1:
-                self.assertEqual(data['item_to_add'], self.de1)
-            elif data['ORDER'] == 2:
-                self.assertEqual(data['item_to_add'], self.de2)
+            self.assertEqual(len(formset_initial), 3)
+            for data in formset_initial:
+                self.assertTrue(data['ORDER'] in [0,1,2])
+                if data['ORDER'] == 0:
+                    self.assertEqual(data['{}'.format(item_add_field)], self.de3)
+                elif data['ORDER'] == 1:
+                    self.assertEqual(data['{}'.format(item_add_field)], self.de1)
+                elif data['ORDER'] == 2:
+                    self.assertEqual(data['{}'.format(item_add_field)], self.de2)
+
+        if attr == 'derives':
+            through_model = models.DedDerivesThrough
+        else:
+            through_model = models.DedInputsThrough
+
+        self.assertEqual(through_model.objects.get(order=0).data_element, self.de3)
+        self.assertEqual(through_model.objects.get(order=1).data_element, self.de1)
+        self.assertEqual(through_model.objects.get(order=2).data_element, self.de2)
+
 
         # Change order and delete
         postdata = management_form.copy()
-        postdata['{}-0-item_to_add'.format(prefix)] = self.de3.pk
+        postdata['{}-0-{}'.format(prefix, item_add_field)] = self.de3.pk
         postdata['{}-0-ORDER'.format(prefix)] = 0
         postdata['{}-0-DELETE'.format(prefix)] = 'checked'
-        postdata['{}-1-item_to_add'.format(prefix)] = self.de2.pk
+        postdata['{}-1-{}'.format(prefix, item_add_field)] = self.de2.pk
         postdata['{}-1-ORDER'.format(prefix)] = 1
-        postdata['{}-2-item_to_add'.format(prefix)] = self.de1.pk
+        postdata['{}-2-{}'.format(prefix, item_add_field)] = self.de1.pk
         postdata['{}-2-ORDER'.format(prefix)] = 2
         postdata['{}-TOTAL_FORMS'.format(prefix)] = 3
+
+        print(postdata)
 
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
             postdata
         )
+        print(response.status_code)
+        print(response.context['through_formsets'][0]['formset'].non_form_errors)
+        print(response.context['through_formsets'][1]['formset'].non_form_errors)
+        #print(response.content)
 
-        self.assertRedirects(response, self.item1.get_absolute_url())
+        #self.assertRedirects(response, self.item1.get_absolute_url())
 
         items = getattr(self.item1, attr).all()
         self.assertTrue(self.de1 in items)
@@ -1749,13 +1770,19 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         response = self.client.get(reverse(url, args=[self.item1.pk]))
         formset_initial = response.context['formset'].initial
 
-        self.assertEqual(len(formset_initial), 2)
-        for data in formset_initial:
-            self.assertTrue(data['ORDER'] in [1,2])
-            if data['ORDER'] == 1:
-                self.assertEqual(data['item_to_add'], self.de2)
-            elif data['ORDER'] == 2:
-                self.assertEqual(data['item_to_add'], self.de1)
+        if prefix == 'form':
+            # If m2m specific form
+            self.assertEqual(len(formset_initial), 2)
+            for data in formset_initial:
+                self.assertTrue(data['ORDER'] in [1,2])
+                if data['ORDER'] == 1:
+                    self.assertEqual(data['{}'.format(item_add_field)], self.de2)
+                elif data['ORDER'] == 2:
+                    self.assertEqual(data['{}'.format(item_add_field)], self.de1)
+
+        self.assertEqual(through_model.objects.get(order=0).data_element, self.de2)
+        self.assertEqual(through_model.objects.get(order=1).data_element, self.de1)
+
 
     def test_derivation_inputs_formset(self):
         self.derivation_m2m_formset(
@@ -1767,6 +1794,28 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         self.derivation_m2m_formset(
             url="aristotle_mdr:dataelementderivation_change_derives",
             attr='derives',
+        )
+
+    @tag('runthistest')
+    def test_derivation_inputs_formset_editor(self):
+
+        offprefix = 'derives'
+        off_management_form = {
+            '{}-INITIAL_FORMS'.format(offprefix): 0,
+            '{}-TOTAL_FORMS'.format(offprefix): 1,
+            '{}-MIN_NUM_FORMS'.format(offprefix): 0,
+            '{}-MAX_NUM_FORMS'.format(offprefix): 1000
+        }
+
+        data = utils.model_to_dict_with_change_time(self.item1)
+        data.update(off_management_form)
+
+        self.derivation_m2m_formset(
+            url="aristotle_mdr:edit_item",
+            attr="inputs",
+            prefix="inputs",
+            item_add_field="data_element",
+            added_post=data
         )
 
     def test_derivation_item_page(self):
