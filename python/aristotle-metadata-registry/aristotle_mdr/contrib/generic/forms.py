@@ -171,7 +171,7 @@ def ordered_formset_save(formset, item, model_to_add_field, ordering_field):
 def get_weak_model_field(model, search_model):
     # get the field in the model that we are adding so it can be excluded from form
     model_to_add_field = ''
-    for field in field_model._meta.get_fields():
+    for field in model._meta.get_fields():
         if (field.is_relation):
             if (field.related_model == search_model):
                 model_to_add_field = field.name
@@ -180,18 +180,26 @@ def get_weak_model_field(model, search_model):
     return model_to_add_field
 
 
-def get_weak_formset(entity, item, search_model):
+def get_weak_formset(entity, search_model, item=None, field_model=None, postdata=None, queryset=None):
     # where entity is an entry in serialize_weak_entities
 
-    field_model = getattr(item, entity[1]).model
-    model_to_add_field = self.get_weak_model_field(field_model, search_model)
+    if not field_model:
+        field_model = getattr(item, entity[1]).model
 
-    extra_excludes = one_to_many_formset_excludes(item, field_model)
+    model_to_add_field = get_weak_model_field(field_model, search_model)
+
+    if item:
+        extra_excludes = one_to_many_formset_excludes(item, field_model)
+    else:
+        extra_excludes=['value_meaning'] # Default to not displaying value meaning
+
     formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field, extra_excludes)
+
+    final_formset = formset(prefix=entity[0], data=postdata, queryset=queryset)
+
     formset_info = {
-        'formset': formset,
+        'formset': final_formset,
         'model_field': model_to_add_field,
-        'prefix': entity[0],
         'ordering': field_model.ordering_field,
     }
 

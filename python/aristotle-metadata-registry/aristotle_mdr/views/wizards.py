@@ -21,6 +21,7 @@ from aristotle_mdr.contrib.generic.forms import get_weak_formset, get_order_form
 from formtools.wizard.views import SessionWizardView
 from reversion import revisions as reversion
 
+import re
 import logging
 logger = logging.getLogger(__name__)
 
@@ -108,16 +109,31 @@ class ConceptWizard(PermissionWizard):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def get_extra_formsets(self, postdata=None):
+    def get_extra_formsets(self):
 
         through_list = get_m2m_through(self.model)
 
         through_formsets = []
         for through in through_list:
-            formset = get_order_formset(through, postdata=postdata)
+            formset = get_order_formset(through)
             through_formsets.append({'formset': formset, 'title': through['field_name'].title()})
 
-        return {'through_formsets': through_formsets}
+        weak_formsets = []
+        if (hasattr(self.model, 'serialize_weak_entities')):
+            weak = self.model.serialize_weak_entities
+
+            for entity in weak:
+                fmodel = getattr(self.model, entity[1]).rel.related_model
+                queryset = fmodel.objects.none()
+
+                weak_formset = get_weak_formset(entity, self.model, field_model=fmodel, queryset=queryset)['formset']
+
+                title = 'Edit ' + queryset.model.__name__
+                title = re.sub(r"\B([A-Z])", r" \1", title)
+
+                weak_formsets.append({'formset': weak_formset, 'title': title})
+
+        return {'through_formsets': through_formsets, 'weak_formsets': weak_formsets}
 
     def get_form(self, step=None, data=None, files=None):
         if step is None:  # pragma: no cover
@@ -166,6 +182,12 @@ class ConceptWizard(PermissionWizard):
                         })
         return context
 
+    def get(self, *args, **kwargs):
+        if 'resultspost' in self.request.session.keys():
+            self.request.session.pop('resultspost')
+
+        return super().get(*args, **kwargs)
+
     def post(self, *args, **kwargs):
 
         if self.steps.current == 'results':
@@ -201,6 +223,22 @@ class ConceptWizard(PermissionWizard):
                 else:
                     logger.debug('formset invalid')
                     logger.debug('errors: {}'.format(formset.errors))
+
+            if (hasattr(saved_item, 'serialize_weak_entities')):
+
+                weak = saved_item.serialize_weak_entities
+
+                for entity in weak:
+
+                    fmodel = getattr(self.model, entity[1]).rel.related_model
+                    formset_info = get_weak_formset(entity, self.model, field_model=fmodel, postdata=self.request.session['resultspost'])
+
+                    weak_formset = formset_info['formset']
+
+                    if weak_formset.is_valid():
+                        ordered_formset_save(weak_formset, saved_item, formset_info['model_field'], formset_info['ordering'])
+                    else:
+                        logger.debug('weak formset invalid')
 
             self.request.session.pop('resultspost')
         else:

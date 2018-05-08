@@ -114,9 +114,9 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                     for entity in weak:
 
-                        formset_info = self.get_weak_formset(entity)
+                        formset_info = self.get_weak_formset(entity, postdata=request.POST)
 
-                        weak_formset = formset_info['formset'](request.POST, request.FILES, prefix=formset_info['prefix'])
+                        weak_formset = formset_info['formset']
 
                         if weak_formset.is_valid():
                             ordered_formset_save(weak_formset, self.item, formset_info['model_field'], formset_info['ordering'])
@@ -167,8 +167,8 @@ class EditItemView(ConceptEditFormView, UpdateView):
             extra=1,
             )
 
-    def get_weak_formset(self, entity):
-        return get_weak_formset(entity, self.item, self.model)
+    def get_weak_formset(self, entity, postdata=None, queryset=None):
+        return get_weak_formset(entity, self.model, item=self.item, postdata=postdata, queryset=queryset)
 
     def get_order_formset(self, through, postdata=None):
         return get_order_formset(through, self.item, postdata)
@@ -218,14 +218,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
                     # query weak entity
                     queryset = getattr(self.item, entity[1]).all()
 
-                    formset = self.get_weak_formset(entity)['formset']
-
-                    weak_formset = formset(
-                        queryset=queryset,
-                        initial=[{'ORDER': queryset.count() + 1}],
-                        prefix=entity[0]
-                    )
-
+                    weak_formset = self.get_weak_formset(entity, queryset=queryset)['formset']
                     weak_formset = one_to_many_formset_filters(weak_formset, self.item)
 
                     title = 'Edit ' + queryset.model.__name__
