@@ -102,17 +102,6 @@ function addCode(id) {
 
 function renumberRow(row,num) {
     $(row).find('input[name$="-ORDER"]').attr('value',num);
-    $(row).find(':input').each(function(index, elem) {
-        if ($(this).attr('name')) {
-            name = [
-                $(this).attr('name').split('-')[0],
-                num,
-                $(this).attr('name').split('-')[2]
-                ].join('-');
-            $(this).attr('name',name);
-            $(this).attr('id',"id_"+name);
-        }
-    });
 }
 
 function reorderRows(panelList) {

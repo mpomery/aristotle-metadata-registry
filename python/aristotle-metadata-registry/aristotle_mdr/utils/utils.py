@@ -352,3 +352,21 @@ def get_aristotle_url(label, obj_id, obj_name=None):
             return reverse('aristotle:userReviewDetails', args=[obj_id])
 
     return None
+
+
+def get_m2m_through(item):
+    through_list = []
+
+    for field in item._meta.get_fields():
+        if field.many_to_many:
+            if hasattr(field.remote_field, 'through'):
+                through = field.remote_field.through
+                if not through._meta.auto_created:
+                    item_fields = []
+                    for through_field in through._meta.get_fields():
+                        if through_field.is_relation:
+                            if through_field.related_model == item.__class__:
+                                item_fields.append(through_field.name)
+                    through_list.append({'field_name': field.name, 'model': through, 'item_fields': item_fields})
+
+    return through_list

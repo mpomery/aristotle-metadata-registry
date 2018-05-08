@@ -9,7 +9,8 @@ import reversion
 
 from aristotle_mdr.utils import (
     concept_to_clone_dict,
-    construct_change_message, url_slugify_concept, is_active_module
+    construct_change_message, url_slugify_concept, is_active_module,
+    get_m2m_through
 )
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
@@ -21,7 +22,8 @@ import logging
 from aristotle_mdr.contrib.generic.forms import (
     one_to_many_formset_factory, one_to_many_formset_save,
     one_to_many_formset_excludes, one_to_many_formset_filters,
-    through_formset_factory, ordered_formset_save
+    through_formset_factory, ordered_formset_save,
+    get_weak_formset, get_order_formset
 )
 import re
 
@@ -73,7 +75,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
         form = self.get_form()
         slot_formset = None
         self.object = self.item
-        through_list = self.get_m2m_through(self.item)
+        through_list = get_m2m_through(self.item)
 
         if form.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
@@ -136,7 +138,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                         else:
 
-                            return self.form_invalid(form, through_formset=through_formset)
+                            return self.form_invalid(form, through_formset=formset)
 
 
                 # save the change comments
@@ -165,76 +167,18 @@ class EditItemView(ConceptEditFormView, UpdateView):
             extra=1,
             )
 
-    def get_weak_model_field(self, field_model):
-        # get the field in the model that we are adding so it can be excluded from form
-        model_to_add_field = ''
-        for field in field_model._meta.get_fields():
-            if (field.is_relation):
-                if (field.related_model == self.model):
-                    model_to_add_field = field.name
-                    break
-
-        return model_to_add_field
-
     def get_weak_formset(self, entity):
-
-        # where entity is an entry in serialize_weak_entities
-
-        field_model = getattr(self.item, entity[1]).model
-        model_to_add_field = self.get_weak_model_field(field_model)
-
-        extra_excludes = one_to_many_formset_excludes(self.item, field_model)
-        formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field, extra_excludes)
-        formset_info = {
-            'formset': formset,
-            'model_field': model_to_add_field,
-            'prefix': entity[0],
-            'ordering': field_model.ordering_field,
-        }
-
-        return formset_info
+        return get_weak_formset(entity, self.item, self.model)
 
     def get_order_formset(self, through, postdata=None):
-        excludes = ['order'] + through['item_fields']
-        formset = through_formset_factory(through['model'], excludes)
+        return get_order_formset(self.item, through, postdata)
 
-        fsargs = {'prefix': through['field_name']}
-
-        if len(through['item_fields']) == 1:
-            through_filter = {through['item_fields'][0]: self.item}
-            fsargs.update({'queryset': through['model'].objects.filter(**through_filter)})
-
-        if postdata:
-            fsargs.update({'data': postdata})
-
-        formset_instance = formset(**fsargs)
-
-        return formset_instance
-
-    def get_m2m_through(self, item):
-        through_list = []
-
-        for field in item._meta.get_fields():
-            if field.many_to_many:
-                if hasattr(field.remote_field, 'through'):
-                    through = field.remote_field.through
-                    if not through._meta.auto_created:
-                        item_fields = []
-                        for through_field in through._meta.get_fields():
-                            if through_field.is_relation:
-                                logger.debug('realted model is {}'.format(through_field.related_model))
-                                if through_field.related_model == self.item.__class__:
-                                    item_fields.append(through_field.name)
-                        through_list.append({'field_name': field.name, 'model': through, 'item_fields': item_fields})
-
-        return through_list
-
-    def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None, weak_formset=None):
+    def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None, weak_formset=None, through_formset=None):
         """
         If the form is invalid, re-render the context data with the
         data-filled form and errors.
         """
-        return self.render_to_response(self.get_context_data(form=form, slots_FormSet=slots_FormSet, weak_formset=weak_formset))
+        return self.render_to_response(self.get_context_data(form=form, slots_FormSet=slots_FormSet, weak_formset=weak_formset, through_formset=through_formset))
 
     def get_context_data(self, *args, **kwargs):
         from aristotle_mdr.contrib.slots.models import Slot
@@ -295,7 +239,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
         context['show_slots_tab'] = self.slots_active
         context['show_id_tab'] = self.identifiers_active
 
-        through_list = self.get_m2m_through(self.item)
+        through_list = get_m2m_through(self.item)
         through_formsets = []
         for through in through_list:
             formset = self.get_order_formset(through)

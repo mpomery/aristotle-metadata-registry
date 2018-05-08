@@ -136,7 +136,6 @@ def one_to_many_formset_save(formset, item, model_to_add_field, ordering_field):
 def through_formset_factory(model, excludes=[]):
 
     _widgets = get_aristotle_widgets(model)
-    logger.debug('widgets are {}'.format(_widgets))
 
     return modelformset_factory(
         model,
@@ -167,3 +166,50 @@ def ordered_formset_save(formset, item, model_to_add_field, ordering_field):
 
     # Save any m2m relations on the ojects (not actually needed yet)
     formset.save_m2m()
+
+
+def get_weak_model_field(model, search_model):
+    # get the field in the model that we are adding so it can be excluded from form
+    model_to_add_field = ''
+    for field in field_model._meta.get_fields():
+        if (field.is_relation):
+            if (field.related_model == search_model):
+                model_to_add_field = field.name
+                break
+
+    return model_to_add_field
+
+
+def get_weak_formset(entity, item, search_model):
+    # where entity is an entry in serialize_weak_entities
+
+    field_model = getattr(item, entity[1]).model
+    model_to_add_field = self.get_weak_model_field(field_model, search_model)
+
+    extra_excludes = one_to_many_formset_excludes(item, field_model)
+    formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field, extra_excludes)
+    formset_info = {
+        'formset': formset,
+        'model_field': model_to_add_field,
+        'prefix': entity[0],
+        'ordering': field_model.ordering_field,
+    }
+
+    return formset_info
+
+def get_order_formset(item, through, postdata=None):
+    excludes = ['order'] + through['item_fields']
+    formset = through_formset_factory(through['model'], excludes)
+
+    fsargs = {'prefix': through['field_name']}
+
+    if len(through['item_fields']) == 1:
+        through_filter = {through['item_fields'][0]: item}
+        fsargs.update({'queryset': through['model'].objects.filter(**through_filter)})
+
+    if postdata:
+        fsargs.update({'data': postdata})
+
+    formset_instance = formset(**fsargs)
+
+    return formset_instance
