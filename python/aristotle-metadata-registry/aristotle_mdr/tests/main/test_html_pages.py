@@ -1668,7 +1668,7 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
             attr='inputs',
         )
 
-    def derivation_m2m_formset(self, url, attr, prefix='form', item_add_field='item_to_add', added_post={}):
+    def derivation_m2m_formset(self, url, attr, prefix='form', item_add_field='item_to_add', add_itemdata=False, extra_postdata=None):
 
         self.de1 = models.DataElement.objects.create(name='DE1 - visible',definition="my definition",workgroup=self.wg1)
         self.de2 = models.DataElement.objects.create(name='DE2 - visible',definition="my definition",workgroup=self.wg1)
@@ -1683,8 +1683,8 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
             '{}-MAX_NUM_FORMS'.format(prefix): 1000
         }
 
-        if added_post:
-            management_form.update(added_post)
+        if extra_postdata:
+            management_form.update(extra_postdata)
 
         # Post 3 items
         postdata = management_form.copy()
@@ -1695,6 +1695,9 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         postdata['{}-2-{}'.format(prefix, item_add_field)] = self.de2.pk
         postdata['{}-2-ORDER'.format(prefix)] = 2
         postdata['{}-TOTAL_FORMS'.format(prefix)] = 3
+
+        if add_itemdata:
+            postdata.update(utils.model_to_dict_with_change_time(self.item1))
 
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
@@ -1711,8 +1714,9 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         # Load page to check loading of existing data and preserved order
 
         response = self.client.get(reverse(url, args=[self.item1.pk]))
+        self.assertEqual(response.status_code, 200)
 
-        if prefix == 'form':
+        if not add_itemdata:
             # If m2m specific form
             formset_initial = response.context['formset'].initial
 
@@ -1731,6 +1735,8 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         else:
             through_model = models.DedInputsThrough
 
+        # Check order with through table
+        self.assertEqual(through_model.objects.count(), 3)
         self.assertEqual(through_model.objects.get(order=0).data_element, self.de3)
         self.assertEqual(through_model.objects.get(order=1).data_element, self.de1)
         self.assertEqual(through_model.objects.get(order=2).data_element, self.de2)
@@ -1739,13 +1745,20 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         # Change order and delete
         postdata = management_form.copy()
         postdata['{}-0-{}'.format(prefix, item_add_field)] = self.de3.pk
+        postdata['{}-0-id'.format(prefix)] = through_model.objects.get(data_element=self.de3).pk
         postdata['{}-0-ORDER'.format(prefix)] = 0
         postdata['{}-0-DELETE'.format(prefix)] = 'checked'
         postdata['{}-1-{}'.format(prefix, item_add_field)] = self.de2.pk
+        postdata['{}-1-id'.format(prefix)] = through_model.objects.get(data_element=self.de2).pk
         postdata['{}-1-ORDER'.format(prefix)] = 1
         postdata['{}-2-{}'.format(prefix, item_add_field)] = self.de1.pk
+        postdata['{}-2-id'.format(prefix)] = through_model.objects.get(data_element=self.de1).pk
         postdata['{}-2-ORDER'.format(prefix)] = 2
         postdata['{}-TOTAL_FORMS'.format(prefix)] = 3
+        postdata['{}-INITIAL_FORMS'.format(prefix)] = 3
+
+        if add_itemdata:
+            postdata.update(utils.model_to_dict_with_change_time(self.item1))
 
         print(postdata)
 
@@ -1754,13 +1767,11 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
             postdata
         )
         print(response.status_code)
-        print(response.context['through_formsets'][0]['formset'].non_form_errors)
-        print(response.context['through_formsets'][1]['formset'].non_form_errors)
-        #print(response.content)
 
-        #self.assertRedirects(response, self.item1.get_absolute_url())
+        self.assertRedirects(response, self.item1.get_absolute_url())
 
         items = getattr(self.item1, attr).all()
+        self.assertTrue(items.count(), 2)
         self.assertTrue(self.de1 in items)
         self.assertTrue(self.de2 in items)
         self.assertFalse(self.de3 in items)
@@ -1768,9 +1779,11 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         # Load page to check order
 
         response = self.client.get(reverse(url, args=[self.item1.pk]))
+        self.assertEqual(response.status_code, 200)
+
         formset_initial = response.context['formset'].initial
 
-        if prefix == 'form':
+        if not add_itemdata:
             # If m2m specific form
             self.assertEqual(len(formset_initial), 2)
             for data in formset_initial:
@@ -1780,8 +1793,10 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
                 elif data['ORDER'] == 2:
                     self.assertEqual(data['{}'.format(item_add_field)], self.de1)
 
-        self.assertEqual(through_model.objects.get(order=0).data_element, self.de2)
-        self.assertEqual(through_model.objects.get(order=1).data_element, self.de1)
+        # Check order with through table
+        self.assertEqual(through_model.objects.count(), 2)
+        self.assertEqual(through_model.objects.get(order=1).data_element, self.de2)
+        self.assertEqual(through_model.objects.get(order=2).data_element, self.de1)
 
 
     def test_derivation_inputs_formset(self):
@@ -1807,15 +1822,13 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
             '{}-MAX_NUM_FORMS'.format(offprefix): 1000
         }
 
-        data = utils.model_to_dict_with_change_time(self.item1)
-        data.update(off_management_form)
-
         self.derivation_m2m_formset(
             url="aristotle_mdr:edit_item",
             attr="inputs",
             prefix="inputs",
             item_add_field="data_element",
-            added_post=data
+            add_itemdata=True,
+            extra_postdata=off_management_form
         )
 
     def test_derivation_item_page(self):

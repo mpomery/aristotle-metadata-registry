@@ -21,7 +21,7 @@ import logging
 from aristotle_mdr.contrib.generic.forms import (
     one_to_many_formset_factory, one_to_many_formset_save,
     one_to_many_formset_excludes, one_to_many_formset_filters,
-    through_formset_factory
+    through_formset_factory, ordered_formset_save
 )
 import re
 
@@ -131,7 +131,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                         if formset.is_valid():
 
-                            one_to_many_formset_save(formset, self.item, through['item_fields'][0], 'order')
+                            ordered_formset_save(formset, self.item, through['item_fields'][0], 'order')
                             changed_formsets.append(formset)
 
                         else:
