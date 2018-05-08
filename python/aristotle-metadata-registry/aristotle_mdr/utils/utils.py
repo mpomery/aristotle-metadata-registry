@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.db.models import Q
 
 import logging
+import inspect
 
 logger = logging.getLogger(__name__)
 logger.debug("Logging started for " + __name__)
@@ -357,6 +358,11 @@ def get_aristotle_url(label, obj_id, obj_name=None):
 def get_m2m_through(item):
     through_list = []
 
+    if inspect.isclass(item):
+        check_class = item
+    else:
+        check_class = item.__class__
+
     for field in item._meta.get_fields():
         if field.many_to_many:
             if hasattr(field.remote_field, 'through'):
@@ -365,8 +371,9 @@ def get_m2m_through(item):
                     item_fields = []
                     for through_field in through._meta.get_fields():
                         if through_field.is_relation:
-                            if through_field.related_model == item.__class__:
+                            if through_field.related_model == check_class:
                                 item_fields.append(through_field.name)
                     through_list.append({'field_name': field.name, 'model': through, 'item_fields': item_fields})
 
+    logger.debug(through_list)
     return through_list

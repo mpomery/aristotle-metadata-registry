@@ -197,15 +197,18 @@ def get_weak_formset(entity, item, search_model):
 
     return formset_info
 
-def get_order_formset(item, through, postdata=None):
+def get_order_formset(through, item=None, postdata=None):
     excludes = ['order'] + through['item_fields']
     formset = through_formset_factory(through['model'], excludes)
 
     fsargs = {'prefix': through['field_name']}
 
     if len(through['item_fields']) == 1:
-        through_filter = {through['item_fields'][0]: item}
-        fsargs.update({'queryset': through['model'].objects.filter(**through_filter)})
+        if item:
+            through_filter = {through['item_fields'][0]: item}
+            fsargs.update({'queryset': through['model'].objects.filter(**through_filter)})
+        else:
+            fsargs.update({'queryset': through['model'].objects.none()})
 
     if postdata:
         fsargs.update({'data': postdata})

@@ -15,7 +15,8 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from aristotle_mdr.contrib.help.models import ConceptHelp
-from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
+from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps, get_m2m_through
+from aristotle_mdr.contrib.generic.forms import get_weak_formset, get_order_formset
 
 from formtools.wizard.views import SessionWizardView
 from reversion import revisions as reversion
@@ -101,6 +102,20 @@ class ConceptWizard(PermissionWizard):
         ("results", MDRForms.wizards.Concept_2_Results),
     ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def get_extra_formsets(self):
+
+        through_list = get_m2m_through(self.model)
+
+        through_formsets = []
+        for through in through_list:
+            formset = get_order_formset(through)
+            through_formsets.append({'formset': formset, 'title': through['field_name'].title()})
+
+        return {'through_formsets': through_formsets}
+
     def get_form(self, step=None, data=None, files=None):
         if step is None:  # pragma: no cover
             step = self.steps.current
@@ -133,6 +148,9 @@ class ConceptWizard(PermissionWizard):
             else:
                 context.update({'similar_items': self.find_similar()})
             context['step_title'] = _('Select or create')
+            fslist = self.get_extra_formsets()
+            context.update(fslist)
+
         context.update({'model_name': self.model._meta.verbose_name,
                         'model_name_plural': self.model._meta.verbose_name_plural,
                         'help': ConceptHelp.objects.filter(
