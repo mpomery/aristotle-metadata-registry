@@ -158,12 +158,11 @@ def ordered_formset_save(formset, item, model_to_add_field, ordering_field):
         # ordered_forms does not contain forms marked for deletion
         obj = form.save(commit=False)
         setattr(obj, model_to_add_field, item)
-        if ordering_field:
-            setattr(obj, ordering_field, form.cleaned_data['ORDER'])
+        setattr(obj, ordering_field, form.cleaned_data['ORDER'])
         obj.save()
 
     for obj in formset.deleted_objects:
-        # Deleted objects marked for deletion
+        # Delete objects marked for deletion
         obj.delete()
 
     # Save any m2m relations on the ojects (not actually needed yet)
