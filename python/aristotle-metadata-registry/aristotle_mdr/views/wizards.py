@@ -16,10 +16,13 @@ from django.utils.translation import ugettext_lazy as _
 
 from aristotle_mdr.contrib.help.models import ConceptHelp
 from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps, get_m2m_through
-from aristotle_mdr.contrib.generic.forms import get_weak_formset, get_order_formset
+from aristotle_mdr.contrib.generic.forms import get_weak_formset, get_order_formset, ordered_formset_save
 
 from formtools.wizard.views import SessionWizardView
 from reversion import revisions as reversion
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 def make_it_clean(string):
@@ -105,13 +108,13 @@ class ConceptWizard(PermissionWizard):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def get_extra_formsets(self):
+    def get_extra_formsets(self, postdata=None):
 
         through_list = get_m2m_through(self.model)
 
         through_formsets = []
         for through in through_list:
-            formset = get_order_formset(through)
+            formset = get_order_formset(through, postdata=postdata)
             through_formsets.append({'formset': formset, 'title': through['field_name'].title()})
 
         return {'through_formsets': through_formsets}
@@ -163,6 +166,15 @@ class ConceptWizard(PermissionWizard):
                         })
         return context
 
+    def post(self, *args, **kwargs):
+
+        if self.steps.current == 'results':
+            self.request.session['resultspost'] = self.request.POST
+            logger.debug('saved resultspost')
+
+        return  super().post(*args, **kwargs)
+
+
     @reversion.create_revision()
     def done(self, form_list, **kwargs):
         reversion.set_user(self.request.user)
@@ -175,6 +187,26 @@ class ConceptWizard(PermissionWizard):
                 saved_item.submitter = self.request.user
                 saved_item.save()
                 form.save_m2m()
+
+        through_list = get_m2m_through(self.model)
+        if 'resultspost' in self.request.session:
+            logger.debug('resultspost was found')
+            logger.debug('resultspost is {}'.format(self.request.session['resultspost']))
+            for through in through_list:
+                formset = get_order_formset(through, postdata=self.request.session['resultspost'])
+
+                if formset.is_valid():
+
+                    ordered_formset_save(formset, saved_item, through['item_fields'][0], 'order')
+                else:
+                    logger.debug('formset invalid')
+                    logger.debug('errors: {}'.format(formset.errors))
+
+            self.request.session.pop('resultspost')
+        else:
+            logger.debug('resultspost not found')
+
+
         return HttpResponseRedirect(url_slugify_concept(saved_item))
 
     def find_duplicates(self):

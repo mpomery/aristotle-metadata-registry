@@ -119,7 +119,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
                         weak_formset = formset_info['formset'](request.POST, request.FILES, prefix=formset_info['prefix'])
 
                         if weak_formset.is_valid():
-                            one_to_many_formset_save(weak_formset, self.item, formset_info['model_field'], formset_info['ordering'])
+                            ordered_formset_save(weak_formset, self.item, formset_info['model_field'], formset_info['ordering'])
 
                             changed_formsets.append(weak_formset)
 
@@ -171,7 +171,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
         return get_weak_formset(entity, self.item, self.model)
 
     def get_order_formset(self, through, postdata=None):
-        return get_order_formset(self.item, through, postdata)
+        return get_order_formset(through, self.item, postdata)
 
     def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None, weak_formset=None, through_formset=None):
         """

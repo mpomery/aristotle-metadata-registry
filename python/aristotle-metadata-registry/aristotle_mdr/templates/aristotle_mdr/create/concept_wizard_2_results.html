@@ -83,12 +83,15 @@
             {% include "aristotle_mdr/create/concept_editor.html" with form=wizard.form %}
         </div>
     </div>
-    {% for formset in weak_formsets %}
-    {% include 'aristotle_mdr/generic/actions/alter_one_to_many_formstage.html' with formset=formset.formset %}
-    {% endfor %}
-    {% for formset in through_formsets %}
-    {% include 'aristotle_mdr/generic/actions/alter_one_to_many_formstage.html' with formset=formset.formset %}
-    {% endfor %}
+{% endblock %}
+
+{% block underform %}
+{% for formset in weak_formsets %}
+{% include 'aristotle_mdr/generic/actions/alter_one_to_many_formstage.html' with formset=formset.formset %}
+{% endfor %}
+{% for formset in through_formsets %}
+{% include 'aristotle_mdr/generic/actions/alter_one_to_many_formstage.html' with formset=formset.formset %}
+{% endfor %}
 {% endblock %}
 
 {% block next_button %}
