@@ -83,30 +83,36 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                 has_change_comments = form.data.get('change_comments', False)
                 change_comments = form.data.get('change_comments', "")
+                formset_invalid = False
                 changed_formsets = []
+                formsets_to_save = []
                 if self.slots_active:
                     slot_formset = self.get_slots_formset()(request.POST, request.FILES, item.concept)
                     if slot_formset.is_valid():
 
                         # Save the slots
-                        slot_formset.save()
-
-                        changed_formsets.append(slot_formset)
+                        formsets_to_save.append({
+                            'formset': slot_formset,
+                            'type': 'slot',
+                            'saveargs': None
+                        })
 
                     else:
-                        return self.form_invalid(form, slots_FormSet=slot_formset)
+                        formset_invalid = True
 
                 if self.identifiers_active:
                     id_formset = self.get_identifier_formset()(request.POST, request.FILES, item.concept)
                     if id_formset.is_valid():
 
                         # Save the slots
-                        id_formset.save()
-
-                        changed_formsets.append(id_formset)
+                        formsets_to_save.append({
+                            'formset': id_formset,
+                            'type': 'identifiers',
+                            'saveargs': None
+                        })
 
                     else:
-                        return self.form_invalid(form, identifier_FormSet=id_formset)
+                        formset_invalid = True
 
                 if (hasattr(self.item, 'serialize_weak_entities')):
                     # if weak formset is active
@@ -119,12 +125,20 @@ class EditItemView(ConceptEditFormView, UpdateView):
                         weak_formset = formset_info['formset']
 
                         if weak_formset.is_valid():
-                            ordered_formset_save(weak_formset, self.item, formset_info['model_field'], formset_info['ordering'])
 
-                            changed_formsets.append(weak_formset)
+                            formsets_to_save.append({
+                                'formset': weak_formset,
+                                'type': 'weak',
+                                'saveargs': {
+                                    'formset': weak_formset,
+                                    'item': self.item,
+                                    'model_to_add_field': formset_info['model_field'],
+                                    'ordering_field': formset_info['ordering']
+                                }
+                            })
 
                         else:
-                            return self.form_invalid(form, weak_formset=weak_formset)
+                            formset_invalid = True
 
                 if through_list:
                     # If there are through formsets
@@ -133,17 +147,32 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                         if formset.is_valid():
 
-                            ordered_formset_save(formset, self.item, through['item_fields'][0], 'order')
-                            changed_formsets.append(formset)
+                            formsets_to_save.append({
+                                'formset': formset,
+                                'type': 'through',
+                                'saveargs': {
+                                    'formset': formset,
+                                    'item': self.item,
+                                    'model_to_add_field': through['item_fields'][0],
+                                    'ordering_field': 'order'
+                                }
+                            })
 
                         else:
+                            formset_invalid = True
 
-                            return self.form_invalid(form, through_formset=formset)
-
+                if formset_invalid:
+                    self.form_invalid(form, formsets=formsets_to_save)
+                else:
+                    for formsetinfo in formsets_to_save:
+                        if formsetinfo['saveargs']:
+                            ordered_formset_save(**formsetinfo['saveargs'])
+                        else:
+                            formsetinfo['formset'].save()
 
                 # save the change comments
-                if not has_change_comments:
-                    change_comments += construct_change_message(request, form, changed_formsets)
+                # if not has_change_comments:
+                #     change_comments += construct_change_message(request, form, changed_formsets)
 
                 reversion.revisions.set_user(request.user)
                 reversion.revisions.set_comment(change_comments)
@@ -173,16 +202,37 @@ class EditItemView(ConceptEditFormView, UpdateView):
     def get_order_formset(self, through, postdata=None):
         return get_order_formset(through, self.item, postdata)
 
-    def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None, weak_formset=None, through_formset=None):
+    def form_invalid(self, form, formsets=None):
         """
         If the form is invalid, re-render the context data with the
         data-filled form and errors.
         """
-        return self.render_to_response(self.get_context_data(form=form, slots_FormSet=slots_FormSet, weak_formset=weak_formset, through_formset=through_formset))
+        error_formsets = {}
+        for formsetinfo in formsets:
+            type = formsetinfo['type']
+            if type == 'identifiers':
+                error_formsets['identifier_FormSet'] = formsetinfo['formset']
+            elif type == 'slot':
+                error_formsets['slots_FormSet'] = formsetinfo['formset']
+            elif type == 'weak':
+                if 'weak_formsets' not in error_formsets.keys():
+                    error_formsets['weak_formsets'] = []
+                error_formsets['weak_formsets'].append({'formset': formsetinfo['formset']})
+            elif type == 'through':
+                if 'through_formsets' not in error_formsets.keys():
+                    error_formsets['through_formsets'] = []
+                error_formsets['through_formsets'].append({'formset': formsetinfo['formset']})
+
+        return self.render_to_response(self.get_context_data(form=form, error_formsets=error_formsets))
 
     def get_context_data(self, *args, **kwargs):
         from aristotle_mdr.contrib.slots.models import Slot
         context = super().get_context_data(*args, **kwargs)
+
+        if 'error_formsets' in kwargs:
+            context.update(kwargs['error_formsets'])
+            return context
+
         if self.slots_active and kwargs.get('slots_FormSet', None):
             context['slots_FormSet'] = kwargs['slots_FormSet']
         else:
@@ -200,34 +250,22 @@ class EditItemView(ConceptEditFormView, UpdateView):
                 )
 
         if (hasattr(self.item, 'serialize_weak_entities')):
-            if kwargs.get('weak_formset', None):
-                # Will only display the formset that produced an error
-                weak_formset = kwargs['weak_formset']
-                title = 'Edit ' + weak_formset.model.__name__
-                formsets = [{'formset': weak_formset, 'title': title}]
-                context['weak_formsets'] = formsets
-            elif kwargs.get('through_formset', None):
-                through_formset = kwargs.get('through_formset')
-                title = through_formset.model.__name__.title()
-                formsets = [{'formset': weak_formset, 'title': title}]
-                context['through_formsets'] = formsets
-            else:
-                weak = self.item.serialize_weak_entities
-                formsets = []
-                for entity in weak:
-                    # query weak entity
-                    queryset = getattr(self.item, entity[1]).all()
+            weak = self.item.serialize_weak_entities
+            formsets = []
+            for entity in weak:
+                # query weak entity
+                queryset = getattr(self.item, entity[1]).all()
 
-                    weak_formset = self.get_weak_formset(entity, queryset=queryset)['formset']
-                    weak_formset = one_to_many_formset_filters(weak_formset, self.item)
+                weak_formset = self.get_weak_formset(entity, queryset=queryset)['formset']
+                weak_formset = one_to_many_formset_filters(weak_formset, self.item)
 
-                    title = 'Edit ' + queryset.model.__name__
-                    # add spaces before capital letters
-                    title = re.sub(r"\B([A-Z])", r" \1", title)
+                title = 'Edit ' + queryset.model.__name__
+                # add spaces before capital letters
+                title = re.sub(r"\B([A-Z])", r" \1", title)
 
-                    formsets.append({'formset': weak_formset, 'title': title})
+                formsets.append({'formset': weak_formset, 'title': title})
 
-                context['weak_formsets'] = formsets
+            context['weak_formsets'] = formsets
 
         context['show_slots_tab'] = self.slots_active
         context['show_id_tab'] = self.identifiers_active
