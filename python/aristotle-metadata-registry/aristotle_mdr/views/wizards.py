@@ -94,7 +94,7 @@ class PermissionWizard(SessionWizardView):
         return context
 
 
-class ConceptWizard(PermissionWizard):
+class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
     widgets = {}
     templates = {
         "initial": "aristotle_mdr/create/concept_wizard_1_search.html",
@@ -190,16 +190,8 @@ class ConceptWizard(PermissionWizard):
 
             fslist = self.get_extra_formsets()
 
-            for formsetinfo in fslist:
-                type = formsetinfo['type']
-                if type == 'weak':
-                    if 'weak_formsets' not in context.keys():
-                        context['weak_formsets'] = []
-                    context['weak_formsets'].append({'formset': formsetinfo['formset'], 'title': formsetinfo['title']})
-                elif type == 'through':
-                    if 'through_formsets' not in context.keys():
-                        context['through_formsets'] = []
-                    context['through_formsets'].append({'formset': formsetinfo['formset'], 'title': formsetinfo['title']})
+            fscontext = self.get_formset_context()
+            context.update(fscontext)
 
 
         context.update({'model_name': self.model._meta.verbose_name,
@@ -225,11 +217,7 @@ class ConceptWizard(PermissionWizard):
         if self.steps.current == 'results':
             extra_formsets = self.get_extra_formsets(postdata=self.request.POST)
 
-            invalid = False
-
-            for formsetinfo in extra_formsets:
-                if not formsetinfo['formset'].is_valid():
-                    invalid = True
+            formsets_invalid = self.validate_formsets(extra_formsets)
 
             if invalid:
                 form = self.get_form(data=self.request.POST, files=self.request.FILES)
@@ -256,12 +244,7 @@ class ConceptWizard(PermissionWizard):
             logger.debug('extra formsets were found')
 
             extra_formsets = self.request.session['extra_formsets']
-            # Save formsets
-            for formsetinfo in extra_formsets:
-                if formsetinfo['saveargs']:
-                    saveargs = formsetinfo['saveargs']
-                    saveargs['item'] = saved_item
-                    ordered_formset_save(**saveargs)
+            self.save_formsets(extra_formsets)
 
             self.request.session.pop('extra_formsets')
         else:
