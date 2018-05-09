@@ -6,6 +6,7 @@
         {{ weak_formset.formset.management_form }}
         {{ weak_formset.formset.non_form_errors.as_ul }}
         {% for dict in weak_formset.formset.errors %}
+          {% if dict %}
           <div class="alert alert-danger">
           <ul>
           {% for key, value in dict.items %}
@@ -13,6 +14,7 @@
           {% endfor %}
           </ul>
           </div>
+          {% endif %}
         {% endfor %}
         {% include 'aristotle_mdr/generic/actions/alter_one_to_many_formset.html' with formset=weak_formset.formset %}
         <a class="btn btn-primary add_code_button" formid='{{ weak_formset.formset.prefix}}'>

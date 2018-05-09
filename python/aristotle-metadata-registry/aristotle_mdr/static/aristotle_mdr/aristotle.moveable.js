@@ -66,6 +66,13 @@ jQuery(function($) {
     });
 });
 
+function replacePrefix(element, num_forms) {
+  new_name = $(element).attr('name').replace('__prefix__', num_forms-1)
+  new_id = $(element).attr('id').replace('__prefix__', num_forms-1)
+  $(element).attr('id', new_id)
+  $(element).attr('name', new_name)
+}
+
 function addCode(id) {
     var table = '.draggableTable#' + id;
     var formstage = '.formstage#' + id + ' tr';
@@ -89,8 +96,14 @@ function addCode(id) {
     new_form.appendTo(panelList);
     var all_tr = table + ' tr'
     num_forms = $(all_tr).length
-    $(new_form).find('input').attr('value','');
-    $(new_form).find('input[name$="-id"]').removeAttr('value');
+
+    $(new_form).find('input').each(function() {
+        replacePrefix(this, num_forms)
+    });
+
+    $(new_form).find('select').each(function() {
+        replacePrefix(this, num_forms)
+    });
 
     // rename the form entries
     renumberRow(new_form,num_forms-1);

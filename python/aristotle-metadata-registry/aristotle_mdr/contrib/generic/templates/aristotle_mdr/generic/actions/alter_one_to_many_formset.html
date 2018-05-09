@@ -1,5 +1,5 @@
 <table id="{{ formset.prefix }}" class="formset form table table-hover">
-{% with formset.forms.0 as form %}
+{% with formset.empty_form as form %}
   {{ form.media }}
   <thead><tr>
       <th></th>
@@ -12,8 +12,6 @@
 {% endwith %}
 <tbody id="{{ formset.prefix }}" class="draggableTable">
 {% for form in formset.forms %}
-{% if not forloop.last %}
-<p>{{form.errors}}</p>
   <tr class="moveablerow">
       <td title="Drag to reorder"><i class="fa fa-bars grabber"></i>
           {% for hidden in form.hidden_fields %}
@@ -34,7 +32,6 @@
         </td>
       {% endfor %}
   </tr>
-{% endif %}
 {% endfor %}
 </tbody>
 </table>

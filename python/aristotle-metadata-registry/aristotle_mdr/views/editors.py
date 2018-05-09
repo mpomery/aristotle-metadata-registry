@@ -88,31 +88,29 @@ class EditItemView(ConceptEditFormView, UpdateView):
                 formsets_to_save = []
                 if self.slots_active:
                     slot_formset = self.get_slots_formset()(request.POST, request.FILES, item.concept)
-                    if slot_formset.is_valid():
 
-                        # Save the slots
-                        formsets_to_save.append({
-                            'formset': slot_formset,
-                            'type': 'slot',
-                            'saveargs': None
-                        })
-
-                    else:
+                    if not slot_formset.is_valid():
                         formset_invalid = True
+
+                    # Save the slots
+                    formsets_to_save.append({
+                        'formset': slot_formset,
+                        'type': 'slot',
+                        'saveargs': None
+                    })
 
                 if self.identifiers_active:
                     id_formset = self.get_identifier_formset()(request.POST, request.FILES, item.concept)
-                    if id_formset.is_valid():
 
-                        # Save the slots
-                        formsets_to_save.append({
-                            'formset': id_formset,
-                            'type': 'identifiers',
-                            'saveargs': None
-                        })
-
-                    else:
+                    if not id_formset.is_valid():
                         formset_invalid = True
+
+                    # Save the slots
+                    formsets_to_save.append({
+                        'formset': id_formset,
+                        'type': 'identifiers',
+                        'saveargs': None
+                    })
 
                 if (hasattr(self.item, 'serialize_weak_entities')):
                     # if weak formset is active
@@ -124,45 +122,41 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
                         weak_formset = formset_info['formset']
 
-                        if weak_formset.is_valid():
-
-                            formsets_to_save.append({
-                                'formset': weak_formset,
-                                'type': 'weak',
-                                'saveargs': {
-                                    'formset': weak_formset,
-                                    'item': self.item,
-                                    'model_to_add_field': formset_info['model_field'],
-                                    'ordering_field': formset_info['ordering']
-                                }
-                            })
-
-                        else:
+                        if not weak_formset.is_valid():
                             formset_invalid = True
+
+                        formsets_to_save.append({
+                            'formset': weak_formset,
+                            'type': 'weak',
+                            'saveargs': {
+                                'formset': weak_formset,
+                                'item': self.item,
+                                'model_to_add_field': formset_info['model_field'],
+                                'ordering_field': formset_info['ordering']
+                            }
+                        })
 
                 if through_list:
                     # If there are through formsets
                     for through in through_list:
                         formset = self.get_order_formset(through, request.POST)
 
-                        if formset.is_valid():
-
-                            formsets_to_save.append({
-                                'formset': formset,
-                                'type': 'through',
-                                'saveargs': {
-                                    'formset': formset,
-                                    'item': self.item,
-                                    'model_to_add_field': through['item_fields'][0],
-                                    'ordering_field': 'order'
-                                }
-                            })
-
-                        else:
+                        if not formset.is_valid():
                             formset_invalid = True
 
+                        formsets_to_save.append({
+                            'formset': formset,
+                            'type': 'through',
+                            'saveargs': {
+                                'formset': formset,
+                                'item': self.item,
+                                'model_to_add_field': through['item_fields'][0],
+                                'ordering_field': 'order'
+                            }
+                        })
+
                 if formset_invalid:
-                    self.form_invalid(form, formsets=formsets_to_save)
+                    return self.form_invalid(form, formsets=formsets_to_save)
                 else:
                     for formsetinfo in formsets_to_save:
                         if formsetinfo['saveargs']:
@@ -170,15 +164,15 @@ class EditItemView(ConceptEditFormView, UpdateView):
                         else:
                             formsetinfo['formset'].save()
 
-                # save the change comments
-                # if not has_change_comments:
-                #     change_comments += construct_change_message(request, form, changed_formsets)
+                    # save the change comments
+                    # if not has_change_comments:
+                    #     change_comments += construct_change_message(request, form, changed_formsets)
 
-                reversion.revisions.set_user(request.user)
-                reversion.revisions.set_comment(change_comments)
-                form.save_m2m()
-                item.save()
-                return HttpResponseRedirect(url_slugify_concept(self.item))
+                    reversion.revisions.set_user(request.user)
+                    reversion.revisions.set_comment(change_comments)
+                    form.save_m2m()
+                    item.save()
+                    return HttpResponseRedirect(url_slugify_concept(self.item))
 
         return self.form_invalid(form)
 
@@ -222,6 +216,8 @@ class EditItemView(ConceptEditFormView, UpdateView):
                 if 'through_formsets' not in error_formsets.keys():
                     error_formsets['through_formsets'] = []
                 error_formsets['through_formsets'].append({'formset': formsetinfo['formset']})
+
+        logger.debug('error formsets are {}'.format(error_formsets))
 
         return self.render_to_response(self.get_context_data(form=form, error_formsets=error_formsets))
 

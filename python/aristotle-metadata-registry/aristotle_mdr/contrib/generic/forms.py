@@ -109,7 +109,7 @@ def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field
         can_delete=True,
         exclude=exclude_fields,
         # fields='__all__',
-        extra=1,
+        extra=0,
         widgets=_widgets
         )
 
@@ -143,7 +143,7 @@ def through_formset_factory(model, excludes=[]):
         can_order=True,  # we assign this back to the ordering field
         can_delete=True,
         exclude=excludes,
-        extra=1,
+        extra=0,
         widgets=_widgets
     )
 
