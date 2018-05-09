@@ -27,16 +27,6 @@ jQuery(function($) {
 
     });
 
-    $('a.add_code_button').each(function() {
-        //Set the initial value of total forms
-        var form_id = $(this).attr('formid')
-        var tf_identifier = 'input[name=' + form_id + '-TOTAL_FORMS]';
-        all_tr = '.draggableTable#' + form_id + ' tr';
-        num_forms = $(all_tr).length;
-        $(tf_identifier).val(num_forms);
-    })
-
-
     $( "form" ).submit(function( event ) {
         var blank_row = $('#formstage tr');
         $( "table#formset #draggableTable tr" ).each(function() {
