@@ -17,6 +17,7 @@ from django.utils.translation import ugettext_lazy as _
 from aristotle_mdr.contrib.help.models import ConceptHelp
 from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps, get_m2m_through
 from aristotle_mdr.contrib.generic.forms import get_weak_formset, get_order_formset, ordered_formset_save
+from aristotle_mdr.contrib.generic.views import ExtraFormsetMixin
 
 from formtools.wizard.views import SessionWizardView
 from reversion import revisions as reversion
@@ -190,7 +191,7 @@ class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
 
             fslist = self.get_extra_formsets()
 
-            fscontext = self.get_formset_context()
+            fscontext = self.get_formset_context(fslist)
             context.update(fscontext)
 
 
@@ -219,7 +220,7 @@ class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
 
             formsets_invalid = self.validate_formsets(extra_formsets)
 
-            if invalid:
+            if formsets_invalid:
                 form = self.get_form(data=self.request.POST, files=self.request.FILES)
                 return self.render(form=form, extra_formsets=extra_formsets)
             else:
@@ -244,7 +245,13 @@ class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
             logger.debug('extra formsets were found')
 
             extra_formsets = self.request.session['extra_formsets']
-            self.save_formsets(extra_formsets)
+
+            final_formsets = []
+            for info in extra_formsets:
+                info['saveargs']['item'] = saved_item
+                final_formsets.append(info)
+
+            self.save_formsets(final_formsets)
 
             self.request.session.pop('extra_formsets')
         else:

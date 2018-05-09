@@ -604,3 +604,32 @@ class LoggedInViewPages(object):
                 print('failed, keep trying - %s',i)
                 sleep(i) # sleep for progressively longer, just to give it a fighting chance to finish.
         self.assertEqual(*args)
+
+
+class FormsetTestUtils:
+
+    def get_formset_postdata(self, datalist, prefix='form', initialforms=0):
+
+        postdata = {}
+        # Add data
+        index = 0
+        for data in datalist:
+            for key in data.keys():
+                postkey = '{}-{}-{}'.format(prefix, index, key)
+                postdata[postkey] = data[key]
+            index += 1
+
+        # Add management form
+        postdata['{}-INITIAL_FORMS'.format(prefix)] = initialforms
+        postdata['{}-TOTAL_FORMS'.format(prefix)] = index+1
+        postdata['{}-MIN_NUM_FORMS'.format(prefix)] = 0
+        postdata['{}-MAX_NUM_FORMS'.format(prefix)] = 1000
+
+        return postdata
+
+    def post_formset(self, url, extra_postdata={}, **kwargs):
+
+        postdata = self.get_formset_postdata(**kwargs)
+        postdata.update(extra_postdata)
+        response = self.client.post(url, postdata)
+        return response
