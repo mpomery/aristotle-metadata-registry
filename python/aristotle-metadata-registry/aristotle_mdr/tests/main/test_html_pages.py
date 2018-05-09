@@ -1798,20 +1798,21 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         self.assertEqual(through_model.objects.get(order=1).data_element, self.de2)
         self.assertEqual(through_model.objects.get(order=2).data_element, self.de1)
 
-
+    @tag('edit_formsets')
     def test_derivation_inputs_formset(self):
         self.derivation_m2m_formset(
             url="aristotle_mdr:dataelementderivation_change_inputs",
             attr='inputs',
         )
 
+    @tag('edit_formsets')
     def test_derivation_derives_formset(self):
         self.derivation_m2m_formset(
             url="aristotle_mdr:dataelementderivation_change_derives",
             attr='derives',
         )
 
-    @tag('runthistest')
+    @tag('edit_formsets')
     def test_derivation_inputs_formset_editor(self):
 
         offprefix = 'derives'

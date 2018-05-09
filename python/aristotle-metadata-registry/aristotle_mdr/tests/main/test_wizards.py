@@ -246,8 +246,65 @@ class ObjectClassWizardPage(ConceptWizardPage,TestCase):
     model=models.ObjectClass
 class PropertyWizardPage(ConceptWizardPage,TestCase):
     model=models.Property
-class ValueDomainWizardPage(ConceptWizardPage,TestCase):
+
+class ValueDomainWizardPage(FormsetTestUtils, ConceptWizardPage,TestCase):
     model=models.ValueDomain
+
+    @tag('edit_formsets')
+    def test_weak_editor_during_create(self):
+
+        self.login_editor()
+
+        item_name = 'My Shiny New Value Domain'
+        step_1_data = {
+            self.wizard_form_name+'-current_step': 'initial',
+            'initial-name': item_name,
+        }
+
+        response = self.client.post(self.wizard_url, step_1_data)
+        wizard = response.context['wizard']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(wizard['steps'].current, 'results')
+
+        step_2_data = {
+            self.wizard_form_name+'-current_step': 'results',
+            'initial-name':item_name,
+            'results-name':item_name,
+            'results-definition':"Test Definition",
+        }
+
+        permissible_formset_data = [
+            {'value': 'Test1', 'meaning': 'Test1', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 0},
+            {'value': 'Test2', 'meaning': 'Test2', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 1}
+        ]
+        step_2_data.update(self.get_formset_postdata(permissible_formset_data, 'permissible_values', 0))
+
+        supplementary_formset_data = [
+            {'value': 'Test3', 'meaning': 'Test3', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 0},
+            {'value': 'Test4', 'meaning': 'Test4', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 1}
+        ]
+        step_2_data.update(self.get_formset_postdata(supplementary_formset_data, 'supplementary_values', 0))
+
+        response = self.client.post(self.wizard_url, step_2_data)
+        self.assertEqual(response.status_code, 302)
+
+        self.assertTrue(self.model.objects.filter(name=item_name).exists())
+        self.assertEqual(self.model.objects.filter(name=item_name).count(),1)
+        item = self.model.objects.filter(name=item_name).first()
+        self.assertRedirects(response,url_slugify_concept(item))
+
+        supvals = item.supplementaryvalue_set.all()
+        permvals = item.permissiblevalue_set.all()
+
+        self.assertEqual(len(supvals), 2)
+        self.assertEqual(supvals[0].value, 'Test3')
+        self.assertEqual(supvals[1].value, 'Test4')
+
+        self.assertEqual(len(permvals), 2)
+        self.assertEqual(permvals[0].value, 'Test1')
+        self.assertEqual(permvals[1].value, 'Test2')
+
+
 class DataElementConceptWizardPage(ConceptWizardPage, TestCase):
     model=models.DataElementConcept
 class DataElementWizardPage(ConceptWizardPage, TestCase):
@@ -296,7 +353,6 @@ class DataElementDerivationWizardPage(FormsetTestUtils, ConceptWizardPage,TestCa
         ]
         step_2_data.update(self.get_formset_postdata(derives_formset_data, 'derives', 0))
 
-        print(step_2_data)
         response = self.client.post(self.wizard_url, step_2_data)
         self.assertEqual(response.status_code, 302)
 
