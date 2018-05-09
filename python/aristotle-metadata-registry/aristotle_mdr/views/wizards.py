@@ -15,8 +15,8 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from aristotle_mdr.contrib.help.models import ConceptHelp
-from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps, get_m2m_through
-from aristotle_mdr.contrib.generic.forms import get_weak_formset, get_order_formset, ordered_formset_save
+from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
+from aristotle_mdr.contrib.generic.forms import ordered_formset_save
 from aristotle_mdr.contrib.generic.views import ExtraFormsetMixin
 
 from formtools.wizard.views import SessionWizardView

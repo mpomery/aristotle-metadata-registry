@@ -9,8 +9,7 @@ import reversion
 
 from aristotle_mdr.utils import (
     concept_to_clone_dict,
-    construct_change_message, url_slugify_concept, is_active_module,
-    get_m2m_through
+    construct_change_message, url_slugify_concept, is_active_module
 )
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
@@ -24,7 +23,6 @@ import logging
 from aristotle_mdr.contrib.generic.forms import (
     one_to_many_formset_excludes, one_to_many_formset_filters,
     ordered_formset_factory, ordered_formset_save,
-    get_weak_formset, get_order_formset
 )
 from aristotle_mdr.contrib.generic.views import ExtraFormsetMixin
 
@@ -75,9 +73,10 @@ class EditItemView(ExtraFormsetMixin, ConceptEditFormView, UpdateView):
         })
         return kwargs
 
-    def get_extra_formsets(self, postdata=None):
+    def get_extra_formsets(self, item=None, postdata=None):
 
-        extra_formsets = []
+        extra_formsets = super().get_extra_formsets(item, postdata)
+
         if self.slots_active:
             slot_formset = self.get_slots_formset()(
                 queryset=Slot.objects.filter(concept=self.item.id),
@@ -104,52 +103,11 @@ class EditItemView(ExtraFormsetMixin, ConceptEditFormView, UpdateView):
                 'saveargs': None
             })
 
-        if (hasattr(self.item, 'serialize_weak_entities')):
-            # if weak formset is active
-            weak = self.item.serialize_weak_entities
-
-            for entity in weak:
-                queryset = getattr(self.item, entity[1]).all()
-                formset_info = get_weak_formset(entity, self.model, item=self.item, queryset=queryset, postdata=postdata)
-                weak_formset = formset_info['formset']
-                weak_formset = one_to_many_formset_filters(weak_formset, self.item)
-
-                title = 'Edit ' + queryset.model.__name__
-                # add spaces before capital letters
-                title = re.sub(r"\B([A-Z])", r" \1", title)
-
-                extra_formsets.append({
-                    'formset': weak_formset,
-                    'type': 'weak',
-                    'title': title,
-                    'saveargs': {
-                        'formset': weak_formset,
-                        'item': self.item,
-                        'model_to_add_field': formset_info['model_field'],
-                        'ordering_field': formset_info['ordering']
-                    }
-                })
-
-        through_list = get_m2m_through(self.item)
-        for through in through_list:
-            formset = get_order_formset(through, self.item, postdata)
-            extra_formsets.append({
-                'formset': formset,
-                'type': 'through',
-                'title': through['field_name'].title(),
-                'saveargs': {
-                    'formset': formset,
-                    'item': self.item,
-                    'model_to_add_field': through['item_fields'][0],
-                    'ordering_field': 'order'
-                }
-            })
-
         return extra_formsets
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
-        extra_formsets = self.get_extra_formsets(postdata=request.POST)
+        extra_formsets = self.get_extra_formsets(self.item, request.POST)
 
         if form.is_valid():
             item = form.save(commit=False)
@@ -211,7 +169,7 @@ class EditItemView(ExtraFormsetMixin, ConceptEditFormView, UpdateView):
         if 'formsets' in kwargs:
             extra_formsets = kwargs['formsets']
         else:
-            extra_formsets = self.get_extra_formsets()
+            extra_formsets = self.get_extra_formsets(self.item)
 
         fscontext = self.get_formset_context(extra_formsets)
         context.update(fscontext)

@@ -19,6 +19,7 @@ from aristotle_mdr.contrib.generic.forms import (
     HiddenOrderFormset, HiddenOrderModelFormSet
 )
 import reversion
+import inspect
 
 import logging
 logger = logging.getLogger(__name__)
@@ -270,7 +271,6 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
     def dispatch(self, request, *args, **kwargs):
 
         self.through_model = self.model_base._meta.get_field(self.model_base_field).remote_field.through
-        logger.debug('through model is {}'.format(self.through_model))
 
         self.base_through_field = None
         self.related_through_field = None
@@ -470,6 +470,162 @@ class ExtraFormsetMixin:
                 context['through_formsets'].append({'formset': formsetinfo['formset'], 'title': formsetinfo['title']})
 
         return context
+
+    def get_extra_formsets(self, item=None, postdata=None):
+        # Item can be a class or an object
+        # This is so we can reuse this function in creation wizards
+
+        extra_formsets = []
+
+        if inspect.isclass(item):
+            is_class = True
+            add_item = None
+        else:
+            is_class = False
+            add_item = item
+
+        through_list = self.get_m2m_through(item)
+        for through in through_list:
+
+            if not is_class:
+                formset = self.get_order_formset(through, item, postdata)
+            else:
+                formset = self.get_order_formset(through, postdata=postdata)
+
+            extra_formsets.append({
+                'formset': formset,
+                'type': 'through',
+                'title': through['field_name'].title(),
+                'saveargs': {
+                    'formset': formset,
+                    'item': add_item,
+                    'model_to_add_field': through['item_field'],
+                    'ordering_field': 'order'
+                }
+            })
+
+        weak_list = self.get_m2m_weak(item)
+        for weak in weak_list:
+
+            if not is_class:
+                formset = self.get_weak_formset(weak, item, postdata)
+            else:
+                formset = self.get_weak_formset(weak, postdata=postdata)
+
+            title = 'Edit ' + weak['model'].name
+            # add spaces before capital letters
+            title = re.sub(r"\B([A-Z])", r" \1", title)
+
+            extra_formsets.append({
+                'formset': formset,
+                'type': 'weak',
+                'title': title,
+                'saveargs': {
+                    'formset': formset,
+                    'item': add_item,
+                    'model_to_add_field': through['item_field'],
+                    'ordering_field': 'order'
+                }
+            })
+
+        return extra_formsets
+
+    def get_order_formset(self, through, item=None, postdata=None):
+        excludes = ['order', through['item_field']]
+        formset = ordered_formset_factory(through['model'], excludes)
+
+        fsargs = {'prefix': through['field_name']}
+
+        if through['item_field']:
+            if item:
+                through_filter = {through['item_field']: item}
+                fsargs['queryset'] = through['model'].objects.filter(**through_filter)
+            else:
+                fsargs['queryset'] = through['model'].objects.none()
+
+        if postdata:
+            fsargs['data'] = postdata
+
+        formset_instance = formset(**fsargs)
+
+        return formset_instance
+
+    def get_weak_formset(self, weak, item=None, postdata=None):
+
+        model_to_add_field = weak['item_field']
+
+        fsargs = {'prefix': weak['field_name']}
+
+        if item:
+            extra_excludes = one_to_many_formset_excludes(item, field_model)
+            fsargs['queryset'] = getattr(item, weak['field_name']).all()
+        else:
+            if issubclass(weak['model'], ValueDomain):
+                extra_excludes = ['value_meaning']
+            else:
+                extra_excludes = []
+            fsargs['queryset'] = weak['model'].objects.none()
+
+        if postdata:
+            fsargs['data'] = postdata
+
+        all_excludes = [model_to_add_field, weak['model'].ordering_field] + extra_excludes
+        formset = ordered_formset_factory(field_model, all_excludes)
+
+        final_formset = formset(**fsargs)
+
+        return final_formset
+
+    def get_model_field(self, model, search_model):
+        # get the field in the model that we are adding so it can be excluded from form
+        model_to_add_field = ''
+        for field in model._meta.get_fields():
+            if (field.is_relation):
+                if (field.related_model == search_model):
+                    model_to_add_field = field.name
+                    break
+
+        return model_to_add_field
+
+    def get_m2m_through(self, item):
+        through_list = []
+
+        if inspect.isclass(item):
+            check_class = item
+        else:
+            check_class = item.__class__
+
+        for field in check_class._meta.get_fields():
+            if field.many_to_many:
+                if hasattr(field.remote_field, 'through'):
+                    through = field.remote_field.through
+                    if not through._meta.auto_created:
+                        item_field = self.get_model_field(through, check_class)
+                        through_list.append({'field_name': field.name, 'model': through, 'item_field': item_field})
+
+
+        logger.debug(through_list)
+        return through_list
+
+    def get_m2m_weak(self, item):
+        weak_list = []
+
+        if inspect.isclass(item):
+            check_class = item
+        else:
+            check_class = item.__class__
+
+        if hasattr(check_class, 'serialize_weak_entities'):
+
+            weak = check_class.serialize_weak_entities
+
+            for entity in weak:
+
+                field = check_class._meta.get_field(weak[1])
+                item_field = self.get_model_field(through, check_class)
+                weak_list.append({'field_name': field.name, 'model': field.model, 'item_field': item_field})
+
+        return weak_list
 
 class ConfirmDeleteView(GenericWithItemURLView, TemplateView):
     confirm_template = "aristotle_mdr/generic/actions/confirm_delete.html"
