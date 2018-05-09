@@ -191,7 +191,10 @@ def get_weak_formset(entity, search_model, item=None, field_model=None, postdata
     if item:
         extra_excludes = one_to_many_formset_excludes(item, field_model)
     else:
-        extra_excludes=['value_meaning'] # Default to not displaying value meaning
+        if issubclass(search_model, ValueDomain):
+            extra_excludes = ['value_meaning']
+        else:
+            extra_excludes = []
 
     formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field, extra_excludes)
 
