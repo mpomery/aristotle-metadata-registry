@@ -21,6 +21,7 @@ Changelog
     - Items can now be deleted from the sandbox
     - Added review page for any status changes
     - Fixed Data Element Wizard incorrectly stating it was creating a "Data Element Concept"
+    - Fixed issue where cached permissions would check against the wrong item type
 
 - 1.6.5
   - Fixed regression where private methods showed up in creation wizards

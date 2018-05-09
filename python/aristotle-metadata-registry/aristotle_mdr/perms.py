@@ -2,6 +2,9 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from aristotle_mdr.utils import fetch_aristotle_settings
 
+import logging
+logger = logging.getLogger(__name__)
+
 VIEW_CACHE_SECONDS=60
 EDIT_CACHE_SECONDS=60
 
@@ -56,14 +59,15 @@ def user_can_view(user, item):
     else:
         can_use_cache = True
 
-    cached_can_view = cache.get('user_can_view_%s|%s' % (user_key, str(item.id)))
+    key = 'user_can_view_%s|%s:%s|%s' % (user_key, item._meta.app_label, item._meta.app_label, str(item.id))
+    cached_can_view = cache.get(key)
     if can_use_cache and cached_can_view is not None:
         return cached_can_view
 
     _can_view = False
 
     _can_view = item.can_view(user)
-    cache.set('user_can_view_%s|%s' % (str(user.id), str(item.id)), _can_view, VIEW_CACHE_SECONDS)
+    cache.set(key, _can_view, VIEW_CACHE_SECONDS)
     return _can_view
 
 
@@ -85,7 +89,8 @@ def user_can_edit(user, item):
     else:
         can_use_cache = True
 
-    cached_can_edit = cache.get('user_can_edit_%s|%s' % (str(user.id), str(item.id)))
+    key = 'user_can_edit_%s|%s:%s|%s' % (user_key, item._meta.app_label, item._meta.app_label, str(item.id))
+    cached_can_edit = cache.get(key)
     if can_use_cache and cached_can_edit is not None:
         return cached_can_edit
 
@@ -95,7 +100,7 @@ def user_can_edit(user, item):
         _can_edit = False
     else:
         _can_edit = item.can_edit(user)
-    cache.set('user_can_edit_%s|%s' % (str(user.id), str(item.id)), _can_edit, VIEW_CACHE_SECONDS)
+    cache.set(key, _can_edit, VIEW_CACHE_SECONDS)
 
     return _can_edit
 

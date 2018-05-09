@@ -6,17 +6,16 @@ import django_filters
 
 from aristotle_mdr_graphql.filterset import AristotleFilterSet
 
-class AristotleFilterConnectionField(DjangoFilterConnectionField):
 
-    def __init__(self, *args, **kwargs):
+class AristotleFilterConnectionField(DjangoFilterConnectionField):
+    def __init__(self, type, *args, **kwargs):
 
         extrameta = {
             'filterset_base_class': AristotleFilterSet
         }
 
         kwargs.update({'extra_filter_meta': extrameta})
-
-        super().__init__(*args, **kwargs)
+        super().__init__(type, *args, **kwargs)
 
     @classmethod
     def connection_resolver(cls, resolver, connection, default_manager, max_limit,
@@ -42,3 +41,18 @@ class AristotleFilterConnectionField(DjangoFilterConnectionField):
             info,
             **args
         )
+
+
+class AristotleConceptFilterConnectionField(AristotleFilterConnectionField):
+    def __init__(self, type, *args, **kwargs):
+
+        extrameta = {
+            'filterset_base_class': AristotleFilterSet,
+            # 'filter_fields': ['name'],
+        }
+
+        kwargs.update({'extra_filter_meta': extrameta})
+        if "description" not in kwargs.keys():
+            kwargs['description'] = "Look up a collection of " + str(type._meta.model.get_verbose_name_plural())
+
+        super().__init__(type, *args, **kwargs)

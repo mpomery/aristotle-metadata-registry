@@ -3,51 +3,97 @@ from graphene_django.types import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django.fields import DjangoConnectionField, DjangoListField
 from graphene import Field
-from aristotle_mdr import models as mdr_models
 from django.db import models
-import django_filters
-from aristotle_mdr_graphql.fields import AristotleFilterConnectionField
+
+from aristotle_mdr import models as mdr_models
+from aristotle_mdr_graphql.fields import AristotleFilterConnectionField, AristotleConceptFilterConnectionField
 from aristotle_mdr_graphql.types import AristotleObjectType
-from aristotle_mdr_graphql.utils import type_from_model
+from aristotle_mdr_graphql.utils import type_from_model, type_from_concept_model
+
+from aristotle_mdr_graphql import resolvers
 
 
-ConceptNode = type_from_model(mdr_models._concept)
+class StatusNode(DjangoObjectType):
+    class Meta:
+        model = mdr_models.Status
+        default_resolver = resolvers.aristotle_resolver
+
+
 WorkgroupNode = type_from_model(mdr_models.Workgroup)
-OrganizationNode = type_from_model(mdr_models.Organization)
-RegistrationAuthorityNode = type_from_model(mdr_models.RegistrationAuthority)
-ReviewRequestNode = type_from_model(mdr_models.ReviewRequest)
-StatusNode = type_from_model(mdr_models.Status)
-ObjectClassNode = type_from_model(mdr_models.ObjectClass)
-PropertyNode = type_from_model(mdr_models.Property)
-MeasureNode = type_from_model(mdr_models.Measure)
-UnitOfMeasureNode = type_from_model(mdr_models.UnitOfMeasure)
-DataTypeNode = type_from_model(mdr_models.DataType)
-ConceptualDomainNode = type_from_model(mdr_models.ConceptualDomain)
+# OrganizationNode = type_from_model(mdr_models.Organization)
+
+class RegistrationAuthorityNode(DjangoObjectType):
+    # At the moment, querying backward for a status from a registration authority has
+    # permissions issues, and querying problems.
+    # Lets come back to this one
+    class Meta:
+        model = mdr_models.RegistrationAuthority
+        interfaces = (relay.Node, )
+        filter_fields = ['name']
+        default_resolver = resolvers.RegistrationAuthorityResolver()
+        exclude_fields = ['status_set']
+
+
+# ReviewRequestNode = type_from_model(mdr_models.ReviewRequest)
+
+ConceptNode = type_from_concept_model(mdr_models._concept)
+ObjectClassNode = type_from_concept_model(mdr_models.ObjectClass)
+PropertyNode = type_from_concept_model(mdr_models.Property)
+# MeasureNode = type_from_concept_model(mdr_models.Measure)
+UnitOfMeasureNode = type_from_concept_model(mdr_models.UnitOfMeasure)
+DataTypeNode = type_from_concept_model(mdr_models.DataType)
+ConceptualDomainNode = type_from_concept_model(mdr_models.ConceptualDomain)
 ValueMeaningNode = type_from_model(mdr_models.ValueMeaning)
-ValueDomainNode = type_from_model(mdr_models.ValueDomain)
-PermissibleValueNode = type_from_model(mdr_models.PermissibleValue)
-SupplementaryValueNode = type_from_model(mdr_models.SupplementaryValue)
+
+class ValueMeaningNode(DjangoObjectType):
+    class Meta:
+        model = mdr_models.ValueMeaning
+
+ValueDomainNode = type_from_concept_model(
+    mdr_models.ValueDomain,
+    resolver = resolvers.ValueDomainResolver()
+)
+
+DataElementNode = type_from_concept_model(
+    mdr_models.DataElement,
+    extra_filter_fields=['dataElementConcept','valueDomain','dataElementConcept__objectClass'],
+)
+
 DataElementConceptNode = type_from_model(mdr_models.DataElementConcept)
-DataElementNode = type_from_model(mdr_models.DataElement)
-DataElementDerivationNode = type_from_model(mdr_models.DataElementDerivation)
+DataElementDerivationNode = type_from_concept_model(mdr_models.DataElementDerivation)
+
+
+class PermissibleValueNode(DjangoObjectType):
+    class Meta:
+        model = mdr_models.PermissibleValue
+        exclude_fields = ['value_meaning']
+
+class SupplementaryValueNode(DjangoObjectType):
+    class Meta:
+        model = mdr_models.SupplementaryValue
+        exclude_fields = ['value_meaning']
 
 
 class Query(object):
 
-    metadata = AristotleFilterConnectionField(ConceptNode)
+    metadata = AristotleConceptFilterConnectionField(
+        ConceptNode,
+        description="Retrieve a collection of untyped metadata"
+    )
     workgroups = AristotleFilterConnectionField(WorkgroupNode)
-    organizations = AristotleFilterConnectionField(OrganizationNode)
-    registration_authorities = AristotleFilterConnectionField(RegistrationAuthorityNode)
+    # organizations = AristotleFilterConnectionField(OrganizationNode)
+    registration_authorities = DjangoFilterConnectionField(RegistrationAuthorityNode)
     #discussion_posts = AristotleFilterConnectionField(DiscussionPostNode)
     #discussion_comments = AristotleFilterConnectionField(DiscussionCommentNode)
-    review_requests = AristotleFilterConnectionField(ReviewRequestNode)
-    object_classes = AristotleFilterConnectionField(ObjectClassNode)
-    properties = AristotleFilterConnectionField(PropertyNode)
-    measures = AristotleFilterConnectionField(MeasureNode)
-    unit_of_measures = AristotleFilterConnectionField(UnitOfMeasureNode)
-    data_types = AristotleFilterConnectionField(DataTypeNode)
-    conceptual_domains = AristotleFilterConnectionField(ConceptualDomainNode)
-    value_domains = AristotleFilterConnectionField(ValueDomainNode)
-    data_element_concepts = AristotleFilterConnectionField(DataElementConceptNode)
-    data_elements = AristotleFilterConnectionField(DataElementNode)
-    data_element_derivations = AristotleFilterConnectionField(DataElementDerivationNode)
+    # review_requests = AristotleFilterConnectionField(ReviewRequestNode)
+
+    object_classes = AristotleConceptFilterConnectionField(ObjectClassNode)
+    properties = AristotleConceptFilterConnectionField(PropertyNode)
+    # measures = AristotleConceptFilterConnectionField(MeasureNode)
+    unit_of_measures = AristotleConceptFilterConnectionField(UnitOfMeasureNode)
+    data_types = AristotleConceptFilterConnectionField(DataTypeNode)
+    conceptual_domains = AristotleConceptFilterConnectionField(ConceptualDomainNode)
+    value_domains = AristotleConceptFilterConnectionField(ValueDomainNode)
+    data_element_concepts = AristotleConceptFilterConnectionField(DataElementConceptNode)
+    data_elements = AristotleConceptFilterConnectionField(DataElementNode)
+    data_element_derivations = AristotleConceptFilterConnectionField(DataElementDerivationNode)
