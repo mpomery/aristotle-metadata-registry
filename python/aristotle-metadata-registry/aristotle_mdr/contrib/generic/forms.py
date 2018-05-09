@@ -93,47 +93,8 @@ def get_aristotle_widgets(model):
 
     return _widgets
 
-def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field, extra_excludes=[]):
-    # creates a one to many formset
-    # model_to_add is weak entity class, model_to_add_field is the foriegn key field name
 
-    exclude_fields = [model_to_add_field, ordering_field]
-    exclude_fields += extra_excludes
-
-    _widgets = get_aristotle_widgets(model_to_add)
-
-    return modelformset_factory(
-        model_to_add,
-        formset=HiddenOrderModelFormSet,
-        can_order=True,  # we assign this back to the ordering field
-        can_delete=True,
-        exclude=exclude_fields,
-        # fields='__all__',
-        extra=0,
-        widgets=_widgets
-        )
-
-
-def one_to_many_formset_save(formset, item, model_to_add_field, ordering_field):
-
-    item.save()  # do this to ensure we are saving reversion records for the value domain, not just the values
-    formset.save(commit=False)
-    for form in formset.forms:
-        all_blank = not any(form[f].value() for f in form.fields if f is not ordering_field)
-        if all_blank:
-            continue
-        if form['id'].value() not in [deleted_record['id'].value() for deleted_record in formset.deleted_forms]:
-            # Don't immediately save, we need to attach the parent object
-            value = form.save(commit=False)
-            setattr(value, model_to_add_field, item)
-            if ordering_field:
-                setattr(value, ordering_field, form.cleaned_data['ORDER'])
-            value.save()
-    for obj in formset.deleted_objects:
-        obj.delete()
-    formset.save_m2m()
-
-def through_formset_factory(model, excludes=[]):
+def ordered_formset_factory(model, excludes=[]):
 
     _widgets = get_aristotle_widgets(model)
 
@@ -180,23 +141,24 @@ def get_weak_model_field(model, search_model):
     return model_to_add_field
 
 
-def get_weak_formset(entity, search_model, item=None, field_model=None, postdata=None, queryset=None):
+def get_weak_formset(entity, model, item=None, field_model=None, postdata=None, queryset=None):
     # where entity is an entry in serialize_weak_entities
 
     if not field_model:
         field_model = getattr(item, entity[1]).model
 
-    model_to_add_field = get_weak_model_field(field_model, search_model)
+    model_to_add_field = get_weak_model_field(field_model, model)
 
     if item:
         extra_excludes = one_to_many_formset_excludes(item, field_model)
     else:
-        if issubclass(search_model, ValueDomain):
+        if issubclass(model, ValueDomain):
             extra_excludes = ['value_meaning']
         else:
             extra_excludes = []
 
-    formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field, extra_excludes)
+    all_excludes = [model_to_add_field, field_model.ordering_field] + extra_excludes
+    formset = ordered_formset_factory(field_model, all_excludes)
 
     final_formset = formset(prefix=entity[0], data=postdata, queryset=queryset)
 
@@ -210,7 +172,7 @@ def get_weak_formset(entity, search_model, item=None, field_model=None, postdata
 
 def get_order_formset(through, item=None, postdata=None):
     excludes = ['order'] + through['item_fields']
-    formset = through_formset_factory(through['model'], excludes)
+    formset = ordered_formset_factory(through['model'], excludes)
 
     fsargs = {'prefix': through['field_name']}
 

@@ -14,7 +14,7 @@ from aristotle_mdr.models import _concept, ValueDomain
 from aristotle_mdr.perms import user_can_edit, user_can_view
 from aristotle_mdr.utils import construct_change_message
 from aristotle_mdr.contrib.generic.forms import (
-    one_to_many_formset_factory, one_to_many_formset_save,
+    ordered_formset_factory, ordered_formset_save,
     one_to_many_formset_excludes, one_to_many_formset_filters,
     HiddenOrderFormset, HiddenOrderModelFormSet
 )
@@ -392,7 +392,6 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
         num_items = getattr(self.item, self.model_base_field).count()
         formset = self.formset or self.get_formset()(
             queryset=getattr(self.item, self.model_base_field).all(),
-            initial=[{'ORDER': num_items + 1}]
             )
         context['formset'] = one_to_many_formset_filters(formset, self.item)
         return context
@@ -403,7 +402,8 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
     def get_formset(self):
 
         extra_excludes = one_to_many_formset_excludes(self.item, self.model_to_add)
-        formset = one_to_many_formset_factory(self.model_to_add, self.model_to_add_field, self.ordering_field, extra_excludes)
+        all_excludes = [self.model_to_add_field, self.ordering_field] + extra_excludes
+        formset = ordered_formset_factory(self.model_to_add, all_excludes)
 
         return formset
 
@@ -418,7 +418,7 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
         formset = self.formset
         if formset.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
-                one_to_many_formset_save(formset, self.item, self.model_to_add_field, self.ordering_field)
+                ordered_formset_save(formset, self.item, self.model_to_add_field, self.ordering_field)
 
                 # formset.save(commit=True)
                 reversion.revisions.set_user(request.user)
@@ -428,6 +428,48 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
         else:
             return self.form_invalid(form)
 
+
+class ExtraFormsetMixin:
+
+    # Mixin of utils function for adding addtional formsets to a view
+    # extra_formsets must contain formset, type, title and saveargs
+    # See EditItemView for example usage
+
+    def save_formsets(self, extra_formsets):
+        for formsetinfo in extra_formsets:
+            if formsetinfo['saveargs']:
+                ordered_formset_save(**formsetinfo['saveargs'])
+            else:
+                formsetinfo['formset'].save()
+
+    def validate_formsets(self, extra_formsets):
+        invalid = False
+
+        for formsetinfo in extra_formsets:
+            if not formsetinfo['formset'].is_valid():
+                invalid = True
+
+        return invalid
+
+    def get_formset_context(self, extra_formsets):
+        context = {}
+
+        for formsetinfo in extra_formsets:
+            type = formsetinfo['type']
+            if type == 'identifiers':
+                context['identifier_FormSet'] = formsetinfo['formset']
+            elif type == 'slot':
+                context['slots_FormSet'] = formsetinfo['formset']
+            elif type == 'weak':
+                if 'weak_formsets' not in context.keys():
+                    context['weak_formsets'] = []
+                context['weak_formsets'].append({'formset': formsetinfo['formset'], 'title': formsetinfo['title']})
+            elif type == 'through':
+                if 'through_formsets' not in context.keys():
+                    context['through_formsets'] = []
+                context['through_formsets'].append({'formset': formsetinfo['formset'], 'title': formsetinfo['title']})
+
+        return context
 
 class ConfirmDeleteView(GenericWithItemURLView, TemplateView):
     confirm_template = "aristotle_mdr/generic/actions/confirm_delete.html"

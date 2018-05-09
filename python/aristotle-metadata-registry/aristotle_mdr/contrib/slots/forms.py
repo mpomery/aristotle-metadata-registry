@@ -14,7 +14,7 @@ def slot_inlineformset_factory(model):
         MDR._concept, Slot,
         can_delete=True,
         fields=('concept', 'name', 'type', 'value'),
-        extra=1,
+        extra=0,
         )
 
     return base_formset

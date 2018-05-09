@@ -22,11 +22,13 @@ from aristotle_mdr.contrib.slots.models import Slot
 import logging
 
 from aristotle_mdr.contrib.generic.forms import (
-    one_to_many_formset_factory, one_to_many_formset_save,
     one_to_many_formset_excludes, one_to_many_formset_filters,
-    through_formset_factory, ordered_formset_save,
+    ordered_formset_factory, ordered_formset_save,
     get_weak_formset, get_order_formset
 )
+from aristotle_mdr.contrib.generic.views import ExtraFormsetMixin
+
+
 import re
 
 logger = logging.getLogger(__name__)
@@ -53,7 +55,7 @@ class ConceptEditFormView(ObjectLevelPermissionRequiredMixin):
         return context
 
 
-class EditItemView(ConceptEditFormView, UpdateView):
+class EditItemView(ExtraFormsetMixin, ConceptEditFormView, UpdateView):
     template_name = "aristotle_mdr/actions/advanced_editor.html"
     permission_required = "aristotle_mdr.user_can_edit"
 
@@ -108,8 +110,9 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
             for entity in weak:
                 queryset = getattr(self.item, entity[1]).all()
-                formset_info = self.get_weak_formset(entity, queryset=queryset, postdata=postdata)
+                formset_info = get_weak_formset(entity, self.model, item=self.item, queryset=queryset, postdata=postdata)
                 weak_formset = formset_info['formset']
+                weak_formset = one_to_many_formset_filters(weak_formset, self.item)
 
                 title = 'Edit ' + queryset.model.__name__
                 # add spaces before capital letters
@@ -129,7 +132,7 @@ class EditItemView(ConceptEditFormView, UpdateView):
 
         through_list = get_m2m_through(self.item)
         for through in through_list:
-            formset = self.get_order_formset(through, postdata)
+            formset = get_order_formset(through, self.item, postdata)
             extra_formsets.append({
                 'formset': formset,
                 'type': 'through',
@@ -148,22 +151,15 @@ class EditItemView(ConceptEditFormView, UpdateView):
         form = self.get_form()
         extra_formsets = self.get_extra_formsets(postdata=request.POST)
 
-        self.object = self.item
-
-        invalid = False
-
         if form.is_valid():
             item = form.save(commit=False)
-            has_change_comments = form.data.get('change_comments', False)
-            change_comments = form.data.get('change_comments', "")
+            change_comments = form.data.get('change_comments', None)
+            form_invalid = False
         else:
-            invalid = True
+            form_invalid = True
 
-
-        for formsetinfo in extra_formsets:
-
-            if not formsetinfo['formset'].is_valid():
-                invalid = True
+        formsets_invalid = self.validate_formsets(extra_formsets)
+        invalid = form_invalid or formsets_invalid
 
         if invalid:
             return self.form_invalid(form, formsets=formsets_to_save)
@@ -171,15 +167,11 @@ class EditItemView(ConceptEditFormView, UpdateView):
             with transaction.atomic(), reversion.revisions.create_revision():
 
                 # Save formsets
-                for formsetinfo in extra_formsets:
-                    if formsetinfo['saveargs']:
-                        ordered_formset_save(**formsetinfo['saveargs'])
-                    else:
-                        formsetinfo['formset'].save()
+                self.save_formsets(extra_formsets)
 
                 # save the change comments
-                # if not has_change_comments:
-                #     change_comments += construct_change_message(request, form, changed_formsets)
+                # if not change_comments:
+                #     change_comments = construct_change_message(request, form, changed_formsets)
 
                 reversion.revisions.set_user(request.user)
                 reversion.revisions.set_comment(change_comments)
@@ -201,14 +193,8 @@ class EditItemView(ConceptEditFormView, UpdateView):
             MDR._concept, ScopedIdentifier,
             can_delete=True,
             fields=('concept', 'namespace', 'identifier', 'version'),
-            extra=1,
+            extra=0,
             )
-
-    def get_weak_formset(self, entity, postdata=None, queryset=None):
-        return get_weak_formset(entity, self.model, item=self.item, postdata=postdata, queryset=queryset)
-
-    def get_order_formset(self, through, postdata=None):
-        return get_order_formset(through, self.item, postdata)
 
     def form_invalid(self, form, formsets=None):
         """
@@ -227,20 +213,8 @@ class EditItemView(ConceptEditFormView, UpdateView):
         else:
             extra_formsets = self.get_extra_formsets()
 
-        for formsetinfo in extra_formsets:
-            type = formsetinfo['type']
-            if type == 'identifiers':
-                context['identifier_FormSet'] = formsetinfo['formset']
-            elif type == 'slot':
-                context['slots_FormSet'] = formsetinfo['formset']
-            elif type == 'weak':
-                if 'weak_formsets' not in context.keys():
-                    context['weak_formsets'] = []
-                context['weak_formsets'].append({'formset': formsetinfo['formset'], 'title': formsetinfo['title']})
-            elif type == 'through':
-                if 'through_formsets' not in context.keys():
-                    context['through_formsets'] = []
-                context['through_formsets'].append({'formset': formsetinfo['formset'], 'title': formsetinfo['title']})
+        fscontext = self.get_formset_context(extra_formsets)
+        context.update(fscontext)
 
         context['show_slots_tab'] = self.slots_active
         context['show_id_tab'] = self.identifiers_active
