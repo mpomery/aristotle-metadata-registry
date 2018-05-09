@@ -110,52 +110,6 @@ class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def get_extra_formsets(self, postdata=None):
-
-        extra_formsets = []
-        through_list = get_m2m_through(self.model)
-
-        for through in through_list:
-            formset = get_order_formset(through, postdata=postdata)
-            extra_formsets.append({
-                'formset': formset,
-                'type': 'through',
-                'title': through['field_name'].title(),
-                'saveargs': {
-                    'formset': formset,
-                    'item': None,
-                    'model_to_add_field': through['item_fields'][0],
-                    'ordering_field': 'order'
-                }
-            })
-
-        if (hasattr(self.model, 'serialize_weak_entities')):
-            weak = self.model.serialize_weak_entities
-
-            for entity in weak:
-                fmodel = getattr(self.model, entity[1]).rel.related_model
-                queryset = fmodel.objects.none()
-
-                formset_info = get_weak_formset(entity, self.model, field_model=fmodel, queryset=queryset, postdata=postdata)
-                weak_formset = formset_info['formset']
-
-                title = 'Edit ' + queryset.model.__name__
-                title = re.sub(r"\B([A-Z])", r" \1", title)
-
-                extra_formsets.append({
-                    'formset': weak_formset,
-                    'type': 'weak',
-                    'title': title,
-                    'saveargs': {
-                        'formset': weak_formset,
-                        'item': None,
-                        'model_to_add_field': formset_info['model_field'],
-                        'ordering_field': formset_info['ordering']
-                    }
-                })
-
-        return extra_formsets
-
     def get_form(self, step=None, data=None, files=None):
         if step is None:  # pragma: no cover
             step = self.steps.current
@@ -189,7 +143,7 @@ class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
                 context.update({'similar_items': self.find_similar()})
             context['step_title'] = _('Select or create')
 
-            fslist = self.get_extra_formsets()
+            fslist = self.get_extra_formsets(item=self.model)
 
             fscontext = self.get_formset_context(fslist)
             context.update(fscontext)
@@ -216,7 +170,7 @@ class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
     def post(self, *args, **kwargs):
 
         if self.steps.current == 'results':
-            extra_formsets = self.get_extra_formsets(postdata=self.request.POST)
+            extra_formsets = self.get_extra_formsets(item=self.model, postdata=self.request.POST)
 
             formsets_invalid = self.validate_formsets(extra_formsets)
 

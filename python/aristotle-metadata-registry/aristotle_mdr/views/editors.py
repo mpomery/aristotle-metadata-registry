@@ -109,6 +109,8 @@ class EditItemView(ExtraFormsetMixin, ConceptEditFormView, UpdateView):
         form = self.get_form()
         extra_formsets = self.get_extra_formsets(self.item, request.POST)
 
+        self.object = self.item
+
         if form.is_valid():
             item = form.save(commit=False)
             change_comments = form.data.get('change_comments', None)
@@ -120,7 +122,7 @@ class EditItemView(ExtraFormsetMixin, ConceptEditFormView, UpdateView):
         invalid = form_invalid or formsets_invalid
 
         if invalid:
-            return self.form_invalid(form, formsets=formsets_to_save)
+            return self.form_invalid(form, formsets=extra_formsets)
         else:
             with transaction.atomic(), reversion.revisions.create_revision():
 

@@ -288,7 +288,7 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
     def get_formset(self):
 
         formclass = self.get_form_class()
-        return formset_factory(formclass, formset=HiddenOrderFormset, can_order=True, can_delete=True)
+        return formset_factory(formclass, formset=HiddenOrderFormset, can_order=True, can_delete=True, extra=0)
 
     def get_formset_initial(self):
         # Build initial
@@ -326,14 +326,15 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
                 for form in filled_formset.ordered_forms:
                     to_add = form.cleaned_data['item_to_add']
 
-                    model_args = {
-                        self.base_through_field: self.item,
-                        self.related_through_field: to_add,
-                        'order': form.cleaned_data['ORDER']
-                    }
+                    if to_add:
+                        model_args = {
+                            self.base_through_field: self.item,
+                            self.related_through_field: to_add,
+                            'order': form.cleaned_data['ORDER']
+                        }
 
-                    model_arglist.append(model_args)
-                    change_message.append('Added {} to {} {}'.format(to_add.name, self.item.name, self.model_base_field))
+                        model_arglist.append(model_args)
+                        change_message.append('Added {} to {} {}'.format(to_add.name, self.item.name, self.model_base_field))
 
                 # Delete existing links
 
