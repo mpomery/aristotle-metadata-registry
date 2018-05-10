@@ -31,7 +31,10 @@ from aristotle_mdr.utils import (
 from aristotle_mdr import comparators
 
 from .fields import ConceptForeignKey, ConceptManyToManyField, ShortTextField
-from .managers import MetadataItemManager, ConceptManager
+from .managers import (
+    MetadataItemManager, ConceptManager,
+    ReviewRequestQuerySet, WorkgroupQuerySet
+)
 
 import logging
 logger = logging.getLogger(__name__)
@@ -439,6 +442,7 @@ class Workgroup(registryGroup):
     created in that workgroup.
     """
     template = "aristotle_mdr/workgroup.html"
+    objects = WorkgroupQuerySet.as_manager()
     archived = models.BooleanField(
         default=False,
         help_text=_("Archived workgroups can no longer have new items or "
@@ -835,44 +839,8 @@ REVIEW_STATES = Choices(
 )
 
 
-class ReviewRequestQuerySet(models.QuerySet):
-    def visible(self, user):
-        """
-        Returns a queryset that returns all reviews that the given user has
-        permission to view.
-
-        It is **chainable** with other querysets. For example, both of these
-        will work and return the same list::
-
-            ObjectClass.objects.filter(name__contains="Person").visible()
-            ObjectClass.objects.visible().filter(name__contains="Person")
-        """
-        if user.is_superuser:
-            return self.all()
-        if user.is_anonymous():
-            return self.none()
-        q = Q(requester=user)  # Users can always see reviews they requested
-        if user.profile.is_registrar:
-            # Registars can see reviews for the registration authority
-            q |= Q(
-                Q(registration_authority__registrars__profile__user=user) & ~Q(status=REVIEW_STATES.cancelled)
-            )
-        return self.filter(q)
-
-
-class ReviewRequestManager(models.Manager):
-    def get_queryset(self):
-        return ReviewRequestQuerySet(self.model, using=self._db)
-
-    def __getattr__(self, attr, *args):
-        if attr in ['visible']:
-            return getattr(self.get_queryset(), attr, *args)
-        else:
-            return getattr(self.__class__, attr, *args)
-
-
 class ReviewRequest(TimeStampedModel):
-    objects = ReviewRequestManager()
+    objects = ReviewRequestQuerySet.as_manager()
     concepts = models.ManyToManyField(_concept, related_name="review_requests")
     registration_authority = models.ForeignKey(
         RegistrationAuthority,

@@ -1,0 +1,6 @@
+--index-url https://pypi.python.org/simple/
+
+-e .
+-e ../aristotle-metadata-registry/.
+-e ../aristotle-dataset-extensions/.
+-e ../comet-indicator-registry/.

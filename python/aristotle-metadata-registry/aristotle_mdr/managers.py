@@ -2,7 +2,6 @@ from django.db import models
 from django.db.models import Q
 from django.utils.module_loading import import_string
 from aristotle_mdr.utils import fetch_aristotle_settings
-
 from model_utils.managers import InheritanceManager, InheritanceQuerySet
 
 
@@ -30,7 +29,17 @@ class MetadataItemManager(InheritanceManager):
         return qs
 
 
+class WorkgroupQuerySet(MetadataItemQuerySet):
+    def visible(self, user):
+        if user.is_anonymous():
+            return self.none()
+        if user.is_superuser:
+            return self.all()
+        return user.profile.workgroups
+
+
 class ConceptQuerySet(MetadataItemQuerySet):
+
     def visible(self, user):
         """
         Returns a queryset that returns all items that the given user has
@@ -147,3 +156,25 @@ class ConceptManager(MetadataItemManager):
             return getattr(self.get_queryset(), attr, *args)
         else:
             return getattr(self.__class__, attr, *args)
+
+
+class ReviewRequestQuerySet(models.QuerySet):
+    def visible(self, user):
+        """
+        Returns a queryset that returns all reviews that the given user has
+        permission to view.
+
+        It is **chainable** with other querysets.
+        """
+        from aristotle_mdr.models import REVIEW_STATES
+        if user.is_superuser:
+            return self.all()
+        if user.is_anonymous():
+            return self.none()
+        q = Q(requester=user)  # Users can always see reviews they requested
+        if user.profile.is_registrar:
+            # Registars can see reviews for the registration authority
+            q |= Q(
+                Q(registration_authority__registrars__profile__user=user) & ~Q(status=REVIEW_STATES.cancelled)
+            )
+        return self.filter(q)
