@@ -645,6 +645,7 @@ class ExtraFormsetMixin:
 
         return weak_list
 
+
 class ConfirmDeleteView(GenericWithItemURLView, TemplateView):
     confirm_template = "aristotle_mdr/generic/actions/confirm_delete.html"
     template_name = "aristotle_mdr/generic/actions/confirm_delete.html"

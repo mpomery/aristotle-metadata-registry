@@ -148,7 +148,6 @@ class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
             fscontext = self.get_formset_context(fslist)
             context.update(fscontext)
 
-
         context.update({'model_name': self.model._meta.verbose_name,
                         'model_name_plural': self.model._meta.verbose_name_plural,
                         'help': ConceptHelp.objects.filter(

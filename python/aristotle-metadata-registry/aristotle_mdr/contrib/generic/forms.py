@@ -116,7 +116,7 @@ def ordered_formset_save(formset, item, model_to_add_field, ordering_field):
     # Save a formset created with the above factory
 
     item.save()  # do this to ensure we are saving reversion records for the item, not just the values
-    formset.save(commit=False) # Save formset so we have access to deleted_objects and save_m2m
+    formset.save(commit=False)  # Save formset so we have access to deleted_objects and save_m2m
 
     for form in formset.ordered_forms:
         # Loop through the forms so we can add the order value to the ordering field

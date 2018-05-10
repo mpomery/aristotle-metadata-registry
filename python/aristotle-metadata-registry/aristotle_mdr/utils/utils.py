@@ -105,6 +105,7 @@ def url_slugify_organization(org):
         kwargs={'iid': org.pk, 'name_slug': slug}
     )
 
+
 def construct_change_message_for_form(request, form):
     change_message = []
     if form and form.changed_data:
@@ -115,6 +116,7 @@ def construct_change_message_for_form(request, form):
         change_message.append(_('Changed %s.') % get_text_list(changed, _('and')))
 
     return change_message
+
 
 def construct_change_message(request, form, formsets):
     """
