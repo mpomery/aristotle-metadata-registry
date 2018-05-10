@@ -53,7 +53,7 @@ def setup_mdr(args):
     if not args.name or not re.match(name_regex, args.name[0]):
         name = valid_input("Enter the system name for your registry (lowercase letters and underscores ONLY): ", name_regex)
     else:
-        name = args.name
+        name = args.name[0]
 
     if not args.directory or args.directory[0] == '.':
         directory = os.getcwd()
@@ -92,7 +92,8 @@ def setup_mdr(args):
                 extensions.append(ext_token)
 
     if extensions:
-        find_and_remove(directory, extensions)
+        start_dir = os.path.join(directory, name)
+        find_and_remove(start_dir, extensions)
 
     # Update the settings key
     generate_secret_key(name, directory)
@@ -143,7 +144,9 @@ def rename_example_mdr(name, directory):
 
     os.rename(os.path.join(startpath, 'example_mdr'), os.path.join(startpath, name))
     os.rename(startpath, os.path.join(directory, name))
-    find_and_replace(directory, 'example_mdr', name)
+
+    new_startpath = os.path.join(directory, name)
+    find_and_replace(new_startpath, 'example_mdr', name)
 
 
 def install_reqs(name, dir):
