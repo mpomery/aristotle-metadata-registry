@@ -1,4 +1,4 @@
-<table id="{{ formset.prefix }}" class="formset form table table-hover">
+<table id="{{ formset.prefix }}" class="formset form table table-hover" style="overflow: auto">
 {% with formset.empty_form as form %}
   {{ form.media }}
   <thead><tr>
@@ -20,7 +20,6 @@
       </td>
       {% for field in form.visible_fields %}
         <td>
-        {# Include the hidden fields in the form #}
           {% if field.errors %}
               <div class="alert alert-danger">
           {% endif %}

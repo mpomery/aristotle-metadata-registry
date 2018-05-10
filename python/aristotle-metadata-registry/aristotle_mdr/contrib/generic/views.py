@@ -20,6 +20,7 @@ from aristotle_mdr.contrib.generic.forms import (
 )
 import reversion
 import inspect
+import re
 
 import logging
 logger = logging.getLogger(__name__)
@@ -282,6 +283,8 @@ class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
                     self.related_through_field = field.name
 
         # Check if either is None
+        if self.base_through_field is None or self.related_through_field is None:
+            return self.error_with_message('Many to Many edit could not be performed on this object')
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -513,7 +516,7 @@ class ExtraFormsetMixin:
             else:
                 formset = self.get_weak_formset(weak, postdata=postdata)
 
-            title = 'Edit ' + weak['model'].name
+            title = 'Edit ' + weak['model'].__name__
             # add spaces before capital letters
             title = re.sub(r"\B([A-Z])", r" \1", title)
 
@@ -524,7 +527,7 @@ class ExtraFormsetMixin:
                 'saveargs': {
                     'formset': formset,
                     'item': add_item,
-                    'model_to_add_field': through['item_field'],
+                    'model_to_add_field': weak['item_field'],
                     'ordering_field': 'order'
                 }
             })
@@ -558,7 +561,7 @@ class ExtraFormsetMixin:
         fsargs = {'prefix': weak['field_name']}
 
         if item:
-            extra_excludes = one_to_many_formset_excludes(item, field_model)
+            extra_excludes = one_to_many_formset_excludes(item, weak['model'])
             fsargs['queryset'] = getattr(item, weak['field_name']).all()
         else:
             if issubclass(weak['model'], ValueDomain):
@@ -571,7 +574,7 @@ class ExtraFormsetMixin:
             fsargs['data'] = postdata
 
         all_excludes = [model_to_add_field, weak['model'].ordering_field] + extra_excludes
-        formset = ordered_formset_factory(field_model, all_excludes)
+        formset = ordered_formset_factory(weak['model'], all_excludes)
 
         final_formset = formset(**fsargs)
 
@@ -604,8 +607,6 @@ class ExtraFormsetMixin:
                         item_field = self.get_model_field(through, check_class)
                         through_list.append({'field_name': field.name, 'model': through, 'item_field': item_field})
 
-
-        logger.debug(through_list)
         return through_list
 
     def get_m2m_weak(self, item):
@@ -622,9 +623,9 @@ class ExtraFormsetMixin:
 
             for entity in weak:
 
-                field = check_class._meta.get_field(weak[1])
-                item_field = self.get_model_field(through, check_class)
-                weak_list.append({'field_name': field.name, 'model': field.model, 'item_field': item_field})
+                field = check_class._meta.get_field(entity[1])
+                item_field = self.get_model_field(field.related_model, check_class)
+                weak_list.append({'field_name': field.name, 'model': field.related_model, 'item_field': item_field})
 
         return weak_list
 

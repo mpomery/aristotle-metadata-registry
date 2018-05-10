@@ -18,7 +18,7 @@ datePickerOptions = {
     "useCurrent": False,
     "widgetPositioning": {
         "horizontal": "left",
-        "vertical": "auto"
+        "vertical": "bottom"
     }
 }
 
@@ -36,6 +36,9 @@ class HiddenOrderModelFormSet(BaseModelFormSet):
         super().add_fields(form, index)
         form.fields["ORDER"].widget = forms.HiddenInput()
 
+
+# Below are some util functions for creating o2m and m2m querysets
+# They are used in the generic alter views and the ExtraFormsetMixin
 
 def one_to_many_formset_excludes(item, model_to_add):
     # creates a list of extra fields to be excluded based on the item related to the weak entity
@@ -95,7 +98,7 @@ def get_aristotle_widgets(model):
 
 
 def ordered_formset_factory(model, excludes=[]):
-
+    # Formset factory for a hidden order model formset with aristotle widgets
     _widgets = get_aristotle_widgets(model)
 
     return modelformset_factory(
@@ -108,9 +111,11 @@ def ordered_formset_factory(model, excludes=[]):
         widgets=_widgets
     )
 
-def ordered_formset_save(formset, item, model_to_add_field, ordering_field):
 
-    item.save()  # do this to ensure we are saving reversion records for the value domain, not just the values
+def ordered_formset_save(formset, item, model_to_add_field, ordering_field):
+    # Save a formset created with the above factory
+
+    item.save()  # do this to ensure we are saving reversion records for the item, not just the values
     formset.save(commit=False) # Save formset so we have access to deleted_objects and save_m2m
 
     for form in formset.ordered_forms:

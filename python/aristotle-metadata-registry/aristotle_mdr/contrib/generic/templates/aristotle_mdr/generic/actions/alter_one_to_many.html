@@ -33,7 +33,7 @@
     {% csrf_token %}
     {{ formset.management_form }}
     {{ formset.non_form_errors.as_ul }}
-    <div style="overflow-x:auto">
+    <div>
     {% include 'aristotle_mdr/generic/actions/alter_one_to_many_formset.html' with formset=formset %}
     </div>
     <a class="btn btn-primary add_code_button" formid='{{ formset.prefix }}'>
