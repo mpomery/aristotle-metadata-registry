@@ -86,6 +86,7 @@ class EditItemView(ExtraFormsetMixin, ConceptEditFormView, UpdateView):
 
             extra_formsets.append({
                 'formset': slot_formset,
+                'title': 'Slots',
                 'type': 'slot',
                 'saveargs': None
             })
@@ -99,6 +100,7 @@ class EditItemView(ExtraFormsetMixin, ConceptEditFormView, UpdateView):
 
             extra_formsets.append({
                 'formset': id_formset,
+                'title': 'Identifiers',
                 'type': 'identifiers',
                 'saveargs': None
             })
