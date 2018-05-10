@@ -27,29 +27,23 @@ jQuery(function($) {
 
     });
 
-    $( "form" ).submit(function( event ) {
-        var blank_row = $('#formstage tr');
-        $( "table#formset #draggableTable tr" ).each(function() {
+    $("form").submit(function(event) {
+        $(".draggableTable .moveablerow").each(function() {
             var row = this;
-            if ( $(row).find( "input[name$=-id]" ).val() == "" ) {
+            if ($(row).find("input[name$=-id]").val() == "") {
+                // For rows with a blank id (newly added)
                 var all_empty = true;
                 $(row).find(':input').each(function() {
                     var name = $(this).attr('name').split('-')[2];
-                    if (name !== name.toUpperCase()) {
+                    if (name != 'ORDER' && name != 'DELETE') {
                         // We skip all uppercase ones as they are Django sepcial fields
-                        original_value = $(blank_row).find("input[name$=-"+name+"]").val()
-                        all_empty = all_empty && (
-                            $(this).val() == original_value ||
-                            $(this).val() === ""
-                        )
+                        all_empty = all_empty && ($(this).val() == "")
                     }
                 })
                 if (all_empty) {
                     // We could delete it, but that might be visually disturbing
-                    // So lets just forcefully null everything
-                    $(row).find(':input').val('').prop('checked', false);
+                    // So lets just check deleted
                     $(row).find('input[name$=-DELETE]').val('on').prop('checked', 'on');
-
                 }
             }
         })
