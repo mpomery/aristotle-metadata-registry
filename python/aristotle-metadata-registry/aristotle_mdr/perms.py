@@ -89,6 +89,7 @@ def user_can_edit(user, item):
     else:
         can_use_cache = True
 
+    user_key = str(user.id)
     key = 'user_can_edit_%s|%s:%s|%s' % (user_key, item._meta.app_label, item._meta.app_label, str(item.id))
     cached_can_edit = cache.get(key)
     if can_use_cache and cached_can_edit is not None:
