@@ -1,6 +1,5 @@
 <table id="{{ formset.prefix }}" class="formset form table table-hover" style="overflow: auto">
 {% with formset.empty_form as form %}
-  {{ form.media }}
   <thead><tr>
       <th></th>
     {% for field in form.visible_fields %}
