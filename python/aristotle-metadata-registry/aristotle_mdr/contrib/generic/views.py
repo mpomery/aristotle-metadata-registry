@@ -516,7 +516,7 @@ class ExtraFormsetMixin:
             else:
                 formset = self.get_weak_formset(weak, postdata=postdata)
 
-            title = 'Edit ' + weak['model'].__name__
+            title = weak['model'].__name__
             # add spaces before capital letters
             title = re.sub(r"\B([A-Z])", r" \1", title)
 
@@ -605,7 +605,8 @@ class ExtraFormsetMixin:
                     through = field.remote_field.through
                     if not through._meta.auto_created:
                         item_field = self.get_model_field(through, check_class)
-                        through_list.append({'field_name': field.name, 'model': through, 'item_field': item_field})
+                        if item_field:
+                            through_list.append({'field_name': field.name, 'model': through, 'item_field': item_field})
 
         return through_list
 
@@ -625,7 +626,8 @@ class ExtraFormsetMixin:
 
                 field = check_class._meta.get_field(entity[1])
                 item_field = self.get_model_field(field.related_model, check_class)
-                weak_list.append({'field_name': field.name, 'model': field.related_model, 'item_field': item_field})
+                if item_field:
+                    weak_list.append({'field_name': field.name, 'model': field.related_model, 'item_field': item_field})
 
         return weak_list
 
