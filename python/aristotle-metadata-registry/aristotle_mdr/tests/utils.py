@@ -54,6 +54,14 @@ def model_to_dict_with_change_time(item, fetch_time=None):
             d['%s-MIN_NUM_FORMS'%entity[0]] = 0
             d['%s-MAX_NUM_FORMS'%entity[0]] = 1
 
+    if isinstance(item, models.DataElementDerivation):
+        prefixes = ['derives', 'inputs']
+        for pre in prefixes:
+            d['%s-TOTAL_FORMS'%pre] = 0
+            d['%s-INITIAL_FORMS'%pre] = 0
+            d['%s-MIN_NUM_FORMS'%pre] = 0
+            d['%s-MAX_NUM_FORMS'%pre] = 1
+
     return d
 
 
