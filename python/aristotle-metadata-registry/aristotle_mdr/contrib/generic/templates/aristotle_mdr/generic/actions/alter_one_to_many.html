@@ -24,11 +24,17 @@
           <li class="active">{{ form_title }}</li>
         </ol>
 
-        {% if formset.errors %}
-        <div class="alert alert-danger">
-            {{formset.errors}}
-        </div>
-        {% endif %}
+        {% for dict in formset.errors %}
+          {% if dict %}
+          <div class="alert alert-danger">
+          <ul>
+          {% for key, value in dict.items %}
+              <li>{{ key }} {{ value }}</li>
+          {% endfor %}
+          </ul>
+          </div>
+          {% endif %}
+        {% endfor %}
 
     {% csrf_token %}
     {{ formset.management_form }}
