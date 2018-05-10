@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, TemplateView, View
 
 from aristotle_mdr.contrib.autocomplete import widgets
-from aristotle_mdr.models import _concept, ValueDomain
+from aristotle_mdr.models import _concept, ValueDomain, AbstractValue
 from aristotle_mdr.perms import user_can_edit, user_can_view
 from aristotle_mdr.utils import construct_change_message
 from aristotle_mdr.contrib.generic.forms import (
@@ -564,7 +564,7 @@ class ExtraFormsetMixin:
             extra_excludes = one_to_many_formset_excludes(item, weak['model'])
             fsargs['queryset'] = getattr(item, weak['field_name']).all()
         else:
-            if issubclass(weak['model'], ValueDomain):
+            if issubclass(weak['model'], AbstractValue):
                 extra_excludes = ['value_meaning']
             else:
                 extra_excludes = []
