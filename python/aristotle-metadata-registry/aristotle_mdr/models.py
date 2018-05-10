@@ -1347,6 +1347,7 @@ class DedBaseThrough(models.Model):
     class Meta:
         abstract = True
         ordering = ['order']
+        unique_together = ('data_element_derivation', 'data_element')
 
 
 class DedDerivesThrough(DedBaseThrough):
