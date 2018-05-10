@@ -196,7 +196,6 @@ class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
                 form.save_m2m()
 
         if 'extra_formsets' in self.request.session:
-            logger.debug('extra formsets were found')
 
             extra_formsets = self.request.session['extra_formsets']
 
@@ -206,11 +205,7 @@ class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
                 final_formsets.append(info)
 
             self.save_formsets(final_formsets)
-
             self.request.session.pop('extra_formsets')
-        else:
-            logger.debug('extra formsets not found')
-
 
         return HttpResponseRedirect(url_slugify_concept(saved_item))
 
