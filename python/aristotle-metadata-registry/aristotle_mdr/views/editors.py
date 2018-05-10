@@ -8,7 +8,7 @@ from django.views.generic import (
 import reversion
 
 from aristotle_mdr.utils import (
-    concept_to_clone_dict,
+    concept_to_clone_dict, construct_change_message_extra_formsets,
     construct_change_message, url_slugify_concept, is_active_module
 )
 from aristotle_mdr import forms as MDRForms
@@ -130,8 +130,8 @@ class EditItemView(ExtraFormsetMixin, ConceptEditFormView, UpdateView):
                 self.save_formsets(extra_formsets)
 
                 # save the change comments
-                # if not change_comments:
-                #     change_comments = construct_change_message(request, form, changed_formsets)
+                if not change_comments:
+                    change_comments = construct_change_message_extra_formsets(request, form, extra_formsets)
 
                 reversion.revisions.set_user(request.user)
                 reversion.revisions.set_comment(change_comments)
