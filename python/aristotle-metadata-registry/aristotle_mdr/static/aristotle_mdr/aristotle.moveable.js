@@ -34,10 +34,13 @@ jQuery(function($) {
                 // For rows with a blank id (newly added)
                 var all_empty = true;
                 $(row).find(':input').each(function() {
-                    var name = $(this).attr('name').split('-')[2];
-                    if (name != 'ORDER' && name != 'DELETE') {
-                        // We skip all uppercase ones as they are Django sepcial fields
-                        all_empty = all_empty && ($(this).val() == "")
+                    var myclass = $(this).attr('class')
+                    if (myclass != 'select2-search__field') {
+                      var name = $(this).attr('name').split('-')[2];
+                      if (name != 'ORDER' && name != 'DELETE') {
+                          // We skip all uppercase ones as they are Django sepcial fields
+                          all_empty = all_empty && ($(this).val() == "")
+                      }
                     }
                 })
                 if (all_empty) {
@@ -51,10 +54,19 @@ jQuery(function($) {
 });
 
 function replacePrefix(element, num_forms) {
-  new_name = $(element).attr('name').replace('__prefix__', num_forms-1)
-  new_id = $(element).attr('id').replace('__prefix__', num_forms-1)
-  $(element).attr('id', new_id)
-  $(element).attr('name', new_name)
+  var name = $(element).attr('name')
+  var id = $(element).attr('id')
+
+  if (name && name.includes('__prefix__')) {
+    var new_name = name.replace('__prefix__', num_forms)
+    $(element).attr('name', new_name)
+  }
+
+  if (id && id.includes('__prefix__')) {
+    var new_id = id.replace('__prefix__', num_forms)
+    $(element).attr('id', new_id)
+  }
+
 }
 
 function addCode(id) {
@@ -81,19 +93,14 @@ function addCode(id) {
     var all_tr = table + ' tr'
     num_forms = $(all_tr).length
 
-    $(new_form).find('input').each(function() {
-        replacePrefix(this, num_forms)
-    });
-
-    $(new_form).find('select').each(function() {
-        replacePrefix(this, num_forms)
+    $(new_form).find(':input').each(function() {
+        replacePrefix(this, num_forms-1)
     });
 
     // rename the form entries
-    renumberRow(new_form,num_forms-1);
+    reorderRows(table);
     var total_forms_identifier = 'input[name=' + id + '-TOTAL_FORMS]'
     $(total_forms_identifier).val(num_forms);
-    return false;
 
 }
 
