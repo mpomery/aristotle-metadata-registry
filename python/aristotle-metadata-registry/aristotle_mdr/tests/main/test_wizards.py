@@ -247,6 +247,54 @@ class ObjectClassWizardPage(ConceptWizardPage,TestCase):
 class PropertyWizardPage(ConceptWizardPage,TestCase):
     model=models.Property
 
+class ConceptualDomainWizardPage(FormsetTestUtils, ConceptWizardPage, TestCase):
+    model=models.ConceptualDomain
+
+    @tag('edit_formsets')
+    def test_weak_editor_during_create(self):
+
+        self.login_editor()
+
+        item_name = 'My Shiny New Conceptual Domain'
+        step_1_data = {
+            self.wizard_form_name+'-current_step': 'initial',
+            'initial-name': item_name,
+        }
+
+        response = self.client.post(self.wizard_url, step_1_data)
+        wizard = response.context['wizard']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(wizard['steps'].current, 'results')
+
+        step_2_data = {
+            self.wizard_form_name+'-current_step': 'results',
+            'initial-name':item_name,
+            'results-name':item_name,
+            'results-definition':"Test Definition",
+        }
+
+        valuemeaning_formset_data = [
+            {'name': 'Test1', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 0},
+            {'value': 'Test2', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 1}
+        ]
+        step_2_data.update(self.get_formset_postdata(valuemeaning_formset_data, 'value_meaning', 0))
+
+
+        response = self.client.post(self.wizard_url, step_2_data)
+        self.assertEqual(response.status_code, 302)
+
+        self.assertTrue(self.model.objects.filter(name=item_name).exists())
+        self.assertEqual(self.model.objects.filter(name=item_name).count(),1)
+        item = self.model.objects.filter(name=item_name).first()
+        self.assertRedirects(response,url_slugify_concept(item))
+
+        vms = item.valuemeaning_set.all()
+
+        self.assertEqual(len(vms), 2)
+        self.assertEqual(vms[0].value, 'Test3')
+        self.assertEqual(vms[1].value, 'Test4')
+
+
 class ValueDomainWizardPage(FormsetTestUtils, ConceptWizardPage,TestCase):
     model=models.ValueDomain
 
