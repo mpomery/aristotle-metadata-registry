@@ -84,7 +84,7 @@ def model_to_dict_with_change_time(item, fetch_time=None):
     d = model_to_dict(item)
     d['last_fetched'] = str(fetch_time)
 
-    mfs = get_management_forms()
+    mfs = get_management_forms(item, slots=True, identifiers=True)
     d.update(mfs)
 
     return d
