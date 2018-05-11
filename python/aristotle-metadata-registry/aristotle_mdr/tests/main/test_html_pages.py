@@ -1400,7 +1400,7 @@ class ValueDomainViewPage(LoggedInViewConceptPages, TestCase):
             self.assertFalse('value_meaning' in form.fields)
             self.assertTrue('meaning' in form.fields)
 
-class ConceptualDomainViewPage(LoggedInViewConceptPages, TestCase):
+class ConceptualDomainViewPage(utils.FormsetTestUtils, LoggedInViewConceptPages, TestCase):
     url_name='conceptualDomain'
     itemType=models.ConceptualDomain
 
@@ -1414,6 +1414,29 @@ class ConceptualDomainViewPage(LoggedInViewConceptPages, TestCase):
                 conceptual_domain=self.item1,
                 order=i,
             )
+
+    @tag('edit_formsets')
+    def test_edit_formset_error_display(self):
+
+        self.login_editor()
+
+        edit_url = 'aristotle:edit_item'
+        response = self.client.get(reverse(edit_url,args=[self.item1.id]))
+        self.assertEqual(response.status_code, 200)
+
+        data = utils.model_to_dict_with_change_time(self.item1)
+
+        # submit an item with a blank name
+        valuemeaning_formset_data = [
+            {'name': '', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 0},
+            {'name': 'Test2', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 1}
+        ]
+        data.update(self.get_formset_postdata(valuemeaning_formset_data, 'value_meaning', 0))
+        response = self.client.post(reverse(edit_url,args=[self.item1.id]), data)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(response.context['weak_formsets'][0]['formset'].errors[0], {'name': ['This field is required.']})
+        self.assertContains(response, 'This field is required.')
 
 
 class DataElementConceptViewPage(LoggedInViewConceptPages, TestCase):
