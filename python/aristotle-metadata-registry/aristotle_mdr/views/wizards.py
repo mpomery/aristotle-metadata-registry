@@ -161,8 +161,8 @@ class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
         return context
 
     def get(self, *args, **kwargs):
-        if 'extra_formsets' in self.request.session.keys():
-            self.request.session.pop('extra_formsets')
+        if 'results_postdata' in self.request.session.keys():
+            self.request.session.pop('results_postdata')
 
         return super().get(*args, **kwargs)
 
@@ -172,12 +172,12 @@ class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
             extra_formsets = self.get_extra_formsets(item=self.model, postdata=self.request.POST)
 
             formsets_invalid = self.validate_formsets(extra_formsets)
-
+            print('formsets_invalid is {}'.format(formsets_invalid))
             if formsets_invalid:
                 form = self.get_form(data=self.request.POST, files=self.request.FILES)
                 return self.render(form=form, extra_formsets=extra_formsets)
             else:
-                self.request.session['extra_formsets'] = extra_formsets
+                self.request.session['results_postdata'] = self.request.POST
 
         return super().post(*args, **kwargs)
 
@@ -194,17 +194,18 @@ class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
                 saved_item.save()
                 form.save_m2m()
 
-        if 'extra_formsets' in self.request.session:
+        if 'results_postdata' in self.request.session:
 
-            extra_formsets = self.request.session['extra_formsets']
+            extra_formsets = self.get_extra_formsets(item=self.model, postdata=self.request.session['results_postdata'])
+            formsets_invalid = self.validate_formsets(extra_formsets)
+            if not formsets_invalid:
+                final_formsets = []
+                for info in extra_formsets:
+                    info['saveargs']['item'] = saved_item
+                    final_formsets.append(info)
 
-            final_formsets = []
-            for info in extra_formsets:
-                info['saveargs']['item'] = saved_item
-                final_formsets.append(info)
-
-            self.save_formsets(final_formsets)
-            self.request.session.pop('extra_formsets')
+                self.save_formsets(final_formsets)
+            self.request.session.pop('results_postdata')
 
         return HttpResponseRedirect(url_slugify_concept(saved_item))
 
