@@ -606,7 +606,7 @@ class ExtraFormsetMixin:
                     if not through._meta.auto_created:
                         item_field = self.get_model_field(through, check_class)
                         if item_field:
-                            through_list.append({'field_name': entity[0], 'model': through, 'item_field': item_field})
+                            through_list.append({'field_name': field.name, 'model': through, 'item_field': item_field})
 
         return through_list
 
@@ -647,7 +647,7 @@ class ExtraFormsetMixin:
 
                     item_field = self.get_model_field(field.related_model, check_class)
                     if item_field:
-                        weak_list.append({'field_name': entity[1], 'model': field.related_model, 'item_field': item_field})
+                        weak_list.append({'field_name': entity[0], 'model': field.related_model, 'item_field': item_field})
 
         return weak_list
 
