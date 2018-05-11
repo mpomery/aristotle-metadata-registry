@@ -142,7 +142,9 @@ class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
             self.wizard_form_name+'-current_step': 'results',
             'results-name':"Test Item",
         }
-
+        management_forms = utils.get_management_forms(self.model)
+        step_2_data.update(management_forms)
+        print('step 2 data is: {}'.format(step_2_data))
         response = self.client.post(self.wizard_url, step_2_data)
         wizard = response.context['wizard']
         self.assertTrue('definition' in wizard['form'].errors.keys())
