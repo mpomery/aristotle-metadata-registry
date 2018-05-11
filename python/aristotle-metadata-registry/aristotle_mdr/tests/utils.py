@@ -25,26 +25,21 @@ def model_to_dict(item):
     return dict((k, v) for (k, v) in mtd(item).items() if v is not None)
 
 
-def model_to_dict_with_change_time(item, fetch_time=None):
-    """
-    This constructs a dictionary from a model, with a last_fetched value as well
-    that is needed for checking in edit forms to prevent overrides of other saves.
-    """
-    if fetch_time is None:
-        fetch_time = timezone.now()
-    d = model_to_dict(item)
-    d['last_fetched'] = str(fetch_time)
+def get_management_forms(item, slots=False, identifiers=False):
 
-    # Add slots management form
-    d['slots-TOTAL_FORMS'] = 0
-    d['slots-INITIAL_FORMS'] = 0
-    d['slots-MIN_NUM_FORMS'] = 0
-    d['slots-MAX_NUM_FORMS'] = 0
+    d = {}
 
-    d['identifiers-TOTAL_FORMS'] = 0
-    d['identifiers-INITIAL_FORMS'] = 0
-    d['identifiers-MIN_NUM_FORMS'] = 0
-    d['identifiers-MAX_NUM_FORMS'] = 1
+    if slots:
+        d['slots-TOTAL_FORMS'] = 0
+        d['slots-INITIAL_FORMS'] = 0
+        d['slots-MIN_NUM_FORMS'] = 0
+        d['slots-MAX_NUM_FORMS'] = 0
+
+    if identifiers:
+        d['identifiers-TOTAL_FORMS'] = 0
+        d['identifiers-INITIAL_FORMS'] = 0
+        d['identifiers-MIN_NUM_FORMS'] = 0
+        d['identifiers-MAX_NUM_FORMS'] = 1
 
     if hasattr(item, 'serialize_weak_entities'):
         weak = item.serialize_weak_entities
@@ -61,6 +56,36 @@ def model_to_dict_with_change_time(item, fetch_time=None):
             d['%s-INITIAL_FORMS'%pre] = 0
             d['%s-MIN_NUM_FORMS'%pre] = 0
             d['%s-MAX_NUM_FORMS'%pre] = 1000
+
+    return d
+
+
+def get_admin_management_forms(item_class):
+
+    d = {}
+    if issubclass(item_class, models.DataElementDerivation):
+        prefixes = ['dedderivesthrough_set', 'dedinputsthrough_set']
+        for pre in prefixes:
+            d['%s-TOTAL_FORMS'%pre] = 0
+            d['%s-INITIAL_FORMS'%pre] = 0
+            d['%s-MIN_NUM_FORMS'%pre] = 0
+            d['%s-MAX_NUM_FORMS'%pre] = 1000
+
+    return d
+
+
+def model_to_dict_with_change_time(item, fetch_time=None):
+    """
+    This constructs a dictionary from a model, with a last_fetched value as well
+    that is needed for checking in edit forms to prevent overrides of other saves.
+    """
+    if fetch_time is None:
+        fetch_time = timezone.now()
+    d = model_to_dict(item)
+    d['last_fetched'] = str(fetch_time)
+
+    mfs = get_management_forms()
+    d.update(mfs)
 
     return d
 
