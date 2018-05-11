@@ -6,11 +6,6 @@
 <script src="{% static 'aristotle_mdr/jqueryui/jquery-ui.min.js' %}"></script>
 <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.moveable.less'|compile %}" />
 <script src="{% static 'aristotle_mdr/aristotle.moveable.js' %}"></script>
-{% if weak_formsets or through_formsets %}
-<script src="{% static 'autocomplete_light/autocomplete.init.js' %}"></script>
-<script src="{% static 'autocomplete_light/vendor/select2/dist/js/select2.full.js' %}"></script>
-<script src="{% static 'autocomplete_light/select2.js' %}"></script>
-{% endif %}
 {% endblock %}
 
 {% block formarea %}

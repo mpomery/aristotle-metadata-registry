@@ -14,11 +14,7 @@
         </script>
         <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
     {% endif %}
-    {% if weak_formsets or through_formsets %}
-    <script src="{% static 'autocomplete_light/autocomplete.init.js' %}"></script>
-    <script src="{% static 'autocomplete_light/vendor/select2/dist/js/select2.full.js' %}"></script>
-    <script src="{% static 'autocomplete_light/select2.js' %}"></script>
-    {% endif %}
+
 {% endblock %}
 
 {% block content %}
