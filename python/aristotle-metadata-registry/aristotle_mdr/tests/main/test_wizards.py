@@ -250,7 +250,7 @@ class PropertyWizardPage(ConceptWizardPage,TestCase):
 class ConceptualDomainWizardPage(FormsetTestUtils, ConceptWizardPage, TestCase):
     model=models.ConceptualDomain
 
-    @tag('edit_formsets')
+    @tag('edit_formsets', 'runthis')
     def test_weak_editor_during_create(self):
 
         self.login_editor()
@@ -275,7 +275,7 @@ class ConceptualDomainWizardPage(FormsetTestUtils, ConceptWizardPage, TestCase):
 
         valuemeaning_formset_data = [
             {'name': 'Test1', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 0},
-            {'value': 'Test2', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 1}
+            {'name': 'Test2', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 1}
         ]
         step_2_data.update(self.get_formset_postdata(valuemeaning_formset_data, 'value_meaning', 0))
 
@@ -291,8 +291,8 @@ class ConceptualDomainWizardPage(FormsetTestUtils, ConceptWizardPage, TestCase):
         vms = item.valuemeaning_set.all()
 
         self.assertEqual(len(vms), 2)
-        self.assertEqual(vms[0].value, 'Test3')
-        self.assertEqual(vms[1].value, 'Test4')
+        self.assertEqual(vms[0].name, 'Test1')
+        self.assertEqual(vms[1].name, 'Test2')
 
 
 class ValueDomainWizardPage(FormsetTestUtils, ConceptWizardPage,TestCase):
