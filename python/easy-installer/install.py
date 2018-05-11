@@ -27,7 +27,6 @@ PIP_MSG = "You can finish installing by running - pip install -r requirements.tx
 optional_modules = [
     ("Aristotle Glossary Extension", "#!aristotle_glossary!"),
     ("Aristotle Dataset Extensions", "#!aristotle_dse!"),
-    ("Aristotle DDI Downloaders", "#!aristotle_ddi_utils!"),
     ("Aristotle MDR API", "#!aristotle_mdr_api!")
 ]
 

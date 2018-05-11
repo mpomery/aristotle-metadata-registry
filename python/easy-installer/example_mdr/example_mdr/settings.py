@@ -48,7 +48,6 @@ TEMPLATE_DEBUG = True
 # * the installation command in `requirements.txt` file
 # * the url import in `example_mdr/urls.py`
 INSTALLED_APPS = (
-    #!aristotle_ddi_utils! 'aristotle_ddi_utils', # Download formats in the DDI3.2 XML format - https://github.com/aristotle-mdr/aristotle-ddi-utils
     #!aristotle_dse! 'aristotle_dse', # Additional models for describing datasets - https://github.com/aristotle-mdr/aristotle-dataset-extensions
     #!aristotle_glossary! 'aristotle_glossary', # Model for managing and inserting glossary content - https://github.com/aristotle-mdr/aristotle-glossary
     #!aristotle_mdr_api! 'aristotle_mdr_api', # JSON API for programmatic access to content
@@ -116,8 +115,6 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
     }
 }
-# Specified the agency to use when outputing items in the DDI XML format.
-#!aristotle_ddi_utils!ARISTOTLE_DDI_AGENCY = "demo.ddi.aristotle_mdr"
 
 # This option gives a site the ability to register the different download options available for the site
 # This invoked in templates using the aristotle template tag "downloadMenu"
