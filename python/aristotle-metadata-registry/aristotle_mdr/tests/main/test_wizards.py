@@ -250,7 +250,7 @@ class PropertyWizardPage(ConceptWizardPage,TestCase):
 class ConceptualDomainWizardPage(FormsetTestUtils, ConceptWizardPage, TestCase):
     model=models.ConceptualDomain
 
-    @tag('edit_formsets', 'runthis')
+    @tag('edit_formsets')
     def test_weak_editor_during_create(self):
 
         self.login_editor()
