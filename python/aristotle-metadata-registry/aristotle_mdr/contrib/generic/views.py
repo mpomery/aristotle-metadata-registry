@@ -558,7 +558,10 @@ class ExtraFormsetMixin:
 
         model_to_add_field = weak['item_field']
 
-        fsargs = {'prefix': weak['field_name']}
+        if 'prefix' in weak:
+            fsargs = {'prefix': weak['prefix']}
+        else:
+            fsargs = {'prefix': weak['field_name']}
 
         if item:
             extra_excludes = one_to_many_formset_excludes(item, weak['model'])
@@ -647,7 +650,7 @@ class ExtraFormsetMixin:
 
                     item_field = self.get_model_field(field.related_model, check_class)
                     if item_field:
-                        weak_list.append({'field_name': entity[0], 'model': field.related_model, 'item_field': item_field})
+                        weak_list.append({'prefix': entity[0], 'field_name': entity[1], 'model': field.related_model, 'item_field': item_field})
 
         return weak_list
 
