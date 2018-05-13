@@ -520,6 +520,11 @@ class ExtraFormsetMixin:
             # add spaces before capital letters
             title = re.sub(r"\B([A-Z])", r" \1", title)
 
+            if hasattr(weak['model'], 'ordering_field'):
+                order_field = weak['model'].ordering_field
+            else:
+                order_field = 'order'
+
             extra_formsets.append({
                 'formset': formset,
                 'type': 'weak',
@@ -528,7 +533,7 @@ class ExtraFormsetMixin:
                     'formset': formset,
                     'item': add_item,
                     'model_to_add_field': weak['item_field'],
-                    'ordering_field': 'order'
+                    'ordering_field': order_field
                 }
             })
 
