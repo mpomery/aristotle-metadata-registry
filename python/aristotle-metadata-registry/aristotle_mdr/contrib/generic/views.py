@@ -607,7 +607,7 @@ class ExtraFormsetMixin:
         else:
             check_class = item.__class__
 
-        excludes = getattr(check_class, 'edit_page_excludes', [])
+        excludes = getattr(check_class, 'through_edit_excludes', [])
         if not excludes:
             excludes = []
 
