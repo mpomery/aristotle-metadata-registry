@@ -46,6 +46,7 @@ def setup_mdr(args):
         name = args.name[0]
 
     if not args.directory or args.directory[0] == '.':
+        print('No directory specified, Using current directory')
         directory = os.getcwd()
     else:
         directory = args.directory[0]
@@ -80,30 +81,27 @@ def setup_mdr(args):
     generate_secret_key(name, directory)
 
     if args.dry_install:
-        print("Performing dry run, no requirements installed.")
-        print(PIP_MSG)
-        return 0
+        do_install = False
     elif args.force_install:
-        print("Installing from requirements.txt")
         do_install = True
     else:
-        do_install = ask_yesno("Ready to install requirements?")
-        if not do_install:
-            print("Performing dry run, no requirements installed.")
-            print(PIP_MSG)
+        do_install = ask_yesno("Ready to install requirements and run setup commands?")
 
-    if do_install:
-        try:
-            install_reqs(name, directory)
-        except:
-            print("Installing requirements failed.")
-            print(PIP_MSG)
-            raise
+    if not do_install:
+        print("Performing dry run, no requirements installed.")
+        print(PIP_MSG)
+        exit()
 
-    if not args.dry_install:
-        print("Running django management commands")
-        result = manage_commands(name, directory)
-        print("You can now locally test your installed registry by running the command './manage.py runserver'")
+    try:
+        install_reqs(name, directory)
+    except:
+        print("Installing requirements failed.")
+        print(PIP_MSG)
+        exit()
+
+    print("Running django management commands")
+    result = manage_commands(name, directory)
+    print("You can now locally test your installed registry by running the command './manage.py runserver'")
 
     print('Done! Your registry was installed in %s' % directory)
 
@@ -203,8 +201,8 @@ def main():
 
     parser = argparse.ArgumentParser(description='Install Aristotle Example Registry')
     parser.add_argument('-n', '--name', nargs=1, default='', type=str, dest='name', help='Registry Name')
-    parser.add_argument('-f', '--force', action='store_true', default=False, dest='force_install', help='Force Requirements Install (instead of asking)')
-    parser.add_argument('-d', '--dry', action='store_true', default=False, dest='dry_install', help='Dry Install (do dependancies installed or management commands run)')
+    parser.add_argument('-f', '--force', action='store_true', default=False, dest='force_install', help='Force requirements install and setup commands (instead of asking)')
+    parser.add_argument('-d', '--dry', action='store_true', default=False, dest='dry_install', help='Dry Install (do requirements installed or management commands run)')
     parser.add_argument('--dir', nargs=1, default='.', dest='directory', help='Directory to install the registry (default: current directory)')
 
     args = parser.parse_args()
