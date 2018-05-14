@@ -1711,6 +1711,10 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
 
         # Post 3 items
         postdata = management_form.copy()
+
+        if add_itemdata:
+            postdata.update(utils.model_to_dict_with_change_time(self.item1))
+
         postdata['{}-0-{}'.format(prefix, item_add_field)] = self.de3.pk
         postdata['{}-0-ORDER'.format(prefix)] = 0
         postdata['{}-1-{}'.format(prefix, item_add_field)] = self.de1.pk
@@ -1718,9 +1722,6 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         postdata['{}-2-{}'.format(prefix, item_add_field)] = self.de2.pk
         postdata['{}-2-ORDER'.format(prefix)] = 2
         postdata['{}-TOTAL_FORMS'.format(prefix)] = 3
-
-        if add_itemdata:
-            postdata.update(utils.model_to_dict_with_change_time(self.item1))
 
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
@@ -1767,6 +1768,10 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
 
         # Change order and delete
         postdata = management_form.copy()
+
+        if add_itemdata:
+            postdata.update(utils.model_to_dict_with_change_time(self.item1))
+
         postdata['{}-0-{}'.format(prefix, item_add_field)] = self.de3.pk
         postdata['{}-0-id'.format(prefix)] = through_model.objects.get(data_element=self.de3).pk
         postdata['{}-0-ORDER'.format(prefix)] = 0
@@ -1779,11 +1784,6 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         postdata['{}-2-ORDER'.format(prefix)] = 2
         postdata['{}-TOTAL_FORMS'.format(prefix)] = 3
         postdata['{}-INITIAL_FORMS'.format(prefix)] = 3
-
-        if add_itemdata:
-            postdata.update(utils.model_to_dict_with_change_time(self.item1))
-
-        print(postdata)
 
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
@@ -1838,21 +1838,23 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
     @tag('edit_formsets')
     def test_derivation_inputs_formset_editor(self):
 
-        offprefix = 'derives'
-        off_management_form = {
-            '{}-INITIAL_FORMS'.format(offprefix): 0,
-            '{}-TOTAL_FORMS'.format(offprefix): 1,
-            '{}-MIN_NUM_FORMS'.format(offprefix): 0,
-            '{}-MAX_NUM_FORMS'.format(offprefix): 1000
-        }
-
         self.derivation_m2m_formset(
             url="aristotle_mdr:edit_item",
             attr="inputs",
             prefix="inputs",
             item_add_field="data_element",
             add_itemdata=True,
-            extra_postdata=off_management_form
+        )
+
+    @tag('edit_formsets')
+    def test_derivation_derives_formset_editor(self):
+
+        self.derivation_m2m_formset(
+            url="aristotle_mdr:edit_item",
+            attr="derives",
+            prefix="derives",
+            item_add_field="data_element",
+            add_itemdata=True,
         )
 
     def test_derivation_item_page(self):
