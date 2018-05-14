@@ -1,4 +1,3 @@
-#Uncomment lines as required
+#Example Requirements
 
-aristotle-metadata-registry>=1.5
 Whoosh

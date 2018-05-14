@@ -5,8 +5,6 @@ This script guides you through the setup of the Aristotle Metadata Registry.
 
 Run install --help for help text
 """
-from __future__ import unicode_literals, print_function
-
 
 import os
 import re
@@ -16,20 +14,16 @@ from random import getrandbits
 import hashlib
 import shutil
 import argparse
-import zipfile
-
 
 BASE_DIR = os.path.dirname(__file__)
 name = "newly created"  # Forward-declaration placeholder
 PIP_MSG = "You can finish installing by running - pip install -r requirements.txt - from the %s directory" % name
-
 
 optional_modules = [
     ("Aristotle Glossary Extension", "#!aristotle_glossary!"),
     ("Aristotle Dataset Extensions", "#!aristotle_dse!"),
     ("Aristotle MDR API", "#!aristotle_mdr_api!")
 ]
-
 
 def valid_input(prompt, match):
 
@@ -56,14 +50,13 @@ def setup_mdr(args):
     else:
         directory = args.directory[0]
 
-
     use_existing_files = check_example_exists(directory, name)
 
     if not use_existing_files:
 
-        try:
-            copy_example_mdr(directory)
-        except:
+        copied = copy_example_mdr(directory)
+
+        if not copied:
             print("Copying Example registy failed")
             exit()
 
@@ -80,7 +73,7 @@ def setup_mdr(args):
                 extensions.append(ext_token)
 
     if extensions:
-        start_dir = os.path.join(directory, name)
+        start_dir = os.path.join(directory, name, name)
         find_and_remove(start_dir, extensions)
 
     # Update the settings key
@@ -155,7 +148,7 @@ def check_example_exists(dir, name):
 
     dest = os.path.join(dir, name)
     if os.path.isdir(dest):
-        print('The example_mdr folder is already at %s' % dest)
+        print('A folder is already at %s' % dest)
         use_existing = ask_yesno("Would you like to use the existing files? They will be deleted otherwise")
         if use_existing:
             return True
