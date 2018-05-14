@@ -251,11 +251,7 @@ class PropertyWizardPage(ConceptWizardPage,TestCase):
 class ConceptualDomainWizardPage(FormsetTestUtils, ConceptWizardPage, TestCase):
     model=models.ConceptualDomain
 
-    @tag('edit_formsets')
-    def test_weak_editor_during_create(self):
-
-        self.login_editor()
-
+    def post_first_step(self):
         item_name = 'My Shiny New Conceptual Domain'
         step_1_data = {
             self.wizard_form_name+'-current_step': 'initial',
@@ -266,6 +262,14 @@ class ConceptualDomainWizardPage(FormsetTestUtils, ConceptWizardPage, TestCase):
         wizard = response.context['wizard']
         self.assertEqual(response.status_code, 200)
         self.assertEqual(wizard['steps'].current, 'results')
+
+        return item_name
+
+    @tag('edit_formsets')
+    def test_weak_editor_during_create(self):
+
+        self.login_editor()
+        item_name = self.post_first_step()
 
         step_2_data = {
             self.wizard_form_name+'-current_step': 'results',
@@ -294,6 +298,32 @@ class ConceptualDomainWizardPage(FormsetTestUtils, ConceptWizardPage, TestCase):
         self.assertEqual(len(vms), 2)
         self.assertEqual(vms[0].name, 'Test1')
         self.assertEqual(vms[1].name, 'Test2')
+
+    @tag('edit_formsets', 'runthis')
+    def test_wizard_error_display(self):
+
+        self.login_editor()
+        item_name = self.post_first_step()
+
+        step_2_data = {
+            self.wizard_form_name+'-current_step': 'results',
+            'initial-name':item_name,
+            'results-name':item_name,
+            'results-definition':"Test Definition",
+        }
+
+        # Post with a blank name
+        valuemeaning_formset_data = [
+            {'name': '', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 0},
+            {'name': 'Test2', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 1}
+        ]
+        step_2_data.update(self.get_formset_postdata(valuemeaning_formset_data, 'value_meaning', 0))
+
+        response = self.client.post(self.wizard_url, step_2_data)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(response.context['weak_formsets'][0]['formset'].errors[0], {'name': ['This field is required.']})
+        self.assertContains(response, 'This field is required.')
 
 
 class ValueDomainWizardPage(FormsetTestUtils, ConceptWizardPage,TestCase):
