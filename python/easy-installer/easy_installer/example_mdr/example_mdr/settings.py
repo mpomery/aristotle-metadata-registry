@@ -108,18 +108,18 @@ ARISTOTLE_SETTINGS.update({
     'CONTENT_EXTENSIONS' : [ #Extensions that add additional object types for search/display.
         'aristotle_mdr.contrib.identifiers',
         #'aristotle_mdr.contrib.links'
-        #!aristotle_dse! 'aristotle_dse',
-        #!aristotle_glossary! 'aristotle_glossary',
-        #!comet! 'comet',
-        #!mallard! 'mallard_qr',
+        #!aristotle_dse!'aristotle_dse',
+        #!aristotle_glossary!'aristotle_glossary',
+        #!comet!'comet',
+        #!mallard!'mallard_qr',
     ],
     'MODULES': [
-        #!aristotle_mdr_api! 'aristotle_mdr_api',
-        #!aristotle_graphql! 'aristotle_mdr_graphql',
+        #!aristotle_mdr_api!'aristotle_mdr_api',
+        #!aristotle_graphql!'aristotle_mdr_graphql',
     ],
     'DOWNLOADERS': [
         'aristotle_mdr.downloader.CSVDownloader',
-        #!aristotle_pdf! 'aristotle_pdf.downloader.PDFDownloader',
+        #!aristotle_pdf!'aristotle_pdf.downloader.PDFDownloader',
     ]
 })
 
