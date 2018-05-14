@@ -6,8 +6,11 @@ urlpatterns = (
     url(r'^', include('aristotle_mdr.urls')),
     url(r'^browse/', include('aristotle_mdr.contrib.browse.urls')),
     url(r'^help/', include('aristotle_mdr.contrib.help.urls', app_name="aristotle_help", namespace="aristotle_help")),
-#!aristotle_ddi_utils!      url(r'^ddi/', include('aristotle_ddi_utils.urls',app_name="aristotle_ddi_utils",namespace="aristotle_ddi_utils")),
-#!aristotle_dse!      url(r'^dse/', include('aristotle_dse.urls',app_name="aristotle_dse",namespace="aristotle_dse")),
+    url(r'^', include('aristotle_mdr.contrib.identifiers.urls', app_name="aristotle_mdr_identifiers", namespace="aristotle_identifiers")),
+#!aristotle_dse!     url(r'^dse/', include('aristotle_dse.urls',app_name="aristotle_dse",namespace="aristotle_dse")),
 #!aristotle_glossary!     url(r'^glossary/', include('aristotle_glossary.urls',app_name="aristotle_glossary",namespace="glossary")),
 #!aristotle_mdr_api!     url(r'^api/', include('aristotle_mdr_api.urls',app_name="aristotle_mdr_api",namespace="aristotle_mdr_api")),
+#!aristotle_graphql!     url(r'^api/graphql/', include('aristotle_mdr_graphql.urls', namespace="aristotle_graphql")),
+#!mallard!     url(r'^mallard/', include('mallard_qr.urls',app_name="mallard_qr",namespace="mallard_qr")),
+#!comet!     url(r'^comet/', include('comet.urls', namespace='comet')),
     )

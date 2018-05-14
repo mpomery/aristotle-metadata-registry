@@ -22,7 +22,11 @@ PIP_MSG = "You can finish installing by running - pip install -r requirements.tx
 optional_modules = [
     ("Aristotle Glossary Extension", "#!aristotle_glossary!"),
     ("Aristotle Dataset Extensions", "#!aristotle_dse!"),
-    ("Aristotle MDR API", "#!aristotle_mdr_api!")
+    ("Aristotle MDR API", "#!aristotle_mdr_api!"),
+    ("Aristotle Graphql API", '#!aristotle_graphql!'),
+    ("Aristotle PDF Downloads", '#!aristotle_pdf!'),
+    ("Comet Indicator Registry", '#!comet!'),
+    ("Mallard Questionnaire Registry", '#!mallard!')
 ]
 
 def valid_input(prompt, match):

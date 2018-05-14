@@ -52,6 +52,9 @@ INSTALLED_APPS = (
     #!aristotle_glossary! 'aristotle_glossary', # Model for managing and inserting glossary content - https://github.com/aristotle-mdr/aristotle-glossary
     #!aristotle_mdr_api! 'aristotle_mdr_api', # JSON API for programmatic access to content
     #!aristotle_mdr_api! 'rest_framework', # Needed for the above
+    #!aristotle_graphql! 'aristotle_mdr_graphql',
+    #!comet! 'comet',
+    #!mallard! 'mallard_qr',
 ) + INSTALLED_APPS # Installs the required apps to run aristotle.
 
 ROOT_URLCONF = 'example_mdr.urls'
@@ -103,10 +106,21 @@ ARISTOTLE_SETTINGS.update({
     'SITE_INTRO': 'Use Default Site Name to search for metadata...', # 'Intro text use on the home page as a prompt for users.'
     'SITE_DESCRIPTION': 'About this site', # 'The main title for the site.'
     'CONTENT_EXTENSIONS' : [ #Extensions that add additional object types for search/display.
-            #!aristotle_dse! 'aristotle_dse',
-            #!aristotle_glossary! 'aristotle_glossary',
-        ],
-    'DOWNLOADERS': ['aristotle_mdr.downloader.CSVDownloader', 'aristotle_pdf.downloader.PDFDownloader']
+        'aristotle_mdr.contrib.identifiers',
+        #'aristotle_mdr.contrib.links'
+        #!aristotle_dse! 'aristotle_dse',
+        #!aristotle_glossary! 'aristotle_glossary',
+        #!comet! 'comet',
+        #!mallard! 'mallard_qr',
+    ],
+    'MODULES': [
+        #!aristotle_mdr_api! 'aristotle_mdr_api',
+        #!aristotle_graphql! 'aristotle_mdr_graphql',
+    ],
+    'DOWNLOADERS': [
+        'aristotle_mdr.downloader.CSVDownloader',
+        #!aristotle_pdf! 'aristotle_pdf.downloader.PDFDownloader',
+    ]
 })
 
 
