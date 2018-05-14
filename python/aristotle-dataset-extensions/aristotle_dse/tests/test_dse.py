@@ -166,7 +166,7 @@ class DistributionViewPage(LoggedInViewConceptPages,TestCase):
 class DistributionWizardPage(FormsetTestUtils, ConceptWizardPage, TestCase):
     model=models.Distribution
 
-    @tag('runthis')
+    @tag('edit_formsets')
     def test_weak_editor_during_create(self):
         self.de1 = MDR.DataElement.objects.create(name='DE1 - visible',definition="my definition",workgroup=self.wg1)
         self.de2 = MDR.DataElement.objects.create(name='DE2 - visible',definition="my definition",workgroup=self.wg1)

@@ -175,7 +175,11 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
             name="My Calculation"
         )
 
-        ded.inputs.add(self.de)
+        mdr_models.DedInputsThrough.objects.create(
+            data_element_derivation=ded,
+            data_element=self.de,
+            order=0
+        )
 
         self.assertTrue(ded.can_view(self.editor))
         self.assertTrue(self.de.can_view(self.editor))
