@@ -49,7 +49,7 @@ def get_management_forms(item, slots=False, identifiers=False):
             d['%s-MIN_NUM_FORMS'%entity[0]] = 0
             d['%s-MAX_NUM_FORMS'%entity[0]] = 1000
 
-    if isinstance(item, models.DataElementDerivation) or issubclass(item, models.DataElementDerivation):
+    if isinstance(item, models.DataElementDerivation):
         prefixes = ['derives', 'inputs']
         for pre in prefixes:
             d['%s-TOTAL_FORMS'%pre] = 0
