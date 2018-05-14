@@ -143,5 +143,4 @@ jobs:
 
 
 after_success:
-  - coveralls
-  - codecov
+  - ./scripts/coverage_reporter.sh $MODULE
