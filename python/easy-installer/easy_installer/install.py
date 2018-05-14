@@ -39,10 +39,12 @@ def valid_input(prompt, match):
             return check
     raise Exception
 
+def ask_yesno(message):
+    yn = '^[YyNn]?$'  # yes/no regex
+    return 'y' == valid_input('{} (y/n): '.format(message), yn).lower()
 
 def setup_mdr(args):
     name_regex = '^[a-z][a-z_]*$'
-    yn = '^[YyNn]?$'  # yes/no regex
 
     if not args.name or not re.match(name_regex, args.name[0]):
         name = valid_input("Enter the system name for your registry (lowercase letters and underscores ONLY): ", name_regex)
@@ -55,34 +57,26 @@ def setup_mdr(args):
         directory = args.directory[0]
 
 
-    use_existing_files = check_example_exists(directory, name, yn)
+    use_existing_files = check_example_exists(directory, name)
 
     if not use_existing_files:
 
-        if args.force_dl:
-            copied = False
-        else:
-            try:
-                copied = copy_example_mdr(directory)
-            except:
-                print("Copying Example registy failed")
-                raise
-
-        if not copied:
-            # if not args.force_dl:
-            #     print('Copying Registry Failed, Downloading registry')
-            download_example_mdr(directory)
+        try:
+            copy_example_mdr(directory)
+        except:
+            print("Copying Example registy failed")
+            exit()
 
         rename_example_mdr(name, directory)
 
     extensions = []
 
-    do_install = valid_input("Do you wish to install any additional Aristotle modules? (y/n): ", yn).lower()
-    if do_install == 'y':
+    do_install = ask_yesno("Do you wish to install any additional Aristotle modules?")
+    if do_install:
         print("Select extensions to install (y/n)")
         for display, ext_token in optional_modules:
-            do_ext = valid_input("  %s: " % display, yn).lower()
-            if do_ext == 'y':
+            do_ext = ask_yesno("  %s: "%display)
+            if do_ext:
                 extensions.append(ext_token)
 
     if extensions:
@@ -100,7 +94,7 @@ def setup_mdr(args):
         print("Installing from requirements.txt")
         do_install = True
     else:
-        do_install = 'y' == valid_input("Ready to install requirements? (y/n): ", yn).lower()
+        do_install = ask_yesno("Ready to install requirements?")
         if not do_install:
             print("Performing dry run, no requirements installed.")
             print(PIP_MSG)
@@ -157,16 +151,16 @@ def manage_commands(name, dir):
     cctable = call(["python3", manage_path, 'createcachetable'])
     return (migrate, cstatic, cctable)
 
-def check_example_exists(dir, name, yn):
+def check_example_exists(dir, name):
 
     dest = os.path.join(dir, name)
     if os.path.isdir(dest):
         print('The example_mdr folder is already at %s' % dest)
-        use_existing = 'y' == valid_input("Would you like to use the existing files? They will be deleted otherwise (y/n): ", yn).lower()
+        use_existing = ask_yesno("Would you like to use the existing files? They will be deleted otherwise")
         if use_existing:
             return True
         else:
-            you_sure = 'y' == valid_input("Are you sure you want to delete the directory at %s (y/n):" % dest, yn).lower()
+            you_sure = ask_yesno("Are you sure you want to delete the directory at %s"%dest)
             if you_sure:
                 print('Deleting existing example_mdr')
                 shutil.rmtree(dest)
@@ -176,29 +170,6 @@ def check_example_exists(dir, name, yn):
                 return True
 
     return False
-
-def download_example_mdr(directory):
-
-    try:
-        import requests
-    except ImportError:
-        print('requests must be installed to download the example registry')
-        print('run \"pip install requests\" to install')
-        raise
-
-    print("Attempting to retrieve example registry")
-    url = "https://s3-ap-southeast-2.amazonaws.com/aristotle-mdr/example_mdr.zip"
-    response = requests.get(url)
-    dest = os.path.join(directory, 'example_mdr.zip')
-    with open(dest, 'wb') as f:
-        f.write(response.content)
-
-    zip = zipfile.ZipFile(dest)
-    zip.extractall(directory)
-    os.remove(dest)
-
-    return True
-
 
 def copy_example_mdr(dir):
     print("Copying in example metadata registry")
@@ -211,7 +182,6 @@ def copy_example_mdr(dir):
 
     return False
 
-
 def find_and_replace(mydir, old, new):
     """Really naive find and replace lovingly borrowed from stack overflow - http://stackoverflow.com/a/4205918/764357"""
     for dname, dirs, files in os.walk(mydir):
@@ -223,7 +193,6 @@ def find_and_replace(mydir, old, new):
                 s = s.replace(old, new)
                 with open(fpath, "w") as f:
                     f.write(s)
-
 
 def find_and_remove(mydir, extensions):
     for dname, dirs, files in os.walk(mydir):
@@ -243,12 +212,8 @@ def main():
     parser.add_argument('-n', '--name', nargs=1, default='', type=str, dest='name', help='Registry Name')
     parser.add_argument('-f', '--force', action='store_true', default=False, dest='force_install', help='Force Requirements Install (instead of asking)')
     parser.add_argument('-d', '--dry', action='store_true', default=False, dest='dry_install', help='Dry Install (do dependancies installed or management commands run)')
-    parser.add_argument('--dl', '--download', action='store_true', default=False, dest='force_dl', help='Force the registry to be downloaded instead of copied from package')
     parser.add_argument('--dir', nargs=1, default='.', dest='directory', help='Directory to install the registry (default: current directory)')
 
     args = parser.parse_args()
 
     return setup_mdr(args)
-
-if __name__ == "__main__":
-    sys.exit(main())
