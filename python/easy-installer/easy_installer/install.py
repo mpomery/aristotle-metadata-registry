@@ -33,13 +33,8 @@ optional_modules = [
 
 def valid_input(prompt, match):
 
-    try:
-        # Ensure input compatability across Python 2/3
-        input_func = vars(__builtins__).get('raw_input', input)
-    except:
-        pass
     for i in range(5):
-        check = input_func(prompt)
+        check = input(prompt)
         if re.match(match, check):
             return check
     raise Exception
@@ -242,7 +237,7 @@ def find_and_remove(mydir, extensions):
                 with open(fpath, "w") as f:
                     f.write(s)
 
-def main(argv=None):
+def main():
 
     parser = argparse.ArgumentParser(description='Install Aristotle Example Registry')
     parser.add_argument('-n', '--name', nargs=1, default='', type=str, dest='name', help='Registry Name')
