@@ -53,6 +53,7 @@ class RelationAdminPage(AdminPageForConcept, TestCase):
 
 class RelationCreationWizard(utils.FormsetTestUtils, ConceptWizardPage, TestCase):
     model=models.Relation
+    extra_step2_data = {'results-arity': 2}
 
     @tag('edit_formsets')
     def test_weak_editor_during_create(self):

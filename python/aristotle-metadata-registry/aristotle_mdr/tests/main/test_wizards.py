@@ -65,6 +65,7 @@ class ConceptWizard_TestInvalidUrls(HaystackReindexMixin, utils.LoggedInViewPage
 class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
     wizard_name="Harry Potter" # This used to be needed, now its not. We kept it cause its funny.
     wizard_form_name="dynamic_aristotle_wizard"
+    extra_step2_data = {}
     # def tearDown(self):
     #     call_command('clear_index', interactive=False, verbosity=0)
 
@@ -144,6 +145,8 @@ class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
         }
         management_forms = utils.get_management_forms(self.model, item_is_model=True)
         step_2_data.update(management_forms)
+        step_2_data.update(self.extra_step2_data)
+        
         response = self.client.post(self.wizard_url, step_2_data)
         wizard = response.context['wizard']
         self.assertTrue('definition' in wizard['form'].errors.keys())
