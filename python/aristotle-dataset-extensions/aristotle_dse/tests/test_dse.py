@@ -40,50 +40,53 @@ class DataSetSpecificationViewPage(LoggedInViewConceptPages,TestCase):
 
     def test_weak_editing_in_advanced_editor_dynamic(self):
 
-        oc = MDR.ObjectClass.objects.create(
-            name="a very nice object class"
-        )
-        oc.save()
+        pass
+        # Weak editing currently disabled on this model
 
-        de = MDR.DataElement.objects.create(
-            name="test name",
-            definition="test definition",
-        )
-        de.save()
-
-        for i in range(4):
-            models.DSSDEInclusion.objects.create(
-                data_element=de,
-                specific_information="test info",
-                conditional_obligation="test obligation",
-                order=i,
-                dss=self.item1
-            )
-        for i in range(4):
-            inc = models.DSSDEInclusion.objects.create(
-                data_element=de,
-                specific_information="test info",
-                conditional_obligation="test obligation",
-                order=i,
-                dss=self.item1
-            )
-            clust = models.DSSClusterInclusion.objects.create(
-                specific_information="test info",
-                conditional_obligation="test obligation",
-                order=i,
-                dss=self.item1,
-                child=self.item1
-            )
-
-
-        #self.item1.addCluster(child=self.item3)
-        default_fields = {
-            'specialisation_classes': oc.id,
-            'data_element': de.id,
-            'child': self.item1.id
-        }
-
-        super().test_weak_editing_in_advanced_editor_dynamic(updating_field='specific_information', default_fields=default_fields)
+        # oc = MDR.ObjectClass.objects.create(
+        #     name="a very nice object class"
+        # )
+        # oc.save()
+        #
+        # de = MDR.DataElement.objects.create(
+        #     name="test name",
+        #     definition="test definition",
+        # )
+        # de.save()
+        #
+        # for i in range(4):
+        #     models.DSSDEInclusion.objects.create(
+        #         data_element=de,
+        #         specific_information="test info",
+        #         conditional_obligation="test obligation",
+        #         order=i,
+        #         dss=self.item1
+        #     )
+        # for i in range(4):
+        #     inc = models.DSSDEInclusion.objects.create(
+        #         data_element=de,
+        #         specific_information="test info",
+        #         conditional_obligation="test obligation",
+        #         order=i,
+        #         dss=self.item1
+        #     )
+        #     clust = models.DSSClusterInclusion.objects.create(
+        #         specific_information="test info",
+        #         conditional_obligation="test obligation",
+        #         order=i,
+        #         dss=self.item1,
+        #         child=self.item1
+        #     )
+        #
+        #
+        # #self.item1.addCluster(child=self.item3)
+        # default_fields = {
+        #     'specialisation_classes': oc.id,
+        #     'data_element': de.id,
+        #     'child': self.item1.id
+        # }
+        #
+        # super().test_weak_editing_in_advanced_editor_dynamic(updating_field='specific_information', default_fields=default_fields)
 
     def test_add_data_element(self):
         de,created = MDR.DataElement.objects.get_or_create(name="Person-sex, Code N",
