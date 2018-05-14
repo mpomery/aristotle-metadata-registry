@@ -607,13 +607,17 @@ class ExtraFormsetMixin:
         else:
             check_class = item.__class__
 
+        excludes = getattr(check_class, 'edit_page_excludes', [])
+        if not excludes:
+            excludes = []
+
         for field in check_class._meta.get_fields():
             if field.many_to_many:
                 if hasattr(field.remote_field, 'through'):
                     through = field.remote_field.through
                     if not through._meta.auto_created:
                         item_field = self.get_model_field(through, check_class)
-                        if item_field:
+                        if item_field and field.name not in excludes:
                             through_list.append({'field_name': field.name, 'model': through, 'item_field': item_field})
 
         return through_list
