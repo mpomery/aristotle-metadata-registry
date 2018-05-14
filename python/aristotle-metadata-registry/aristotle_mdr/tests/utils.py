@@ -25,7 +25,7 @@ def model_to_dict(item):
     return dict((k, v) for (k, v) in mtd(item).items() if v is not None)
 
 
-def get_management_forms(item, slots=False, identifiers=False):
+def get_management_forms(item, slots=False, identifiers=False, item_is_model=False):
 
     d = {}
 
@@ -49,7 +49,15 @@ def get_management_forms(item, slots=False, identifiers=False):
             d['%s-MIN_NUM_FORMS'%entity[0]] = 0
             d['%s-MAX_NUM_FORMS'%entity[0]] = 1000
 
-    if isinstance(item, models.DataElementDerivation):
+    add_through_forms = False
+    if not item_is_model:
+        if isinstance(item, models.DataElementDerivation):
+            add_through_forms = True
+    else:
+        if issubclass(item, models.DataElementDerivation):
+            add_through_forms = True
+
+    if add_through_forms:
         prefixes = ['derives', 'inputs']
         for pre in prefixes:
             d['%s-TOTAL_FORMS'%pre] = 0
