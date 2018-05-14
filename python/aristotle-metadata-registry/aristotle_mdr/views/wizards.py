@@ -147,7 +147,7 @@ class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
                 fslist = kwargs['extra_formsets']
             else:
                 fslist = self.get_extra_formsets(item=self.model)
-                
+            
             fscontext = self.get_formset_context(fslist)
             context.update(fscontext)
 
