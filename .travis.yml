@@ -144,7 +144,7 @@ jobs:
     - stage: deploy-it
       script: true
       install: skip
-      after_success: skip
+      after_success: true
       deploy:
         provider: pypi
         user: Samuel.Spencer
