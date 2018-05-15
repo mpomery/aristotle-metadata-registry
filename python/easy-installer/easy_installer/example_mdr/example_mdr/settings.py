@@ -48,11 +48,13 @@ TEMPLATE_DEBUG = True
 # * the installation command in `requirements.txt` file
 # * the url import in `example_mdr/urls.py`
 INSTALLED_APPS = (
-    #!aristotle_ddi_utils! 'aristotle_ddi_utils', # Download formats in the DDI3.2 XML format - https://github.com/aristotle-mdr/aristotle-ddi-utils
     #!aristotle_dse! 'aristotle_dse', # Additional models for describing datasets - https://github.com/aristotle-mdr/aristotle-dataset-extensions
     #!aristotle_glossary! 'aristotle_glossary', # Model for managing and inserting glossary content - https://github.com/aristotle-mdr/aristotle-glossary
     #!aristotle_mdr_api! 'aristotle_mdr_api', # JSON API for programmatic access to content
     #!aristotle_mdr_api! 'rest_framework', # Needed for the above
+    #!aristotle_graphql! 'aristotle_mdr_graphql',
+    #!comet! 'comet',
+    #!mallard! 'mallard_qr',
 ) + INSTALLED_APPS # Installs the required apps to run aristotle.
 
 ROOT_URLCONF = 'example_mdr.urls'
@@ -97,23 +99,36 @@ HAYSTACK_CONNECTIONS = {
         'INCLUDE_SPELLING':True,
     },
 }
+
 ARISTOTLE_SETTINGS.update({
     'SITE_NAME': 'Example Metadata Registry', # 'The main title for the site.'
     'SITE_BRAND': '/static/aristotle_mdr/images/aristotle_small.png', # URL for the Site-wide logo
     'SITE_INTRO': 'Use Default Site Name to search for metadata...', # 'Intro text use on the home page as a prompt for users.'
     'SITE_DESCRIPTION': 'About this site', # 'The main title for the site.'
     'CONTENT_EXTENSIONS' : [ #Extensions that add additional object types for search/display.
-            #!aristotle_dse! 'aristotle_dse',
-            #!aristotle_glossary! 'aristotle_glossary',
-        ],
-    "DOWNLOADERS": [
-        ('pdf', 'PDF', 'fa-file-pdf-o', 'aristotle_pdf', 'Downloads for various content types in the PDF format'),
-        ('csv-vd', 'CSV list of values', 'fa-file-excel-o', 'aristotle_mdr', 'CSV downloads for value domain codelists'),
-        ##!aristotle_ddi_utils!    ('ddi3.2','DDI 3.2','fa-file-code-o','aristotle_ddi_utils'),
+        'aristotle_mdr.contrib.identifiers',
+        #'aristotle_mdr.contrib.links'
+        #!aristotle_dse!'aristotle_dse',
+        #!aristotle_glossary!'aristotle_glossary',
+        #!comet!'comet',
+        #!mallard!'mallard_qr',
     ],
+    'MODULES': [
+        #!aristotle_mdr_api!'aristotle_mdr_api',
+        #!aristotle_graphql!'aristotle_mdr_graphql',
+    ],
+    'DOWNLOADERS': [
+        'aristotle_mdr.downloader.CSVDownloader',
+        #!aristotle_pdf!'aristotle_pdf.downloader.PDFDownloader',
+    ]
 })
-# Specified the agency to use when outputing items in the DDI XML format.
-#!aristotle_ddi_utils!ARISTOTLE_DDI_AGENCY = "demo.ddi.aristotle_mdr"
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+    }
+}
 
 # This option gives a site the ability to register the different download options available for the site
 # This invoked in templates using the aristotle template tag "downloadMenu"
