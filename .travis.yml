@@ -152,7 +152,6 @@ jobs:
         server: https://test.pypi.org/legacy
         # skip_upload_docs: true
         on:
-          tags: true
           all_branches: true
         distributions: sdist bdist_wheel
         repo: aristotle-mdr/aristotle-metadata-registry
