@@ -59,99 +59,99 @@ language: python
 #     python: 3.6
 #     script: ./scripts/tox_if.sh $MODULE ally-$ALLY
 
-# jobs:
+jobs:
 
-#   include:
-#   #   - stage: stylecheck
-#   #     python: 3.6
-#   #     env: MODULE=aristotle-metadata-registry
-#   #     script: cd $TRAVIS_BUILD_DIR/python/$MODULE && tox -e flake8 --skip-missing-interpreters
+  include:
+  #   - stage: stylecheck
+  #     python: 3.6
+  #     env: MODULE=aristotle-metadata-registry
+  #     script: cd $TRAVIS_BUILD_DIR/python/$MODULE && tox -e flake8 --skip-missing-interpreters
 
-#   #   - stage: documentation
-#   #     python: 3.6
-#   #     env: MODULE=aristotle-metadata-registry
-#   #     script: ./scripts/tox_if.sh $MODULE docs
+  #   - stage: documentation
+  #     python: 3.6
+  #     env: MODULE=aristotle-metadata-registry
+  #     script: ./scripts/tox_if.sh $MODULE docs
 
-#   #   - stage: testing-aristotle-mdr
-#   #     env: DJANGO_VERSION='1.11'  DB=sqlite  SEARCH=elastic MODULE=aristotle-metadata-registry
-#   #     <<: *main_test_script_py36
-#   #   - stage: testing-aristotle-mdr
-#   #     env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic MODULE=aristotle-metadata-registry
-#   #     <<: *main_test_script_py36
-#   #   - stage: testing-aristotle-mdr
-#   #     env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh MODULE=aristotle-metadata-registry
-#   #     <<: *main_test_script_py36
-#   #   - stage: testing-aristotle-mdr
-#   #     env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=whoosh MODULE=aristotle-metadata-registry
-#   #     <<: *main_test_script_py36
-#   #   - stage: testing-aristotle-mdr
-#   #     env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=whoosh MODULE=aristotle-metadata-registry
-#   #     <<: *main_test_script_py36
-#   #   - stage: testing-aristotle-mdr
-#   #     env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic MODULE=aristotle-metadata-registry
-#   #     <<: *main_test_script_py36
+  #   - stage: testing-aristotle-mdr
+  #     env: DJANGO_VERSION='1.11'  DB=sqlite  SEARCH=elastic MODULE=aristotle-metadata-registry
+  #     <<: *main_test_script_py36
+  #   - stage: testing-aristotle-mdr
+  #     env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic MODULE=aristotle-metadata-registry
+  #     <<: *main_test_script_py36
+  #   - stage: testing-aristotle-mdr
+  #     env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh MODULE=aristotle-metadata-registry
+  #     <<: *main_test_script_py36
+  #   - stage: testing-aristotle-mdr
+  #     env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=whoosh MODULE=aristotle-metadata-registry
+  #     <<: *main_test_script_py36
+  #   - stage: testing-aristotle-mdr
+  #     env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=whoosh MODULE=aristotle-metadata-registry
+  #     <<: *main_test_script_py36
+  #   - stage: testing-aristotle-mdr
+  #     env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic MODULE=aristotle-metadata-registry
+  #     <<: *main_test_script_py36
 
-#   #     # Possible failures:
-#   #   # - stage: testing
-#   #   #   env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-#   #   #   <<: *main_test_script_py36
-#   #   # - stage: testing
-#   #   #   env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-#   #   #   <<: *main_test_script_py36
+  #     # Possible failures:
+  #   # - stage: testing
+  #   #   env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
+  #   #   <<: *main_test_script_py36
+  #   # - stage: testing
+  #   #   env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
+  #   #   <<: *main_test_script_py36
 
-#   #   - stage: testing-modules
-#   #     env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-dataset-extensions
-#   #     <<: *main_test_script_py36
+  #   - stage: testing-modules
+  #     env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-dataset-extensions
+  #     <<: *main_test_script_py36
 
-#   #   - stage: testing-modules
-#   #     env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=comet-indicator-registry
-#   #     <<: *main_test_script_py36
+  #   - stage: testing-modules
+  #     env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=comet-indicator-registry
+  #     <<: *main_test_script_py36
 
-#   #   - stage: testing-modules
-#   #     env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-pdf-downloads
-#   #     <<: *main_test_script_py36
+  #   - stage: testing-modules
+  #     env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-pdf-downloads
+  #     <<: *main_test_script_py36
 
-#   #   - stage: testing-modules
-#   #     env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-mdr-graphql
-#   #     <<: *main_test_script_py36
+  #   - stage: testing-modules
+  #     env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-mdr-graphql
+  #     <<: *main_test_script_py36
 
-#   # # Test Accessibility
-#   #   - <<: *test_accessibility_py36
-#   #     env: ALLY=metadata_item MODULE=aristotle-metadata-registry
-#   #   - <<: *test_accessibility_py36
-#   #     env: ALLY=metadata_action MODULE=aristotle-metadata-registry
-#   #   - <<: *test_accessibility_py36
-#   #     env: ALLY=static MODULE=aristotle-metadata-registry
+  # # Test Accessibility
+  #   - <<: *test_accessibility_py36
+  #     env: ALLY=metadata_item MODULE=aristotle-metadata-registry
+  #   - <<: *test_accessibility_py36
+  #     env: ALLY=metadata_action MODULE=aristotle-metadata-registry
+  #   - <<: *test_accessibility_py36
+  #     env: ALLY=static MODULE=aristotle-metadata-registry
 
-#   # allow_failures:
-#     # - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-#     # - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
+  # allow_failures:
+    # - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
+    # - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
     
-#     # - stage: deploy
-#     #   script: true
-#     #   deploy:
-#     #       provider: pypi
-#     #       user: Samuel.Spencer
-#     #       skip_upload_docs: true
-#     #       password:
-#     #         secure: fNL+70u1QPgkC3+6iLSPBBeo/J1VrwVn6Tg9PdKR3n4X/m6MgAboDc93CfccfsxVxGqsIRBtEfUwRCJ6MrajWqgfQhjQ9KodiYzPVS8vPUQyOtn73AB8iPYKgKX1pFn6UVXcnI67RmtPyJJEUFPbqy5saKZfRpjVRH3vjM2mDJ0=
-#     #       on:
-#     #         branch: master
-#     #         distributions: sdist bdist_wheel
-#     #         repo: aristotle-mdr/aristotle-metadata-registry
-#     - stage: deploy
-#       script: echo Deploy
-deploy:
-    provider: pypi
-    user: Samuel.Spencer
-    server: https://test.pypi.org/legacy/
-    skip_upload_docs: true
-    password:
-      secure: fNL+70u1QPgkC3+6iLSPBBeo/J1VrwVn6Tg9PdKR3n4X/m6MgAboDc93CfccfsxVxGqsIRBtEfUwRCJ6MrajWqgfQhjQ9KodiYzPVS8vPUQyOtn73AB8iPYKgKX1pFn6UVXcnI67RmtPyJJEUFPbqy5saKZfRpjVRH3vjM2mDJ0=
-    on:
-      # all_branches: true
-      distributions: sdist bdist_wheel
-      repo: aristotle-mdr/aristotle-metadata-registry
+    # - stage: deploy
+    #   script: true
+    #   deploy:
+    #       provider: pypi
+    #       user: Samuel.Spencer
+    #       skip_upload_docs: true
+    #       password:
+    #         secure: fNL+70u1QPgkC3+6iLSPBBeo/J1VrwVn6Tg9PdKR3n4X/m6MgAboDc93CfccfsxVxGqsIRBtEfUwRCJ6MrajWqgfQhjQ9KodiYzPVS8vPUQyOtn73AB8iPYKgKX1pFn6UVXcnI67RmtPyJJEUFPbqy5saKZfRpjVRH3vjM2mDJ0=
+    #       on:
+    #         branch: master
+    #         distributions: sdist bdist_wheel
+    #         repo: aristotle-mdr/aristotle-metadata-registry
+    - stage: deploy
+      script: echo Deploy
+    deploy:
+        provider: pypi
+        user: Samuel.Spencer
+        server: https://test.pypi.org/legacy/
+        skip_upload_docs: true
+        password:
+          secure: fNL+70u1QPgkC3+6iLSPBBeo/J1VrwVn6Tg9PdKR3n4X/m6MgAboDc93CfccfsxVxGqsIRBtEfUwRCJ6MrajWqgfQhjQ9KodiYzPVS8vPUQyOtn73AB8iPYKgKX1pFn6UVXcnI67RmtPyJJEUFPbqy5saKZfRpjVRH3vjM2mDJ0=
+        # on:
+        #   # all_branches: true
+        #   distributions: sdist bdist_wheel
+        #   repo: aristotle-mdr/aristotle-metadata-registry
 
 after_success:
   - ./scripts/coverage_reporter.sh $MODULE
