@@ -146,8 +146,7 @@ jobs:
       deploy:
         provider: pypi
         user: Samuel.Spencer
-        password:
-          secure: "B3jQGTCMrCxXAIPE0gcQRVcyZeFVaWh3rTyYtTz6iKrHsj65pNFIFb8DNAK8MWmPms3U5tP0xQiReoGpoMZzxLPNRKZJCUIg2KccN3GjIzuz82tJZ59dFCt3cBxObX3HMFwuHjTqheW90zHVeyGUJv2LnV2iJfWuMKFnInFwATw="
+        password: "B3jQGTCMrCxXAIPE0gcQRVcyZeFVaWh3rTyYtTz6iKrHsj65pNFIFb8DNAK8MWmPms3U5tP0xQiReoGpoMZzxLPNRKZJCUIg2KccN3GjIzuz82tJZ59dFCt3cBxObX3HMFwuHjTqheW90zHVeyGUJv2LnV2iJfWuMKFnInFwATw="
         server: https://test.pypi.org/
         # skip_upload_docs: true
         on:
@@ -155,15 +154,6 @@ jobs:
           all_branches: true
         distributions: sdist bdist_wheel
         # repo: aristotle-mdr/aristotle-metadata-registry
-    - stage: deploy-it
-      script: skip #./scripts/deploy_it.sh
-      install: skip #pip install pip tox twine setuptools -U
-      deploy:
-        provider: script
-        script: echo WAT
-        on:
-          tags: true
-          all_branches: true
 
 after_success:
   - ./scripts/coverage_reporter.sh $MODULE
