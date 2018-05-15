@@ -139,8 +139,6 @@ class MonoRepoPackageFinder(PackageFinder):
                             for k in getattr(c, "keywords", []):
                                 if k.arg == "install_requires" and isinstance(k.value, ast.List) :
                                     v = ast.literal_eval(k.value)
-                                    reqs += v
-                                    print(v)
                                     for v in ast.literal_eval(k.value):
                                         yield(v)
                                     continue

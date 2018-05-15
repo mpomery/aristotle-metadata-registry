@@ -150,7 +150,7 @@ jobs:
         user: Samuel.Spencer
         password:
           secure: "B3jQGTCMrCxXAIPE0gcQRVcyZeFVaWh3rTyYtTz6iKrHsj65pNFIFb8DNAK8MWmPms3U5tP0xQiReoGpoMZzxLPNRKZJCUIg2KccN3GjIzuz82tJZ59dFCt3cBxObX3HMFwuHjTqheW90zHVeyGUJv2LnV2iJfWuMKFnInFwATw="
-        server: https://test.pypi.org/legacy
+        server: https://test.pypi.org/legacy/
         # skip_upload_docs: true
         on:
           all_branches: true
