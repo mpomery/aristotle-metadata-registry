@@ -9,8 +9,7 @@ script:
 deploy:
   provider: pypi
   user: hwhite4
-  password:
-    secure: uhisdfiusfisdfosdfuhsdofiusdf
+  password: uhisdfiusfisdfosdfuhsdofiusdf
   distributions: sdist bdist_wheel
   on:
     tags: true
