@@ -151,9 +151,19 @@ jobs:
         server: https://test.pypi.org/
         # skip_upload_docs: true
         on:
+          tags: true
           all_branches: true
         distributions: sdist bdist_wheel
         # repo: aristotle-mdr/aristotle-metadata-registry
+    - stage: deploy-it
+      script: skip #./scripts/deploy_it.sh
+      install: skip #pip install pip tox twine setuptools -U
+      deploy:
+        provider: script
+        script: echo WAT
+        on:
+          tags: true
+          all_branches: true
 
 after_success:
   - ./scripts/coverage_reporter.sh $MODULE
