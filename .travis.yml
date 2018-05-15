@@ -5,6 +5,7 @@ sudo: false
 dist: precise
 
 language: python
+python: 3.6
 
 install:
   - pip install tox codecov coveralls
@@ -142,7 +143,6 @@ jobs:
     - stage: deploy-it
       script: true
       install: skip
-      python: 3.6
       deploy:
           provider: pypi
           user: Samuel.Spencer
