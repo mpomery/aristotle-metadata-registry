@@ -130,7 +130,6 @@ jobs:
     - stage: deploy
       script: skip
       deploy:
-        -
           provider: pypi
           user: Samuel.Spencer
           skip_upload_docs: true
@@ -140,7 +139,9 @@ jobs:
             branch: master
             distributions: sdist bdist_wheel
             repo: aristotle-mdr/aristotle-metadata-registry
-        -
+    - stage: deploy
+      script: skip
+      deploy:
           provider: pypi
           user: Samuel.Spencer
           server: https://test.pypi.org/legacy/
