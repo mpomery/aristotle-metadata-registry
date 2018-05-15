@@ -4,15 +4,13 @@ python: 3.6
 install:
   - pip install tox
 
-script: true #./scripts/deploy_it.sh
-deploy: 
+script: true
+deploy:
   provider: pypi
   user: Samuel.Spencer
   password:
     secure: "B3jQGTCMrCxXAIPE0gcQRVcyZeFVaWh3rTyYtTz6iKrHsj65pNFIFb8DNAK8MWmPms3U5tP0xQiReoGpoMZzxLPNRKZJCUIg2KccN3GjIzuz82tJZ59dFCt3cBxObX3HMFwuHjTqheW90zHVeyGUJv2LnV2iJfWuMKFnInFwATw="
   server: https://test.pypi.org/legacy
-  # skip_upload_docs: true
   on:
     all_branches: true
   distributions: sdist bdist_wheel
-  # repo: aristotle-mdr/aristotle-metadata-registry
