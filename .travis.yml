@@ -141,7 +141,7 @@ jobs:
     #         distributions: sdist bdist_wheel
     #         repo: aristotle-mdr/aristotle-metadata-registry
     - stage: deploy-it
-      script: ./scripts/deploy_it.sh
+      script: skip #./scripts/deploy_it.sh
       install: skip
       deploy:
         provider: pypi
