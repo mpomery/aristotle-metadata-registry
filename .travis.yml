@@ -142,7 +142,7 @@ jobs:
     #         repo: aristotle-mdr/aristotle-metadata-registry
 
     - stage: deploy-it
-      script: skip
+      script: true
       install: skip
       after_success: skip
       deploy:
