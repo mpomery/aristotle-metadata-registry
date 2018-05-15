@@ -141,19 +141,20 @@ jobs:
     #         distributions: sdist bdist_wheel
     #         repo: aristotle-mdr/aristotle-metadata-registry
     - stage: deploy-it
-      script: skip #./scripts/deploy_it.sh
-      install: pip install pip tox twine setuptools -U
+      script: skip
+      install: skip
+      after_success: skip
       deploy:
         provider: pypi
         user: Samuel.Spencer
-        password: "B3jQGTCMrCxXAIPE0gcQRVcyZeFVaWh3rTyYtTz6iKrHsj65pNFIFb8DNAK8MWmPms3U5tP0xQiReoGpoMZzxLPNRKZJCUIg2KccN3GjIzuz82tJZ59dFCt3cBxObX3HMFwuHjTqheW90zHVeyGUJv2LnV2iJfWuMKFnInFwATw="
-        server: https://test.pypi.org/
+        password:
+          secure: "B3jQGTCMrCxXAIPE0gcQRVcyZeFVaWh3rTyYtTz6iKrHsj65pNFIFb8DNAK8MWmPms3U5tP0xQiReoGpoMZzxLPNRKZJCUIg2KccN3GjIzuz82tJZ59dFCt3cBxObX3HMFwuHjTqheW90zHVeyGUJv2LnV2iJfWuMKFnInFwATw="
+        server: https://test.pypi.org/legacy
         # skip_upload_docs: true
         on:
-          tags: true
           all_branches: true
         distributions: sdist bdist_wheel
-        # repo: aristotle-mdr/aristotle-metadata-registry
+        repo: aristotle-mdr/aristotle-metadata-registry
 
 after_success:
   - ./scripts/coverage_reporter.sh $MODULE
