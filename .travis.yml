@@ -139,7 +139,7 @@ jobs:
     #         branch: master
     #         distributions: sdist bdist_wheel
     #         repo: aristotle-mdr/aristotle-metadata-registry
-    - stage: deploy
+    - stage: deploy-it
       script: true
       install: skip
       python: 3.6
