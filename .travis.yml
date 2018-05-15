@@ -141,6 +141,8 @@ jobs:
     #         repo: aristotle-mdr/aristotle-metadata-registry
     - stage: deploy
       script: true
+      install: skip
+      python: 3.6
       deploy:
           provider: pypi
           user: Samuel.Spencer
