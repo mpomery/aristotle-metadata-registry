@@ -123,31 +123,6 @@ jobs:
     - <<: *test_accessibility_py36
       env: ALLY=static MODULE=aristotle-metadata-registry
 
-    - stage: deploy
-      deploy:
-        provider: pypi
-        user: Samuel.Spencer
-        skip_upload_docs: true
-        password:
-          secure: fNL+70u1QPgkC3+6iLSPBBeo/J1VrwVn6Tg9PdKR3n4X/m6MgAboDc93CfccfsxVxGqsIRBtEfUwRCJ6MrajWqgfQhjQ9KodiYzPVS8vPUQyOtn73AB8iPYKgKX1pFn6UVXcnI67RmtPyJJEUFPbqy5saKZfRpjVRH3vjM2mDJ0=
-        on:
-          branch: master
-          distributions: sdist bdist_wheel
-          repo: aristotle-mdr/aristotle-metadata-registry
-
-    - stage: deploy
-      deploy:
-        provider: pypi
-        user: Samuel.Spencer
-        server: https://test.pypi.org/legacy/
-        skip_upload_docs: true
-        password:
-          secure: fNL+70u1QPgkC3+6iLSPBBeo/J1VrwVn6Tg9PdKR3n4X/m6MgAboDc93CfccfsxVxGqsIRBtEfUwRCJ6MrajWqgfQhjQ9KodiYzPVS8vPUQyOtn73AB8iPYKgKX1pFn6UVXcnI67RmtPyJJEUFPbqy5saKZfRpjVRH3vjM2mDJ0=
-        on:
-          all_branches: true
-          distributions: sdist bdist_wheel
-          repo: aristotle-mdr/aristotle-metadata-registry
-
   # allow_failures:
     # - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
     # - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
@@ -155,3 +130,26 @@ jobs:
 
 after_success:
   - ./scripts/coverage_reporter.sh $MODULE
+
+deploy:
+  -
+    provider: pypi
+    user: Samuel.Spencer
+    skip_upload_docs: true
+    password:
+      secure: fNL+70u1QPgkC3+6iLSPBBeo/J1VrwVn6Tg9PdKR3n4X/m6MgAboDc93CfccfsxVxGqsIRBtEfUwRCJ6MrajWqgfQhjQ9KodiYzPVS8vPUQyOtn73AB8iPYKgKX1pFn6UVXcnI67RmtPyJJEUFPbqy5saKZfRpjVRH3vjM2mDJ0=
+    on:
+      branch: master
+      distributions: sdist bdist_wheel
+      repo: aristotle-mdr/aristotle-metadata-registry
+  -
+    provider: pypi
+    user: Samuel.Spencer
+    server: https://test.pypi.org/legacy/
+    skip_upload_docs: true
+    password:
+      secure: fNL+70u1QPgkC3+6iLSPBBeo/J1VrwVn6Tg9PdKR3n4X/m6MgAboDc93CfccfsxVxGqsIRBtEfUwRCJ6MrajWqgfQhjQ9KodiYzPVS8vPUQyOtn73AB8iPYKgKX1pFn6UVXcnI67RmtPyJJEUFPbqy5saKZfRpjVRH3vjM2mDJ0=
+    on:
+      all_branches: true
+      distributions: sdist bdist_wheel
+      repo: aristotle-mdr/aristotle-metadata-registry
