@@ -6,58 +6,58 @@ dist: precise
 
 language: python
 
-install:
-  - pip install tox codecov coveralls
+# install:
+#   - pip install tox codecov coveralls
 
-defaults:
-  - &main_test_script
-    before_script:
-    # Make a MariaDB database
-    # Fix wierdness with MariaDB on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0
-      - if [[ $DB == mariadb ]]; then ./scripts/prep_mysql.sh ; fi
-      - if [[ $SEARCH == elastic ]]; then sudo service elasticsearch start && sleep 10; fi
-    # Make a posgres database
-      - if [[ $DB == postgres* ]]; then ./scripts/prep_psql.sh; fi
+# defaults:
+#   - &main_test_script
+#     before_script:
+#     # Make a MariaDB database
+#     # Fix wierdness with MariaDB on Travis - https://github.com/mozilla/kitsune/pull/2453/commits/229db28973f00dfc4fa7b386f266caf3417966a0
+#       - if [[ $DB == mariadb ]]; then ./scripts/prep_mysql.sh ; fi
+#       - if [[ $SEARCH == elastic ]]; then sudo service elasticsearch start && sleep 10; fi
+#     # Make a posgres database
+#       - if [[ $DB == postgres* ]]; then ./scripts/prep_psql.sh; fi
 
-    script:
-      - |
-        case "$DB" in
-          mariadb) export DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db;;
-         postgres) export DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db;;
-           sqlite) export DATABASE_URL=sqlite:///./db.db;;
-                *) export DATABASE_URL=sqlite:///./db.db;;
-        esac
-        echo "Running script with DATABASE_URL="$DATABASE_URL
-        echo "Running script with DB="$DB
-        echo $TRAVIS_BRANCH
-        echo "HEAD to TRAVIS_BRANCH"
-        git diff --name-only HEAD...$TRAVIS_BRANCH
-        echo "TRAVIS_BRANCH to HEAD"
-        git diff --name-only $TRAVIS_BRANCH...HEAD
-        ./scripts/tox_if.sh $MODULE dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH
-    services:
-      - postgresql
-      - redis-server
-      - elasticsearch
-      - mariadb
-    addons:
-      apt:
-        sources:
-          - elasticsearch-2.x
-        packages:
-          - elasticsearch
-      code_climate:
-        repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
-      mariadb: '10.1'
+#     script:
+#       - |
+#         case "$DB" in
+#           mariadb) export DATABASE_URL=mysql://travis:@localhost:3306/aristotle_test_db;;
+#         postgres) export DATABASE_URL=postgresql://postgres:@localhost/aristotle_test_db;;
+#           sqlite) export DATABASE_URL=sqlite:///./db.db;;
+#                 *) export DATABASE_URL=sqlite:///./db.db;;
+#         esac
+#         echo "Running script with DATABASE_URL="$DATABASE_URL
+#         echo "Running script with DB="$DB
+#         echo $TRAVIS_BRANCH
+#         echo "HEAD to TRAVIS_BRANCH"
+#         git diff --name-only HEAD...$TRAVIS_BRANCH
+#         echo "TRAVIS_BRANCH to HEAD"
+#         git diff --name-only $TRAVIS_BRANCH...HEAD
+#         ./scripts/tox_if.sh $MODULE dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH
+#     services:
+#       - postgresql
+#       - redis-server
+#       - elasticsearch
+#       - mariadb
+#     addons:
+#       apt:
+#         sources:
+#           - elasticsearch-2.x
+#         packages:
+#           - elasticsearch
+#       code_climate:
+#         repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
+#       mariadb: '10.1'
 
-  - &main_test_script_py36
-      python: 3.6
-      <<: *main_test_script
+#   - &main_test_script_py36
+#       python: 3.6
+#       <<: *main_test_script
 
-  - &test_accessibility_py36
-    stage: accessibility
-    python: 3.6
-    script: ./scripts/tox_if.sh $MODULE ally-$ALLY
+#   - &test_accessibility_py36
+#     stage: accessibility
+#     python: 3.6
+#     script: ./scripts/tox_if.sh $MODULE ally-$ALLY
 
 jobs:
 
@@ -140,7 +140,7 @@ jobs:
     #         distributions: sdist bdist_wheel
     #         repo: aristotle-mdr/aristotle-metadata-registry
     - stage: deploy
-      script: true
+      script: echo Deploy
       deploy:
           provider: pypi
           user: Samuel.Spencer
@@ -149,7 +149,7 @@ jobs:
           password:
             secure: fNL+70u1QPgkC3+6iLSPBBeo/J1VrwVn6Tg9PdKR3n4X/m6MgAboDc93CfccfsxVxGqsIRBtEfUwRCJ6MrajWqgfQhjQ9KodiYzPVS8vPUQyOtn73AB8iPYKgKX1pFn6UVXcnI67RmtPyJJEUFPbqy5saKZfRpjVRH3vjM2mDJ0=
           on:
-            all_branches: true
+            # all_branches: true
             distributions: sdist bdist_wheel
             repo: aristotle-mdr/aristotle-metadata-registry
 
