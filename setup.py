@@ -179,5 +179,6 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
     install_requires=MonoRepoPackageFinder.fetch_requirements("python")
+    tests_require=['tox'],
     # cmdclass={ 'install': InstallLocalPackages }
 )
