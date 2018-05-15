@@ -62,66 +62,66 @@ defaults:
 jobs:
 
   include:
-    - stage: stylecheck
-      python: 3.6
-      env: MODULE=aristotle-metadata-registry
-      script: cd $TRAVIS_BUILD_DIR/python/$MODULE && tox -e flake8 --skip-missing-interpreters
+  #   - stage: stylecheck
+  #     python: 3.6
+  #     env: MODULE=aristotle-metadata-registry
+  #     script: cd $TRAVIS_BUILD_DIR/python/$MODULE && tox -e flake8 --skip-missing-interpreters
 
-    - stage: documentation
-      python: 3.6
-      env: MODULE=aristotle-metadata-registry
-      script: ./scripts/tox_if.sh $MODULE docs
+  #   - stage: documentation
+  #     python: 3.6
+  #     env: MODULE=aristotle-metadata-registry
+  #     script: ./scripts/tox_if.sh $MODULE docs
 
-    - stage: testing-aristotle-mdr
-      env: DJANGO_VERSION='1.11'  DB=sqlite  SEARCH=elastic MODULE=aristotle-metadata-registry
-      <<: *main_test_script_py36
-    - stage: testing-aristotle-mdr
-      env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic MODULE=aristotle-metadata-registry
-      <<: *main_test_script_py36
-    - stage: testing-aristotle-mdr
-      env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh MODULE=aristotle-metadata-registry
-      <<: *main_test_script_py36
-    - stage: testing-aristotle-mdr
-      env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=whoosh MODULE=aristotle-metadata-registry
-      <<: *main_test_script_py36
-    - stage: testing-aristotle-mdr
-      env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=whoosh MODULE=aristotle-metadata-registry
-      <<: *main_test_script_py36
-    - stage: testing-aristotle-mdr
-      env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic MODULE=aristotle-metadata-registry
-      <<: *main_test_script_py36
+  #   - stage: testing-aristotle-mdr
+  #     env: DJANGO_VERSION='1.11'  DB=sqlite  SEARCH=elastic MODULE=aristotle-metadata-registry
+  #     <<: *main_test_script_py36
+  #   - stage: testing-aristotle-mdr
+  #     env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic MODULE=aristotle-metadata-registry
+  #     <<: *main_test_script_py36
+  #   - stage: testing-aristotle-mdr
+  #     env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh MODULE=aristotle-metadata-registry
+  #     <<: *main_test_script_py36
+  #   - stage: testing-aristotle-mdr
+  #     env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=whoosh MODULE=aristotle-metadata-registry
+  #     <<: *main_test_script_py36
+  #   - stage: testing-aristotle-mdr
+  #     env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=whoosh MODULE=aristotle-metadata-registry
+  #     <<: *main_test_script_py36
+  #   - stage: testing-aristotle-mdr
+  #     env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic MODULE=aristotle-metadata-registry
+  #     <<: *main_test_script_py36
 
-      # Possible failures:
-    # - stage: testing
-    #   env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-    #   <<: *main_test_script_py36
-    # - stage: testing
-    #   env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-    #   <<: *main_test_script_py36
+  #     # Possible failures:
+  #   # - stage: testing
+  #   #   env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
+  #   #   <<: *main_test_script_py36
+  #   # - stage: testing
+  #   #   env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
+  #   #   <<: *main_test_script_py36
 
-    - stage: testing-modules
-      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-dataset-extensions
-      <<: *main_test_script_py36
+  #   - stage: testing-modules
+  #     env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-dataset-extensions
+  #     <<: *main_test_script_py36
 
-    - stage: testing-modules
-      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=comet-indicator-registry
-      <<: *main_test_script_py36
+  #   - stage: testing-modules
+  #     env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=comet-indicator-registry
+  #     <<: *main_test_script_py36
 
-    - stage: testing-modules
-      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-pdf-downloads
-      <<: *main_test_script_py36
+  #   - stage: testing-modules
+  #     env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-pdf-downloads
+  #     <<: *main_test_script_py36
 
-    - stage: testing-modules
-      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-mdr-graphql
-      <<: *main_test_script_py36
+  #   - stage: testing-modules
+  #     env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-mdr-graphql
+  #     <<: *main_test_script_py36
 
-  # Test Accessibility
-    - <<: *test_accessibility_py36
-      env: ALLY=metadata_item MODULE=aristotle-metadata-registry
-    - <<: *test_accessibility_py36
-      env: ALLY=metadata_action MODULE=aristotle-metadata-registry
-    - <<: *test_accessibility_py36
-      env: ALLY=static MODULE=aristotle-metadata-registry
+  # # Test Accessibility
+  #   - <<: *test_accessibility_py36
+  #     env: ALLY=metadata_item MODULE=aristotle-metadata-registry
+  #   - <<: *test_accessibility_py36
+  #     env: ALLY=metadata_action MODULE=aristotle-metadata-registry
+  #   - <<: *test_accessibility_py36
+  #     env: ALLY=static MODULE=aristotle-metadata-registry
 
   # allow_failures:
     # - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
