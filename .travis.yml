@@ -124,7 +124,6 @@ jobs:
       env: ALLY=static MODULE=aristotle-metadata-registry
 
     - stage: deploy
-      script: true
       deploy:
         provider: pypi
         user: Samuel.Spencer
@@ -137,7 +136,6 @@ jobs:
           repo: aristotle-mdr/aristotle-metadata-registry
 
     - stage: deploy
-      script: true
       deploy:
         provider: pypi
         user: Samuel.Spencer
