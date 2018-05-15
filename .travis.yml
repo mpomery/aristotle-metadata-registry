@@ -128,9 +128,9 @@ jobs:
     # - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
     
     - stage: deploy
+      script: skip
       deploy:
         -
-          script: skip
           provider: pypi
           user: Samuel.Spencer
           skip_upload_docs: true
@@ -141,7 +141,6 @@ jobs:
             distributions: sdist bdist_wheel
             repo: aristotle-mdr/aristotle-metadata-registry
         -
-          script: skip
           provider: pypi
           user: Samuel.Spencer
           server: https://test.pypi.org/legacy/
