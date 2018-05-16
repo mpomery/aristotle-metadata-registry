@@ -102,7 +102,7 @@ HAYSTACK_CONNECTIONS = {
 
 ARISTOTLE_SETTINGS.update({
     'SITE_NAME': 'Example Metadata Registry', # 'The main title for the site.'
-    'SITE_BRAND': '/static/aristotle_mdr/images/aristotle_small.png', # URL for the Site-wide logo
+    'SITE_BRAND': 'aristotle_mdr/images/aristotle_small.png', # URL for the Site-wide logo
     'SITE_INTRO': 'Use Default Site Name to search for metadata...', # 'Intro text use on the home page as a prompt for users.'
     'SITE_DESCRIPTION': 'About this site', # 'The main title for the site.'
     'CONTENT_EXTENSIONS' : [ #Extensions that add additional object types for search/display.
@@ -123,14 +123,9 @@ ARISTOTLE_SETTINGS.update({
     ]
 })
 
-
+# Use database caching by default
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
     }
 }
-
-# This option gives a site the ability to register the different download options available for the site
-# This invoked in templates using the aristotle template tag "downloadMenu"
-
-#
