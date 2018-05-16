@@ -60,6 +60,22 @@ defaults:
     python: 3.6
     script: ./scripts/tox_if.sh $MODULE ally-$ALLY
 
+  - &deploy_stage
+    stage: deploy-it
+    script: true
+    install: skip
+    after_success: true
+    deploy: &deploy_step
+      provider: pypi
+      user: Samuel.Spencer
+      skip_upload_docs: true
+      password:
+        secure: fNL+70u1QPgkC3+6iLSPBBeo/J1VrwVn6Tg9PdKR3n4X/m6MgAboDc93CfccfsxVxGqsIRBtEfUwRCJ6MrajWqgfQhjQ9KodiYzPVS8vPUQyOtn73AB8iPYKgKX1pFn6UVXcnI67RmtPyJJEUFPbqy5saKZfRpjVRH3vjM2mDJ0=
+      on:
+        branch: master
+      distributions: sdist bdist_wheel
+      repo: aristotle-mdr/aristotle-metadata-registry
+
 jobs:
 
   include:
@@ -124,31 +140,15 @@ jobs:
     - <<: *test_accessibility_py36
       env: ALLY=static MODULE=aristotle-metadata-registry
 
-    - &deploy_stage
-      stage: deploy-it
-      script: true
-      install: skip
-      after_success: true
-      deploy: &deploy_step
-        provider: pypi
-        user: Samuel.Spencer
-        skip_upload_docs: true
-        password:
-          secure: fNL+70u1QPgkC3+6iLSPBBeo/J1VrwVn6Tg9PdKR3n4X/m6MgAboDc93CfccfsxVxGqsIRBtEfUwRCJ6MrajWqgfQhjQ9KodiYzPVS8vPUQyOtn73AB8iPYKgKX1pFn6UVXcnI67RmtPyJJEUFPbqy5saKZfRpjVRH3vjM2mDJ0=
-        on:
-          branch: master
-        distributions: sdist bdist_wheel
-        repo: aristotle-mdr/aristotle-metadata-registry
-
-    - *deploy_stage
-      if: branch = master
-      deploy: *deploy_step
+    - <<: *deploy_stage
+      deploy:
+        <<: *deploy_step
         on:
           branch: master
 
-    - *deploy_stage
-      if: branch = master
-      deploy: *deploy_step
+    - <<: *deploy_stage
+      deploy:
+        <<: *deploy_step
         server: https://test.pypi.org/legacy/
         on:
           all_branches: true
