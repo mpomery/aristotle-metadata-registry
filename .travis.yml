@@ -141,6 +141,7 @@ jobs:
       env: ALLY=static MODULE=aristotle-metadata-registry
 
     - <<: *deploy_stage
+      if: branch = master
       deploy:
         <<: *deploy_step
         on:
