@@ -41,7 +41,7 @@ class MonoRepoPackageFinder(PackageFinder):
     @staticmethod
     def _looks_like_sub_repo(path):
         """Does a directory look like a package?"""
-        return os.path.isfile(os.path.join(path, 'setup.py')) 
+        return os.path.isfile(os.path.join(path, 'setup.py'))
 
     @classmethod
     def _find_packages_iter(cls, where, exclude, include):
@@ -57,7 +57,7 @@ class MonoRepoPackageFinder(PackageFinder):
             for dir in all_dirs:
                 full_path = os.path.join(root, dir)
                 rel_path = os.path.relpath(full_path, where)
-                # base_path = 
+                # base_path =
 
                 if cls._looks_like_sub_repo(full_path):
                     dirs.append(dir)
@@ -117,7 +117,7 @@ class MonoRepoPackageFinder(PackageFinder):
                 # Keep searching subdirectories, as there may be more packages
                 # down there, even if the parent was excluded.
                 # dirs.append(dir)
-    
+
     @classmethod
     def fetch_requirements(cls, where=""):
         return list(cls._fetch_requirements_iter(where))
@@ -133,7 +133,7 @@ class MonoRepoPackageFinder(PackageFinder):
                 with open(setup_py_path, "r") as f:
                     import ast
                     t = compile(f.read(), setup_py_path, 'exec', ast.PyCF_ONLY_AST)
-                    for node in t.body: 
+                    for node in t.body:
                         if isinstance(node, ast.Expr):
                             c = node.value
                             for k in getattr(c, "keywords", []):
@@ -178,5 +178,8 @@ setup(
     ],
     install_requires=MonoRepoPackageFinder.fetch_requirements("python"),
     tests_require=['tox'],
+    entry_points={
+        'console_scripts': ['aristotle-installer=easy_installer.install:main']
+    },
     # cmdclass={ 'install': InstallLocalPackages }
 )
