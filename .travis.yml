@@ -124,11 +124,12 @@ jobs:
     - <<: *test_accessibility_py36
       env: ALLY=static MODULE=aristotle-metadata-registry
 
-    - stage: deploy-it
+    - &deploy_stage
+      stage: deploy-it
       script: true
       install: skip
       after_success: true
-      deploy:
+      deploy: &deploy_step
         provider: pypi
         user: Samuel.Spencer
         skip_upload_docs: true
@@ -136,24 +137,21 @@ jobs:
           secure: fNL+70u1QPgkC3+6iLSPBBeo/J1VrwVn6Tg9PdKR3n4X/m6MgAboDc93CfccfsxVxGqsIRBtEfUwRCJ6MrajWqgfQhjQ9KodiYzPVS8vPUQyOtn73AB8iPYKgKX1pFn6UVXcnI67RmtPyJJEUFPbqy5saKZfRpjVRH3vjM2mDJ0=
         on:
           branch: master
-          distributions: sdist bdist_wheel
-          repo: aristotle-mdr/aristotle-metadata-registry
-
-    - stage: deploy-it
-      script: true
-      install: skip
-      after_success: true
-      deploy:
-        provider: pypi
-        user: Samuel.Spencer
-        password:
-          secure: "B3jQGTCMrCxXAIPE0gcQRVcyZeFVaWh3rTyYtTz6iKrHsj65pNFIFb8DNAK8MWmPms3U5tP0xQiReoGpoMZzxLPNRKZJCUIg2KccN3GjIzuz82tJZ59dFCt3cBxObX3HMFwuHjTqheW90zHVeyGUJv2LnV2iJfWuMKFnInFwATw="
-        server: https://test.pypi.org/legacy/
-        # skip_upload_docs: true
-        on:
-          all_branches: true
         distributions: sdist bdist_wheel
         repo: aristotle-mdr/aristotle-metadata-registry
+
+    - *deploy_stage
+      if: branch = master
+      deploy: *deploy_step
+        on:
+          branch: master
+
+    - *deploy_stage
+      if: branch = master
+      deploy: *deploy_step
+        server: https://test.pypi.org/legacy/
+        on:
+          all_branches: true
 
   # allow_failures:
   #   - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
