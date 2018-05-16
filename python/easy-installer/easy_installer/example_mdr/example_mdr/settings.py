@@ -2,10 +2,10 @@
 Django settings for example_mdr project.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/1.7/topics/settings/
+https://docs.djangoproject.com/en/1.11/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.7/ref/settings/
+https://docs.djangoproject.com/en/1.11/ref/settings/
 
 # Quick-start development settings - unsuitable for production
 """
@@ -28,7 +28,7 @@ ALLOWED_HOSTS = ["*"]
 # the glossary insertion button in the rich text editor
 #!aristotle_glossary!from aristotle_glossary.settings import CKEDITOR_CONFIGS
 
-# See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 # SECURITY WARNING: keep the secret key used in production secret!
 # You need to
 SECRET_KEY = 'Change-this-key-as-soon-as-you-can'
@@ -65,7 +65,7 @@ WSGI_APPLICATION = 'example_mdr.wsgi.application'
 # Database
 # Below is the default database setup, which uses the file-based SQLite database.
 # For production systems, examine the django guide below to getting other databases configured.
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -74,7 +74,7 @@ DATABASES = {
 }
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.7/topics/i18n/
+# https://docs.djangoproject.com/en/1.11/topics/i18n/
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
@@ -82,7 +82,7 @@ USE_L10N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'/media/')
