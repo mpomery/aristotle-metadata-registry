@@ -6,3 +6,9 @@ from django.views.generic import TemplateView
 
 class APIRootView(TemplateView):
     template_name = "aristotle_mdr_api/base.html"
+
+
+class GetTokenView(TemplateView):
+    template_name = "aristotle_mdr_api/api_message.html"
+
+    # def get(self, request, *args, **kwargs):
