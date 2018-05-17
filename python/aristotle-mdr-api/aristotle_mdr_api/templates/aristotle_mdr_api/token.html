@@ -1,0 +1,9 @@
+{% extends 'aristotle_mdr_api/base.html' %}
+
+{% block api_content %}
+{% if token %}
+<p>Your token is {{ token }}</p>
+{% else %}
+<p>Token generation failed</p>
+{% endif %}
+{% endblock %}
