@@ -3,7 +3,7 @@ from rest_framework.documentation import include_docs_urls
 from rest_framework_swagger.views import get_swagger_view
 from django.utils.module_loading import import_string
 from .views import APIRootView, GetTokenView
-from rest_framework.authtoken import views as tokenviews
+# from rest_framework.authtoken import views as tokenviews
 
 import re
 
@@ -31,7 +31,7 @@ def version_schema(*args, **kwargs):
 
 urlpatterns = [
     url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^api-token-auth/', tokenviews.obtain_auth_token),
+    # url(r'^api-token-auth/', tokenviews.obtain_auth_token),
     url(r'^gettoken/', GetTokenView.as_view()),
 
     url(r'^(?P<version>(v2|v3)?)/schemas/', version_schema),

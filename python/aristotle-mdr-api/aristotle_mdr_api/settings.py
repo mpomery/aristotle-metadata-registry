@@ -1,7 +1,6 @@
 REQUIRED_APPS = (
     'aristotle_mdr_api',
     'rest_framework',
-    'rest_framework.authtoken',
     'rest_framework_swagger',
     'django_filters',
 )

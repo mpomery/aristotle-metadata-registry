@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from rest_framework.authtoken.models import Token
+from aristotle_mdr_api.models import AristotleToken
 
 
 class APIRootView(TemplateView):
@@ -16,7 +16,11 @@ class GetTokenView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
 
-        token, created = Token.objects.get_or_create(user=request.user)
+        try:
+            token = AristotleToken.objects.get(user=request.user)
+        except AristotleToken.DoesNotExist:
+            token = AristotleToken.objects.create(user=request.user, permissions={})
+
         kwargs['token'] = token.key
 
         return super().get(request, *args, **kwargs)
