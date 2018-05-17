@@ -1,0 +1,24 @@
+{% if badperms %}<p>You do not have permission to update any items shown below in red</p>{% endif %}
+{% with id=widget.attrs.id %}<table{% if id %} id="{{ id }}"{% endif %}{% if widget.attrs.tableclass %} class="{{ widget.attrs.tableclass }}"{% endif %}>
+  {% if top_header %}
+    <tr>{% for header in top_header %}
+    <th {% if header.colspan %}colspan="{{ header.colspan }}"{% endif %} {% if header.rowspan %}rowspan="{{ header.rowspan }}"{% endif %}>
+    {{ header.text }}</th>
+    {% endfor %}</tr>
+  {% endif %}
+  <tr>{% for header in headers %}<th>{{ header }}</th>{% endfor %}<tr>
+  {% for group, options, index in widget.optgroups %}{% if group %}
+  <td>{{ group }}<table{% if id %} id="{{ id }}_{{ index }}"{% endif %}>{% endif %}
+    {% for option in options %}
+    <tr {% if not option.permission %}class="danger"{% endif %}>{% include option.template_name with widget=option enabled=option.permission %}
+      {% for item in option.extra %}
+      {% if item.url %}
+      <td><a href={{ item.url }}>{{ item.text }}</a></td>
+      {% else %}
+      <td>{{ item }}</td>
+      {% endif %}
+      {% endfor %}
+    </tr>
+    {% endfor %}{% if group %}
+  </table></td>{% endif %}{% endfor %}
+</table>{% endwith %}

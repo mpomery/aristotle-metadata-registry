@@ -1,0 +1,41 @@
+{% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
+{% load compile_static i18n %}
+
+{% block title %}Review Changes{% endblock %}
+
+{% block extra_head_scripts %}
+{{ wizard.form.media }}
+{% endblock %}
+
+{% block content %}
+{% block form_tag %}
+<form {% if formurl %}action="{{ formurl }}"{% else %}action=""{% endif %} method="post">
+{% endblock %}
+{% csrf_token %}
+{% block content_body %}
+<table>
+{{ wizard.management_form }}
+{% if wizard.form.forms %}
+    {{ wizard.form.management_form }}
+    {% for form in wizard.form.forms %}
+        {% block formset %}
+        {{ form }}
+        {% endblock %}
+    {% endfor %}
+{% else %}
+    {% block form %}
+    {{ wizard.form.as_p }}
+    {% endblock %}
+{% endif %}
+</table>
+{% endblock %}
+{% block content_footer %}
+{% if wizard.steps.prev %}
+<button class="btn btn-default" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "Previous Step" %}</button>
+{% endif %}
+{% block buttons %}
+<input class="btn btn-primary" type="submit" value="{% trans "Submit" %}" />
+{% endblock %}
+{% endblock %}
+</form>
+{% endblock %}

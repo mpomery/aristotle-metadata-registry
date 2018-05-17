@@ -1,0 +1,50 @@
+{% extends "aristotle_mdr/helpers/wizard_form_modal.html" %}
+{% load compile_static i18n %}
+{% load aristotle_tags %}
+
+{% block title %}Accept Request{% endblock %}
+
+{% block form_tag %}
+<form method="post" action="{% url 'aristotle:userReviewAccept' review.id %}">
+{% endblock %}
+
+{% block form %}
+      <ol class="breadcrumb">
+        <li><a href="{% url 'aristotle:userReadyForReview' %}">Review list</a></li>
+        <li class="active">Approve review request</li>
+      </ol>
+
+      <header>By approving this review, this form will change the status of the listed items in your registration authorities.
+      </header>
+      <div>Requested registration status:
+          <em>{{review.get_state_display}}</em> in <a href="{{review.registration_authority.get_absolute_url }}">{{review.registration_authority.name }}</a>
+      </div>
+      <div class="well">
+          {{ wizard.form.errors }}
+          <strong>The original message for this request:</strong>
+          <p>{{ review.message }}</p>
+          <strong>The items in this request are listed below:</strong>
+          <ul>
+              {% for item in review.concepts.all %}
+                  <li>
+                  {% include "aristotle_mdr/helpers/inlineDetails.html" with item=item %}
+                  </li>
+              {% endfor %}
+          </ul>
+      </div>
+      <div id="visibilty">
+
+      </div>
+      <section>
+      <div class="status_change_description">
+          <label for='id_response'>{{ wizard.form.response.label }}:</label> {{ wizard.form.response.help_text }}
+          {{ wizard.form.response }}
+      </div>
+      </section>
+{% endblock %}
+
+{% block buttons %}
+<a class="btn btn-default" href="{% url 'aristotle:userReadyForReview' %}" data-dismiss="modal">Cancel</a>
+<input class="btn btn-success" type="submit" name="submit_next" value="{% trans 'Review Changes' %}" />
+<input class="btn btn-primary" type="submit" name="submit_skip" value="{% trans 'Update Status' %}" />
+{% endblock %}

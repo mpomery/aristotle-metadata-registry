@@ -1,0 +1,59 @@
+{% extends "aristotle_mdr/helpers/wizard_form_modal.html" %}
+
+{% load aristotle_tags %}
+{% load compile_static i18n %}
+{% load static %}
+
+{% block title %}Change Status{% endblock %}
+
+{% block extra_head_scripts %}
+<script>
+    status_matrix = {{status_matrix|safe}};
+    current_visibility = "{{item|visibility_text}}";
+    {# VISIBILITY_STATUS will be replaced in javascript #}
+    same_visibility_text = "{% trans 'After saving, this item will stay VISIBILITY_STATUS' %}";
+    {# VISIBILITY_STATUS will be replaced in javascript #}
+    diff_visibility_text = "{% trans 'After saving, this item will become VISIBILITY_STATUS' %}";
+    select_state_to_see = "{% trans 'Select a new state to see how the visibility of this item will change.' %}";
+    visibility_translations = {
+        "hidden":"{% trans 'hidden' %}",
+        "locked":"{% trans 'locked' %}",
+        "public":"{% trans 'public' %}"
+    }
+</script>
+<script src="{% static 'aristotle_mdr/aristotle.status_change.js' %}"></script>
+{{ block.super }}
+{% endblock %}
+
+{% block form_tag %}
+<form method="post" action="{% url 'aristotle_mdr:changeStatus' item.id %}">
+{% endblock %}
+
+{% block form %}
+      <ol class="breadcrumb">
+        <li><a href="{% url 'aristotle:item' item.id %}">{{ item.name }}</a></li>
+        <li class="active">Change registation status</li>
+      </ol>
+
+      <header>This form allows you to change the status of multiple items in your registration authorities.
+      </header>
+      <div>
+
+          {{ wizard.form.items }}
+      </div>
+      <div id="visibilty">
+          This item is currently {{ item|visibility_text }}.
+          <span id="potential">
+          {% trans 'Select a new state to see how the visibility of this item will change.' %}
+          </span>
+      </div>
+      {% include 'aristotle_mdr/helpers/changestatus.html' with form=wizard.form %}
+{% endblock %}
+
+{% block buttons %}
+<div class="pull-right">
+<a class="btn btn-default" href="{% url 'aristotle:item' item.id %}" data-dismiss="modal">Cancel</a>
+<input class="btn btn-success" type="submit" name="submit_next" value="{% trans 'Review Changes' %}" />
+<input class="btn btn-primary" type="submit" name="submit_skip" value="{% trans 'Update Status' %}" />
+</div>
+{% endblock %}

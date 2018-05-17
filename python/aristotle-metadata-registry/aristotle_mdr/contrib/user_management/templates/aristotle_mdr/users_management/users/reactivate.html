@@ -1,0 +1,43 @@
+{% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
+{% load compile_static i18n %}
+{% load aristotle_tags %}
+
+{% block title %}Reactivate user {% firstof reactivate_user.get_full_name reactivate_user.email %}{% endblock %}
+{% block content %}
+<form method="post" action="{% url 'aristotle-user:reactivate_user' reactivate_user.pk %}">{% csrf_token %}
+    <div class="modal-header">
+       <header class="modal-title">Reactivate user - {% firstof reactivate_user.get_full_name reactivate_user.email %}</header>
+    </div>
+    <div class="modal-body">
+      <p>
+        <strong>
+        You are about to reactivate the account of
+          <em>{% firstof reactivate_user.get_full_name reactivate_user.email %}</em>
+        on this registry.
+        </strong>
+        <ul>
+        <li>This will reactivate their account.
+        This user will be able to login to this registry.
+        </li><li>
+          They have not been re-added to any workgroups or registration authorities.
+          To grant them permissions, they will need to be given new roles.
+        </li><li>
+        The metadata previously created by this account will be associated with this user,
+        and they will be able to edit content associated with their account.
+        </li>
+        </ul>
+      </p>
+    </div>
+    <div class="modal-footer">
+        {% if request.is_ajax %}
+            <button type="button" class="btn btn-default" data-dismiss="modal">Return to users</button>
+        {% else %}
+            <a class="btn btn-default" href="{% url 'aristotle-user:registry_user_list' %}">Return to users</a>
+        {% endif %}
+        <button type="submit" class="btn btn-primary" data-dismiss="modal">
+          <i class="fa fa-user-plus"></i>
+          Reactivate
+        </button>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
+{% load compile_static i18n humanize %}
+{% load aristotle_tags %}
+{% load static from staticfiles %}
+
+{% block title %}Request review for {{ item.name }}{% endblock %}
+
+{% block content %}
+<form method="post" action="{% url 'aristotle:request_review' item.id %}">{% csrf_token %}
+    <div class="modal-body">
+        <ol class="breadcrumb">
+          <li><a href="{% url 'aristotle:item' item.id %}">{{ item.name }}</a></li>
+          <li class="active">Request review</li>
+        </ol>
+
+
+        <header>This form allows you to request a registrar review this metadata for endorsement.
+        </header>
+        {% with count=reviews.count %}
+        {% if count > 0 %}
+        <div class='alert alert-warning'>
+            <strong>Note:</strong> There {{ count|pluralize:"is,are" }} currently {{count}} outstanding review{{ count|pluralize }}
+            for this item.
+        </div>
+        {% endif %}
+        {% endwith %}
+        <div id="visibilty">
+            This item is currently {{item|visibility_text}}.
+            <span id="potential">
+            {% trans 'Select a new state to see how the visibility of this item will change.' %}
+            </span>
+        </div>
+        <div>
+            {{form.errors}}
+        </div>
+        {% include 'aristotle_mdr/helpers/changestatus.html' with form=form %}
+    </div>
+    <div class="modal-footer">
+        {% if request.is_ajax %}
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        {% else %}
+            <a class="btn btn-default" href="{% url 'aristotle:item' item.id %}">Cancel</a>
+        {% endif %}
+        <input type="submit" class="btn btn-primary" value="{% trans 'Request Review'%}" />
+    </div>
+</form>
+<script>
+    status_matrix = {{status_matrix|safe}};
+    current_visibility = "{{item|visibility_text}}";
+    {# VISIBILITY_STATUS will be replaced in javascript #}
+    same_visibility_text = "{% trans 'If this review is accepted, this item will stay VISIBILITY_STATUS' %}";
+    {# VISIBILITY_STATUS will be replaced in javascript #}
+    diff_visibility_text = "{% trans 'If this review is accepted, this item will become VISIBILITY_STATUS' %}";
+    select_state_to_see = "{% trans 'Select a new state to see how the visibility of this item will change.' %}";
+    visibility_translations = {
+        "hidden":"{% trans 'hidden' %}",
+        "locked":"{% trans 'locked' %}",
+        "public":"{% trans 'public' %}"
+    }
+</script>
+<script src="{% static 'aristotle_mdr/aristotle.status_change.js' %}"></script>
+{% endblock %}

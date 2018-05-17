@@ -1,0 +1,25 @@
+{% load humanize %}
+<div class="result">
+{% if object.id %}
+<a href="{% url 'aristotle:item' object.id %}">{{ object.name }}</a>
+{% endif %}
+<span class="item_type">({{ object.get_verbose_name }})</span>
+<p>
+    {{ object.definition|striptags|safe|truncatewords:20 }}
+</p>
+<div class="attrs">
+    <span class="attr">
+        {# <span class="time">Created: {{ object.created }}</span> #}
+        <header class="time">Last modified:</header>
+        {{ object.modified }}
+    </span>
+    <span class="attr">
+        <header>Statuses:</header>
+        {% for s in object.current_statuses.all %}
+            [{{ s.registrationAuthority }}: {{ s.state_name }}]
+        {% empty %}
+        <em>Unregistered</em>
+        {% endfor %}
+    </span>
+</div>
+</div>

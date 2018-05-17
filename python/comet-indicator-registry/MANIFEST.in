@@ -1,0 +1,7 @@
+include LICENSE
+include README.rst
+recursive-include comet/aristotle_help_files *
+recursive-include comet/templates *
+recursive-include comet/templates *
+recursive-exclude comet/ *.pyc
+exclude MANIFEST.in

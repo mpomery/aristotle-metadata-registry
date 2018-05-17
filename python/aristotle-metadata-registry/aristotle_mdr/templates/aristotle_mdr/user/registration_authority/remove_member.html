@@ -1,0 +1,44 @@
+{% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
+{% load compile_static i18n %}
+{% load aristotle_tags %}
+
+{% block title %}Remove user from registation authority {% firstof user_to_change.get_full_name user_to_change.email %}{% endblock %}
+{% block content %}
+<form method="post" action="{% url 'aristotle:registrationauthority_member_remove' item.id user_to_change.pk %}">{% csrf_token %}
+    {% if not request.is_ajax %}
+    <div class="modal-header">
+       <header class="modal-title">Remove user from registation authority - {% firstof user_to_change.get_full_name user_to_change.email %}</header>
+    </div>
+    {% endif %}
+    <div class="modal-body">
+      <p>
+        <strong>
+        You are about to remove the account of
+          <em>{% firstof user_to_change.get_full_name user_to_change.email %}</em>
+        from the registation authority <em>{{item.name}}</em>.
+        </strong>
+        <ul>
+        <li>
+        This will remove all roles from the user in this registation authority,
+        they will no longer be able to register content for this registation authority.
+        </li><li>
+        This user will still be able login to this registry and create content in their own space.
+        </li><li>
+        You can re-invite this user later to this registation authority.
+        </li>
+        </ul>
+      </p>
+    </div>
+    <div class="modal-footer">
+        {% if request.is_ajax %}
+            <button type="button" class="btn btn-default" data-dismiss="modal">Return to members list</button>
+        {% else %}
+            <a class="btn btn-default" href="{% url 'aristotle:workgroupMembers' item.id %}">Return to members list</a>
+        {% endif %}
+        <button type="submit" class="btn btn-danger" data-dismiss="modal">
+          <i class="fa fa-user-times"></i>
+          Remove user
+        </button>
+    </div>
+</form>
+{% endblock %}

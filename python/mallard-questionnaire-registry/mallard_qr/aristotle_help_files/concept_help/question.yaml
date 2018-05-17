@@ -1,0 +1,27 @@
+- model: aristotle_mdr_help.concepthelp
+  fields:
+    app_label: mallard_qr
+    concept_type: question
+    language: en
+    brief: A question describes the text used to elicit a response for the Concept to be measured.
+    offical_definition: Describes the text used to elicit a response for the Concept to be measured.
+
+        A Question may be a single question used to obtain a response, or may be a multiple question, a construct which links multiple sub-questions, each with their own response.
+        A Question also includes a relationship to the Value Domain to document the associated response criteria for the question. A single response question will have one Value Domain associated with it, while a 'multiple question' may have more than one Value Domain.
+        A Question should be designed with re-use in mind, as it can be used in multiple Questionnaires.
+
+    official_reference: Generic Statistical Information Model, GSIM Question Definition
+    official_link: https://statswiki.unece.org/display/GSIMclick/Question
+    body: >
+        TBC
+    creation_tip: 
+        <p>
+        Questions should have a name that clearly describes what will be collected.
+        
+        A question can have multiple [[aristotle_mdr.ValueDomain|s]] associated with it.
+        </p>
+        
+        <p>
+        Once a question has been saved, the collected
+        [[aristotle_mdr.DataElement]] can be attached.
+        </p>

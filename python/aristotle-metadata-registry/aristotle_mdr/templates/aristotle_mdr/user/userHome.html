@@ -1,0 +1,99 @@
+{% extends "aristotle_mdr/user/base.html" %}
+{% load aristotle_tags compile_static %}
+{% load static from staticfiles %}
+
+
+{% block title %}My Dashboard{% endblock %}
+{% block extra_head_scripts %}
+    <link rel="stylesheet" href="{% static 'aristotle_mdr/aristotle.dashboard.less'|compile %}" />
+    {% block individual_scripts %}
+    {% endblock %}
+{% endblock %}
+
+{% block page %}
+<h1><a href="#">My Dashboard</a> <small>- {% firstof user.get_full_name user.email %}</small></h1>
+    <div class='row'>
+        <section class="col-md-8">
+            <div class='panel-body'>
+                <a class="col-md-4 btn btn-default" href="{% url 'aristotle:create_list' %}">
+                    <i class="fa fa-2x fa-plus"></i><br>
+                    Create new metadata
+                </a>
+                <a class="col-md-4 btn btn-default" href="{% url 'aristotle:userWorkgroups' %}">
+                    <i class="fa fa-2x fa-users"></i><br>
+                    View my workgroups
+                </a>
+                <a class="col-md-4 btn btn-default" href="{% url 'aristotle:userEdit' %}">
+                    <i class="fa fa-2x fa-user"></i><br>
+                    View my account
+                </a>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-envelope fa-fw"></i>
+                    <span class="panel-title" href="{% url 'aristotle:userInbox' %}">Recent Notifications</span>
+                </div>
+                    <ul class="list-group">
+                    {% for item in user.notifications.unread|slice:':5' %}
+                      <li class="list-group-item">
+                        {{ item }}
+                      </a>
+                      </li>
+                    {% empty %}
+                        <li class="list-group-item"> No unread notifications </li>
+                    {% endfor %}
+                    </ul>
+                    <div class="panel-footer"><a href="{% url 'aristotle:userInbox' %}">See more</a></div>
+            </div>
+        </section>
+
+        <section class="col-md-4">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <i class="fa fa-bookmark fa-fw"></i>
+                    <span class="panel-title">Recent Favourites</span>
+                    <a href="{% url 'aristotle:userFavourites' %}">See more</a>
+                </div>
+
+                <div class="list-group">
+                    {% for item in user.profile.favourites.all|slice:':5' %}
+                      <a class="list-group-item" href="{{ item.get_absolute_url }}">
+                        {{ item }}
+                        <small>({{ item.item.get_verbose_name }})</small>
+                      </a>
+
+                    {% empty %}
+                        <a class="list-group-item"> No favourites </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="panel-title" href="{% url 'aristotle:userRecentItems' %}">
+                        <i class="fa fa-history fa-fw"></i> Recent Actions
+                    </span>
+                    <a href="{% url 'aristotle:userRecentItems' %}">See more
+                    </a>
+                </div>
+                <ul class="list-group">
+                {% for data in recentdata %}
+                    <li class="list-group-item">
+                        <span>{{ data.revision.comment }} <small>({{ data.revision.date_created }})</small></span>
+                        <ul>
+                            {% for item in data.versions %}
+                                  <li><a href="{{ item.url }}">{{ item.text }} ({{ item.id }})</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item"> No recent items </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </section>
+    </div>
+{% endblock %}

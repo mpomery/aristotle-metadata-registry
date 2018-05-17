@@ -1,0 +1,41 @@
+{% extends "aristotle_mdr/base.html" %}
+{% load compile_static i18n humanize %}
+{% load aristotle_tags %}
+
+{% block title %}Request review for multiple items{% endblock %}
+{% block content %}
+<form method="post" action="{% url 'aristotle:bulk_action' %}?next={{next}}">{% csrf_token %}
+    <input type="hidden" name="bulkaction" value="{{ bulk_action_title }}"/>
+    <div class="modal-body">
+        <header>This form allows you to request a registrar review this metadata for endorsement.
+        </header>
+        {{ reviews }}
+        {{ reviews.count }}
+        {% with count=reviews.count %}
+        {% if count > 0 %}
+        <div class='alert alert-warning'>
+            <strong>Note:</strong> There {{ count|pluralize:"is,are" }} currently {{count}} outstanding review{{ count|pluralize }}
+            for this item.
+        </div>
+        {% endif %}
+        {% endwith %}
+        <div>
+            {{form.errors}}
+        </div>
+        <div>
+            {{ form.items.label }}
+            {{ form.items }}
+        </div>
+        {% include 'aristotle_mdr/helpers/changestatus.html' with form=form %}
+    </div>
+    <div class="modal-footer">
+        {% if request.is_ajax %}
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        {% else %}
+            <a class="btn btn-default" href="{{ next }}">Cancel</a>
+        {% endif %}
+        <input type="submit" name="confirmed" class="btn btn-primary" value="Request Review" />
+    </div>
+</form>
+{% include 'autocomplete_light/static.html' %}
+{% endblock %}

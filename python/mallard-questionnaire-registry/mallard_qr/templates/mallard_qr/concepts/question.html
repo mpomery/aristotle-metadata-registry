@@ -1,0 +1,46 @@
+{% extends "aristotle_mdr/concepts/managedContent.html" %}
+{% load aristotle_tags %}
+
+{% block objSpecific %}
+
+{% if item.question_text %}
+<h2>Question Text</h2>
+<div class="panel panel-default question_text">
+<div class="panel-body">
+    {% if item|can_edit:request.user %}
+    <a href="{% url 'mallard_qr:question_alter_responses' item.id %}"
+        data-toggle="modal" data-target="#editResponsesPopover"
+        class="pull-right btn btn-default btn-sm">
+        <i class="fa fa-plus"></i>
+        Edit responses
+    </a>
+    {% bootstrap_modal 'editResponsesPopover' %}
+    {% endif %}
+    <p>{{ item.question_text|safe }}
+    </p>
+</div>
+</div>
+{% endif %}
+
+{% if item.response_domains.exists %}
+    <ul>
+    {% for response in item.response_domains.all %}
+    <li>
+        {% include "aristotle_mdr/helpers/itemLink.html" with item=response.value_domain showType=False %}
+        {% include "aristotle_mdr/concepts/valueDomainRepresentation.html" with item=response.value_domain %}
+    </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% if item.collected_data_element %}
+<h2>Collected Data element</h2>
+<div>
+    {% with de=item.collected_data_element %}
+    {% include "aristotle_mdr/helpers/itemLink.html" with item=de %}
+    {{ de.definition }}
+    {% endwith %}
+</div>
+{% endif %}
+
+{% endblock %}

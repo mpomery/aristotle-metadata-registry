@@ -20,6 +20,13 @@ lib
 lib64
 __pycache__
 
+#cache
+caches/*
+python/aristotle-metadata-registry/caches/*
+
+#static
+staticfiles/*
+
 # Installer logs
 pip-log.txt
 

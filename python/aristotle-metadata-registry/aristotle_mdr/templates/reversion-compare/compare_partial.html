@@ -1,0 +1,49 @@
+{% load i18n %}
+
+<section id="comments">
+<header>
+    {% trans "Edit comment:" %} -
+    {{version}}
+    {% if object.version.revision.user %}
+        {% firstof action.revision.user.get_full_name  action.revision.user.email %}
+    {% endif %}
+</header>
+<p>{{ version2.revision.comment|default:"(no comment exists)" }}</p>
+</section>
+
+<div class="panel">
+{% if has_unfollowed_fields %}
+<h4 class="follow">{% trans "Note:" %}</h4>
+<p class="follow">
+    {% blocktrans %}
+        Fields/entries marked with <sup class="follow">*</sup> are not under reversion control.
+        It may be that not all marked information is accurate.
+    {% endblocktrans %}
+</p>
+{% endif %}
+
+{% if compare_data %}
+    <table class="table table-striped">
+        <thead>
+            <th width="25%">Field name</th>
+            <th>Differences</th>
+        </thead>
+        <tbody>
+    {% for field_diff in compare_data %}
+    <tr>
+        <td>{% firstof field_diff.field.verbose_name field_diff.field.related_name %}{% if field_diff.is_related and not field_diff.follow %}<sup class="follow">*</sup>{% endif %}
+        {% if field_diff.field.help_text %}<p class="help">{{ field_diff.field.help_text }}</p>{% endif %}
+        </td>
+        <td class="module">
+            <p>{{ field_diff.diff }}</p>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+{% else %}
+    <div class="module">
+        <p><strong>{% trans "There are no differences." %}</strong></p>
+    </div>
+{% endif %}
+</div>

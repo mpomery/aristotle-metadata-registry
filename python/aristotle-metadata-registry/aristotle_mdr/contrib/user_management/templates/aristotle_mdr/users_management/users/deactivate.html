@@ -1,0 +1,45 @@
+{% extends request.is_ajax|yesno:"aristotle_mdr/base_ajax.html,aristotle_mdr/base.html" %}
+{% load compile_static i18n %}
+{% load aristotle_tags %}
+
+{% block title %}Deactivate user {% firstof deactivate_user.get_full_name  deactivate_user.email %}{% endblock %}
+{% block content %}
+<form method="post" action="{% url 'aristotle-user:deactivate_user' deactivate_user.pk %}">{% csrf_token %}
+    <div class="modal-header">
+       <header class="modal-title">Deactivate user - {% firstof deactivate_user.get_full_name  deactivate_user.email %}</header>
+    </div>
+    <div class="modal-body">
+      <p>
+        <strong>
+        You are about to deactivate the account of
+          <em>{% firstof deactivate_user.get_full_name  deactivate_user.email %}</em>
+        on this registry.
+        </strong>
+        <ul>
+        <li>
+        This will deactivate their account and remove all roles in this registry,
+        including all workgroups and registration authorities.
+        </li><li>
+        This user will no longer be able to login to this registry.
+        </li><li>
+        The metadata created by this account will remain in the registry,
+        and will remain connected to the account for auditing purposes.
+        </li><li>
+        You can re-invite this user later to re-activate their account.
+        </li>
+        </ul>
+      </p>
+    </div>
+    <div class="modal-footer">
+        {% if request.is_ajax %}
+            <button type="button" class="btn btn-default" data-dismiss="modal">Return to users</button>
+        {% else %}
+            <a class="btn btn-default" href="{% url 'aristotle-user:registry_user_list' %}">Return to users</a>
+        {% endif %}
+        <button type="submit" class="btn btn-danger" data-dismiss="modal">
+          <i class="fa fa-user-times"></i>
+          Deactivate
+        </button>
+    </div>
+</form>
+{% endblock %}

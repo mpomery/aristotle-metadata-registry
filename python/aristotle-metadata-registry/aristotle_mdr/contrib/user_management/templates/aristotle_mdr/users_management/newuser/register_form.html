@@ -1,0 +1,71 @@
+{% extends "aristotle_mdr/users_management/register_base.html" %}
+{% load aristotle_tags compile_static %}
+{% load static from staticfiles %}
+
+{% block title %}Signup to create a new account{% endblock %}
+
+{% block left_side %}
+    <img class="img-responsive" style="margin: 0 auto; height: 80px;" src="{% static config.SITE_BRAND %}">
+
+
+    <h1 class="text-center">You've been invited to the<br> {{config.SITE_NAME}}!</h1>
+    <p>
+        We need to collect some information from you to finish setting up your account.
+    </p>
+
+{% endblock %}
+
+
+{% block right_side %}
+<form action="." method="post">{% csrf_token %}
+
+	<div class="row">
+
+    <div class="col-sm-12 form-group">
+        <hr>
+			<label for="{{form.email.id_for_label}}">Email address</label>
+			<input name="{{ form.email.name }}" value="{{ form.email.value|default:"" }}" type="text"  class="form-control">
+            {% if form.email.errors %}
+            <div class="alert alert-danger">{{ form.email.errors }}</div>
+            {% endif %}
+		</div>
+
+		<div class="col-sm-12 form-group">
+			<label for="{{form.password.id_for_label}}">Password</label>
+			<input name="{{ form.password.name }}"  value="" type="password"  class="form-control">
+            {% if form.password.errors %}
+            <div class="alert alert-danger">{{ form.password.errors }}</div>
+            {% endif %}
+            <p class="help-block">{{ form.password.help_text }}</p>
+		</div>
+		<div class="col-sm-12 form-group">
+			<label for="{{form.password_confirm.id_for_label}}">Confirm Password</label>
+			<input id="{{form.password_confirm.id_for_label}}" name="{{ form.password_confirm.name }}"  value="" type="password"  class="form-control">
+            {% if form.password.errors %}
+            <div class="alert alert-danger">{{ form.password_confirm.errors }}</div>
+            {% endif %}
+            <p class="help-block">{{ form.password_confirm.help_text }}</p>
+		</div>
+
+		<div class="col-sm-6 form-group">
+			<label for="{{form.short_name.id_for_label}}">Display Name</label>
+			<input name="{{ form.short_name.name }}"  value="{{ form.short_name.value|default:"" }}" type="text" class="form-control">
+            {% if form.short_name.errors %}
+            <div class="alert alert-danger">{{ form.short_name.errors }}</div>
+            {% endif %}
+		</div>
+
+		<div class="col-sm-6 form-group">
+			<label for="{{form.full_name.id_for_label}}">Full Name</label>
+			<input name="{{ form.full_name.name }}"  value="{{ form.full_name.value|default:"" }}" type="text"  class="form-control">
+            {% if form.full_name.errors %}
+            <div class="alert alert-danger">{{ form.full_name.errors }}</div>
+            {% endif %}
+		</div>
+	</div>
+
+    <button type="submit" class="btn btn-lg btn-info">Submit</button>
+
+</form>
+
+{% endblock %}
