@@ -47,7 +47,7 @@ class TokenPermissions(permissions.BasePermission):
         else:
             # Default for non token auths
             hasread = True
-            haswrite = True
+            haswrite = request.user.is_superuser
 
         if request.method in permissions.SAFE_METHODS and hasread:
             return True
