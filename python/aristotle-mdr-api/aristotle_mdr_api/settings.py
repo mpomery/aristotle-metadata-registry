@@ -13,7 +13,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        'aristotle_mdr_api.authentication.AristotleTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
     # 'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning'
