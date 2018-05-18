@@ -41,8 +41,16 @@ class TokenPermissions(permissions.BasePermission):
 
             if self.permission_key in perms.keys():
                 perm = perms[self.permission_key]
-                hasread = perm.read
-                haswrite = perm.write
+
+                if 'read' in perm:
+                    hasread = perm['read']
+                else:
+                    hasread = False
+
+                if 'write' in perm:
+                    haswrite = perm['write']
+                else:
+                    haswrite = False
 
         else:
             # Default for non token auths
