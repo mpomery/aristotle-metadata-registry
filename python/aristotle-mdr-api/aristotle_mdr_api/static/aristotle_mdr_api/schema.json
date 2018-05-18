@@ -36,7 +36,7 @@
         }
       }
     },
-    "workgroup": {
+    "organization": {
       "type": "object",
       "title": "Workgroup",
       "description": "Workgroup",

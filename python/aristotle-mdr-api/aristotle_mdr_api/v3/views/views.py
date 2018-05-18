@@ -120,4 +120,4 @@ class OrganizationViewSet(UUIDLookupModelMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = OrganizationSerializer
 
     permission_classes = (permissions.TokenPermissions,)
-    permission_key = 'workgroup'
+    permission_key = 'organization'
