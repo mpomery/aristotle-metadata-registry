@@ -27,6 +27,14 @@ class GetTokenView(LoginRequiredMixin, TemplateView):
         return super().get(request, *args, **kwargs)
 
 
-class TokenCreateView(FormView):
+class TokenCreateView(LoginRequiredMixin, FormView):
     form_class = TokenCreateForm
-    template_name = "aristotle_mdr_api/form.html"
+    template_name = "aristotle_mdr_api/token_create.html"
+
+    def form_valid(self, form):
+        token = AristotleToken.objects.create(
+            name=form.cleaned_data['name'],
+            permissions=form.cleaned_data['perm_json'],
+            user=self.request.user
+        )
+        return self.render_to_response({'key': token.key})

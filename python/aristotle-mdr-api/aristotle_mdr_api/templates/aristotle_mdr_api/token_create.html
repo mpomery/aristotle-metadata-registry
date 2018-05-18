@@ -1,6 +1,12 @@
 {% extends 'aristotle_mdr_api/base.html' %}
 
 {% block api_content %}
+
+{% if key %}
+<p>Success! Your API key is {{ key }}</p>
+{% endif %}
+
+{% if form %}
 <form action="" method="post">
 {% csrf_token %}
 {% for field in form %}
@@ -10,4 +16,5 @@
 {% endfor %}
 <input class="btn btn-primary" type='submit' value='Create Token' />
 </form>
+{% endif %}
 {% endblock %}
