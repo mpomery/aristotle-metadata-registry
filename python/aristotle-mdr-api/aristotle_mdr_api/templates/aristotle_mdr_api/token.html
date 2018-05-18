@@ -1,9 +1,22 @@
 {% extends 'aristotle_mdr_api/base.html' %}
 
 {% block api_content %}
-{% if token %}
-<p>Your token is {{ token }}</p>
-{% else %}
-<p>Token generation failed</p>
-{% endif %}
+
+<table class="table">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Created</th>
+  </tr>
+  </thead>
+  <tbody>
+    {% for token in object_list %}
+    <tr>
+      <td>{{ token.name }}</td>
+      <td>{{ token.created }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
 {% endblock %}
