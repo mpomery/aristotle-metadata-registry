@@ -11,6 +11,7 @@ class AristotleToken(Token):
         max_length=100,
         default='Token'
     )
+    key = models.CharField(_("Key"), max_length=40, unique=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='auth_token',
