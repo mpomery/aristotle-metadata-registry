@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from aristotle_mdr_api.models import AristotleToken
 from aristotle_mdr_api.forms import TokenCreateForm
 
+import json
 
 class APIRootView(TemplateView):
     template_name = "aristotle_mdr_api/base.html"
@@ -30,3 +31,20 @@ class TokenCreateView(LoginRequiredMixin, FormView):
             user=self.request.user
         )
         return self.render_to_response({'key': token.key})
+
+
+class TokenUpdateView(TokenCreateView):
+
+    def get_initial(self):
+        token_id = self.kwargs['token_id']
+
+        try:
+            token = AristotleToken.objects.get(pk=token_id, user=self.request.user)
+        except AristotleToken.DoesNotExist:
+            return super().get_initial()
+
+        initial = {
+            'name': token.name,
+            'perm_json': json.dumps(token.permissions)
+        }
+        return initial

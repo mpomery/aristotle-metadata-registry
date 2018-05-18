@@ -12,7 +12,7 @@
   <tbody>
     {% for token in object_list %}
     <tr>
-      <td>{{ token.name }}</td>
+      <td><a href="{% url 'token_update' token.id %}">{{ token.name }}</a></td>
       <td>{{ token.created }}</td>
     </tr>
     {% endfor %}
