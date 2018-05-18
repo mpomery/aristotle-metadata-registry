@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "title": "Permissions",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "title": "Metadata",
+      "description": "Metadata",
+      "properties": {
+        "read": {
+          "title": "Read Permissions",
+          "type": "boolean",
+          "default": false
+        },
+        "write": {
+          "title": "Write Permissions",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}
