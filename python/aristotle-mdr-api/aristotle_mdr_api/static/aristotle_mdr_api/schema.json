@@ -8,14 +8,65 @@
       "description": "Metadata",
       "properties": {
         "read": {
-          "title": "Read Permissions",
+          "title": "Read",
           "type": "boolean",
-          "default": false
+          "format": "checkbox"
         },
         "write": {
-          "title": "Write Permissions",
+          "title": "Write",
           "type": "boolean",
-          "default": false
+          "format": "checkbox"
+        }
+      }
+    },
+    "search": {
+      "type": "object",
+      "title": "Search",
+      "description": "Search",
+      "properties": {
+        "read": {
+          "title": "Read",
+          "type": "boolean",
+          "format": "checkbox"
+        },
+        "write": {
+          "title": "Write",
+          "type": "boolean",
+          "format": "checkbox"
+        }
+      }
+    },
+    "workgroup": {
+      "type": "object",
+      "title": "Workgroup",
+      "description": "Workgroup",
+      "properties": {
+        "read": {
+          "title": "Read",
+          "type": "boolean",
+          "format": "checkbox"
+        },
+        "write": {
+          "title": "Write",
+          "type": "boolean",
+          "format": "checkbox"
+        }
+      }
+    },
+    "ra": {
+      "type": "object",
+      "title": "Registration Authority",
+      "description": "Registration Authority",
+      "properties": {
+        "read": {
+          "title": "Read",
+          "type": "boolean",
+          "format": "checkbox"
+        },
+        "write": {
+          "title": "Write",
+          "type": "boolean",
+          "format": "checkbox"
         }
       }
     }
