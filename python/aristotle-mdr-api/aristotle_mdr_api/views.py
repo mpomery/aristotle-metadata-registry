@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import permission_required
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.views.generic import TemplateView, FormView, ListView
+from django.views.generic import TemplateView, FormView, ListView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from aristotle_mdr_api.models import AristotleToken
@@ -58,3 +58,12 @@ class TokenUpdateView(TokenCreateView):
             context.pop('form')
 
         return context
+
+
+class TokenDeleteView(DeleteView):
+    model = AristotleToken
+    pk_url_kwarg = 'token_id'
+    template_name = 'aristotle_mdr_api/token_delete.html'
+
+    def get_queryset(self):
+        return AristotleToken.objects.filter(user=self.request.user)

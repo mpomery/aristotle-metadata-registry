@@ -2,7 +2,7 @@ from django.conf.urls import include, url
 from rest_framework.documentation import include_docs_urls
 from rest_framework_swagger.views import get_swagger_view
 from django.utils.module_loading import import_string
-from .views import APIRootView, TokenListView, TokenCreateView, TokenUpdateView
+from .views import APIRootView, TokenListView, TokenCreateView, TokenUpdateView, TokenDeleteView
 # from rest_framework.authtoken import views as tokenviews
 
 import re
@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^tokenlist/', TokenListView.as_view(), name='token_list'),
     url(r'^tokencreate/', TokenCreateView.as_view(), name='token_create'),
     url(r'^tokenupdate/(?P<token_id>\d+)/', TokenUpdateView.as_view(), name='token_update'),
+    url(r'^tokendelete/(?P<token_id>\d+)/', TokenDeleteView.as_view(), name='token_delete'),
 
     url(r'^(?P<version>(v2|v3)?)/schemas/', version_schema),
     url(r'^schemas/', get_swagger_view(title='Aristotle API')),
