@@ -2,6 +2,12 @@
 
 {% block api_content %}
 
+{% if error %}
+<div class="alert alert-danger">
+<p>{{ error }}</p>
+</div>
+{% endif %}
+
 {% if key %}
 <p>Success! Your API key is {{ key }}</p>
 {% endif %}

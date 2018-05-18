@@ -41,10 +41,20 @@ class TokenUpdateView(TokenCreateView):
         try:
             token = AristotleToken.objects.get(pk=token_id, user=self.request.user)
         except AristotleToken.DoesNotExist:
-            return super().get_initial()
+            return {}
 
         initial = {
             'name': token.name,
             'perm_json': json.dumps(token.permissions)
         }
         return initial
+
+    def get_context_data(self):
+
+        context = super().get_context_data()
+
+        if not context['form'].initial:
+            context['error'] = 'Token could not be found'
+            context.pop('form')
+
+        return context
