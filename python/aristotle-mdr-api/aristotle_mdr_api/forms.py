@@ -4,7 +4,7 @@ from django_jsonforms.forms import JSONSchemaField
 
 class TokenCreateForm(Form):
 
-    name = CharField()
+    name = CharField(max_length=100)
     perm_json = JSONSchemaField(
         schema = 'aristotle_mdr_api/schema.json',
         options = {
