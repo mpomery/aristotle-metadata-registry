@@ -19,3 +19,6 @@ class AristotleToken(Token):
         verbose_name=_("User")
     )
     permissions = JSONField()
+
+    def __str__(self):
+        return self.name
