@@ -22,7 +22,7 @@
     "search": {
       "type": "object",
       "title": "Search",
-      "description": "Search",
+      "description": "Search Metadata",
       "properties": {
         "read": {
           "title": "Read",
@@ -33,16 +33,11 @@
     },
     "organization": {
       "type": "object",
-      "title": "Workgroup",
-      "description": "Workgroup",
+      "title": "Organization",
+      "description": "Organization Access",
       "properties": {
         "read": {
           "title": "Read",
-          "type": "boolean",
-          "format": "checkbox"
-        },
-        "write": {
-          "title": "Write",
           "type": "boolean",
           "format": "checkbox"
         }
@@ -51,15 +46,10 @@
     "ra": {
       "type": "object",
       "title": "Registration Authority",
-      "description": "Registration Authority",
+      "description": "Registration Authority Access",
       "properties": {
         "read": {
           "title": "Read",
-          "type": "boolean",
-          "format": "checkbox"
-        },
-        "write": {
-          "title": "Write",
           "type": "boolean",
           "format": "checkbox"
         }

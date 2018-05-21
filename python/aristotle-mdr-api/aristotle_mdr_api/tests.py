@@ -8,7 +8,7 @@ from rest_framework.test import APIClient
 
 import json
 
-@override_settings(SECURE_SSL_REDIRECT=False)
+
 class TokenTestCase(utils.LoggedInViewPages, TestCase):
 
     def setUp(self):
@@ -25,12 +25,10 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
                 'read': False
             },
             'organization': {
-                'read': False,
-                'write': False
+                'read': False
             },
             'ra': {
-                'read': False,
-                'write': False
+                'read': False
             }
         }
 
@@ -43,12 +41,10 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
                 'read': True
             },
             'organization': {
-                'read': True,
-                'write': True
+                'read': True
             },
             'ra': {
-                'read': True,
-                'write': True
+                'read': True
             }
         }
 
