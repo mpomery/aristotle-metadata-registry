@@ -60,8 +60,15 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
             }
         }
 
-        token = self.get_token('MyToken', perms)
+        token_key = self.get_token('MyToken', perms)
         self.assertEqual(AristotleToken.objects.count(), 1)
+
+        token_obj = AristotleToken.objects.get(key=token_key)
+        self.assertEqual(token_obj.permissions, perms)
+        self.assertEqual(token_obj.name, 'MyToken')
+        self.assertEqual(token_obj.user, self.viewer)
+        self.assertIsNotNone(token_obj.key)
+        self.assertIsNotNone(token_obj.id)
 
     def test_token_perms(self):
 
