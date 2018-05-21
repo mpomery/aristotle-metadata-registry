@@ -183,6 +183,35 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         self.assertTrue('error' in response.context)
         self.assertFalse('display_regenerate' in response.context)
 
+    @tag('reg')
+    def test_regenerate_token(self):
+
+        editor_token = self.get_editor_a_token()
+
+        self.login_viewer()
+        token_key = self.get_token('Forgotten Token', self.all_true_perms)
+        token_obj = AristotleToken.objects.get(key=token_key)
+        token_id = token_obj.id
+
+        # Test regenerating a token
+        reg_url = reverse('token_regenerate', args=[token_id])
+        response = self.client.get(reg_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'aristotle_mdr_api/token_create.html')
+        self.assertTrue('key' in response.context)
+        self.assertNotEqual(response.context['key'], token_key)
+
+        regenerated_token = AristotleToken.objects.get(key=response.context['key'])
+        self.assertEqual(regenerated_token.name, 'Forgotten Token')
+
+        # Test user cannot regenerate a token that aint theirs
+        bad_reg_url = reverse('token_regenerate', args=[editor_token.id])
+        response = self.client.get(bad_reg_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('error' in response.context)
+        self.assertFalse('key' in response.context)
+
     def test_token_perms(self):
 
         self.login_viewer()
