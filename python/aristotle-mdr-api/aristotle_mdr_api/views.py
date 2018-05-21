@@ -32,6 +32,10 @@ class TokenCreateView(LoginRequiredMixin, FormView):
         )
         return self.render_to_response({'key': token.key})
 
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['submit_text'] = 'Create Token'
+        return context
 
 class TokenUpdateView(TokenCreateView):
 
@@ -52,6 +56,9 @@ class TokenUpdateView(TokenCreateView):
     def get_context_data(self):
 
         context = super().get_context_data()
+        context['display_regenerate'] = True
+        context['token_id'] = self.kwargs['token_id']
+        context['submit_text'] = 'Update Token'
 
         if not context['form'].initial:
             context['error'] = 'Token could not be found'
@@ -60,7 +67,24 @@ class TokenUpdateView(TokenCreateView):
         return context
 
 
-class TokenDeleteView(DeleteView):
+class TokenRegenerateView(LoginRequiredMixin, TemplateView):
+    template_name = "aristotle_mdr_api/token_create.html"
+
+    def get(self, request, *args, **kwargs):
+        token_id = self.kwargs['token_id']
+
+        try:
+            token = AristotleToken.objects.get(id=token_id, user=self.request.user)
+        except AristotleToken.DoesNotExist:
+            return self.render_to_response({'error': 'Could not regenerate token'})
+
+        token.key = token.generate_key()
+        token.save()
+
+        return self.render_to_response({'key': token.key})
+
+
+class TokenDeleteView(LoginRequiredMixin, DeleteView):
     model = AristotleToken
     pk_url_kwarg = 'token_id'
     template_name = 'aristotle_mdr_api/token_delete.html'
