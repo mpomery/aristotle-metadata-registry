@@ -27,7 +27,11 @@
 <p>Be sure to copy your new token. As you will not be able to view it again</p>
 </div>
 <script>
-new ClipboardJS('#copybutton');
+if (ClipboardJS.isSupported()) {
+  new ClipboardJS('#copybutton');
+} else {
+  $('#copybutton').remove()
+}
 </script>
 {% endif %}
 
