@@ -32,7 +32,7 @@ def version_schema(*args, **kwargs):
 urlpatterns = [
     url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
     # url(r'^api-token-auth/', tokenviews.obtain_auth_token),
-    url(r'^token', include('aristotle_mdr_api.token_auth.urls')),
+    url(r'^token/', include('aristotle_mdr_api.token_auth.urls')),
     url(r'^(?P<version>(v2|v3)?)/schemas/', version_schema),
     url(r'^schemas/', get_swagger_view(title='Aristotle API')),
     url(r'^$', APIRootView.as_view(), name="aristotle_api_root"),
