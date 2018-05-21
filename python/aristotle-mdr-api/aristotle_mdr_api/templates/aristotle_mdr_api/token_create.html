@@ -11,7 +11,6 @@
 {% if key %}
 <p>Success! Your API key is {{ key }}</p>
 <p>Be sure to copy your new token. As you will not be able to view it again</p>
-<a class="btn btn-default" href="{% url 'token_list' %}">Back</a>
 {% endif %}
 
 {% if display_regenerate %}
@@ -32,6 +31,8 @@
   <input class="btn btn-primary" type='submit' value='{{ submit_text }}' />
   <a class="btn btn-default" href="{% url 'token_list' %}">Back</a>
 </form>
+{% else %}
+<a class="btn btn-default" href="{% url 'token_list' %}">Back</a>
 {% endif %}
 
 {% endblock %}
