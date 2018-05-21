@@ -16,7 +16,7 @@
 {% if display_regenerate %}
 <div class="alert alert-warning">
 <p>This will generate a new key for this token. Invalidating the old one</p>
-<a class="btn btn-default" href="{% url 'token_regenerate' token_id %}">Regenerate Token</a>
+<a class="btn btn-default" href="{% url 'token_auth:token_regenerate' token_id %}">Regenerate Token</a>
 </div>
 {% endif %}
 
@@ -29,10 +29,10 @@
   {{ field }}
   {% endfor %}
   <input class="btn btn-primary" type='submit' value='{{ submit_text }}' />
-  <a class="btn btn-default" href="{% url 'token_list' %}">Back</a>
+  <a class="btn btn-default" href="{% url 'token_auth:token_list' %}">Back</a>
 </form>
 {% else %}
-<a class="btn btn-default" href="{% url 'token_list' %}">Back</a>
+<a class="btn btn-default" href="{% url 'token_auth:token_list' %}">Back</a>
 {% endif %}
 
 {% endblock %}

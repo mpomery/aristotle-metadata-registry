@@ -117,4 +117,4 @@ class TokenDeleteView(LoginRequiredMixin, DeleteView):
         return AristotleToken.objects.filter(user=self.request.user)
 
     def get_success_url(self):
-        return reverse('token_list')
+        return reverse('token_auth:token_list')

@@ -57,7 +57,7 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
     def post_token_create(self, name, perms):
 
         postdata = {'name': name, 'perm_json': json.dumps(perms)}
-        response = self.client.post(reverse('token_create'), postdata)
+        response = self.client.post(reverse('token_auth:token_create'), postdata)
         return response
 
     def get_token(self, name, perms):
@@ -79,13 +79,13 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
 
     def test_create_token(self):
 
-        response = self.client.get(reverse('token_create'))
+        response = self.client.get(reverse('token_auth:token_create'))
         self.assertEqual(response.status_code, 302)
 
         self.login_viewer()
 
         self.assertEqual(AristotleToken.objects.count(), 0)
-        response = self.client.get(reverse('token_create'))
+        response = self.client.get(reverse('token_auth:token_create'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'aristotle_mdr_api/token_create.html')
 
@@ -116,7 +116,7 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         token_obj = AristotleToken.objects.get(key=token_key)
         token_id = token_obj.id
 
-        delete_url = reverse('token_delete', args=[token_id])
+        delete_url = reverse('token_auth:token_delete', args=[token_id])
 
         # Check delete confirm page loads
         response = self.client.get(delete_url)
@@ -125,11 +125,11 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
 
         # Check object can be deleted
         post_response = self.client.post(delete_url, {})
-        self.assertRedirects(post_response, reverse('token_list'))
+        self.assertRedirects(post_response, reverse('token_auth:token_list'))
         self.assertFalse(AristotleToken.objects.filter(id=token_id).exists())
 
         # Check user cannot delete a non owned token
-        bad_delete_url = reverse('token_delete', args=[editor_token.id])
+        bad_delete_url = reverse('token_auth:token_delete', args=[editor_token.id])
         post_response = self.client.post(bad_delete_url, {})
         self.assertEqual(post_response.status_code, 404)
 
@@ -143,7 +143,7 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         token_id = token_obj.id
         initial_perms = token_obj.permissions
 
-        update_url = reverse('token_update', args=[token_id])
+        update_url = reverse('token_auth:token_update', args=[token_id])
 
         # Check initial form data
         response = self.client.get(update_url)
@@ -169,7 +169,7 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         self.assertEqual(updated_token.name, 'My Updated Token')
 
         # Check updating another users token isnt allowed
-        bad_update_url = reverse('token_update', args=[editor_token.id])
+        bad_update_url = reverse('token_auth:token_update', args=[editor_token.id])
 
         response = self.client.get(bad_update_url)
         self.assertEqual(response.status_code, 200)
@@ -194,7 +194,7 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         token_id = token_obj.id
 
         # Test regenerating a token
-        reg_url = reverse('token_regenerate', args=[token_id])
+        reg_url = reverse('token_auth:token_regenerate', args=[token_id])
         response = self.client.get(reg_url)
 
         self.assertEqual(response.status_code, 200)
@@ -206,7 +206,7 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         self.assertEqual(regenerated_token.name, 'Forgotten Token')
 
         # Test user cannot regenerate a token that aint theirs
-        bad_reg_url = reverse('token_regenerate', args=[editor_token.id])
+        bad_reg_url = reverse('token_auth:token_regenerate', args=[editor_token.id])
         response = self.client.get(bad_reg_url)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('error' in response.context)
