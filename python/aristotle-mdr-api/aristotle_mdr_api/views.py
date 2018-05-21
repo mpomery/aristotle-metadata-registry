@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView, FormView, ListView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse
 
 from aristotle_mdr_api.models import AristotleToken
 from aristotle_mdr_api.forms import TokenCreateForm
@@ -91,3 +92,6 @@ class TokenDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return AristotleToken.objects.filter(user=self.request.user)
+
+    def get_success_url(self):
+        return reverse('token_list')
