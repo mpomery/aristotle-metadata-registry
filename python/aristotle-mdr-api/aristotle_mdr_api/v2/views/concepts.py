@@ -61,7 +61,7 @@ class ConceptDetailSerializer(ConceptSerializerBase):
         if instance.item.uuid not in self.object_cache.keys():
             self.object_cache[instance.item.uuid] = Serializer().serialize([instance.item])[0]
         return self.object_cache[instance.item.uuid]
-        
+
     class Meta:
         model = models._concept
         fields = standard_fields+('fields','statuses','ids','slots', 'links')
@@ -93,7 +93,7 @@ class ConceptViewSet(
     UUIDLookupModelMixin,
     #mixins.RetrieveModelMixin,
                     #mixins.UpdateModelMixin,
-                    
+
                     #viewsets.ModelViewSet):
     viewsets.ReadOnlyModelViewSet):
     """
@@ -113,8 +113,8 @@ class ConceptViewSet(
     filter_backends = (concept_backend.ConceptFilterBackend,)
     filter_class = concept_backend.ConceptFilter
 
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (permissions.IsSuperuserOrReadOnly,)
+    permission_classes = (permissions.TokenPermissions,)
+    permission_key = 'metadata'
 
 
     def get_queryset(self):
@@ -125,7 +125,7 @@ class ConceptViewSet(
 
         """
         self.queryset = self.get_content_type_for_request().objects.all()
-        
+
         queryset = super(ConceptViewSet,self).get_queryset()
         if self.request:
             concepttype = self.request.query_params.get('type', None)
@@ -170,7 +170,7 @@ class ConceptViewSet(
             class SpecialFilter(self.filter_class):
                 class Meta(self.filter_class.Meta):
                     model = content_type
-            
+
             self.filter_class = SpecialFilter
 
         return content_type
@@ -209,7 +209,7 @@ class ConceptViewSet(
                         })
                         s.submitter = request.user
                         s.object.recache_states()
-        
+
                         reversion.set_user(request.user)
                         reversion.set_comment(
                             _("Imported using API")
