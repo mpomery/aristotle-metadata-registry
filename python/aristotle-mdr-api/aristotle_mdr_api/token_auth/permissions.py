@@ -21,6 +21,9 @@ class TokenPermissions(permissions.BasePermission):
 
         # request.auth will be None when using any other default authentication class
         if token is not None:
+            hasread = False
+            haswrite = False
+
             perms = token.permissions
 
             if self.permission_key in perms.keys():
@@ -28,13 +31,9 @@ class TokenPermissions(permissions.BasePermission):
 
                 if 'read' in perm:
                     hasread = perm['read']
-                else:
-                    hasread = False
 
                 if 'write' in perm:
                     haswrite = perm['write']
-                else:
-                    haswrite = False
 
         else:
             # Default for non token auths
