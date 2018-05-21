@@ -16,6 +16,44 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         self.client = Client()
         self.apiclient = APIClient()
 
+        self.all_false_perms =  {
+            'metadata': {
+                'read': False,
+                'write': False
+            },
+            'search': {
+                'read': False
+            },
+            'organization': {
+                'read': False,
+                'write': False
+            },
+            'ra': {
+                'read': False,
+                'write': False
+            }
+        }
+
+        self.all_true_perms =  {
+            'metadata': {
+                'read': True,
+                'write': True
+            },
+            'search': {
+                'read': True
+            },
+            'organization': {
+                'read': True,
+                'write': True
+            },
+            'ra': {
+                'read': True,
+                'write': True
+            }
+        }
+
+    # ------ Util Functions ------
+
     def post_token_create(self, name, perms):
 
         postdata = {'name': name, 'perm_json': json.dumps(perms)}
@@ -29,6 +67,16 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         self.assertTrue('key' in response.context.keys())
         return response.context['key']
 
+    def get_editor_a_token(self):
+        token = AristotleToken.objects.create(
+            name='Editor Token',
+            user=self.editor,
+            permissions=self.all_true_perms
+        )
+        return token
+
+    # ------ Tests ------
+
     def test_create_token(self):
 
         response = self.client.get(reverse('token_create'))
@@ -41,24 +89,12 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'aristotle_mdr_api/token_create.html')
 
-        perms = {
-            'metadata': {
-                'read': True,
-                'write': False
-            },
-            'search': {
-                'read': True,
-                'write': False
-            },
-            'organization': {
-                'read': True,
-                'write': False
-            },
-            'ra': {
-                'read': True,
-                'write': False
-            }
-        }
+        perms = self.all_false_perms
+
+        perms['metadata']['read'] = True
+        perms['search']['read'] = True
+        perms['organization']['read'] = True
+        perms['ra']['read'] = True
 
         token_key = self.get_token('MyToken', perms)
         self.assertEqual(AristotleToken.objects.count(), 1)
@@ -70,28 +106,41 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         self.assertIsNotNone(token_obj.key)
         self.assertIsNotNone(token_obj.id)
 
+    def test_delete_token(self):
+
+        editor_token = self.get_editor_a_token()
+
+        self.login_viewer()
+
+        token_key = self.get_token('Brand New Token', self.all_true_perms)
+        token_obj = AristotleToken.objects.get(key=token_key)
+        token_id = token_obj.id
+
+        delete_url = reverse('token_delete', args=[token_id])
+
+        # Check delete confirm page loads
+        response = self.client.get(delete_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'aristotle_mdr_api/token_delete.html')
+
+        # Check object can be deleted
+        post_response = self.client.post(delete_url, {})
+        self.assertRedirects(post_response, reverse('token_list'))
+        self.assertFalse(AristotleToken.objects.filter(id=token_id).exists())
+
+        # Check user cannot delete a non owned token
+        bad_delete_url = reverse('token_delete', args=[editor_token.id])
+        post_response = self.client.post(bad_delete_url, {})
+        self.assertEqual(post_response.status_code, 404)
+
     def test_token_perms(self):
 
         self.login_viewer()
 
-        perms = {
-            'metadata': {
-                'read': True,
-                'write': False
-            },
-            'search': {
-                'read': False,
-                'write': False
-            },
-            'organization': {
-                'read': False,
-                'write': False
-            },
-            'ra': {
-                'read': True,
-                'write': False
-            }
-        }
+        perms = self.all_false_perms
+
+        perms['metadata']['read'] = True
+        perms['ra']['read'] = True
 
         token = self.get_token('MyToken', perms)
 
