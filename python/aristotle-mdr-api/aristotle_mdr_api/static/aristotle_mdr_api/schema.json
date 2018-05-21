@@ -28,11 +28,6 @@
           "title": "Read",
           "type": "boolean",
           "format": "checkbox"
-        },
-        "write": {
-          "title": "Write",
-          "type": "boolean",
-          "format": "checkbox"
         }
       }
     },
