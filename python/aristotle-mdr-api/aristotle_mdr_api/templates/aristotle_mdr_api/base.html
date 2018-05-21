@@ -17,8 +17,8 @@
 </div>
 
 {% block api_content %}
-<p>
-The following versions of the API are available on this server:
+
+<h3>The following versions of the API are available on this server:</h3>
 <ul class="list-group">
   <li class="list-group-item">
     <strong><a href='{% url "aristotle_api_root" %}v3'>API v3</a></strong>
@@ -41,11 +41,21 @@ The following versions of the API are available on this server:
 </ul>
 
 
-</p>
-
+<h3>Authentication</h3>
+<ul class="list-group">
+  <li class="list-group-item">
+    <a href="{% url 'token_list' %}">Token Management Page</a>
+    <p>Create and manage API access tokens</p>
+  </li>
+  <li class="list-group-item">
+    <a href="{% url 'friendly_login' %}">Login</a>
+    <p>Login to an account for session authentication</p>
+  </li>
+</ul>
 
 To see a full list of endpoints review the
 <a href='{% url "aristotle_api_root" %}schemas'>Aristotle API Swagger documentation</a>
+
 {% endblock %}
 
 
