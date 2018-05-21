@@ -58,7 +58,7 @@ class TokenUpdateView(LoginRequiredMixin, FormView):
         token.permissions = form.cleaned_data['perm_json']
         token.save()
 
-        return self.render_to_response({'key': token.key})
+        return self.render_to_response({'message': 'Your token has been updated'})
 
     def get_initial(self):
 

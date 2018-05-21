@@ -8,9 +8,17 @@
 </div>
 {% endif %}
 
+{% if message %}
+<div class="alert alert-success">
+<p>{{ message }}</p>
+</div>
+{% endif %}
+
 {% if key %}
+<div class="alert alert-success">
 <p>Success! Your API key is {{ key }}</p>
 <p>Be sure to copy your new token. As you will not be able to view it again</p>
+</div>
 {% endif %}
 
 {% if display_regenerate %}

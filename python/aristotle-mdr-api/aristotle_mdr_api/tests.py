@@ -157,7 +157,8 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         post_response = self.client.post(update_url, {'name': 'My Updated Token', 'perm_json': json.dumps(perms)})
         self.assertEqual(post_response.status_code, 200)
         self.assertTemplateUsed('aristotle_mdr_api/token_create.html')
-        self.assertTrue('key' in post_response.context)
+        self.assertFalse('key' in post_response.context)
+        self.assertTrue('message' in post_response.context)
 
         updated_token = AristotleToken.objects.get(id=token_id)
         self.assertEqual(updated_token.key, token_key)
