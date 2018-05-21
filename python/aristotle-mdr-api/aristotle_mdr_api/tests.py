@@ -133,6 +133,37 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         post_response = self.client.post(bad_delete_url, {})
         self.assertEqual(post_response.status_code, 404)
 
+    def test_update_token(self):
+
+        self.login_viewer()
+        token_key = self.get_token('Real Neat Token', self.all_true_perms)
+        token_obj = AristotleToken.objects.get(key=token_key)
+        token_id = token_obj.id
+        initial_perms = token_obj.permissions
+
+        update_url = reverse('token_update', args=[token_id])
+
+        response = self.client.get(update_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'aristotle_mdr_api/token_create.html')
+
+        self.assertTrue(response.context['display_regenerate'])
+        self.assertEqual(response.context['form'].initial['perm_json'], json.dumps(initial_perms))
+        self.assertEqual(response.context['form'].initial['name'], 'Real Neat Token')
+
+        perms = self.all_true_perms
+        perms['metadata']['read'] = False
+
+        post_response = self.client.post(update_url, {'name': 'My Updated Token', 'perm_json': json.dumps(perms)})
+        self.assertEqual(post_response.status_code, 200)
+        self.assertTemplateUsed('aristotle_mdr_api/token_create.html')
+        self.assertTrue('key' in post_response.context)
+
+        updated_token = AristotleToken.objects.get(id=token_id)
+        self.assertEqual(updated_token.key, token_key)
+        self.assertEqual(updated_token.permissions['metadata']['read'], False)
+        self.assertEqual(updated_token.name, 'My Updated Token')
+
     def test_token_perms(self):
 
         self.login_viewer()
