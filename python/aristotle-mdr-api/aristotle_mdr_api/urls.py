@@ -2,7 +2,7 @@ from django.conf.urls import include, url
 from rest_framework.documentation import include_docs_urls
 from rest_framework_swagger.views import get_swagger_view
 from django.utils.module_loading import import_string
-from .views import APIRootView, TokenListView, TokenCreateView, TokenUpdateView, TokenDeleteView, TokenRegenerateView
+from .views import APIRootView
 # from rest_framework.authtoken import views as tokenviews
 
 import re
@@ -32,12 +32,7 @@ def version_schema(*args, **kwargs):
 urlpatterns = [
     url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
     # url(r'^api-token-auth/', tokenviews.obtain_auth_token),
-    url(r'^tokenlist/', TokenListView.as_view(), name='token_list'),
-    url(r'^tokencreate/', TokenCreateView.as_view(), name='token_create'),
-    url(r'^tokenupdate/(?P<token_id>\d+)/', TokenUpdateView.as_view(), name='token_update'),
-    url(r'^tokendelete/(?P<token_id>\d+)/', TokenDeleteView.as_view(), name='token_delete'),
-    url(r'^tokenregenerate/(?P<token_id>\d+)/', TokenRegenerateView.as_view(), name='token_regenerate'),
-
+    url(r'^token', include('aristotle_mdr_api.token_auth.urls')),
     url(r'^(?P<version>(v2|v3)?)/schemas/', version_schema),
     url(r'^schemas/', get_swagger_view(title='Aristotle API')),
     url(r'^$', APIRootView.as_view(), name="aristotle_api_root"),

@@ -2,7 +2,7 @@ from django.test import TestCase, Client, override_settings, tag
 from django.urls import reverse
 
 from aristotle_mdr.tests import utils
-from aristotle_mdr_api.models import AristotleToken
+from aristotle_mdr_api.token_auth.models import AristotleToken
 
 from rest_framework.test import APIClient
 
