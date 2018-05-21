@@ -14,7 +14,7 @@ class TokenListView(LoginRequiredMixin, ListView):
     template_name = "aristotle_mdr_api/token.html"
 
     def get_queryset(self):
-        return AristotleToken.objects.filter(user=self.request.user)
+        return AristotleToken.objects.filter(user=self.request.user).order_by('created')
 
 
 class TokenCreateView(LoginRequiredMixin, FormView):
