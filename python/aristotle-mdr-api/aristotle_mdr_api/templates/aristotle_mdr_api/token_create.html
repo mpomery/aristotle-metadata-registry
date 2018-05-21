@@ -1,5 +1,12 @@
 {% extends 'aristotle_mdr_api/base.html' %}
 
+{% block extra_head_scripts %}
+{{ block.super }}
+{% if key %}
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+{% endif %}
+{% endblock %}
+
 {% block api_content %}
 
 {% if error %}
@@ -16,9 +23,12 @@
 
 {% if key %}
 <div class="alert alert-success">
-<p>Success! Your API key is {{ key }}</p>
+<p>Success! Your API key is <span id="key">{{ key }}</span> <button id="copybutton" class="btn btn-default" data-clipboard-target="#key">Copy</button></p>
 <p>Be sure to copy your new token. As you will not be able to view it again</p>
 </div>
+<script>
+new ClipboardJS('#copybutton');
+</script>
 {% endif %}
 
 {% if display_regenerate %}
