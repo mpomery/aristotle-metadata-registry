@@ -22,10 +22,8 @@
 {% endif %}
 
 {% if key %}
-<div class="alert alert-success">
-<p>Success! Your API key is <span id="key">{{ key }}</span> <button id="copybutton" class="btn btn-default" data-clipboard-target="#key">Copy</button></p>
+<p>Success! Your API key is <span id="key">{{ key }}</span> <button id="copybutton" class="btn btn-default btn-sm" data-clipboard-target="#key">Copy</button></p>
 <p>Be sure to copy your new token. As you will not be able to view it again</p>
-</div>
 <script>
 if (ClipboardJS.isSupported()) {
   new ClipboardJS('#copybutton');
