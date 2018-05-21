@@ -56,7 +56,7 @@ class TokenUpdateView(LoginRequiredMixin, FormView):
         token = self.get_token()
 
         if token is None:
-            return render_to_response({'error': 'Token could not be updated'})
+            return self.render_to_response({'error': 'Token could not be updated'})
 
         token.name = form.cleaned_data['name']
         token.permissions = form.cleaned_data['perm_json']

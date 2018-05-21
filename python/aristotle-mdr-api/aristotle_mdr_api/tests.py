@@ -135,6 +135,8 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
 
     def test_update_token(self):
 
+        editor_token = self.get_editor_a_token()
+
         self.login_viewer()
         token_key = self.get_token('Real Neat Token', self.all_true_perms)
         token_obj = AristotleToken.objects.get(key=token_key)
@@ -143,6 +145,7 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
 
         update_url = reverse('token_update', args=[token_id])
 
+        # Check initial form data
         response = self.client.get(update_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'aristotle_mdr_api/token_create.html')
@@ -151,6 +154,7 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         self.assertEqual(response.context['form'].initial['perm_json'], json.dumps(initial_perms))
         self.assertEqual(response.context['form'].initial['name'], 'Real Neat Token')
 
+        # Check token object updated on post
         perms = self.all_true_perms
         perms['metadata']['read'] = False
 
@@ -163,6 +167,21 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         self.assertEqual(updated_token.key, token_key)
         self.assertEqual(updated_token.permissions['metadata']['read'], False)
         self.assertEqual(updated_token.name, 'My Updated Token')
+
+        # Check updating another users token isnt allowed
+        bad_update_url = reverse('token_update', args=[editor_token.id])
+
+        response = self.client.get(bad_update_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed('aristotle_mdr_api/token_create.html')
+        self.assertTrue('error' in response.context)
+        self.assertFalse('display_regenerate' in response.context)
+
+        post_response = self.client.post(bad_update_url, {'name': 'Useless Token', 'perm_json': json.dumps(self.all_false_perms)})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed('aristotle_mdr_api/token_create.html')
+        self.assertTrue('error' in response.context)
+        self.assertFalse('display_regenerate' in response.context)
 
     def test_token_perms(self):
 
