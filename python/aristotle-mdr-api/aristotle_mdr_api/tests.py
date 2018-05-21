@@ -183,7 +183,6 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         self.assertTrue('error' in response.context)
         self.assertFalse('display_regenerate' in response.context)
 
-    @tag('reg')
     def test_regenerate_token(self):
 
         editor_token = self.get_editor_a_token()
@@ -211,6 +210,30 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('error' in response.context)
         self.assertFalse('key' in response.context)
+
+    def test_list_tokens(self):
+
+        editor_token = self.get_editor_a_token()
+
+        self.login_viewer()
+
+        token_key_1 = self.get_token('My First Token', self.all_true_perms)
+        token_key_2 = self.get_token('My Second Token', self.all_true_perms)
+
+        self.assertEqual(AristotleToken.objects.count(), 3)
+
+        listurl = reverse('token_auth:token_list')
+
+        # Test page load
+        response = self.client.get(listurl)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'aristotle_mdr_api/token.html')
+
+        # Test only shown your own tokens
+        object_list = response.context['object_list']
+        self.assertEqual(len(object_list), 2)
+        self.assertEqual(object_list[0].name, 'My First Token')
+        self.assertEqual(object_list[1].name, 'My Second Token')
 
     def test_token_perms(self):
 
