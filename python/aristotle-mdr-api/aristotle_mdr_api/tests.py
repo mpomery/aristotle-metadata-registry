@@ -235,6 +235,7 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         self.assertEqual(object_list[0].name, 'My First Token')
         self.assertEqual(object_list[1].name, 'My Second Token')
 
+    @tag('perms')
     def test_token_perms(self):
 
         self.login_viewer()
@@ -243,6 +244,7 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
 
         perms['metadata']['read'] = True
         perms['ra']['read'] = True
+        perms['metadata']['write'] = True
 
         token = self.get_token('MyToken', perms)
 
@@ -250,7 +252,12 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
 
         auth = 'Token {}'.format(token)
 
+        # Test that only the endpoints we have perms for are accessable. Anything else should 403
+        # HTTP 403 is Authorized but not able to fulfill request
         response = self.client.get('/api/v3/metadata/', HTTP_AUTHORIZATION=auth)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post('/api/v3/metadata/', {}, HTTP_AUTHORIZATION=auth)
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get('/api/v3/search/', HTTP_AUTHORIZATION=auth)
@@ -262,5 +269,51 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         response = self.client.get('/api/v3/ras/', HTTP_AUTHORIZATION=auth)
         self.assertEqual(response.status_code, 200)
 
+        # Types read access is always allowed
         response = self.client.get('/api/v3/types/', HTTP_AUTHORIZATION=auth)
         self.assertEqual(response.status_code, 200)
+
+        # Update the tokens permissions
+
+        token_obj = AristotleToken.objects.get(key=token)
+        perms['metadata']['write'] = False
+        perms['organization']['read'] = True
+        perms['ra']['read'] = False
+        token_obj.permissions = perms
+        token_obj.save()
+
+        # Test the changes are reflected in access
+
+        response = self.client.post('/api/v3/metadata/', {}, HTTP_AUTHORIZATION=auth)
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.get('/api/v3/organizations/', HTTP_AUTHORIZATION=auth)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/api/v3/ras/', HTTP_AUTHORIZATION=auth)
+        self.assertEqual(response.status_code, 403)
+
+    @tag('perms')
+    def test_invalid_token_perms(self):
+
+        self.client.logout()
+        auth = 'Token {}'.format('let_me_in_plz_this_is_a_real_token')
+
+        # Test API Access (HTTP 401 is Unauthorized)
+        response = self.client.get('/api/v3/metadata/', HTTP_AUTHORIZATION=auth)
+        self.assertEqual(response.status_code, 401)
+
+        response = self.client.post('/api/v3/metadata/', {}, HTTP_AUTHORIZATION=auth)
+        self.assertEqual(response.status_code, 401)
+
+        response = self.client.get('/api/v3/search/', HTTP_AUTHORIZATION=auth)
+        self.assertEqual(response.status_code, 401)
+
+        response = self.client.get('/api/v3/organizations/', HTTP_AUTHORIZATION=auth)
+        self.assertEqual(response.status_code, 401)
+
+        response = self.client.get('/api/v3/ras/', HTTP_AUTHORIZATION=auth)
+        self.assertEqual(response.status_code, 401)
+
+        response = self.client.get('/api/v3/types/', HTTP_AUTHORIZATION=auth)
+        self.assertEqual(response.status_code, 401)
