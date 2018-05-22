@@ -33,6 +33,7 @@ setup(
         'djangorestframework>=3.0',
         'django-rest-swagger',
         'django_filter',
+        'django-jsonforms'
         # 'aristotle-metadata-registry'
     ]
 
