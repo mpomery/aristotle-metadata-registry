@@ -19,6 +19,8 @@ from ..serializers.base import Serializer, Deserializer, exclude_fields
 from ..filters import concept_backend
 from .. import permissions
 
+from aristotle_mdr_api.token_auth.permissions import TokenPermissions
+
 from ..views.utils import (
     DescriptionStubSerializerMixin,
     MultiSerializerViewSetMixin,
@@ -113,7 +115,7 @@ class ConceptViewSet(
     filter_backends = (concept_backend.ConceptFilterBackend,)
     filter_class = concept_backend.ConceptFilter
 
-    permission_classes = (permissions.TokenPermissions,)
+    permission_classes = (TokenPermissions,)
     permission_key = 'metadata'
 
 
