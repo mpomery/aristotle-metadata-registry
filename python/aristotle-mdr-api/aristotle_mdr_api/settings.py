@@ -4,6 +4,7 @@ REQUIRED_APPS = (
     'rest_framework',
     'rest_framework_swagger',
     'django_filters',
+    'django_jsonforms'
 )
 
 SERIALIZATION_MODULES = { 'mdrjson' : 'aristotle_mdr_api.serializers.idjson' }
