@@ -1,0 +1,9 @@
+coverage
+whoosh
+python-decouple
+dj-database-url
+flake8
+django-tools
+mock
+wcag-zoo
+django-silk
