@@ -87,8 +87,7 @@ jobs:
 
     - stage: documentation
       python: 3.6
-      env: MODULE=aristotle-metadata-registry
-      script: ./scripts/tox_if.sh $MODULE docs
+      script: ./scripts/tox_if.sh docs
 
     - stage: testing-aristotle-mdr
       env: DJANGO_VERSION='1.11'  DB=sqlite  SEARCH=elastic MODULE=amr
