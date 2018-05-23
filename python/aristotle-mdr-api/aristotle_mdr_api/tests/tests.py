@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from aristotle_mdr.tests import utils
 from aristotle_mdr_api.token_auth.models import AristotleToken
+from aristotle_mdr import models
 
 from rest_framework.test import APIClient
 
@@ -320,3 +321,37 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
 
             response = self.client.get('/api/' + version + '/types/', HTTP_AUTHORIZATION=auth)
             self.assertEqual(response.status_code, 401)
+
+    @tag('perms', 'createtest')
+    def test_create_metadata_perms(self):
+
+        editor_token = self.get_editor_a_token()
+        auth = 'Token {}'.format(editor_token.key)
+
+        self.login_editor()
+
+        response = self.client.post('/api/v3/metadata/', {})
+        self.assertEqual(response.status_code, 403)
+
+        self.client.logout()
+
+        metadata = {
+            'concept_type': {
+                'app': 'aristotle_mdr',
+                'model': 'objectclass'
+            },
+            'fields': {
+                'name': 'Spicy Metaball',
+                'definition': 'Very Spicy',
+                'workgroup': str(self.wg1.uuid)
+            }
+        }
+
+        response = self.client.post('/api/v3/metadata/?explode=1', json.dumps(metadata), content_type="application/json", HTTP_AUTHORIZATION=auth)
+        print(response.content)
+        content = json.loads(response.content)
+        print(content)
+        self.assertEqual(len(content['created']), 1)
+        self.assertEqual(len(content['errors']), 0)
+
+        #oc = models.OjectClass

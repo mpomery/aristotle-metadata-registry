@@ -198,25 +198,32 @@ class ConceptViewSet(
             manifest = data
 
         try:
-            output = []
+            created = []
+            errors = []
             with transaction.atomic():
                 for s in Deserializer(manifest):
-                    with reversion.create_revision():
-                        output.append({
-                            'uuid': s.object.uuid,
-                            'url': s.object.get_absolute_url()
+
+                    if perms.user_can_submit_to_workgroup(request.user, s.object.workgroup):
+                        with reversion.create_revision():
+                            created.append({
+                                'uuid': s.object.uuid,
+                                'url': s.object.get_absolute_url()
+                            })
+                            s.submitter = request.user
+                            s.object.recache_states()
+
+                            reversion.set_user(request.user)
+                            reversion.set_comment(
+                                _("Imported using API")
+                            )
+                            s.save()
+                    else:
+                        errors.append({
+                            'message': 'You don\'t have permission to create an item in the {} workgroup'.format(s.object.workgroup)
                         })
-                        s.submitter = request.user
-                        s.object.recache_states()
 
-                        reversion.set_user(request.user)
-                        reversion.set_comment(
-                            _("Imported using API")
-                        )
-                        s.save()
-
-            return Response({'created':output}) #stuff
+            return Response({'created':created,'errors':errors})
         except Exception as e:
-            if 'explode' in request.query_params.keys():
+            if settings.DEBUG and 'explode' in request.query_params.keys():
                 raise
             return Response({'error': str(e)})

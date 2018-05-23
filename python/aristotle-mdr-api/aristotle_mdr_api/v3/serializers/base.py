@@ -10,6 +10,7 @@ from collections import OrderedDict
 from django.apps import apps
 from django.conf import settings
 from django.core.serializers import base
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, models, transaction
 from django.utils import six
 from django.utils.encoding import force_text, is_protected_type
@@ -85,7 +86,7 @@ class Serializer(PySerializer):
         # if 'aristotle_mdr.contrib.links' in settings.INSTALLED_APPS:
         #     from aristotle_mdr.contrib.links import models as link_models
         #     obj_links = link_models.Link.objects.filter(linkend__concept=obj).all().distinct()
-    
+
         #     data['links'] = [
                 #     [{
                 #         'relation': {
@@ -208,7 +209,7 @@ class Serializer(PySerializer):
                 if field.serialize:
                     if self.selected_fields is None or field.attname in self.selected_fields:
                         self.handle_m2m_field(obj, field)
-            
+
             if hasattr(obj, 'serialize_weak_entities'): # and field.name in dict(obj.serialize_weak_entities).keys():
 
                 for f,field in getattr(obj, 'serialize_weak_entities'):
@@ -262,7 +263,7 @@ def Deserializer(manifest, **options):
                 name = ra['name'],
                 definition = ra['definition']
             )
-    
+
     from aristotle_mdr.models import Organization
     for org in manifest.get('organizations', []):
         o,_ = Organization.objects.get_or_create(
@@ -270,7 +271,7 @@ def Deserializer(manifest, **options):
             definition=org['definition'],
             uuid=org['uuid'],
         )
-        
+
         if 'aristotle_mdr.contrib.identifiers' in settings.INSTALLED_APPS:
             from aristotle_mdr.contrib.identifiers.models import Namespace
             for namespace in org['namespaces']:
@@ -278,7 +279,7 @@ def Deserializer(manifest, **options):
                     naming_authority = o,
                     shorthand_prefix = namespace['shorthand_prefix']
                 )
-            
+
 
     for d in manifest['metadata']:
         # Look up the model and starting build a dict of data for it.
@@ -335,14 +336,14 @@ def Deserializer(manifest, **options):
                     else:
                         def m2m_convert(v):
                             return force_text(model._meta.pk.to_python(v), strings_only=True)
-    
+
                     try:
                         m2m_data[field.name] = []
                         for pk in field_value:
                             m2m_data[field.name].append(m2m_convert(pk))
                     except Exception as e:
                         raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), pk)
-    
+
                 # Handle FK fields
                 elif field.remote_field and isinstance(field.remote_field, models.ManyToOneRel):
                     model = field.remote_field.model
@@ -360,6 +361,12 @@ def Deserializer(manifest, **options):
                                 #_meta.get_field(field_name).to_python(field_value)
                             elif hasattr(model, 'uuid'):
                                 value = model._meta.get_field(field_name).to_python(field_value)
+                                try:
+                                    value = model.objects.get(uuid=field_value)
+                                except ObjectDoesNotExist:
+                                    # Need to raise error here
+                                    pass
+                                data[field.attname] = value.pk
                             elif hasattr(default_manager, 'get_by_natural_key'):
                                 if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
                                     obj = default_manager.db_manager(db).get_by_natural_key(*field_value)
@@ -372,12 +379,14 @@ def Deserializer(manifest, **options):
                                     value = model._meta.get_field(field_name).to_python(field_value)
                                 data[field.attname] = value
                             else:
+                                print('we in the else {}'.format(field_name))
                                 data[field.attname] = model._meta.get_field(field_name).to_python(field_value)
                         except Exception as e:
                             raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
                     else:
+                        print('settings none')
                         data[field.attname] = None
-    
+
                 # Handle all other fields
                 else:
                     try:
@@ -388,7 +397,7 @@ def Deserializer(manifest, **options):
         with reversion.create_revision():
             obj = build_instance(Model, data, db)
             obj.save()  # Get it in the database.
-    
+
             for (field_name, field_value) in six.iteritems(d["fields"]):
                 weak_entities = dict(getattr(Model, 'serialize_weak_entities', {}))
                 if field_name in weak_entities.keys():
@@ -413,10 +422,10 @@ def Deserializer(manifest, **options):
                                         'definition': 'no definition'
                                     })
                                     weak_entity[sub_field_name] = sub_obj
-    
+
                         weak_entity.update({other_side:obj})
                         RelModel.objects.update_or_create(**weak_entity)
-    
+
             if 'aristotle_mdr.contrib.slots' in settings.INSTALLED_APPS:
                 from aristotle_mdr.contrib.slots.models import Slot
                 for slot in d.get("slots", []):
@@ -446,7 +455,7 @@ def Deserializer(manifest, **options):
                         raise
                         #TODO: Better error logging
                         pass
-    
+
             for status in d.get("statuses", []):
                 ra, created = MDR.RegistrationAuthority.objects.get_or_create(
                     uuid=uuid.UUID(status["registration_authority"]),
@@ -468,7 +477,7 @@ def Deserializer(manifest, **options):
             if "links" in d.keys() and 'aristotle_mdr.contrib.links' in settings.INSTALLED_APPS:
                 from aristotle_mdr.contrib.links import models as link_models
                 # obj_links = link_models.Link.objects.filter(linkend__concept=obj).all().distinct()
-                
+
                 link_models.Link.objects.filter(linkend__concept=obj).all().distinct().delete()
                 for data in d.get("links", []):
                     rel = link_models.Relation.objects.get(uuid=data['relation'])
@@ -488,7 +497,7 @@ def Deserializer(manifest, **options):
                             concept=concept
                         )
 
-    
+
             yield base.DeserializedObject(obj, m2m_data)
 
 def build_instance(Model, data, db):
