@@ -82,8 +82,7 @@ jobs:
   include:
     - stage: stylecheck
       python: 3.6
-      env: MODULE=aristotle-metadata-registry
-      script: cd $TRAVIS_BUILD_DIR/python/$MODULE && tox -e flake8 --skip-missing-interpreters
+      script: tox -e flake8 --skip-missing-interpreters
 
     - stage: documentation
       python: 3.6
