@@ -26,7 +26,7 @@ Likewise, creating relationships to pre-existing items only requires the correct
 application of `Django relationships <https://docs.djangoproject.com/en/stable/topics/db/examples/>`_
 such as a ``ForeignKey`` or ``ManyToManyField``, like so:
 
-.. literalinclude:: /../aristotle_mdr/tests/apps/extension_test/models.py
+.. literalinclude:: /../python/aristotle-metadata-registry/aristotle_mdr/tests/apps/extension_test/models.py
     :caption: mymodule.models.Question
     :start-after: # Start of the question model
     :end-before: # End of the question model
@@ -64,7 +64,7 @@ Including additional items when downloading a custom concept type
 
 For example:
 
-.. literalinclude:: /../aristotle_mdr/tests/apps/extension_test/models.py
+.. literalinclude:: /../python/aristotle-metadata-registry/aristotle_mdr/tests/apps/extension_test/models.py
     :caption: mymodule.models.Questionnaire.get_download_items
     :start-after: # Start of get_download_items
     :end-before: # End of get_download_items
@@ -336,7 +336,7 @@ reuses help content built into the Django Web framework. When producing dynamic
 documentation, Aristotle uses the Python docstring of a ``concept``-inheriting class
 and the field level `help_text` to produce documentation.
 
-This can be seen on in the concept editor, administrator pages, item comparator 
+This can be seen on in the concept editor, administrator pages, item comparator
 and can be accessed in html pages using the ``doc`` template tag in the ``aristotle_tags``
 module.
 
