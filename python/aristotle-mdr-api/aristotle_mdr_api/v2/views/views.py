@@ -47,7 +47,6 @@ class SearchViewSet(viewsets.GenericViewSet):
     pagination_class = ConceptResultsPagination
     base_name="search"
 
-    permission_classes = (TokenPermissions,)
     permission_key = 'search'
 
 #    def get(self, request, format=None):
@@ -96,8 +95,7 @@ class RegistrationAuthorityViewSet(UUIDLookupModelMixin, viewsets.ReadOnlyModelV
 
     queryset = models.RegistrationAuthority.objects.all()
     serializer_class = RegistrationAuthoritySerializer
-
-    permission_classes = (TokenPermissions,)
+    
     permission_key = 'ra'
 
 
@@ -119,5 +117,4 @@ class OrganizationViewSet(UUIDLookupModelMixin, viewsets.ReadOnlyModelViewSet):
     queryset = models.Organization.objects.all()
     serializer_class = OrganizationSerializer
 
-    permission_classes = (TokenPermissions,)
     permission_key = 'organization'

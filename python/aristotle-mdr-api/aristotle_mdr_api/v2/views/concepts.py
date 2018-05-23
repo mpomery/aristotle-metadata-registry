@@ -115,7 +115,6 @@ class ConceptViewSet(
     filter_backends = (concept_backend.ConceptFilterBackend,)
     filter_class = concept_backend.ConceptFilter
 
-    permission_classes = (TokenPermissions,)
     permission_key = 'metadata'
 
 

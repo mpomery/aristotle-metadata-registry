@@ -1,5 +1,4 @@
 from rest_framework import permissions
-from aristotle_mdr_api.token_auth.permissions import TokenPermissions
 
 class IsSuperuserOrReadOnly(permissions.BasePermission):
     """

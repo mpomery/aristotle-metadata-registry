@@ -1,33 +1,31 @@
-from rest_framework import permissions
+from rest_framework.permissions import SAFE_METHODS
+from restfw_composed_permissions.base import BaseComposedPermision, BasePermissionComponent, And, Or
+from restfw_composed_permissions.generic.components import AllowOnlyAuthenticated
 
-class TokenPermissions(permissions.BasePermission):
+
+class TokenPermissions(BasePermissionComponent):
 
     permission_key = 'default'
 
-    def is_authenticated(self, request):
-        return request.user and request.user.is_authenticated
-
-    def has_permission(self, request, view):
-
-        authenticated = self.is_authenticated(request)
-
-        if not authenticated:
-            return False
-
-        if hasattr(view, 'permission_key'):
-            self.permission_key = getattr(view, 'permission_key')
+    def has_permission(self, permission, request, view):
 
         token = request.auth
 
         # request.auth will be None when using any other default authentication class
         if token is not None:
+
+            if hasattr(view, 'permission_key'):
+                permission_key = getattr(view, 'permission_key')
+            else:
+                permission_key = self.permission_key
+
             hasread = False
             haswrite = False
 
             perms = token.permissions
 
-            if self.permission_key in perms.keys():
-                perm = perms[self.permission_key]
+            if permission_key in perms.keys():
+                perm = perms[permission_key]
 
                 if 'read' in perm:
                     hasread = perm['read']
@@ -38,12 +36,17 @@ class TokenPermissions(permissions.BasePermission):
         else:
             # Default for non token auths
             hasread = True
-            haswrite = request.user.is_superuser
+            haswrite = False
 
-        if request.method in permissions.SAFE_METHODS and hasread:
+        if request.method in SAFE_METHODS and hasread:
             return True
 
-        if request.method not in permissions.SAFE_METHODS and haswrite:
+        if request.method not in SAFE_METHODS and haswrite:
             return True
 
         return False
+
+
+class AristotlePermissions(BaseComposedPermision):
+
+    global_permission_set = (lambda s: And(AllowOnlyAuthenticated, TokenPermissions))
