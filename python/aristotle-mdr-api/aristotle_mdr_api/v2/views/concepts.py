@@ -91,7 +91,6 @@ class ConceptDetailSerializer(ConceptSerializerBase):
 
 
 class ConceptViewSet(
-    mixins.CreateModelMixin,
     UUIDLookupModelMixin,
     #mixins.RetrieveModelMixin,
                     #mixins.UpdateModelMixin,
@@ -189,36 +188,3 @@ class ConceptViewSet(
             raise PermissionDenied
         else:
             return item
-
-    def create(self, request, *args, **kwargs):
-
-        data = request.data
-        if 'concept_type' in request.data.keys():
-            # We've been passed a single object
-            manifest = {'metadata':[data]}
-        else:
-            manifest = data
-
-        try:
-            output = []
-            with transaction.atomic():
-                for s in Deserializer(manifest):
-                    with reversion.create_revision():
-                        output.append({
-                            'uuid': s.object.uuid,
-                            'url': s.object.get_absolute_url()
-                        })
-                        s.submitter = request.user
-                        s.object.recache_states()
-
-                        reversion.set_user(request.user)
-                        reversion.set_comment(
-                            _("Imported using API")
-                        )
-                        s.save()
-
-            return Response({'created':output}) #stuff
-        except Exception as e:
-            if 'explode' in request.query_params.keys():
-                raise
-            return Response({'error': str(e)})
