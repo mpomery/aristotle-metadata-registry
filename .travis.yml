@@ -151,11 +151,12 @@ jobs:
           branch: master
 
     - <<: *deploy_stage
+      if: branch = develop
       deploy:
         <<: *deploy_step
         server: https://test.pypi.org/legacy/
         on:
-          all_branches: true
+          branch: develop
 
 after_success:
   - ./scripts/coverage_reporter.sh $MODULE
