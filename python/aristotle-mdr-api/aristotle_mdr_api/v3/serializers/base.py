@@ -352,7 +352,6 @@ def Deserializer(manifest, **options):
                             default_manager = model._default_manager
                             field_name = field.remote_field.field_name
                             if issubclass(model, MDR._concept):
-                                print(field_value)
                                 value,c = model.objects.get_or_create(uuid=field_value, defaults={
                                     'name': "no name",
                                     'definition': 'no definition'
@@ -360,7 +359,6 @@ def Deserializer(manifest, **options):
                                 data[field.attname] = value.pk
                                 #_meta.get_field(field_name).to_python(field_value)
                             elif hasattr(model, 'uuid'):
-                                value = model._meta.get_field(field_name).to_python(field_value)
                                 try:
                                     value = model.objects.get(uuid=field_value)
                                 except ObjectDoesNotExist:
@@ -379,12 +377,10 @@ def Deserializer(manifest, **options):
                                     value = model._meta.get_field(field_name).to_python(field_value)
                                 data[field.attname] = value
                             else:
-                                print('we in the else {}'.format(field_name))
                                 data[field.attname] = model._meta.get_field(field_name).to_python(field_value)
                         except Exception as e:
                             raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
                     else:
-                        print('settings none')
                         data[field.attname] = None
 
                 # Handle all other fields

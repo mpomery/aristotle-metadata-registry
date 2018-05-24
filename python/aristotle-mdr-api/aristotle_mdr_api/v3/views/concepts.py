@@ -219,7 +219,7 @@ class ConceptViewSet(
                             s.save()
                     else:
                         errors.append({
-                            'message': 'You don\'t have permission to create an item in the {} workgroup'.format(s.object.workgroup)
+                            'message': 'You don\'t have permission to create an item in the {} Workgroup'.format(s.object.workgroup)
                         })
 
             return Response({'created':created,'errors':errors})

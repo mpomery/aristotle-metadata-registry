@@ -66,13 +66,16 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         self.assertTrue('key' in response.context.keys())
         return response.context['key']
 
-    def get_editor_a_token(self):
+    def get_user_a_token(self, user, name='User Token'):
         token = AristotleToken.objects.create(
-            name='Editor Token',
-            user=self.editor,
+            name=name,
+            user=user,
             permissions=self.all_true_perms
         )
         return token
+
+    def get_editor_a_token(self):
+        return self.get_user_a_token(self.editor, 'Editor Token')
 
     # ------ Tests ------
 
@@ -330,6 +333,7 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
 
         self.login_editor()
 
+        # Test post with session auth
         response = self.client.post('/api/v3/metadata/', {})
         self.assertEqual(response.status_code, 403)
 
@@ -341,17 +345,33 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
                 'model': 'objectclass'
             },
             'fields': {
-                'name': 'Spicy Metaball',
+                'name': 'Spicy Meatball',
                 'definition': 'Very Spicy',
                 'workgroup': str(self.wg1.uuid)
             }
         }
 
+        # Post correct data with token auth
         response = self.client.post('/api/v3/metadata/?explode=1', json.dumps(metadata), content_type="application/json", HTTP_AUTHORIZATION=auth)
-        print(response.content)
+        self.assertEqual(response.status_code, 200)
         content = json.loads(response.content)
-        print(content)
         self.assertEqual(len(content['created']), 1)
         self.assertEqual(len(content['errors']), 0)
 
-        #oc = models.OjectClass
+        oc = models.ObjectClass.objects.get(uuid=content['created'][0]['uuid'])
+        self.assertEqual(oc.name, 'Spicy Meatball')
+        self.assertEqual(oc.definition, 'Very Spicy')
+        self.assertEqual(oc.workgroup, self.wg1)
+
+        # Attempt to add item to a workgroup without proper perms
+        viewer_token = self.get_user_a_token(self.viewer)
+        auth = 'Token {}'.format(viewer_token.key)
+
+        response = self.client.post('/api/v3/metadata/?explode=1', json.dumps(metadata), content_type="application/json", HTTP_AUTHORIZATION=auth)
+        self.assertEqual(response.status_code, 200)
+        content = json.loads(response.content)
+        self.assertEqual(len(content['created']), 0)
+        self.assertEqual(len(content['errors']), 1)
+        print(content['errors'][0]['message'])
+        self.assertTrue('You don\'t have permission' in content['errors'][0]['message'])
+        self.assertTrue('Test WG 1 Workgroup' in content['errors'][0]['message'])
