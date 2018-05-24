@@ -26,27 +26,18 @@ For more information on configuring a more complete installation review the help
    `installing virtualenv <https://www.pythonanywhere.com/wiki/InstallingVirtualenvWrapper>`_
    and `configuring a new virtualenv <https://www.pythonanywhere.com/wiki/VirtualEnvForNewerDjango>`_.
 
-#. Fetch the example metadata registry stored within the
-   `Aristotle-MDR GitHub repository <https://github.com/aristotle-mdr/python/easy-installer/install.py>`_.
+#. Next install the Aristotle Metadata Registry package. 
+   This can be done using pip with the following command ``pip install aristotle-metadata-registry``.
+   If you already have a version installed your can update with ``pip install -U aristotle-metadata-registry``
 
-   On a linux machine, this can be done with the command::
+#. To run the easy installer simply run ``aristotle-installer`` from the command line. There are a number of command line arguments that are explained in the help documentation which can be accessed from the command line::
 
-      curl https://raw.githubusercontent.com/aristotle-mdr/aristotle-metadata-registry/easyinstall/python/easy-installer/install.py
-
-#. Run the easy installer: ``python install.py``. There are a number of command line arguments
-   that are explained in the help documentation which can be accessed from the command line::
-
-    python install.py --help
-
-   If you do not have the example registry folder in the same directory as the installer it will download it for you
-   however you will need to install the requests library for this to work. You can install it with ``pip install requests``
-
-   Alternatively the folder is available here https://github.com/aristotle-mdr/aristotle-metadata-registry/python/easy-installer/example_mdr
+    ``aristotle-installer --help``
 
    To install your registry in a different directory use the --dir option ``python install.py --dir ./myregistry``
 
-   This will setup an example registry, and will prompt you for a new name, ask for a few
-   additional settings, install requirements, setup a database and set up the static files.
+   This installer will setup an example registry, and will prompt you for a new name, ask for a few
+   additional settings, install requirements, setup a database and collect the static files.
 
 #. If required, browse to the directory of your project that was named in the above directory,
    and edit the ``settings.py`` files to meet your requirements.
