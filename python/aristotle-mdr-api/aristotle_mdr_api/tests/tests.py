@@ -263,7 +263,10 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
             self.assertEqual(response.status_code, 200)
 
             response = self.client.post('/api/' + version + '/metadata/', {}, HTTP_AUTHORIZATION=auth)
-            self.assertEqual(response.status_code, 200)
+            if version == 'v2':
+                self.assertEqual(response.status_code, 405) # Write not allowed on v2
+            else:
+                self.assertEqual(response.status_code, 200)
 
             response = self.client.get('/api/' + version + '/search/', HTTP_AUTHORIZATION=auth)
             self.assertEqual(response.status_code, 403)
