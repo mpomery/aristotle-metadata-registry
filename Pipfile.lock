@@ -355,6 +355,12 @@
             ],
             "version": "==3.8.2"
         },
+        "djangorestframework-composed-permissions": {
+            "hashes": [
+                "sha256:eb1595e5f001a14d4711e7813f812c76ebddc23249c477b2e3fae2140abedf06"
+            ],
+            "version": "==0.1"
+        },
         "docutils": {
             "hashes": [
                 "sha256:02aec4bd92ab067f6ff27a38a38a41173bf01bed8f89157768c1573f53e474a6",
