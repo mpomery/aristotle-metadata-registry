@@ -170,7 +170,7 @@ class AristotleSignupBackend(AristotleInvitationBackend):
             regsettings = aristotle_settings['registry']
             # Check if user self signup is enabled
             signup_enabled = regsettings.get('self_signup_enabled', True)
-            allowed_suffixes = regsettings.get('self_signup_emails', None)
+            allowed_suffixes = regsettings.get('self_signup_emails', None).split(',')
 
         if not signup_enabled:
             return render(
@@ -201,7 +201,7 @@ class AristotleSignupBackend(AristotleInvitationBackend):
         valid = False
 
         for suffix in suffixes:
-            if email.endswith(suffix):
+            if email.endswith(suffix.lstrip()):
                 valid = True
 
         return valid
