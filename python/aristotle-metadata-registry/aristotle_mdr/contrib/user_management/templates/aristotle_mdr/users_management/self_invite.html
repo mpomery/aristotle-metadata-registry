@@ -3,12 +3,16 @@
 {% block title %}Signup{% endblock %}
 
 {% block content %}
+
+  {% if config.registry.self_signup_message %}
+  <h1>{{ config.registry.self_signup_message|escape }}</h1>
+  {% endif %}
+
   {% if message %}
   <h2>{{ message }}</h2>
   {% endif %}
 
   {% if form %}
-  <h1>Signup to the registry</h1>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
