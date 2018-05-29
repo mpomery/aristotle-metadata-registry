@@ -2,7 +2,7 @@
 sudo: false
 
 # We're having issues on the default Trusty setup, lets wait for now
-dist: precise
+dist: trusty
 
 language: python
 python: 3.6
