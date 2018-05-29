@@ -148,6 +148,32 @@ class AristotleInvitationBackend(BaseAristotleInvitationBackend):
     registration_form_template = 'aristotle_mdr/users_management/newuser/register_form.html'
 
 
+class AristotleSignupBackend(AristotleInvitationBackend):
+
+    registration_form_template = "aristotle_mdr/users_management/self_invite.html"
+
+    def get_urls(self):
+        return [
+            url(r'^(?P<user_id>[\d]+)-(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+                view=self.activate_view, name="signup_register"),
+            url(r'^$', view=self.create_view, name="signup_create"),
+        ]
+
+    def create_view(self, request):
+        form = forms.SelfInviteForm(request.POST or None)
+        if form.is_valid():
+
+            email = form.cleaned_data['email']
+            self.invite_by_emails(emails=[email], request=request)
+
+            return HttpResponseRedirect(self.get_success_url())
+
+        return render(request, self.registration_form_template, {'form': form})
+
+    def get_success_url(self):
+        return reverse('aristotle_mdr:home')
+
+
 class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 
     form_class = forms.UserInvitationForm
@@ -177,24 +203,3 @@ class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
     def get_success_url(self):
         return reverse(self.success_url)
 
-
-class SelfInviteView(FormView):
-
-    backend_class = AristotleInvitationBackend
-    form_class = forms.SelfInviteForm
-
-    template_name = "aristotle_mdr/users_management/self_invite.html"
-
-    def __init__(self, *args, **kwargs):
-        self.backend = self.backend_class()
-        super().__init__(*args, **kwargs)
-
-    def form_valid(self, form):
-
-        email = form.cleaned_data['email']
-        self.backend.invite_by_emails(emails=[email], request=self.request)
-
-        return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse('aristotle_mdr:home')
