@@ -8,7 +8,7 @@ from django.shortcuts import redirect, render
 from django.views.generic import FormView
 from django.template import loader
 
-from organizations.backends.defaults import InvitationBackend
+from organizations.backends.defaults import InvitationBackend, RegistrationBackend
 from organizations.backends.tokens import RegistrationTokenGenerator
 
 from . import forms
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 logger.debug("Logging started for " + __name__)
 
 
-class AristotleInvitationBackend(InvitationBackend):
+class BaseAristotleInvitationBackend(InvitationBackend):
     """
     A backend for allowing new users to join the site by creating a new user
     associated with a new organization.
@@ -136,7 +136,7 @@ class AristotleInvitationBackend(InvitationBackend):
         return True
 
 
-class NewUserInvitationBackend(AristotleInvitationBackend):
+class AristotleInvitationBackend(BaseAristotleInvitationBackend):
 
     notification_subject = 'aristotle_mdr/users_management/newuser/email/notification_subject.txt'
     notification_body = 'aristotle_mdr/users_management/newuser/email/notification_body.html'
@@ -176,3 +176,25 @@ class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 
     def get_success_url(self):
         return reverse(self.success_url)
+
+
+class SelfInviteView(FormView):
+
+    backend_class = AristotleInvitationBackend
+    form_class = forms.SelfInviteForm
+
+    template_name = "aristotle_mdr/users_management/self_invite.html"
+
+    def __init__(self, *args, **kwargs):
+        self.backend = self.backend_class()
+        super().__init__(*args, **kwargs)
+
+    def form_valid(self, form):
+
+        email = form.cleaned_data['email']
+        self.backend.invite_by_emails(emails=[email], request=self.request)
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('aristotle_mdr:home')
