@@ -32,6 +32,7 @@ class BaseAristotleInvitationBackend(InvitationBackend):
     """
 
     form_class = forms.AristotleUserRegistrationForm
+    accept_url_name = 'aristotle-user:registry_invitations_register'
 
     def get_success_url(self):
         return reverse('friendly_login') + '?welcome=true'
@@ -39,7 +40,7 @@ class BaseAristotleInvitationBackend(InvitationBackend):
     def get_urls(self):
         return [
             url(r'^accept/(?P<user_id>[\d]+)-(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
-                view=self.activate_view, name="registry_invitations_register"),
+                view=self.activate_view, name=self.accept_url_name),
             url(r'^$', view=self.invite_view(), name="registry_invitations_create"),
         ]
 
@@ -113,7 +114,7 @@ class BaseAristotleInvitationBackend(InvitationBackend):
             reply_to = from_email
 
         headers = {'Reply-To': reply_to}
-        kwargs.update({'sender': sender, 'user': user})
+        kwargs.update({'sender': sender, 'user': user, 'accept_url_name': self.accept_url_name})
 
         subject_template = loader.get_template(subject_template)
         body_template = loader.get_template(body_template)
@@ -151,12 +152,13 @@ class AristotleInvitationBackend(BaseAristotleInvitationBackend):
 class AristotleSignupBackend(AristotleInvitationBackend):
 
     registration_form_template = "aristotle_mdr/users_management/self_invite.html"
+    accept_url_name = 'aristotle-user:signup_register'
 
     def get_urls(self):
         return [
             url(r'^(?P<user_id>[\d]+)-(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
                 view=self.activate_view, name="signup_register"),
-            url(r'^$', view=self.create_view, name="signup_create"),
+            url(r'^$', view=self.create_view, name=self.accept_url_name),
         ]
 
     def create_view(self, request):
