@@ -20,6 +20,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from django.http import Http404
 
+from aristotle_mdr.utils.utils import fetch_aristotle_settings
+
 import logging
 logger = logging.getLogger(__name__)
 logger.debug("Logging started for " + __name__)
@@ -162,15 +164,47 @@ class AristotleSignupBackend(AristotleInvitationBackend):
         ]
 
     def create_view(self, request):
+        aristotle_settings = fetch_aristotle_settings()
+
+        if 'registry' in aristotle_settings:
+            regsettings = aristotle_settings['registry']
+            # Check if user self signup is enabled
+            signup_enabled = regsettings.get('self_signup_enabled', True)
+            allowed_suffixes = regsettings.get('self_signup_emails', None)
+
+        if not signup_enabled:
+            return render(
+                request,
+                self.registration_form_template,
+                {'message': 'Self Signup is not enabled'}
+            )
+
         form = forms.SelfInviteForm(request.POST or None)
         if form.is_valid():
 
             email = form.cleaned_data['email']
+
+            # If email suffix whitelist was setup
+            if allowed_suffixes:
+                email_valid = self.validate_email(email, allowed_suffixes)
+                if not email_valid:
+                    form.add_error('email', 'Email is not at an allowed url')
+                    return render(request, self.registration_form_template, {'form': form})
+
             self.invite_by_emails(emails=[email], request=request)
 
             return HttpResponseRedirect(self.get_success_url())
 
         return render(request, self.registration_form_template, {'form': form})
+
+    def validate_email(email, suffixes):
+        valid = False
+
+        for suffix in suffixes:
+            if email.endswith(suffix):
+                valid = True
+
+        return valid
 
     def get_success_url(self):
         return reverse('aristotle_mdr:home')

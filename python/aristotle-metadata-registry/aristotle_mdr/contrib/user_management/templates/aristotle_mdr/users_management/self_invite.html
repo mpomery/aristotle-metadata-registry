@@ -3,10 +3,16 @@
 {% block title %}Signup{% endblock %}
 
 {% block content %}
+  {% if message %}
+  <h2>{{ message }}</h2>
+  {% endif %}
+
+  {% if form %}
   <h1>Signup to the registry</h1>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Submit" />
   </form>
+  {% endif %}
 {% endblock %}
