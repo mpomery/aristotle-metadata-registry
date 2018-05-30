@@ -41,3 +41,13 @@ class AristotleFilterSet(FilterSet):
     #         cls._meta.fields = field_dict
 
     #     return super().get_fields()
+
+
+class ConceptFilterSet(FilterSet):
+
+    identifiers = django_filters.CharFilter(name='identifiers__identifier', lookup_expr='iexact')
+    slots = django_filters.CharFilter(name='slots__name', lookup_expr='iexact')
+
+    class Meta:
+        model = _concept
+        fields = '__all__'
