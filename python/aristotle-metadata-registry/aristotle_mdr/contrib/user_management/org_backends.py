@@ -170,44 +170,45 @@ class AristotleSignupBackend(AristotleInvitationBackend):
             regsettings = aristotle_settings['registry']
             # Check if user self signup is enabled
             signup_enabled = regsettings.get('self_signup_enabled', True)
-            allowed_suffixes = regsettings.get('self_signup_emails', None).split(',')
+            allowed_suffixes = regsettings.get('self_signup_emails', None)
 
         if not signup_enabled:
-            return render(
-                request,
-                self.registration_form_template,
-                {'message': 'Self Signup is not enabled'}
-            )
+            return self.render_message(request, 'Self Signup is not enabled')
 
         form = forms.SelfInviteForm(request.POST or None)
         if form.is_valid():
+            success = True
 
             email = form.cleaned_data['email']
 
             # If email suffix whitelist was setup
             if allowed_suffixes:
-                email_valid = self.validate_email(email, allowed_suffixes)
+                email_valid = self.validate_email(email, allowed_suffixes.split(','))
                 if not email_valid:
                     form.add_error('email', 'Email is not at an allowed url')
-                    return render(request, self.registration_form_template, {'form': form})
+                    success = False
 
-            self.invite_by_emails(emails=[email], request=request)
-
-            return HttpResponseRedirect(self.get_success_url())
+            if success:
+                self.invite_by_emails(emails=[email], request=request)
+                return self.render_message(request, 'Success, an invitation has been sent to your email. Follow the link to continue')
 
         return render(request, self.registration_form_template, {'form': form})
 
-    def validate_email(email, suffixes):
+    def validate_email(self, email, suffixes):
         valid = False
 
         for suffix in suffixes:
-            if email.endswith(suffix.lstrip()):
+            if email.endswith(suffix.strip()):
                 valid = True
 
         return valid
 
-    def get_success_url(self):
-        return reverse('aristotle_mdr:home')
+    def render_message(self, request, message):
+        return render(
+            request,
+            self.registration_form_template,
+            {'message': message}
+        )
 
 
 class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
