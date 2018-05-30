@@ -15,6 +15,13 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
     def setUp(self):
         super().setUp()
 
+    def get_url_from_email(self, email_content):
+        start = email_content.find('/account/')
+        end = email_content.find('\n', start)
+
+        accept_url = email_content[start:end]
+        return accept_url
+
     def test_user_cannot_view_userlist(self):
         self.login_viewer()
         response = self.client.get(reverse('aristotle-user:registry_user_list',))
@@ -112,10 +119,8 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
 
         self.logout()
         message = mail.outbox[0].body
-        start = message.find('/account/')
-        end = message.find('\n', start)
 
-        accept_url = message[start:end]
+        accept_url = self.get_url_from_email(message)
 
         accept_response = self.client.get(accept_url)
 
@@ -150,10 +155,17 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.assertEqual(new_user.short_name, 'Test')
         self.assertEqual(new_user.full_name, 'Test User')
 
-    @tag('runthis')
     def test_send_registration_invite(self):
 
         self.logout()
+        self.assertEqual(len(mail.outbox), 0)
+
+        mock_settings = MagicMock(return_value={'registry': {'self_signup_message': 'Welcome You Can Signup Here'}})
+        with patch('aristotle_mdr.context_processors.fetch_aristotle_settings', mock_settings):
+            response = self.client.get(reverse('aristotle-user:signup_register'))
+            self.assertEqual(response.status_code, 200)
+            print(response.content)
+            self.assertTrue('Welcome You Can Signup Here' in str(response.content))
 
         mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': False}})
         with patch('aristotle_mdr.contrib.user_management.org_backends.fetch_aristotle_settings', mock_settings):
@@ -166,6 +178,54 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('form' in response.context)
 
-        #post_response = self.client.post('aristotle-user:signup_register', {'email', 'aintnuffin@example.com'})
+        mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': True, 'self_signup_emails': '.gov.au, hellokitty.com'}})
+        with patch('aristotle_mdr.contrib.user_management.org_backends.fetch_aristotle_settings', mock_settings):
+            post_response = self.client.post(reverse('aristotle-user:signup_register'), {'email': 'notallowed@example.com'})
+            self.assertTrue(post_response.status_code, 200)
+            self.assertEqual(post_response.context['form'].errors['email'], ['Email is not at an allowed url'])
+
+            post_response = self.client.post(reverse('aristotle-user:signup_register'), {'email': 'someguy@example.gov.au'})
+            self.assertTrue(post_response.status_code, 200)
+            self.assertTrue(post_response.context['message'].startswith('Success'))
+
+            post_response = self.client.post(reverse('aristotle-user:signup_register'), {'email': 'someguy@hellokitty.com'})
+            self.assertTrue(post_response.status_code, 200)
+            self.assertTrue(post_response.context['message'].startswith('Success'))
 
 
+        self.assertEqual(len(mail.outbox), 2)
+
+    def test_accept_registration_email(self):
+
+        self.logout()
+        self.assertEqual(len(mail.outbox), 0)
+
+        post_response = self.client.post(reverse('aristotle-user:signup_register'), {'email': 'anewuser@example.com'})
+        self.assertTrue(post_response.status_code, 200)
+        self.assertTrue(post_response.context['message'].startswith('Success'))
+        self.assertEqual(len(mail.outbox), 1)
+
+        message = mail.outbox[0].body
+        accept_url = self.get_url_from_email(message)
+
+        accept_response = self.client.get(accept_url)
+        self.assertEqual(accept_response.status_code, 200)
+
+        accept_data = {
+            'email': 'anewuser@example.com',
+            'full_name': 'New User',
+            'short_name': 'New',
+            'password': 'verynice',
+            'password_confirm': 'verynice'
+        }
+
+        post_response = self.client.post(accept_url, accept_data, follow=True)
+        self.assertEqual(post_response.status_code, 200)
+        self.assertTemplateUsed(post_response, 'aristotle_mdr/friendly_login.html')
+        self.assertTrue('welcome' in post_response.context.keys())
+
+        new_user = get_user_model().objects.get(email='anewuser@example.com')
+        self.assertTrue(new_user.is_active)
+        self.assertTrue(new_user.password)
+        self.assertEqual(new_user.short_name, 'New')
+        self.assertEqual(new_user.full_name, 'New User')
