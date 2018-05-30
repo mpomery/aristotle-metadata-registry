@@ -4,26 +4,44 @@
 
 {% block content %}
 
-  {% if message %}
-    <h2>{{ message }}</h2>
-  {% else %}
-    {% if config.registry.self_signup_message %}
-      <h1>{{ config.registry.self_signup_message|escape }}</h1>
+  <div class="container">
+
+    {% if message %}
+      <h2>{{ message }}</h2>
     {% else %}
-      <h1>Signup</h1>
+      {% if config.registry.self_signup_message %}
+        <h1>{{ config.registry.self_signup_message|escape }}</h1>
+      {% else %}
+        <h1>Signup</h1>
+      {% endif %}
     {% endif %}
-  {% endif %}
 
-  {% if form %}
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input class="btn btn-primary" type="submit" value="Submit" />
-  </form>
-  {% endif %}
+    <div class="row">
+      <div class="col-md-4">
 
-  <p>
-  <a href="{% url 'aristotle_mdr:home' %}" class="btn btn-default">Back</a>
-  </p>
+        {% if form %}
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="form-group">
+            <p class="bg-danger">{{ field.errors }}</p>
+            <p>{{ field.label_tag }}</p>
+            <p>{{ field }}</p>
+            {% if field.help_text %}
+              <p class="help">{{ field.help_text|safe }}</p>
+            {% endif %}
+          </div>
+          {% endfor %}
+          <input class="btn btn-primary" type="submit" value="Submit" />
+          <a href="{% url 'aristotle_mdr:home' %}" class="btn btn-default">Back</a>
+        </form>
+        {% else %}
+          <a href="{% url 'aristotle_mdr:home' %}" class="btn btn-default">Back</a>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>
 
 {% endblock %}

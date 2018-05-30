@@ -164,7 +164,6 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         with patch('aristotle_mdr.context_processors.fetch_aristotle_settings', mock_settings):
             response = self.client.get(reverse('aristotle-user:signup_register'))
             self.assertEqual(response.status_code, 200)
-            print(response.content)
             self.assertTrue('Welcome You Can Signup Here' in str(response.content))
 
         mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': False}})

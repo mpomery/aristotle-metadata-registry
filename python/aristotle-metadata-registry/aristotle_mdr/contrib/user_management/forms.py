@@ -43,7 +43,7 @@ class UserInvitationForm(FormRequestMixin, forms.Form):
 
 class SelfInviteForm(forms.Form):
 
-    email = forms.EmailField()
+    email = forms.EmailField(widget=forms.TextInput(attrs={'class':'form-control'}))
 
 
 class AristotleUserRegistrationForm(UserRegistrationForm):
