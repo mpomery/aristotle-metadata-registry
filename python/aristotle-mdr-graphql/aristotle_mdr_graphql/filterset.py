@@ -45,8 +45,9 @@ class AristotleFilterSet(FilterSet):
 
 class ConceptFilterSet(FilterSet):
 
-    identifiers = django_filters.CharFilter(name='identifiers__identifier', lookup_expr='iexact')
-    slots = django_filters.CharFilter(name='slots__name', lookup_expr='iexact')
+    identifier = django_filters.CharFilter(name='identifiers__identifier', lookup_expr='iexact')
+    identifier_namespace = django_filters.CharFilter(name='identifiers__namespace__shorthand_prefix', lookup_expr='iexact')
+    identifier_version = django_filters.CharFilter(name='identifiers__version', lookup_expr='iexact')
 
     class Meta:
         model = _concept
