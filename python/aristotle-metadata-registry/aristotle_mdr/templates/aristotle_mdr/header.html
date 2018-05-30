@@ -151,7 +151,7 @@
                     {% endif %}
                     {% live_notify_badge classes="badge" %}
                 </a>
-                {% live_notify_list classes="dropdown-menu" %}
+                {% live_notify_list %}
             </li>
             <li>
                 <a id="header_menu_button_logout" href="{% url 'logout' %}?next={{request.path}}" title="{% trans 'Log out'%}">
