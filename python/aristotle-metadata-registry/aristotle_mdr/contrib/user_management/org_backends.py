@@ -242,4 +242,3 @@ class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 
     def get_success_url(self):
         return reverse(self.success_url)
-
