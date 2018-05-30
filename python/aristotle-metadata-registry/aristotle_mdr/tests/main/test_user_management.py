@@ -2,6 +2,7 @@ from django.test import TestCase, tag, override_settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.core import mail
+from unittest.mock import patch, MagicMock
 
 import aristotle_mdr.tests.utils as utils
 
@@ -148,3 +149,23 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.assertTrue(new_user.password)
         self.assertEqual(new_user.short_name, 'Test')
         self.assertEqual(new_user.full_name, 'Test User')
+
+    @tag('runthis')
+    def test_send_registration_invite(self):
+
+        self.logout()
+
+        mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': False}})
+        with patch('aristotle_mdr.contrib.user_management.org_backends.fetch_aristotle_settings', mock_settings):
+            response = self.client.get(reverse('aristotle-user:signup_register'))
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse('form' in response.context)
+            self.assertTrue('message' in response.context)
+
+        response = self.client.get(reverse('aristotle-user:signup_register'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('form' in response.context)
+
+        #post_response = self.client.post('aristotle-user:signup_register', {'email', 'aintnuffin@example.com'})
+
+
