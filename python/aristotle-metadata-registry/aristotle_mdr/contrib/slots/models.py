@@ -20,6 +20,7 @@ class Slot(TimeStampedModel):
     type = models.CharField(max_length=256, blank=True)  # Or some other sane length
     concept = ConceptForeignKey(MDR._concept, related_name='slots')
     value = models.TextField()
+    order = models.PositiveSmallIntegerField("Position", default=0)
 
     def __str__(self):
         return u"{0} - {1}".format(self.name, self.value)

@@ -37,6 +37,7 @@ class ScopedIdentifier(TimeStampedModel):
         blank=True,
         default=""
     )
+    order = models.PositiveSmallIntegerField("Position", default=0)
 
     class Meta:
         unique_together = ("namespace", "identifier", "version")
