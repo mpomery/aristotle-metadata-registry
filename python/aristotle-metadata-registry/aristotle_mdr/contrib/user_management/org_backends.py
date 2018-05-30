@@ -166,6 +166,9 @@ class AristotleSignupBackend(AristotleInvitationBackend):
     def create_view(self, request):
         aristotle_settings = fetch_aristotle_settings()
 
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(reverse('aristotle_mdr:userHome'))
+
         if 'registry' in aristotle_settings:
             regsettings = aristotle_settings['registry']
             # Check if user self signup is enabled
