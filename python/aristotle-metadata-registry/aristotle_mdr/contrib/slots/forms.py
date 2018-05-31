@@ -12,7 +12,7 @@ def slot_inlineformset_factory():
     base_formset = inlineformset_factory(
         MDR._concept, Slot,
         can_delete=True,
-        fields=('concept', 'name', 'type', 'value', 'order'),
+        fields=('concept', 'name', 'type', 'value', 'order', 'permission'),
         extra=0,
         widgets = {'order': forms.widgets.HiddenInput()}
     )

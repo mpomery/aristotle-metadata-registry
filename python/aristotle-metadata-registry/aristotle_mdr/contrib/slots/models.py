@@ -21,6 +21,14 @@ class Slot(TimeStampedModel):
     concept = ConceptForeignKey(MDR._concept, related_name='slots')
     value = models.TextField()
     order = models.PositiveSmallIntegerField("Position", default=0)
+    permission = models.IntegerField(
+        choices = (
+            (0, 'All'),
+            (1, 'Authenticated'),
+            (2, 'Workgroup'),
+        ),
+        default=0
+    )
 
     def __str__(self):
         return u"{0} - {1}".format(self.name, self.value)
