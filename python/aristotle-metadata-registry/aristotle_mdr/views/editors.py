@@ -17,6 +17,7 @@ from aristotle_mdr import models as MDR
 from aristotle_mdr.views.utils import ObjectLevelPermissionRequiredMixin
 from aristotle_mdr.contrib.identifiers.models import ScopedIdentifier
 from aristotle_mdr.contrib.slots.models import Slot
+from aristotle_mdr.contrib.slots.utils import get_allowed_slots
 
 import logging
 
@@ -79,7 +80,7 @@ class EditItemView(ExtraFormsetMixin, ConceptEditFormView, UpdateView):
 
         if self.slots_active:
             slot_formset = self.get_slots_formset()(
-                queryset=Slot.objects.filter(concept=self.item.id),
+                queryset=get_allowed_slots(concept=self.item, user=self.request.user),
                 instance=self.item.concept,
                 data=postdata
             )
