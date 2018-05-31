@@ -7,7 +7,6 @@
 
     {{ formset.management_form }}
     <table class="form table table-hover">
-    {% with formset.forms.0 as slot_form %}
       <thead><tr>
             <th></th>
             <th>{% trans 'Slot name' %}</th>
@@ -15,7 +14,6 @@
             <th>{% trans 'Value' %}</th>
             <th>{% trans 'Delete' %}</th>
       </tr></thead>
-    {% endwith %}
     <tbody id="slots" class="draggableTable">
     {% for slot_form in formset.forms %}
       <tr class="moveablerow">
@@ -25,6 +23,7 @@
             {{ hidden }}
             {% endfor %}
           </td>
+
           {% for field in slot_form.visible_fields %}
             <td>
               {{ field.errors.as_ul }}

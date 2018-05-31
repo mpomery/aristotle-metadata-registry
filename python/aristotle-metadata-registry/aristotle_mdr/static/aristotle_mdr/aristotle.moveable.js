@@ -122,6 +122,9 @@ function reorderRows(panelList) {
 }
 
 function addSlot() {
-  console.log('adding slot');
   addCode('slots')
+}
+
+function addIdent() {
+  addCode('identifiers')
 }

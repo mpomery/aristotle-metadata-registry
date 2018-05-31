@@ -146,17 +146,11 @@ class EditItemView(ExtraFormsetMixin, ConceptEditFormView, UpdateView):
 
     def get_slots_formset(self):
         from aristotle_mdr.contrib.slots.forms import slot_inlineformset_factory
-        return slot_inlineformset_factory(model=self.model)
+        return slot_inlineformset_factory()
 
     def get_identifier_formset(self):
-        from aristotle_mdr.contrib.identifiers.models import ScopedIdentifier
-
-        return inlineformset_factory(
-            MDR._concept, ScopedIdentifier,
-            can_delete=True,
-            fields=('concept', 'namespace', 'identifier', 'version'),
-            extra=0,
-            )
+        from aristotle_mdr.contrib.identifiers.forms import identifier_inlineformset_factory
+        return identifier_inlineformset_factory()
 
     def form_invalid(self, form, formsets=None):
         """
