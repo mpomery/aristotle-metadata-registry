@@ -1,5 +1,5 @@
 from django.urls import reverse
-from django.test import TestCase
+from django.test import TestCase, tag
 
 from aristotle_mdr.contrib.slots import models
 from aristotle_mdr.models import ObjectClass, Workgroup
@@ -9,6 +9,55 @@ from aristotle_mdr.utils import setup_aristotle_test_environment
 
 setup_aristotle_test_environment()
 
+
+class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
+
+    def setUp(self):
+        super().setUp()
+
+        self.newoc = ObjectClass.objects.create(
+            name='testoc',
+            definition='test defn',
+            workgroup=self.wg1
+        )
+        self.ra.register(self.newoc, self.ra.public_state, self.su)
+
+        public_slot = models.Slot.objects.create(
+            name='public',
+            type='string',
+            value='test value',
+            concept=self.newoc,
+            order=0,
+            permission=0
+        )
+        auth_slot = models.Slot.objects.create(
+            name='auth',
+            type='string',
+            value='test value',
+            concept=self.newoc,
+            order=1,
+            permission=1
+        )
+        work_slot = models.Slot.objects.create(
+            name='work',
+            type='string',
+            value='test value',
+            concept=self.newoc,
+            order=2,
+            permission=2
+        )
+
+    def test_view_permissions(self):
+
+        self.assertEqual(self.newoc.slots.count(), 3)
+
+        # Anon User
+        self.client.logout()
+        response = self.client.get(reverse('aristotle:item', args=[self.newoc.id]), follow=True)
+        self.assertEqual(response.status_code, 200)
+        slots = response.context['slots']
+        self.assertEqual(len(slots), 1)
+        self.assertEqual(slots[0].name, 'public')
 
 class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):
     def test_similar_slots_page(self):
