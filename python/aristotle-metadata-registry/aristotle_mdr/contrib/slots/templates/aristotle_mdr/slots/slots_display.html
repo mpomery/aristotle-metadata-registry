@@ -20,7 +20,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for slot in item.slots.all|order_by:'name' %}
+        {% for slot in item.slots.all %}
         <tr>
             <td>
                 {{ slot.name }}
