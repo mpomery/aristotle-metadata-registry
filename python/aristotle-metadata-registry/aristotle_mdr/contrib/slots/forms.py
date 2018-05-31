@@ -2,7 +2,6 @@ from django import forms
 from django.forms.models import inlineformset_factory
 from django.utils.translation import ugettext_lazy as _
 from aristotle_mdr import models as MDR
-from aristotle_mdr.contrib.generic.forms import HiddenOrderInlineFormSet
 from aristotle_mdr.contrib.slots.models import Slot
 from aristotle_mdr.forms.bulk_actions import LoggedInBulkActionForm
 

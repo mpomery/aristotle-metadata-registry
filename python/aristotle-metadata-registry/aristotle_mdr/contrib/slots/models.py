@@ -25,6 +25,9 @@ class Slot(TimeStampedModel):
     def __str__(self):
         return u"{0} - {1}".format(self.name, self.value)
 
+    class Meta:
+        ordering = ['order']
+
 
 def concepts_with_similar_slots(user, name=None, _type=None, value=None, slot=None):
     assert(slot is not None or _type is not None or name is not None)

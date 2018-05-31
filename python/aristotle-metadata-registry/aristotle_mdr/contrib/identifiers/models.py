@@ -41,6 +41,7 @@ class ScopedIdentifier(TimeStampedModel):
 
     class Meta:
         unique_together = ("namespace", "identifier", "version")
+        ordering = ['order']
 
     def __str__(self):
         return u"{0}:{1}:{2}".format(self.namespace.naming_authority.name, self.identifier, self.version)
