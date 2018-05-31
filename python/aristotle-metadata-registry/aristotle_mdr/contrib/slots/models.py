@@ -22,8 +22,8 @@ class Slot(TimeStampedModel):
     value = models.TextField()
     order = models.PositiveSmallIntegerField("Position", default=0)
     permission = models.IntegerField(
-        choices = (
-            (0, 'All'),
+        choices=(
+            (0, 'Public'),
             (1, 'Authenticated'),
             (2, 'Workgroup'),
         ),

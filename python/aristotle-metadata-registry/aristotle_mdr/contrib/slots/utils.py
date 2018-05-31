@@ -1,5 +1,6 @@
 from aristotle_mdr.contrib.slots.models import Slot
 
+
 def get_allowed_slots(concept, user):
 
     slots = Slot.objects.filter(concept=concept)
