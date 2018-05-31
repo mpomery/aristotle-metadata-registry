@@ -5,6 +5,7 @@ from aristotle_mdr import models as MDR
 from aristotle_mdr.contrib.slots.models import Slot
 from aristotle_mdr.forms.bulk_actions import LoggedInBulkActionForm
 
+
 # TODO: Fix this method, it is a hot mess!... But it works.
 # But it will require Django 1.9 - https://docs.djangoproject.com/en/1.9/topics/forms/formsets/#passing-custom-parameters-to-formset-forms
 # Or some funky functional stuff - http://stackoverflow.com/a/624013/764357
@@ -14,7 +15,7 @@ def slot_inlineformset_factory():
         can_delete=True,
         fields=('concept', 'name', 'type', 'value', 'order', 'permission'),
         extra=0,
-        widgets = {'order': forms.widgets.HiddenInput()}
+        widgets={'order': forms.widgets.HiddenInput()}
     )
 
     return base_formset
