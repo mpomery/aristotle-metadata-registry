@@ -235,23 +235,35 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages, utils.FormsetTestUtils):
                 'value': 'test slot value',
                 'order': 0,
                 'permission': 0,
+            },
+            {
+                'concept': self.item1.pk,
+                'name': 'more_extra',
+                'type': 'string',
+                'value': 'an even better test slot value',
+                'order': 1,
+                'permission': 0,
             }
         ]
         slot_formset_data = self.get_formset_postdata(formset_data, 'slots')
-        print('Formset data is {}'.format(slot_formset_data))
 
         updated_item.update(slot_formset_data)
 
         response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
-        # print('Errors are {}'.format(response.context['slots_FormSet'].errors))
         self.item1 = self.itemType.objects.get(pk=self.item1.pk)
 
         self.assertRedirects(response,url_slugify_concept(self.item1))
-        self.assertEqual(self.item1.slots.count(),1)
+        self.assertEqual(self.item1.slots.count(),2)
 
         response = self.client.get(reverse('aristotle:edit_item',args=[self.item1.id]))
         self.assertContains(response, 'test slot value')
+        self.assertContains(response, 'an even better test slot value')
 
+        slots = self.item1.slots.all()
+        self.assertEqual(slots[0].name, 'extra')
+        self.assertEqual(slots[0].order, 0)
+        self.assertEqual(slots[1].name, 'more_extra')
+        self.assertEqual(slots[1].order, 1)
 
     def test_submitter_cannot_save_via_edit_page_if_other_saves_made(self):
         from datetime import timedelta
