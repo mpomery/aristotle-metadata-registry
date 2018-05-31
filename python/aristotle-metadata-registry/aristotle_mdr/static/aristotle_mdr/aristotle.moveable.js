@@ -105,7 +105,13 @@ function addCode(id) {
 }
 
 function renumberRow(row,num) {
-    $(row).find('input[name$="-ORDER"]').attr('value',num);
+    order_fields = $(row).find('input[name$="-ORDER"]')
+    console.log('length is ' + order_fields.length)
+    if (order_fields.length > 0) {
+      order_field.attr('value',num);
+    } else {
+      $(row).find('input[name$="-order"]').attr('value', num)
+    }
 }
 
 function reorderRows(panelList) {
@@ -117,13 +123,6 @@ function reorderRows(panelList) {
 }
 
 function addSlot() {
-    var panelList = $('#slotsTable');
-    new_form = $('#slotsTable tr:first').clone().appendTo(panelList);
-    num_forms = $('#slotsTable tr').length
-    $(new_form).find('input').attr('value','');
-    $(new_form).find('input[name$="-id"]').removeAttr('value');
-    reorderRows(panelList);
-    // rename the form entries
-    $('input[name=slots-TOTAL_FORMS]').val(num_forms);
-    return false;
+  console.log('adding slot');
+  addCode('slots')
 }

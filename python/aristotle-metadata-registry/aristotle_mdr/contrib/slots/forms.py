@@ -2,9 +2,9 @@ from django import forms
 from django.forms.models import inlineformset_factory
 from django.utils.translation import ugettext_lazy as _
 from aristotle_mdr import models as MDR
+from aristotle_mdr.contrib.generic.forms import HiddenOrderInlineFormSet
 from aristotle_mdr.contrib.slots.models import Slot
 from aristotle_mdr.forms.bulk_actions import LoggedInBulkActionForm
-
 
 # TODO: Fix this method, it is a hot mess!... But it works.
 # But it will require Django 1.9 - https://docs.djangoproject.com/en/1.9/topics/forms/formsets/#passing-custom-parameters-to-formset-forms
@@ -13,9 +13,10 @@ def slot_inlineformset_factory(model):
     base_formset = inlineformset_factory(
         MDR._concept, Slot,
         can_delete=True,
-        fields=('concept', 'name', 'type', 'value'),
+        fields=('concept', 'name', 'type', 'value', 'order'),
         extra=0,
-        )
+        widgets = {'order': forms.widgets.HiddenInput()}
+    )
 
     return base_formset
 
