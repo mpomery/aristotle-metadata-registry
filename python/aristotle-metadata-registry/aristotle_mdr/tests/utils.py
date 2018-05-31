@@ -662,7 +662,7 @@ class FormsetTestUtils:
 
         # Add management form
         postdata['{}-INITIAL_FORMS'.format(prefix)] = initialforms
-        postdata['{}-TOTAL_FORMS'.format(prefix)] = index+1
+        postdata['{}-TOTAL_FORMS'.format(prefix)] = index
         postdata['{}-MIN_NUM_FORMS'.format(prefix)] = 0
         postdata['{}-MAX_NUM_FORMS'.format(prefix)] = 1000
 

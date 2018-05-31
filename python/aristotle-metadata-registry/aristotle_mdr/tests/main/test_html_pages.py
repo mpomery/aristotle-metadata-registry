@@ -62,7 +62,7 @@ def setUpModule():
     from django.core.management import call_command
     call_command('load_aristotle_help', verbosity=0, interactive=False)
 
-class LoggedInViewConceptPages(utils.LoggedInViewPages):
+class LoggedInViewConceptPages(utils.LoggedInViewPages, utils.FormsetTestUtils):
     defaults = {}
     def setUp(self):
         super().setUp()
@@ -227,18 +227,23 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         updated_name = updated_item['name'] + " updated!"
         updated_item['name'] = updated_name
 
-        # Add slots management form
-        updated_item['slots-TOTAL_FORMS'] = 1
-        updated_item['slots-INITIAL_FORMS'] = 0
-        updated_item['slots-MIN_NUM_FORMS'] = 0
-        updated_item['slots-MAX_NUM_FORMS'] = 1
+        formset_data = [
+            {
+                'concept': self.item1.pk,
+                'name': 'extra',
+                'type': 'string',
+                'value': 'test slot value',
+                'order': 0,
+                'permission': 0,
+            }
+        ]
+        slot_formset_data = self.get_formset_postdata(formset_data, 'slots')
+        print('Formset data is {}'.format(slot_formset_data))
 
-        updated_item['slots-0-concept'] = self.item1.pk
-        updated_item['slots-0-name'] = 'extra'
-        updated_item['slots-0-type'] = None
-        updated_item['slots-0-value'] = 'test slot value'
+        updated_item.update(slot_formset_data)
 
         response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
+        # print('Errors are {}'.format(response.context['slots_FormSet'].errors))
         self.item1 = self.itemType.objects.get(pk=self.item1.pk)
 
         self.assertRedirects(response,url_slugify_concept(self.item1))
@@ -1400,7 +1405,7 @@ class ValueDomainViewPage(LoggedInViewConceptPages, TestCase):
             self.assertFalse('value_meaning' in form.fields)
             self.assertTrue('meaning' in form.fields)
 
-class ConceptualDomainViewPage(utils.FormsetTestUtils, LoggedInViewConceptPages, TestCase):
+class ConceptualDomainViewPage(LoggedInViewConceptPages, TestCase):
     url_name='conceptualDomain'
     itemType=models.ConceptualDomain
 
