@@ -6,6 +6,7 @@ from django.db.models.fields import CharField, TextField
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
+import aristotle_mdr.contrib.identifiers.models as ident_models
 from aristotle_mdr.utils import url_slugify_concept
 from aristotle_mdr.forms.creation_wizards import (
     WorkgroupVerificationMixin,
@@ -264,6 +265,59 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages, utils.FormsetTestUtils):
         self.assertEqual(slots[0].order, 0)
         self.assertEqual(slots[1].name, 'more_extra')
         self.assertEqual(slots[1].order, 1)
+
+    def test_submitter_can_save_via_edit_page_with_identifiers(self):
+
+        self.login_editor()
+        response = self.client.get(reverse('aristotle:edit_item',args=[self.item1.id]))
+        self.assertEqual(response.status_code,200)
+
+        self.assertEqual(self.item1.slots.count(),0)
+
+        updated_item = utils.model_to_dict_with_change_time(response.context['item'])
+        updated_name = updated_item['name'] + " updated!"
+        updated_item['name'] = updated_name
+
+        namespace = ident_models.Namespace.objects.create(
+            naming_authority=self.ra,
+            shorthand_prefix='pre'
+        )
+
+        formset_data = [
+            {
+                'concept': self.item1.pk,
+                'namespace': namespace.pk,
+                'identifier': 'YE',
+                'version': 1,
+                'order': 0
+            },
+            {
+                'concept': self.item1.pk,
+                'namespace': namespace.pk,
+                'identifier': 'RE',
+                'version': 1,
+                'order': 1
+            }
+        ]
+        ident_formset_data = self.get_formset_postdata(formset_data, 'identifiers')
+
+        updated_item.update(ident_formset_data)
+
+        response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
+        self.item1 = self.itemType.objects.get(pk=self.item1.pk)
+
+        self.assertRedirects(response,url_slugify_concept(self.item1))
+        self.assertEqual(self.item1.identifiers.count(),2)
+
+        response = self.client.get(reverse('aristotle:item',args=[self.item1.id]), follow=True)
+        self.assertContains(response, 'pre</a>:YE:1')
+        self.assertContains(response, 'pre</a>:RE:1')
+
+        idents = self.item1.identifiers.all()
+        self.assertEqual(idents[0].identifier, 'YE')
+        self.assertEqual(idents[0].order, 0)
+        self.assertEqual(idents[1].identifier, 'RE')
+        self.assertEqual(idents[1].order, 1)
 
     def test_submitter_cannot_save_via_edit_page_if_other_saves_made(self):
         from datetime import timedelta
