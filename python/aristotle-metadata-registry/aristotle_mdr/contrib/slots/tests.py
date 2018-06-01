@@ -67,7 +67,7 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
             requester=self.su,
             registration_authority=self.ra,
             state=self.ra.public_state,
-            registration_date=datetime.date(2010,1,1)
+            registration_date=datetime.date(2010, 1, 1)
         )
         review.concepts.add(self.newoc)
         self.ra.register(self.newoc, self.ra.public_state, self.registrar)
