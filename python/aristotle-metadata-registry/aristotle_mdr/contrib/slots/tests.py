@@ -50,18 +50,15 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
             permission=2
         )
 
-
     def get_aristotle_item(self, id):
         response = self.client.get(reverse('aristotle:item', args=[id]), follow=True)
         self.assertEqual(response.status_code, 200)
         return response
 
-
     def get_aristotle_edit(self, id, code=200):
         response = self.client.get(reverse('aristotle:edit_item', args=[id]))
         self.assertEqual(response.status_code, code)
         return response
-
 
     def test_item_page_permissions(self):
 
@@ -102,7 +99,6 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
         self.assertEqual(slots[0].name, 'public')
         self.assertEqual(slots[1].name, 'auth')
         self.assertEqual(slots[2].name, 'work')
-
 
     def test_edit_page_permissions(self):
 
