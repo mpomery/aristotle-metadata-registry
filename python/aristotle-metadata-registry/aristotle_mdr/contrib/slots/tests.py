@@ -2,10 +2,13 @@ from django.urls import reverse
 from django.test import TestCase, tag
 
 from aristotle_mdr.contrib.slots import models
+from aristotle_mdr import models as mdr_models
 from aristotle_mdr.models import ObjectClass, Workgroup
 from aristotle_mdr.tests import utils
 from aristotle_mdr.tests.main.test_bulk_actions import BulkActionsTest
 from aristotle_mdr.utils import setup_aristotle_test_environment
+
+import datetime
 
 setup_aristotle_test_environment()
 
@@ -18,9 +21,9 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
         self.newoc = ObjectClass.objects.create(
             name='testoc',
             definition='test defn',
-            workgroup=self.wg1
+            workgroup=self.wg1,
+            submitter=self.editor
         )
-        self.ra.register(self.newoc, self.ra.public_state, self.su)
 
         public_slot = models.Slot.objects.create(
             name='public',
@@ -47,17 +50,84 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
             permission=2
         )
 
-    def test_view_permissions(self):
+    def get_aristotle_item(self, id):
+        response = self.client.get(reverse('aristotle:item', args=[id]), follow=True)
+        self.assertEqual(response.status_code, 200)
+        return response
+
+    def get_aristotle_edit(self, id, code=200):
+        response = self.client.get(reverse('aristotle:edit_item', args=[id]))
+        self.assertEqual(response.status_code, code)
+        return response
+
+    def test_item_page_permissions(self):
+
+        # Make newoc public
+        review = mdr_models.ReviewRequest.objects.create(
+            requester=self.su,registration_authority=self.ra,
+            state=self.ra.public_state,
+            registration_date=datetime.date(2010,1,1)
+        )
+        review.concepts.add(self.newoc)
+        self.ra.register(self.newoc, self.ra.public_state, self.registrar)
 
         self.assertEqual(self.newoc.slots.count(), 3)
+        self.assertTrue(self.newoc._is_public)
 
         # Anon User
         self.client.logout()
-        response = self.client.get(reverse('aristotle:item', args=[self.newoc.id]), follow=True)
-        self.assertEqual(response.status_code, 200)
+        response = self.get_aristotle_item(self.newoc.id)
         slots = response.context['slots']
         self.assertEqual(len(slots), 1)
         self.assertEqual(slots[0].name, 'public')
+
+        # Authenticated User, Not in workgroup
+        self.client.logout()
+        self.login_regular_user()
+        response = self.get_aristotle_item(self.newoc.id)
+        slots = response.context['slots']
+        self.assertEqual(len(slots), 2)
+        self.assertEqual(slots[0].name, 'public')
+        self.assertEqual(slots[1].name, 'auth')
+
+        # Authenticated user in workgroup
+        self.client.logout()
+        self.login_editor()
+        response = self.get_aristotle_item(self.newoc.id)
+        slots = response.context['slots']
+        self.assertEqual(len(slots), 3)
+        self.assertEqual(slots[0].name, 'public')
+        self.assertEqual(slots[1].name, 'auth')
+        self.assertEqual(slots[2].name, 'work')
+
+    def test_edit_page_permissions(self):
+
+        self.assertEqual(self.newoc.slots.count(), 3)
+
+        # Anon user
+        self.client.logout()
+        response = self.get_aristotle_edit(self.newoc.id, 302)
+        # Should not be able to view edit page at all
+        self.assertRedirects(
+            response,
+            reverse('friendly_login') + '?next=/item/' + str(self.newoc.id) + '/edit'
+        )
+
+        # Authenticated user, not in wg
+        self.client.logout()
+        self.login_regular_user()
+        # Cant edit the item not in wg
+        response = self.get_aristotle_edit(self.newoc.id, 403)
+
+        # Authenticated user, editor in wg
+        self.client.logout()
+        self.login_editor()
+        response = self.get_aristotle_edit(self.newoc.id)
+        queryset = response.context['slots_FormSet'].queryset
+        self.assertEqual(queryset[0].name, 'public')
+        self.assertEqual(queryset[1].name, 'auth')
+        self.assertEqual(queryset[2].name, 'work')
+
 
 class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):
     def test_similar_slots_page(self):

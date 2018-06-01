@@ -80,7 +80,7 @@ class EditItemView(ExtraFormsetMixin, ConceptEditFormView, UpdateView):
 
         if self.slots_active:
             slot_formset = self.get_slots_formset()(
-                queryset=get_allowed_slots(concept=self.item, user=self.request.user),
+                queryset=Slot.objects.filter(concept=self.item.id),
                 instance=self.item.concept,
                 data=postdata
             )
