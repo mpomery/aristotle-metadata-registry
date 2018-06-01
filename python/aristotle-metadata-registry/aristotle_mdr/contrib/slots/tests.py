@@ -64,7 +64,8 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
 
         # Make newoc public
         review = mdr_models.ReviewRequest.objects.create(
-            requester=self.su,registration_authority=self.ra,
+            requester=self.su,
+            registration_authority=self.ra,
             state=self.ra.public_state,
             registration_date=datetime.date(2010,1,1)
         )
