@@ -44,7 +44,7 @@ defaults:
     addons:
       apt:
         sources:
-          - elasticsearch-2.x
+          - elasticsearch-5.x
         packages:
           - elasticsearch
       code_climate:
