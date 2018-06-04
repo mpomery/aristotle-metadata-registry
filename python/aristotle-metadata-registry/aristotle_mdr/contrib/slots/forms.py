@@ -15,7 +15,7 @@ def slot_inlineformset_factory():
         can_delete=True,
         fields=('concept', 'name', 'type', 'value', 'order', 'permission'),
         extra=0,
-        widgets={'order': forms.widgets.HiddenInput()}
+        widgets={'order': forms.widgets.HiddenInput(), 'value': forms.widgets.Textarea({'cols': 20, 'rows': 5})}
     )
 
     return base_formset

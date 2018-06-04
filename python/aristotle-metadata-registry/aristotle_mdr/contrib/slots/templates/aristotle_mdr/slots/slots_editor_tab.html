@@ -7,14 +7,16 @@
 
     {{ formset.management_form }}
     <table class="form table table-hover">
-      <thead><tr>
-            <th></th>
-            <th>{% trans 'Slot name' %}</th>
-            <th>{% trans 'Type' %}</th>
-            <th>{% trans 'Value' %}</th>
-            <th>{% trans 'Permission' %}</th>
-            <th>{% trans 'Delete' %}</th>
-      </tr></thead>
+      <thead>
+        <tr>
+          <th></th>
+          <th>{% trans 'Slot name' %}</th>
+          <th>{% trans 'Type' %}</th>
+          <th>{% trans 'Value' %}</th>
+          <th>{% trans 'Permission' %}</th>
+          <th>{% trans 'Delete' %}</th>
+        </tr>
+      </thead>
     <tbody id="slots" class="draggableTable">
     {% for slot_form in formset.forms %}
       <tr class="moveablerow">
