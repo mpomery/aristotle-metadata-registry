@@ -188,7 +188,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             self.assertTrue('form' in response.context)
 
         # With email whilelist set
-        mock_settings = MagicMock(return_value={'registry': {'SELF_SIGNUP': {'enabled': True, 'emails': '.gov.au, hellokitty.com'}}})
+        mock_settings = MagicMock(return_value={'registry': {'SELF_SIGNUP': {'enabled': True, 'emails': ['.gov.au', 'hellokitty.com']}}})
         with patch('aristotle_mdr.contrib.user_management.org_backends.fetch_aristotle_settings', mock_settings):
             post_response = self.client.post(reverse('aristotle-user:signup_register'), {'email': 'notallowed@example.com'})
             self.assertTrue(post_response.status_code, 200)

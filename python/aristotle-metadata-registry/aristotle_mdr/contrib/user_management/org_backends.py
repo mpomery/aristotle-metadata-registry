@@ -196,7 +196,7 @@ class AristotleSignupBackend(AristotleInvitationBackend):
 
             # If email suffix whitelist was setup
             if allowed_suffixes:
-                email_valid = self.validate_email(email, allowed_suffixes.split(','))
+                email_valid = self.validate_email(email, allowed_suffixes)
                 if not email_valid:
                     form.add_error('email', 'Email is not at an allowed url')
                     success = False
