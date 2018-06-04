@@ -20,13 +20,18 @@ from aristotle_mdr.utils import setup_aristotle_test_environment
 setup_aristotle_test_environment()
 
 
+def setUpModule():
+    from django.core.management import call_command
+    call_command('load_aristotle_help', verbosity=0, interactive=False)
+
+
 class AnonymousUserViewingThePages(TestCase):
     def test_homepage(self):
-        response = self.client.get("/")
-        self.assertEqual(response.status_code,200)
+        response = self.client.get(reverse('aristotle:smart_root'))
+        self.assertRedirects(reverse('aristotle:home'))
 
     def test_notifications_for_anon_users(self):
-        response = self.client.get("/")
+        response = self.client.get(reverse('aristotle:home'))
         self.assertEqual(response.status_code,200)
         # Make sure notifications library isn't loaded for anon users as they'll never have notifications.
         self.assertNotContains(response, "notifications/notify.js")
@@ -56,9 +61,13 @@ class AnonymousUserViewingThePages(TestCase):
         response = self.client.get(url_slugify_concept(item))
         self.assertEqual(response.status_code,200)
 
-def setUpModule():
-    from django.core.management import call_command
-    call_command('load_aristotle_help', verbosity=0, interactive=False)
+
+class LoggedInViewHTMLPages(utils.LoggedInViewPages):
+    def test_homepage(self):
+        self.login_editor()
+        response = self.client.get(reverse('aristotle:smart_root'))
+        self.assertRedirects(reverse('aristotle:userHome'))
+
 
 class LoggedInViewConceptPages(utils.LoggedInViewPages):
     defaults = {}

@@ -1,5 +1,8 @@
 Changelog
 
+- 2.0.x
+    - Changed how root URL `aristotle.example.com/` resolves: for anonymous users it redirects to `aristotle.example.com/home`, for logged in users it redirects to `aristotle.example.com/account/home/`
+
 - 2.0.0
     - **Dependency notes:**
       - Dropped support for Python 3.4 and below, and Django 1.10 and below
