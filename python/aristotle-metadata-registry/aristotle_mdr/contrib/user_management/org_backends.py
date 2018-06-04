@@ -172,8 +172,11 @@ class AristotleSignupBackend(AristotleInvitationBackend):
         if 'registry' in aristotle_settings:
             regsettings = aristotle_settings['registry']
             # Check if user self signup is enabled
-            signup_enabled = regsettings.get('self_signup_enabled', True)
+            signup_enabled = regsettings.get('self_signup_enabled', False)
             allowed_suffixes = regsettings.get('self_signup_emails', None)
+        else:
+            signup_enabled = False
+            allowed_suffixes = None
 
         if not signup_enabled:
             return self.render_message(request, 'Self Signup is not enabled')

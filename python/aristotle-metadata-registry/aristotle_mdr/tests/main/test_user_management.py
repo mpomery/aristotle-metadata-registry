@@ -165,11 +165,12 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
         # With a signup message
-        mock_settings = MagicMock(return_value={'registry': {'self_signup_message': 'Welcome You Can Signup Here'}})
-        with patch('aristotle_mdr.context_processors.fetch_aristotle_settings', mock_settings):
-            response = self.client.get(reverse('aristotle-user:signup_register'))
-            self.assertEqual(response.status_code, 200)
-            self.assertTrue('Welcome You Can Signup Here' in str(response.content))
+        mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': True, 'self_signup_message': 'Welcome You Can Signup Here'}})
+        with patch('aristotle_mdr.contrib.user_management.org_backends.fetch_aristotle_settings', mock_settings):
+            with patch('aristotle_mdr.context_processors.fetch_aristotle_settings', mock_settings):
+                response = self.client.get(reverse('aristotle-user:signup_register'))
+                self.assertEqual(response.status_code, 200)
+                self.assertTrue('Welcome You Can Signup Here' in str(response.content))
 
         # With signup disabled
         mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': False}})
@@ -179,9 +180,12 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             self.assertFalse('form' in response.context)
             self.assertTrue('message' in response.context)
 
-        response = self.client.get(reverse('aristotle-user:signup_register'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('form' in response.context)
+        # With signup enabled
+        mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': True}})
+        with patch('aristotle_mdr.contrib.user_management.org_backends.fetch_aristotle_settings', mock_settings):
+            response = self.client.get(reverse('aristotle-user:signup_register'))
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue('form' in response.context)
 
         # With email whilelist set
         mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': True, 'self_signup_emails': '.gov.au, hellokitty.com'}})
@@ -206,29 +210,31 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.logout()
         self.assertEqual(len(mail.outbox), 0)
 
-        post_response = self.client.post(reverse('aristotle-user:signup_register'), {'email': 'anewuser@example.com'})
-        self.assertTrue(post_response.status_code, 200)
-        self.assertTrue(post_response.context['message'].startswith('Success'))
-        self.assertEqual(len(mail.outbox), 1)
+        mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': True}})
+        with patch('aristotle_mdr.contrib.user_management.org_backends.fetch_aristotle_settings', mock_settings):
+            post_response = self.client.post(reverse('aristotle-user:signup_register'), {'email': 'anewuser@example.com'})
+            self.assertTrue(post_response.status_code, 200)
+            self.assertTrue(post_response.context['message'].startswith('Success'))
+            self.assertEqual(len(mail.outbox), 1)
 
-        message = mail.outbox[0].body
-        accept_url = self.get_url_from_email(message)
+            message = mail.outbox[0].body
+            accept_url = self.get_url_from_email(message)
 
-        accept_response = self.client.get(accept_url)
-        self.assertEqual(accept_response.status_code, 200)
+            accept_response = self.client.get(accept_url)
+            self.assertEqual(accept_response.status_code, 200)
 
-        accept_data = {
-            'email': 'anewuser@example.com',
-            'full_name': 'New User',
-            'short_name': 'New',
-            'password': 'verynice',
-            'password_confirm': 'verynice'
-        }
+            accept_data = {
+                'email': 'anewuser@example.com',
+                'full_name': 'New User',
+                'short_name': 'New',
+                'password': 'verynice',
+                'password_confirm': 'verynice'
+            }
 
-        post_response = self.client.post(accept_url, accept_data, follow=True)
-        self.assertEqual(post_response.status_code, 200)
-        self.assertTemplateUsed(post_response, 'aristotle_mdr/friendly_login.html')
-        self.assertTrue('welcome' in post_response.context.keys())
+            post_response = self.client.post(accept_url, accept_data, follow=True)
+            self.assertEqual(post_response.status_code, 200)
+            self.assertTemplateUsed(post_response, 'aristotle_mdr/friendly_login.html')
+            self.assertTrue('welcome' in post_response.context.keys())
 
         new_user = get_user_model().objects.get(email='anewuser@example.com')
         self.assertTrue(new_user.is_active)
