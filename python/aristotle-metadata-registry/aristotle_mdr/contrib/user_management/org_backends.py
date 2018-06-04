@@ -169,11 +169,18 @@ class AristotleSignupBackend(AristotleInvitationBackend):
         if request.user.is_authenticated:
             return HttpResponseRedirect(reverse('aristotle_mdr:userHome'))
 
-        if 'registry' in aristotle_settings:
-            regsettings = aristotle_settings['registry']
+        try:
+            signup_settings = aristotle_settings['registry']['SELF_SIGNUP']
+        except KeyError:
+            try:
+                signup_settings = aristotle_settings['SELF_SIGNUP']
+            except KeyError:
+                signup_settings = None
+
+        if signup_settings:
             # Check if user self signup is enabled
-            signup_enabled = regsettings.get('self_signup_enabled', False)
-            allowed_suffixes = regsettings.get('self_signup_emails', None)
+            signup_enabled = signup_settings.get('enabled', False)
+            allowed_suffixes = signup_settings.get('emails', None)
         else:
             signup_enabled = False
             allowed_suffixes = None

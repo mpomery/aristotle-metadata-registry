@@ -9,11 +9,7 @@
     {% if message %}
       <h2>{{ message }}</h2>
     {% else %}
-      {% if config.registry.self_signup_message %}
-        <h1>{{ config.registry.self_signup_message|escape }}</h1>
-      {% else %}
-        <h1>Signup</h1>
-      {% endif %}
+      <h1>{{ config.registry.SELF_SIGNUP.message|default:"Signup" }}</h1>
     {% endif %}
 
     <div class="row">

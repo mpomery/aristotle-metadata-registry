@@ -165,7 +165,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
         # With a signup message
-        mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': True, 'self_signup_message': 'Welcome You Can Signup Here'}})
+        mock_settings = MagicMock(return_value={'registry': {'SELF_SIGNUP': {'enabled': True, 'message': 'Welcome You Can Signup Here'}}})
         with patch('aristotle_mdr.contrib.user_management.org_backends.fetch_aristotle_settings', mock_settings):
             with patch('aristotle_mdr.context_processors.fetch_aristotle_settings', mock_settings):
                 response = self.client.get(reverse('aristotle-user:signup_register'))
@@ -173,7 +173,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
                 self.assertTrue('Welcome You Can Signup Here' in str(response.content))
 
         # With signup disabled
-        mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': False}})
+        mock_settings = MagicMock(return_value={'registry': {'SELF_SIGNUP': {'enabled': False}}})
         with patch('aristotle_mdr.contrib.user_management.org_backends.fetch_aristotle_settings', mock_settings):
             response = self.client.get(reverse('aristotle-user:signup_register'))
             self.assertEqual(response.status_code, 200)
@@ -181,14 +181,14 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             self.assertTrue('message' in response.context)
 
         # With signup enabled
-        mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': True}})
+        mock_settings = MagicMock(return_value={'registry': {'SELF_SIGNUP': {'enabled': True}}})
         with patch('aristotle_mdr.contrib.user_management.org_backends.fetch_aristotle_settings', mock_settings):
             response = self.client.get(reverse('aristotle-user:signup_register'))
             self.assertEqual(response.status_code, 200)
             self.assertTrue('form' in response.context)
 
         # With email whilelist set
-        mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': True, 'self_signup_emails': '.gov.au, hellokitty.com'}})
+        mock_settings = MagicMock(return_value={'registry': {'SELF_SIGNUP': {'enabled': True, 'emails': '.gov.au, hellokitty.com'}}})
         with patch('aristotle_mdr.contrib.user_management.org_backends.fetch_aristotle_settings', mock_settings):
             post_response = self.client.post(reverse('aristotle-user:signup_register'), {'email': 'notallowed@example.com'})
             self.assertTrue(post_response.status_code, 200)
@@ -210,7 +210,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.logout()
         self.assertEqual(len(mail.outbox), 0)
 
-        mock_settings = MagicMock(return_value={'registry': {'self_signup_enabled': True}})
+        mock_settings = MagicMock(return_value={'registry': {'SELF_SIGNUP': {'enabled': True}}})
         with patch('aristotle_mdr.contrib.user_management.org_backends.fetch_aristotle_settings', mock_settings):
             post_response = self.client.post(reverse('aristotle-user:signup_register'), {'email': 'anewuser@example.com'})
             self.assertTrue(post_response.status_code, 200)
