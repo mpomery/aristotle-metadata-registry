@@ -47,12 +47,14 @@ PAGES_PER_RELATED_ITEM = 15
 class SmartRoot(RedirectView):
     unauthenticated_pattern = None
     authenticated_pattern = None
+
     def get_redirect_url(self, *args, **kwargs):
         if self.request.user.is_authenticated():
             self.pattern_name = self.authenticated_pattern
         else:
             self.pattern_name = self.unauthenticated_pattern
         return super().get_redirect_url(*args, **kwargs)
+
 
 class DynamicTemplateView(TemplateView):
     def get_template_names(self):
