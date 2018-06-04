@@ -33,33 +33,33 @@ class TestSynonymMigration(MigrationsTestCase, TestCase):
         self.assertEqual(syn_slot.concept.definition, self.oc1.definition)
         self.assertEqual(syn_slot.value, 'great')
 
-class TestSynonymMigrationReverse(MigrationsTestCase, TestCase):
-
-    migrate_from = '0024_synonym_data_migration'
-    migrate_to = '0023_auto_20180206_0332'
-
-    def setUpBeforeMigration(self, apps):
-        objectclass = apps.get_model('aristotle_mdr', 'ObjectClass')
-        slot = apps.get_model('aristotle_mdr_slots', 'Slot')
-
-        self.oc = objectclass.objects.create(
-            name='Test OC',
-            definition='Test Definition',
-            synonyms='great'
-        )
-
-        self.slot = slot.objects.create(
-            name='Synonyms',
-            concept=self.oc,
-            value='amazing'
-        )
-
-    def test_migration(self):
-
-        objectclass = self.apps.get_model('aristotle_mdr', 'ObjectClass')
-
-        oc = objectclass.objects.get(pk=self.oc.pk)
-        self.assertEqual(oc.synonyms, 'amazing')
+#class TestSynonymMigrationReverse(MigrationsTestCase, TestCase):
+#
+#    migrate_from = '0024_synonym_data_migration'
+#    migrate_to = '0023_auto_20180206_0332'
+#
+#    def setUpBeforeMigration(self, apps):
+#        objectclass = apps.get_model('aristotle_mdr', 'ObjectClass')
+#        slot = apps.get_model('aristotle_mdr_slots', 'Slot')
+#
+#        self.oc = objectclass.objects.create(
+#            name='Test OC',
+#            definition='Test Definition',
+#            synonyms='great'
+#        )
+#
+#        self.slot = slot.objects.create(
+#            name='Synonyms',
+#            concept=self.oc,
+#            value='amazing'
+#        )
+#
+#    def test_migration(self):
+#
+#        objectclass = self.apps.get_model('aristotle_mdr', 'ObjectClass')
+#
+#        oc = objectclass.objects.get(pk=self.oc.pk)
+#        self.assertEqual(oc.synonyms, 'amazing')
 
 class TestDedMigration(MigrationsTestCase, TestCase):
 
