@@ -31,19 +31,6 @@ You can read more about the
 :doc:`template overrides </customising/templates>` in the
 :doc:`extensions documentation </extensions/index>`.
 
-Cross-platform support
-----------------------
-Built upon `Python <https://www.python.org/>`_ and `Django <https://www.djangoproject.com/>`_,
-the Aristotle MetaData Registry can be deployed on a wide range of platform and backend databases
-with relative ease, from traditional Linux/Unix/OSX based servers, to
-`Windows-based servers <https://docs.djangoproject.com/en/dev/howto/windows/>`_.
-The third-party `Django-MSSQL project <http://django-mssql.readthedocs.org/en/latest/>`_
-even provides support for the Microsoft MS-SQL database.
-
-On the client, Aristotle MetaData Registry has rich interactive user interface available
-on all modern browsers, but includes additional support to allow for management of
-content on common legacy browsers as far back as Internet Explorer 8.
-
 Mobile-friendly interface
 -------------------------
 Every page of Aristotle-MDR has been built upon the `Twitter Bootstrap CSS Framework <http://getbootstrap.com/>`_.
