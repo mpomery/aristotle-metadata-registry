@@ -7,6 +7,7 @@ from aristotle_mdr.models import ObjectClass, Workgroup
 from aristotle_mdr.tests import utils
 from aristotle_mdr.tests.main.test_bulk_actions import BulkActionsTest
 from aristotle_mdr.utils import setup_aristotle_test_environment
+from aristotle_mdr.contrib.slots.utils import concepts_with_similar_slots
 
 import datetime
 
@@ -129,6 +130,11 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
         self.assertEqual(queryset[1].name, 'auth')
         self.assertEqual(queryset[2].name, 'work')
 
+    def test_similar_slots_permissions(self):
+
+        # Similar slots search should only display public slots
+        self.assertEqual(self.newoc.slots.count(), 3)
+
 
 class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):
     def test_similar_slots_page(self):
@@ -213,8 +219,8 @@ class TestSlotsBulkAction(BulkActionsTest, TestCase):
             }
         )
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(2, len(models.concepts_with_similar_slots(user=self.editor, name=self.slot_name, value=test_value)))
-        self.assertEqual(2, len(models.concepts_with_similar_slots(user=self.editor, _type=self.slot_type, value=test_value)))
+        self.assertEqual(2, len(concepts_with_similar_slots(user=self.editor, name=self.slot_name, value=test_value)))
+        self.assertEqual(2, len(concepts_with_similar_slots(user=self.editor, _type=self.slot_type, value=test_value)))
 
     def test_bulk_set_slot_on_forbidden_items(self):
         self.login_editor()
@@ -233,5 +239,5 @@ class TestSlotsBulkAction(BulkActionsTest, TestCase):
             },
         )
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(1, len(models.concepts_with_similar_slots(user=self.editor, name=self.slot_name, value=test_value)))
-        self.assertEqual(1, len(models.concepts_with_similar_slots(user=self.editor, _type=self.slot_type, value=test_value)))
+        self.assertEqual(1, len(concepts_with_similar_slots(user=self.editor, name=self.slot_name, value=test_value)))
+        self.assertEqual(1, len(concepts_with_similar_slots(user=self.editor, _type=self.slot_type, value=test_value)))
