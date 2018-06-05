@@ -38,7 +38,8 @@ class Slot(TimeStampedModel):
 
 
 def concepts_with_similar_slots(user, name=None, _type=None, value=None, slot=None):
-    assert(slot is not None or _type is not None or name is not None)
+    if not (slot is not None or _type is not None or name is not None):
+        return MDR._concept.objects.none()
 
     if slot is not None:
         name = slot.name
@@ -53,10 +54,10 @@ def concepts_with_similar_slots(user, name=None, _type=None, value=None, slot=No
     if _type:
         slots = slots.filter(slots__type=_type)
 
-    if value is not None:
+    if value:
         slots = slots.filter(slots__value=value)
 
-    if slot is not None:
+    if slot:
         slots = slots.exclude(id=slot.concept.id)
 
     return slots.distinct()

@@ -6,16 +6,18 @@
 {% block object_list %}
     <p>
         Below is a list of all visible metadata objects with values for the Slot 
-        <em>{{ slot_name }}</em>. This slot is only available on 
-        items of type
+        <em>{{ slot_name }}</em>. 
         {% with item_type=slot_type.model_class %}
+        {% if item_type %}
+        This slot is only available on items of type
         <a href='{#% url "aristotle_help:concept_help" item_type.app_label item_type.model %#}'>[[{{ item_type }}]]</a>.
+        {% endif %}
+        {% endwith %}
         {% if slot_type.help_text %}
         <p class='slot_help'>
             {{ slot_type.help_text }}
         </p>
         {% endif %}
-        {% endwith %}
         {% if value %}
             <p>
                 This list is restricted to just metadata items where this slot 
