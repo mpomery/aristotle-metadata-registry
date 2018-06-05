@@ -226,7 +226,7 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         self.assertEqual(edges[0]['node']['name'], self.dec.name)
         self.assertEqual(edges[0]['node']['dataelement'], None)
 
-    def test_query_slots(self):
+    def test_query_slots_identifiers(self):
 
         self.login_editor()
 
@@ -263,6 +263,54 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         self.assertEqual(edges[0]['node']['slots']['edges'][0]['node']['name'], 'Test slot')
         self.assertEqual(edges[0]['node']['identifiers']['edges'][0]['node']['identifier'], 'Test Identifier')
 
+    @tag('newtest')
+    def test_identifier_filters(self):
+
+        self.login_editor()
+
+        # Add identifier
+        ra = mdr_models.RegistrationAuthority.objects.create()
+        namespace = ident_models.Namespace.objects.create(
+            naming_authority=ra,
+            shorthand_prefix='pre'
+        )
+        ident = ident_models.ScopedIdentifier.objects.create(
+            namespace=namespace,
+            concept=self.oc,
+            identifier='Test Identifier',
+            version='1.0.1'
+        )
+        other_ident = ident_models.ScopedIdentifier.objects.create(
+            namespace=namespace,
+            concept=self.de,
+            identifier='ZZZ',
+            version='6.6.6'
+        )
+
+        self.assertEqual(self.oc.identifiers.count(), 1)
+
+        # Identifier filter
+        json_response = self.post_query(
+            '{{ metadata (identifier: "{}") {{ edges {{ node {{ name }} }} }} }}'.format(ident.identifier)
+        )
+        edges = json_response['data']['metadata']['edges']
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['name'], 'Test Object Class')
+
+        # Identifier Version filter
+        json_response = self.post_query(
+            '{{ metadata (identifierVersion: "{}") {{ edges {{ node {{ name }} }} }} }}'.format(ident.version)
+        )
+        edges = json_response['data']['metadata']['edges']
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['name'], 'Test Object Class')
+
+        # Identifier Namespace filter
+        json_response = self.post_query(
+            '{{ metadata (identifierNamespace: "{}") {{ edges {{ node {{ name }} }} }} }}'.format(namespace.shorthand_prefix)
+        )
+        edges = json_response['data']['metadata']['edges']
+        self.assertEqual(len(edges), 2)
 
 class GraphqlPermissionsTests(BaseGraphqlTestCase, TestCase):
 
