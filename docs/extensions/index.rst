@@ -23,3 +23,4 @@ the `Python programming language <https://www.python.org/about/gettingstarted/>`
    including_extra_content.rst
    templatetags.rst
    using_permissions.rst
+   testing.rst
