@@ -263,7 +263,6 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         self.assertEqual(edges[0]['node']['slots']['edges'][0]['node']['name'], 'Test slot')
         self.assertEqual(edges[0]['node']['identifiers']['edges'][0]['node']['identifier'], 'Test Identifier')
 
-    @tag('newtest')
     def test_identifier_filters(self):
 
         self.login_editor()
