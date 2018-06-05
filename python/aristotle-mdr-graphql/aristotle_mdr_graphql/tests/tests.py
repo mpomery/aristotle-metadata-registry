@@ -3,6 +3,8 @@ from django.urls import reverse
 from aristotle_mdr.tests import utils
 from aristotle_mdr import models as mdr_models
 from aristotle_dse import models as dse_models
+from aristotle_mdr.contrib.slots import models as slots_models
+from aristotle_mdr.contrib.identifiers import models as ident_models
 from comet import models as comet_models
 from graphene.test import Client as QLClient
 
@@ -223,6 +225,43 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         self.assertEqual(len(edges), 1)
         self.assertEqual(edges[0]['node']['name'], self.dec.name)
         self.assertEqual(edges[0]['node']['dataelement'], None)
+
+    def test_query_slots(self):
+
+        self.login_editor()
+
+        # Add slot
+        slot = slots_models.Slot.objects.create(
+            name='Test slot',
+            concept=self.oc,
+            value='Test Value'
+        )
+
+        # Add identifier
+        ra = mdr_models.RegistrationAuthority.objects.create()
+        namespace = ident_models.Namespace.objects.create(
+            naming_authority=ra,
+            shorthand_prefix='pre'
+        )
+        ident = ident_models.ScopedIdentifier.objects.create(
+            namespace=namespace,
+            concept=self.oc,
+            identifier='Test Identifier',
+            version='1.0.1'
+        )
+
+        self.assertEqual(self.oc.identifiers.count(), 1)
+        self.assertEqual(self.oc.slots.count(), 1)
+
+        querytext = (
+            '{ metadata (name: "Test Object Class") { edges { node { name slots { edges { node { name } } }'
+            ' identifiers { edges { node { identifier } } } } } } }'
+        )
+
+        json_response = self.post_query(querytext)
+        edges = json_response['data']['metadata']['edges']
+        self.assertEqual(edges[0]['node']['slots']['edges'][0]['node']['name'], 'Test slot')
+        self.assertEqual(edges[0]['node']['identifiers']['edges'][0]['node']['identifier'], 'Test Identifier')
 
 
 class GraphqlPermissionsTests(BaseGraphqlTestCase, TestCase):
