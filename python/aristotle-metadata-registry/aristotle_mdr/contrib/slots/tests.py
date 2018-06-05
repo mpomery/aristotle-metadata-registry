@@ -136,7 +136,6 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
         self.assertEqual(queryset[1].name, 'auth')
         self.assertEqual(queryset[2].name, 'work')
 
-    @tag('failing')
     def test_similar_slots_permissions(self):
 
         self.make_newoc_public()
