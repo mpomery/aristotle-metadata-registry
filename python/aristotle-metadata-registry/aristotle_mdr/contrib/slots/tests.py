@@ -51,6 +51,8 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
             permission=2
         )
 
+    # ------- utils ------
+
     def get_aristotle_item(self, id):
         response = self.client.get(reverse('aristotle:item', args=[id]), follow=True)
         self.assertEqual(response.status_code, 200)
@@ -61,9 +63,7 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
         self.assertEqual(response.status_code, code)
         return response
 
-    def test_item_page_permissions(self):
-
-        # Make newoc public
+    def make_newoc_public(self):
         review = mdr_models.ReviewRequest.objects.create(
             requester=self.su,
             registration_authority=self.ra,
@@ -72,6 +72,12 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
         )
         review.concepts.add(self.newoc)
         self.ra.register(self.newoc, self.ra.public_state, self.registrar)
+
+    # ------ tests ------
+
+    def test_item_page_permissions(self):
+
+        self.make_newoc_public()
 
         self.assertEqual(self.newoc.slots.count(), 3)
         self.assertTrue(self.newoc._is_public)
@@ -130,11 +136,25 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
         self.assertEqual(queryset[1].name, 'auth')
         self.assertEqual(queryset[2].name, 'work')
 
+    @tag('failing')
     def test_similar_slots_permissions(self):
+
+        self.make_newoc_public()
 
         # Similar slots search should only display public slots
         self.assertEqual(self.newoc.slots.count(), 3)
 
+        response = self.client.get(reverse('aristotle_slots:similar_slots', kwargs={'slot_name': 'public'}))
+        self.assertContains(response, 'test value')
+        self.assertEqual(len(response.context['object_list']), 1)
+
+        response = self.client.get(reverse('aristotle_slots:similar_slots', kwargs={'slot_name': 'auth'}))
+        self.assertContains(response, 'No metadata items have this slot type')
+        self.assertEqual(len(response.context['object_list']), 0)
+
+        response = self.client.get(reverse('aristotle_slots:similar_slots', kwargs={'slot_name': 'work'}))
+        self.assertContains(response, 'No metadata items have this slot type')
+        self.assertEqual(len(response.context['object_list']), 0)
 
 class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):
     def test_similar_slots_page(self):
