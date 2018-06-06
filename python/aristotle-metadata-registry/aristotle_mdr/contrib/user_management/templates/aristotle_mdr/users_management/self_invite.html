@@ -21,24 +21,25 @@
         {% endif %}
 
         <div class="account-wall">
+          {% if form %}
           <span class="face normal">
             <i class="fg fa fa-user"></i>
           </span>
 
-          {% if form %}
+          <div class="bg-danger">{{ form.non_field_errors }}</div>
           <form method="post">
             {% csrf_token %}
             {% for field in form %}
             <div class="form-group">
-              <p class="bg-danger">{{ field.errors }}</p>
               <p>{{ field.label_tag }}</p>
+              <div class="bg-danger">{{ field.errors }}</div>
               <p>{{ field }}</p>
               {% if field.help_text %}
                 <p class="help">{{ field.help_text|safe }}</p>
               {% endif %}
             </div>
             {% endfor %}
-            <input class="btn btn-primary btn-lg btn-block" tabindex="4" type="submit" value="Sign Up" />
+            <input class="btn btn-primary btn-lg btn-block" tabindex="4" type="submit" value="Signup" />
           </form>
           {% else %}
             <a href="{% url 'aristotle_mdr:home' %}" class="btn btn-default">Back</a>

@@ -8,7 +8,9 @@ from django.shortcuts import redirect, render
 from django.views.generic import FormView
 from django.template import loader
 
-from organizations.backends.defaults import InvitationBackend, RegistrationBackend
+from organizations.backends.defaults import (InvitationBackend,
+                                             RegistrationBackend)
+
 from organizations.backends.tokens import RegistrationTokenGenerator
 
 from . import forms
@@ -33,7 +35,7 @@ class BaseAristotleInvitationBackend(InvitationBackend):
     associated with a new organization.
     """
 
-    form_class = forms.AristotleUserRegistrationForm
+    form_class = forms.UserRegistrationForm
     accept_url_name = 'registry_invitations_register'
 
     def get_success_url(self):
@@ -222,6 +224,7 @@ class AristotleSignupBackend(AristotleInvitationBackend):
             self.registration_form_template,
             {'message': message}
         )
+
 
 
 class InviteView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
