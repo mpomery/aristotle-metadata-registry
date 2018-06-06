@@ -19,9 +19,9 @@ from django.utils.translation import ugettext_lazy as _
 
 urlpatterns=[
     url(r'^$', views.SmartRoot.as_view(
-        unauthenticated_pattern='aristotle_mdr:home',
-        authenticated_pattern="aristotle_mdr:userHome"
-    ), name="smart_root"),
+        unauthenticated_pattern='aristotle_mdr:home'
+        authenticated_pattern='aristotle_mdr:userHome'
+    ), name='smart_root'),
     url(r'^home/?$', TemplateView.as_view(template_name='aristotle_mdr/static/home.html'), name="home"),
     url(r'^manifest.json$', TemplateView.as_view(template_name='meta/manifest.json', content_type='application/json')),
     url(r'^robots.txt$', TemplateView.as_view(template_name='meta/robots.txt', content_type='text/plain')),
