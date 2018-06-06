@@ -1,5 +1,8 @@
 Changelog
 
+- 2.0.x
+    - Removed official support for Windows & MSSQL
+
 - 2.0.0
     - **Dependency notes:**
       - Dropped support for Python 3.4 and below, and Django 1.10 and below
