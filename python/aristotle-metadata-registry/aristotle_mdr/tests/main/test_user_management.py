@@ -256,7 +256,9 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         }
 
         # Test entering correct data, following link in email
-        mock_settings = MagicMock(return_value={'registry': {'SELF_SIGNUP': {'enabled': True}}})
+        mock_settings = MagicMock(
+            return_value={'registry': {'SELF_SIGNUP': {'enabled': True}}, 'SITE_NAME': 'Testing Registry'}
+        )
         with patch('aristotle_mdr.contrib.user_management.views.fetch_aristotle_settings', mock_settings):
 
             post_response = self.client.post(reverse('aristotle-user:signup_register'), signup_data)
@@ -268,6 +270,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             accept_url = self.get_url_from_email(message)
 
             response = self.client.get(accept_url, follow=True)
+
             self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, 'aristotle_mdr/friendly_login.html')
             self.assertTrue('welcome' in response.context.keys())
@@ -277,6 +280,12 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.assertTrue(new_user.password)
         self.assertEqual(new_user.short_name, 'New')
         self.assertEqual(new_user.full_name, 'New User')
+
+        # Check notify emails
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[1].to, ['super@example.com'])
+        self.assertTrue('Testing Registry' in mail.outbox[1].subject)
+
 
     def test_self_register_activate_error_handling(self):
 
@@ -322,3 +331,56 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         response = self.client.get(accept_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['message'], 'Account could not be activated')
+
+    def test_resend_activation(self):
+
+        user_model = get_user_model()
+
+        inactive_user = user_model.objects.create(
+            email='inactive@example.com',
+            password='1234',
+            is_active=False
+        )
+
+        active_user = user_model.objects.create(
+            email='active@example.com',
+            password='1234',
+            is_active=True
+        )
+
+        response = self.client.get(reverse('aristotle-user:signup_resend'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['title'], 'Resend Activation')
+
+        # Try to resend to account that doesnt exist
+        response = self.client.post(
+            reverse('aristotle-user:signup_resend'),
+            {'email': 'i_dont_even_exist@example.com'}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['form'].non_field_errors(),
+            ['Activation could not be sent']
+        )
+
+        # Try to resend to already active user
+        response = self.client.post(
+            reverse('aristotle-user:signup_resend'),
+            {'email': 'active@example.com'}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['form'].non_field_errors(),
+            ['Activation could not be sent']
+        )
+
+        # Resend to an inactive user
+        response = self.client.post(
+            reverse('aristotle-user:signup_resend'),
+            {'email': 'inactive@example.com'}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['message'], 'Email has been sent')
+
+        self.assertEqual(len(mail.outbox), 1)
+

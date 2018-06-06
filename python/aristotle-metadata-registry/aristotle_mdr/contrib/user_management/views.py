@@ -168,7 +168,8 @@ class SignupView(FormView):
                 self.activation_body,
                 token=token,
                 user_id=user.id,
-                accept_url_name=self.accept_url_name
+                accept_url_name=self.accept_url_name,
+                config = fetch_aristotle_settings()
             ).send()
 
             # Show message
@@ -227,7 +228,8 @@ class SignupActivateView(TemplateView):
                 user,
                 self.admin_notification_subject,
                 self.admin_notification_body,
-                user_email=user_email
+                user_email=user_email,
+                config = fetch_aristotle_settings()
             ).send()
 
     def get(self, request, *args, **kwargs):
@@ -292,7 +294,8 @@ class ResendActivationView(FormView):
             self.activation_body,
             token=token,
             user_id=user.id,
-            accept_url_name=self.accept_url_name
+            accept_url_name=self.accept_url_name,
+            config = fetch_aristotle_settings()
         ).send()
 
         return self.render_to_response({'message': 'Email has been sent'})
