@@ -1,0 +1,30 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[dev-packages]
+
+honcho = "*"
+django-debug-toolbar = "*"
+django-tools = "*"
+
+[packages]
+django = "~=1.11.0"
+django-haystack = "~=2.7.0"
+django-notifications-hq = "~=1.3.0"
+
+aristotle-metadata-registry = {editable = true, path = "../python/aristotle-metadata-registry/"}
+aristotle-mdr-api = {editable = true, path = "../python/aristotle-mdr-api/"}
+aristotle-mdr-graphql = {editable = true, path = "../python/aristotle-mdr-graphql/"}
+aristotle-glossary = {editable = true, path = "../python/aristotle-glossary/"}
+mallard-questionnaire-registry = {editable = true, path = "../python/mallard-questionnaire-registry/"}
+comet-indicator-registry = {editable = true, path = "../python/comet-indicator-registry/"}
+aristotle-pdf-downloads = {editable = true, path = "../python/aristotle-pdf-downloads/"}
+aristotle-dataset-extensions = {editable = true, path = "../python/aristotle-dataset-extensions/"}
+
+[requires]
+
+python_version = "3.6"
