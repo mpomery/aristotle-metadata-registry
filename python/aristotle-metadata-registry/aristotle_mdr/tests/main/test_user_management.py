@@ -155,7 +155,6 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.assertEqual(new_user.short_name, 'Test')
         self.assertEqual(new_user.full_name, 'Test User')
 
-    @tag('failed')
     def test_self_registration_page(self):
 
         self.login_superuser()
@@ -213,7 +212,6 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
 
         self.assertEqual(len(mail.outbox), 1)
 
-    @tag('updated')
     def test_self_registration_email_whitelist(self):
 
         signup_data = {
@@ -244,7 +242,6 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
 
         self.assertEqual(len(mail.outbox), 2)
 
-    @tag('updated')
     def test_accept_registration_email(self):
 
         self.logout()
@@ -281,7 +278,6 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.assertEqual(new_user.short_name, 'New')
         self.assertEqual(new_user.full_name, 'New User')
 
-    @tag('updated2')
     def test_self_register_activate_error_handling(self):
 
         signup_data = {
