@@ -12,7 +12,6 @@ Operating system support
 ------------------------
 
 * Ubuntu Linux (Precise Pangolin) 12.04 LTS (verification courtesy of Travis-CI)
-* Windows Server 2016 (verification courtesy of Appveyor)
 
 Travis-CI does not yet have containerised support for the Ubuntu 14.04 or 16.04
 long-term support releases.
@@ -34,14 +33,18 @@ Database support
 
 * SQLite
 * Postgres
-* Microsoft SQL Server 2016 (Windows deployments only)
 * MariaDB
 
-Note, MySQL has issues incompatible with Aristotle that prevent it from being used.
+Notes:
+
+Aristotle has been tested against Microsoft SQL Server 2016 on Windows, but we
+no longer provide official testing against this database.
+
+MySQL has issues incompatible with Aristotle that prevent it from being used.
 Consider using an alternative like MariaDB if you need MySQL-like support.
 
 Search index support
 --------------------
 
-* Elasticsearch 2.0+ (Only tested on Linux)
+* Elasticsearch 5.0+ (Only tested on Linux)
 * Whoosh (Linux and Windows)
