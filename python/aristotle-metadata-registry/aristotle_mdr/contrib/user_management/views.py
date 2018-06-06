@@ -91,22 +91,30 @@ class ReactivateRegistryUser(LoginRequiredMixin, PermissionRequiredMixin, Templa
         return data
 
 
-class SignupView(FormView):
-
-    form_class = forms.UserRegistrationForm
-    template_name = "aristotle_mdr/users_management/self_invite.html"
-    accept_url_name = 'aristotle-user:signup_activate'
+class SignupMixin:
 
     activation_subject = 'aristotle_mdr/users_management/newuser/email/activation_subject.txt'
     activation_body = 'aristotle_mdr/users_management/newuser/email/activation_body.html'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.user_model = get_user_model()
         self.registration_backend = BaseBackend()
-        self.if_logged_in_url = reverse('aristotle_mdr:userHome')
+        super().__init__(*args, **kwargs)
 
-    def dispatch(self, request, *args, **kwargs):
+    def send_activation(self, user)
+        # Send Activation Email
+        token = self.registration_backend.get_token(user)
+        self.registration_backend.email_message(
+            user,
+            self.activation_subject,
+            self.activation_body,
+            token=token,
+            user_id=user.id,
+            accept_url_name=self.accept_url_name,
+            config=fetch_aristotle_settings(),
+            request=self.request
+        ).send()
+
+    def get_signup_settings(self):
         aristotle_settings = fetch_aristotle_settings()
 
         if request.user.is_authenticated:
@@ -127,6 +135,23 @@ class SignupView(FormView):
         else:
             self.signup_enabled = False
             self.allowed_suffixes = None
+
+        return self.signup_enabled
+
+
+class SignupView(SignupMixin, FormView):
+
+    form_class = forms.UserRegistrationForm
+    template_name = "aristotle_mdr/users_management/self_invite.html"
+    accept_url_name = 'aristotle-user:signup_activate'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user_model = get_user_model()
+        self.if_logged_in_url = reverse('aristotle_mdr:userHome')
+
+    def dispatch(self, request, *args, **kwargs):
+        self.get_signup_settings()
 
         if not self.signup_enabled:
             return self.render_to_response({'message': 'Self Signup is not enabled'})
@@ -169,8 +194,10 @@ class SignupView(FormView):
                 token=token,
                 user_id=user.id,
                 accept_url_name=self.accept_url_name,
-                config = fetch_aristotle_settings()
+                config=fetch_aristotle_settings(),
+                request=self.request
             ).send()
+            self.send_activation(user)
 
             # Show message
             return self.render_to_response(
@@ -180,7 +207,7 @@ class SignupView(FormView):
             return self.form_invalid(form)
 
 
-class SignupActivateView(TemplateView):
+class SignupActivateView(SingupMixin, TemplateView):
 
     template_name = "aristotle_mdr/users_management/self_invite.html"
 
@@ -189,26 +216,15 @@ class SignupActivateView(TemplateView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.registration_backend = BaseBackend()
         self.token_generator = RegistrationTokenGenerator()
         self.user_model = get_user_model()
-
         self.success_redirect = reverse('friendly_login') + '?welcome=true'
-
         self.users_to_notify = self.user_model.objects.filter(is_superuser=True)
 
     def dispatch(self, request, *args, **kwargs):
-        aristotle_settings = fetch_aristotle_settings()
+        self.get_signup_settings()
 
-        try:
-            signup_settings = aristotle_settings['registry']['SELF_SIGNUP']
-        except KeyError:
-            try:
-                signup_settings = aristotle_settings['SELF_SIGNUP']
-            except KeyError:
-                return self.signup_disabled_message()
-
-        if not signup_settings.get('enabled', False):
+        if not self.signup_enabled:
             return self.signup_disabled_message()
 
         return super().dispatch(request, *args, **kwargs)
@@ -229,7 +245,7 @@ class SignupActivateView(TemplateView):
                 self.admin_notification_subject,
                 self.admin_notification_body,
                 user_email=user_email,
-                config = fetch_aristotle_settings()
+                config=fetch_aristotle_settings(),
             ).send()
 
     def get(self, request, *args, **kwargs):
@@ -254,18 +270,11 @@ class SignupActivateView(TemplateView):
         return self.signup_error_message()
 
 
-class ResendActivationView(FormView):
+class ResendActivationView(SignupMixin, FormView):
 
     template_name = "aristotle_mdr/users_management/self_invite.html"
     form_class = forms.ResendActivationForm
     accept_url_name = 'aristotle-user:signup_activate'
-
-    activation_subject = 'aristotle_mdr/users_management/newuser/email/activation_subject.txt'
-    activation_body = 'aristotle_mdr/users_management/newuser/email/activation_body.html'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.registration_backend = BaseBackend()
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -283,19 +292,10 @@ class ResendActivationView(FormView):
         try:
             user = user_model.objects.get(email=email, is_active=False)
         except user_model.DoesNotExist:
-            form.add_error(None, 'Activation could not be sent')
+            form.add_error(None, 'Activation email could not be sent')
             return self.form_invalid(form)
 
         # Send Activation Email
-        token = self.registration_backend.get_token(user)
-        self.registration_backend.email_message(
-            user,
-            self.activation_subject,
-            self.activation_body,
-            token=token,
-            user_id=user.id,
-            accept_url_name=self.accept_url_name,
-            config = fetch_aristotle_settings()
-        ).send()
+        self.send_activation(user)
 
         return self.render_to_response({'message': 'Email has been sent'})
