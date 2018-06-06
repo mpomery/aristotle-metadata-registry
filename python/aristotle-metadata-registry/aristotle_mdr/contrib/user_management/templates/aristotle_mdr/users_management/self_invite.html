@@ -15,36 +15,47 @@
       <div class="col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
         
         {% if message %}
-          <h2 class="block text-center">{{ message }}</h2>
-        {% else %}
-          <h1 class="block text-center">{{ config.registry.SELF_SIGNUP.message|default:"Signup" }}</h1>
-        {% endif %}
 
-        <div class="account-wall">
-          {% if form %}
-          <span class="face normal">
-            <i class="fg fa fa-user"></i>
-          </span>
-
-          <div class="bg-danger">{{ form.non_field_errors }}</div>
-          <form method="post">
-            {% csrf_token %}
-            {% for field in form %}
-            <div class="form-group">
-              <p>{{ field.label_tag }}</p>
-              <div class="bg-danger">{{ field.errors }}</div>
-              <p>{{ field }}</p>
-              {% if field.help_text %}
-                <p class="help">{{ field.help_text|safe }}</p>
-              {% endif %}
-            </div>
-            {% endfor %}
-            <input class="btn btn-primary btn-lg btn-block" tabindex="4" type="submit" value="Signup" />
-          </form>
-          {% else %}
+          <div class="text-center">
+            <h1 class="block">{{ message }}</h1>
             <a href="{% url 'aristotle_mdr:home' %}" class="btn btn-default">Back</a>
+            {% if resend_button %}
+              <a href="{% url 'aristotle-user:signup_resend' %}" class="btn btn-default">Resend Activation</a>
+            {% endif %}
+          </div>
+
+        {% elif form %}
+
+          {% if title %}
+            <h1 class="block text-center">{{ title }}</h1>
+          {% else %}
+            <h1 class="block text-center">{{ config.registry.SELF_SIGNUP.message|default:"Signup" }}</h1>
           {% endif %}
-        </div>
+
+          <div class="account-wall">
+            <span class="face normal">
+              <i class="fg fa fa-user"></i>
+            </span>
+
+            <div class="bg-danger">{{ form.non_field_errors }}</div>
+            <form method="post">
+              {% csrf_token %}
+              {% for field in form %}
+              <div class="form-group">
+                <p>{{ field.label_tag }}</p>
+                <div class="bg-danger">{{ field.errors }}</div>
+                <p>{{ field }}</p>
+                {% if field.help_text %}
+                  <p class="help">{{ field.help_text|safe }}</p>
+                {% endif %}
+              </div>
+              {% endfor %}
+              <input class="btn btn-primary btn-lg btn-block" tabindex="4" type="submit" 
+                value="{{ button_text|default:'Signup' }}" />
+            </form>
+          </div>
+
+        {% endif %}
 
       </div>
     </div>
