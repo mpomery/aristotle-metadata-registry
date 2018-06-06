@@ -220,12 +220,13 @@ class SignupActivateView(TemplateView):
             'resend_button': True
         })
 
-    def notify_of_activation(self):
+    def notify_of_activation(self, user_email):
         for user in self.users_to_notify:
             self.registration_backend.email_message(
                 user,
                 self.admin_notification_subject,
                 self.admin_notification_body,
+                user_email=user_email
             ).send()
 
     def get(self, request, *args, **kwargs):
@@ -244,7 +245,7 @@ class SignupActivateView(TemplateView):
         if self.token_generator.check_token(user, token):
             user.is_active = True
             user.save()
-            self.notify_of_activation()
+            self.notify_of_activation(user.email)
             return HttpResponseRedirect(self.success_redirect)
 
         return self.signup_error_message()
