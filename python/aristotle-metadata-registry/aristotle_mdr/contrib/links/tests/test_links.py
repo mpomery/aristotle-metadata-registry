@@ -189,7 +189,7 @@ class TestLinkPages(LinkTestBase, TestCase):
 
     def test_add_link_wizard(self):
         self.wizard_form_name = "add_link_wizard"
-        next_url = "/"
+        next_url = reverse("aristotle:home")
         self.wizard_url = reverse('aristotle_mdr_links:add_link')+'?next=' + next_url
 
         self.ra.register(

@@ -28,7 +28,7 @@ def setUpModule():
 class AnonymousUserViewingThePages(TestCase):
     def test_homepage(self):
         response = self.client.get(reverse('aristotle:smart_root'))
-        self.assertRedirects(reverse('aristotle:home'))
+        self.assertRedirects(response, reverse('aristotle:home'))
 
     def test_notifications_for_anon_users(self):
         response = self.client.get(reverse('aristotle:home'))
@@ -62,11 +62,11 @@ class AnonymousUserViewingThePages(TestCase):
         self.assertEqual(response.status_code,200)
 
 
-class LoggedInViewHTMLPages(utils.LoggedInViewPages):
+class LoggedInViewHTMLPages(utils.LoggedInViewPages, TestCase):
     def test_homepage(self):
         self.login_editor()
         response = self.client.get(reverse('aristotle:smart_root'))
-        self.assertRedirects(reverse('aristotle:userHome'))
+        self.assertRedirects(response, reverse('aristotle:userHome'))
 
 
 class LoggedInViewConceptPages(utils.LoggedInViewPages):
