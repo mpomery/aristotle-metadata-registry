@@ -45,10 +45,13 @@ class ResendActivationForm(forms.Form):
 
     email = forms.EmailField(widget=forms.TextInput(attrs={'class': 'form-control'}))
 
+
 class UserRegistrationForm(forms.ModelForm):
 
-    password_confirm = forms.CharField(max_length=30,
-        widget=forms.PasswordInput)
+    password_confirm = forms.CharField(
+        max_length=30,
+        widget=forms.PasswordInput
+    )
 
     def clean(self):
         password = self.cleaned_data.get('password')
@@ -65,4 +68,3 @@ class UserRegistrationForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = ['email', 'short_name', 'full_name', 'password']
-

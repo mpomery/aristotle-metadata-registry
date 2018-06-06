@@ -13,6 +13,7 @@ from organizations.backends.tokens import RegistrationTokenGenerator
 from aristotle_mdr.utils.utils import fetch_aristotle_settings
 from . import forms
 
+
 class RegistryOwnerUserList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     template_name='aristotle_mdr/users_management/users/list.html'
 
@@ -295,4 +296,3 @@ class ResendActivationView(FormView):
         ).send()
 
         return self.render_to_response({'message': 'Email has been sent'})
-
