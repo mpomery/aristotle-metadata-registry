@@ -24,22 +24,21 @@
           <li class="active">{{ form_title }}</li>
         </ol>
 
-        {% for dict in formset.errors %}
-          {% if dict %}
-          <div class="alert alert-danger">
-          <ul>
-          {% for key, value in dict.items %}
-              <li>{{ key }} {{ value }}</li>
-          {% endfor %}
-          </ul>
-          </div>
-          {% endif %}
-        {% endfor %}
+        {% if formset.errors %}
+        <div class="alert alert-danger">
+            {{formset.errors}}
+        </div>
+        {% endif %}
+        {% if error_message %}
+        <div class="alert alert-danger">
+            {{ error_message }}
+        </div>
+        {% endif %}
 
     {% csrf_token %}
     {{ formset.management_form }}
     {{ formset.non_form_errors.as_ul }}
-    <div>
+    <div style="overflow-x:auto">
     {% include 'aristotle_mdr/generic/actions/alter_one_to_many_formset.html' with formset=formset %}
     </div>
     <a class="btn btn-primary add_code_button" formid='{{ formset.prefix }}'>

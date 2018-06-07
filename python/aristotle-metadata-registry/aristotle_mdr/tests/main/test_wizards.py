@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, tag
 from django.urls import reverse
 from django.core.management import call_command
 
@@ -7,6 +7,7 @@ import aristotle_mdr.tests.utils as utils
 from aristotle_mdr.utils import url_slugify_concept
 
 from aristotle_mdr.utils import setup_aristotle_test_environment
+from aristotle_mdr.tests.utils import FormsetTestUtils
 
 
 setup_aristotle_test_environment()
@@ -64,6 +65,7 @@ class ConceptWizard_TestInvalidUrls(HaystackReindexMixin, utils.LoggedInViewPage
 class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
     wizard_name="Harry Potter" # This used to be needed, now its not. We kept it cause its funny.
     wizard_form_name="dynamic_aristotle_wizard"
+    extra_step2_data = {}
     # def tearDown(self):
     #     call_command('clear_index', interactive=False, verbosity=0)
 
@@ -141,7 +143,10 @@ class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
             self.wizard_form_name+'-current_step': 'results',
             'results-name':"Test Item",
         }
-
+        management_forms = utils.get_management_forms(self.model, item_is_model=True)
+        step_2_data.update(management_forms)
+        step_2_data.update(self.extra_step2_data)
+        
         response = self.client.post(self.wizard_url, step_2_data)
         wizard = response.context['wizard']
         self.assertTrue('definition' in wizard['form'].errors.keys())
@@ -184,7 +189,7 @@ class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
             state=models.STATES.standard,
             user=self.su
         )
-        
+
         self.login_editor()
         self.assertTrue(self.item_existing.can_view(self.editor))
         form_data = {
@@ -198,7 +203,7 @@ class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
         print(wizard['form'].errors)
         self.assertTrue(len(wizard['form'].errors.keys()) == 0)
         self.assertTrue(self.item_existing in response.context['duplicate_items'])
-        
+
         # Existing item should show up in the "similar results page"
         self.assertContains(response, self.item_existing.definition)
 
@@ -217,7 +222,7 @@ class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
                 state=models.STATES.standard,
                 user=self.su
             )
-        
+
         self.login_editor()
         self.assertTrue(self.item_existing.can_view(self.editor))
         form_data = {
@@ -230,13 +235,13 @@ class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
         wizard = response.context['wizard']
         self.assertTrue(len(wizard['form'].errors.keys()) == 0)
         self.assertFalse('duplicate_items' in response.context.keys())
-        
+
         self.assertTrue(
             self.item_existing.pk in [
                 x.object.pk for x in response.context['similar_items']
             ]
         )
-        
+
         # Existing item should show up in the "similar results page"
         self.assertContains(response, self.item_existing.definition)
 
@@ -245,28 +250,99 @@ class ObjectClassWizardPage(ConceptWizardPage,TestCase):
     model=models.ObjectClass
 class PropertyWizardPage(ConceptWizardPage,TestCase):
     model=models.Property
-class ValueDomainWizardPage(ConceptWizardPage,TestCase):
-    model=models.ValueDomain
-class DataElementConceptWizardPage(ConceptWizardPage, TestCase):
-    model=models.DataElementConcept
-class DataElementWizardPage(ConceptWizardPage, TestCase):
-    model=models.DataElement
 
+class ConceptualDomainWizardPage(FormsetTestUtils, ConceptWizardPage, TestCase):
+    model=models.ConceptualDomain
 
-class DataElementDerivationWizardPage(ConceptWizardPage,TestCase):
-    model=models.DataElementDerivation
-
-    def derivation_m2m_concepts_save_during_create(self):
-        self.de1 = models.DataElement.objects.create(name='DE1 - visible',definition="my definition",workgroup=self.wg1)
-        self.de2 = models.DataElement.objects.create(name='DE2 - not visible',definition="my definition",workgroup=self.wg2)
-        self.login_editor()
-
-        item_name = "My New DED Test Item"
-
+    def post_first_step(self):
+        item_name = 'My Shiny New Conceptual Domain'
         step_1_data = {
             self.wizard_form_name+'-current_step': 'initial',
-            'initial-name':item_name,
+            'initial-name': item_name,
         }
+
+        response = self.client.post(self.wizard_url, step_1_data)
+        wizard = response.context['wizard']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(wizard['steps'].current, 'results')
+
+        return item_name
+
+    @tag('edit_formsets')
+    def test_weak_editor_during_create(self):
+
+        self.login_editor()
+        item_name = self.post_first_step()
+
+        step_2_data = {
+            self.wizard_form_name+'-current_step': 'results',
+            'initial-name':item_name,
+            'results-name':item_name,
+            'results-definition':"Test Definition",
+        }
+
+        valuemeaning_formset_data = [
+            {'name': 'Test1', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 0},
+            {'name': 'Test2', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 1}
+        ]
+        step_2_data.update(self.get_formset_postdata(valuemeaning_formset_data, 'value_meaning', 0))
+
+
+        response = self.client.post(self.wizard_url, step_2_data)
+        self.assertEqual(response.status_code, 302)
+
+        self.assertTrue(self.model.objects.filter(name=item_name).exists())
+        self.assertEqual(self.model.objects.filter(name=item_name).count(),1)
+        item = self.model.objects.filter(name=item_name).first()
+        self.assertRedirects(response,url_slugify_concept(item))
+
+        vms = item.valuemeaning_set.all()
+
+        self.assertEqual(len(vms), 2)
+        self.assertEqual(vms[0].name, 'Test1')
+        self.assertEqual(vms[1].name, 'Test2')
+
+    @tag('edit_formsets', 'runthis')
+    def test_wizard_error_display(self):
+
+        self.login_editor()
+        item_name = self.post_first_step()
+
+        step_2_data = {
+            self.wizard_form_name+'-current_step': 'results',
+            'initial-name':item_name,
+            'results-name':item_name,
+            'results-definition':"Test Definition",
+        }
+
+        # Post with a blank name
+        valuemeaning_formset_data = [
+            {'name': '', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 0},
+            {'name': 'Test2', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 1}
+        ]
+        step_2_data.update(self.get_formset_postdata(valuemeaning_formset_data, 'value_meaning', 0))
+
+        response = self.client.post(self.wizard_url, step_2_data)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(response.context['weak_formsets'][0]['formset'].errors[0], {'name': ['This field is required.']})
+        self.assertContains(response, 'This field is required.')
+
+
+class ValueDomainWizardPage(FormsetTestUtils, ConceptWizardPage,TestCase):
+    model=models.ValueDomain
+
+    @tag('edit_formsets')
+    def test_weak_editor_during_create(self):
+
+        self.login_editor()
+
+        item_name = 'My Shiny New Value Domain'
+        step_1_data = {
+            self.wizard_form_name+'-current_step': 'initial',
+            'initial-name': item_name,
+        }
+
         response = self.client.post(self.wizard_url, step_1_data)
         wizard = response.context['wizard']
         self.assertEqual(response.status_code, 200)
@@ -277,19 +353,20 @@ class DataElementDerivationWizardPage(ConceptWizardPage,TestCase):
             'initial-name':item_name,
             'results-name':item_name,
             'results-definition':"Test Definition",
-            'results-inputs': [self.de1.pk, self.de2.pk],
-            'results-derives': [self.de1.pk]
         }
 
-        response = self.client.post(self.wizard_url, step_2_data)
-        self.assertEqual(response.status_code, 200)
-        wizard = response.context['wizard']
-        self.assertTrue('inputs' in wizard['form'].errors.keys())
+        permissible_formset_data = [
+            {'value': 'Test1', 'meaning': 'Test1', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 0},
+            {'value': 'Test2', 'meaning': 'Test2', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 1}
+        ]
+        step_2_data.update(self.get_formset_postdata(permissible_formset_data, 'permissible_values', 0))
 
-        # must submit a definition at this step. With the right workgroup
-        step_2_data.update({
-            'results-inputs': [self.de1.pk]
-        })
+        supplementary_formset_data = [
+            {'value': 'Test3', 'meaning': 'Test3', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 0},
+            {'value': 'Test4', 'meaning': 'Test4', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 1}
+        ]
+        step_2_data.update(self.get_formset_postdata(supplementary_formset_data, 'supplementary_values', 0))
+
         response = self.client.post(self.wizard_url, step_2_data)
         self.assertEqual(response.status_code, 302)
 
@@ -297,9 +374,93 @@ class DataElementDerivationWizardPage(ConceptWizardPage,TestCase):
         self.assertEqual(self.model.objects.filter(name=item_name).count(),1)
         item = self.model.objects.filter(name=item_name).first()
         self.assertRedirects(response,url_slugify_concept(item))
-        self.assertTrue(self.de1 in item.inputs.all())
-        self.assertTrue(self.de2 not in item.inputs.all())
-        self.assertTrue(self.de1 in item.derives.all())
+
+        supvals = item.supplementaryvalue_set.all()
+        permvals = item.permissiblevalue_set.all()
+
+        self.assertEqual(len(supvals), 2)
+        self.assertEqual(supvals[0].value, 'Test3')
+        self.assertEqual(supvals[1].value, 'Test4')
+
+        self.assertEqual(len(permvals), 2)
+        self.assertEqual(permvals[0].value, 'Test1')
+        self.assertEqual(permvals[1].value, 'Test2')
+
+
+class DataElementConceptWizardPage(ConceptWizardPage, TestCase):
+    model=models.DataElementConcept
+class DataElementWizardPage(ConceptWizardPage, TestCase):
+    model=models.DataElement
+
+
+class DataElementDerivationWizardPage(FormsetTestUtils, ConceptWizardPage,TestCase):
+    model=models.DataElementDerivation
+
+    @tag('edit_formsets')
+    def test_derivation_m2m_during_create(self):
+
+        self.de1 = models.DataElement.objects.create(name='DE1 - visible',definition="my definition",workgroup=self.wg1)
+        self.de2 = models.DataElement.objects.create(name='DE2 - visible',definition="my definition",workgroup=self.wg1)
+        self.de3 = models.DataElement.objects.create(name='DE3 - visible',definition="my definition",workgroup=self.wg1)
+
+        self.login_editor()
+
+        item_name = 'My New DED Test Item'
+        step_1_data = {
+            self.wizard_form_name+'-current_step': 'initial',
+            'initial-name': item_name,
+        }
+
+        response = self.client.post(self.wizard_url, step_1_data)
+        wizard = response.context['wizard']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(wizard['steps'].current, 'results')
+
+        step_2_data = {
+            self.wizard_form_name+'-current_step': 'results',
+            'initial-name':item_name,
+            'results-name':item_name,
+            'results-definition':"Test Definition",
+        }
+
+        inputs_formset_data = [
+            {'data_element': self.de3.pk, 'ORDER': 0},
+            {'data_element': self.de1.pk, 'ORDER': 1}
+        ]
+        step_2_data.update(self.get_formset_postdata(inputs_formset_data, 'inputs', 0))
+
+        derives_formset_data = [
+            {'data_element': self.de2.pk, 'ORDER': 0},
+            {'data_element': self.de3.pk, 'ORDER': 1}
+        ]
+        step_2_data.update(self.get_formset_postdata(derives_formset_data, 'derives', 0))
+
+        response = self.client.post(self.wizard_url, step_2_data)
+        self.assertEqual(response.status_code, 302)
+
+        self.assertTrue(self.model.objects.filter(name=item_name).exists())
+        self.assertEqual(self.model.objects.filter(name=item_name).count(),1)
+        item = self.model.objects.filter(name=item_name).first()
+        self.assertRedirects(response,url_slugify_concept(item))
+
+        inputs = item.inputs.all()
+        derives = item.derives.all()
+
+        self.assertEqual(len(inputs), 2)
+        self.assertTrue(self.de3 in inputs)
+        self.assertTrue(self.de1 in inputs)
+
+        self.assertEqual(len(derives), 2)
+        self.assertTrue(self.de2 in derives)
+        self.assertTrue(self.de3 in derives)
+
+        self.assertEqual(models.DedInputsThrough.objects.count(), 2)
+        self.assertEqual(models.DedInputsThrough.objects.get(order=0).data_element, self.de3)
+        self.assertEqual(models.DedInputsThrough.objects.get(order=1).data_element, self.de1)
+
+        self.assertEqual(models.DedDerivesThrough.objects.count(), 2)
+        self.assertEqual(models.DedDerivesThrough.objects.get(order=0).data_element, self.de2)
+        self.assertEqual(models.DedDerivesThrough.objects.get(order=1).data_element, self.de3)
 
 
 class DataElementConceptAdvancedWizardPage(HaystackReindexMixin, utils.LoggedInViewPages, TestCase):

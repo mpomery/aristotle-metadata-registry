@@ -1,5 +1,5 @@
 {% load i18n slot_tags util_tags %}
-{% if item.slots.exists %}
+{% if slots %}
 <div>
 <h2>Additional Attributes</h2>
 <table class="table">
@@ -20,7 +20,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for slot in item.slots.all|order_by:'name' %}
+        {% for slot in slots %}
         <tr>
             <td>
                 {{ slot.name }}

@@ -1,22 +1,29 @@
 from django import forms
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, FieldDoesNotExist
 from django.urls import reverse
 from django.db import transaction
 from django.forms.models import modelformset_factory
-from django.http import Http404, HttpResponseRedirect
+from django.forms import formset_factory
+from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import FormView, TemplateView, View
 
 from aristotle_mdr.contrib.autocomplete import widgets
-from aristotle_mdr.models import _concept, ValueDomain
+from aristotle_mdr.models import _concept, ValueDomain, AbstractValue
 from aristotle_mdr.perms import user_can_edit, user_can_view
 from aristotle_mdr.utils import construct_change_message
 from aristotle_mdr.contrib.generic.forms import (
-    one_to_many_formset_factory, one_to_many_formset_save,
-    one_to_many_formset_excludes, one_to_many_formset_filters
+    ordered_formset_factory, ordered_formset_save,
+    one_to_many_formset_excludes, one_to_many_formset_filters,
+    HiddenOrderFormset, HiddenOrderModelFormSet
 )
 import reversion
+import inspect
+import re
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 def generic_foreign_key_factory_view(request, **kwargs):
@@ -225,6 +232,132 @@ class GenericAlterManyToManyView(GenericAlterManyToSomethingFormView):
         return HttpResponseRedirect(self.get_success_url())
 
 
+class GenericAlterManyToManyOrderView(GenericAlterManyToManyView):
+
+    template_name = "aristotle_mdr/generic/actions/alter_many_to_many_order.html"
+
+    def get_form_class(self):
+        class M2MOrderForm(forms.Form):
+            item_to_add = forms.ModelChoiceField(
+                queryset=self.model_to_add.objects.visible(self.request.user),
+                label="Attach",
+                required=False,
+                widget=widgets.ConceptAutocompleteSelect(
+                    model=self.model_to_add
+                )
+            )
+        return M2MOrderForm
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        num_items = getattr(self.item, self.model_base_field).count()
+
+        context['form_add_another_text'] = _('Add Another')
+
+        if 'formset' in kwargs:
+            context['formset'] = kwargs['formset']
+        else:
+            formset_initial = self.get_formset_initial()
+            formset = self.get_formset()(initial=formset_initial)
+            context['formset'] = formset
+
+        if 'message' in kwargs:
+            context['error_message'] = kwargs['message']
+
+        return context
+
+    def get_form(self):
+        return None
+
+    def dispatch(self, request, *args, **kwargs):
+
+        self.through_model = self.model_base._meta.get_field(self.model_base_field).remote_field.through
+
+        self.base_through_field = None
+        self.related_through_field = None
+        for field in self.through_model._meta.get_fields():
+            if field.is_relation:
+                if field.related_model == self.model_base:
+                    self.base_through_field = field.name
+                elif field.related_model == self.model_to_add:
+                    self.related_through_field = field.name
+
+        # Check if either is None
+        if self.base_through_field is None or self.related_through_field is None:
+            return self.error_with_message('Many to Many edit could not be performed on this object')
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_formset(self):
+
+        formclass = self.get_form_class()
+        return formset_factory(formclass, formset=HiddenOrderFormset, can_order=True, can_delete=True, extra=0)
+
+    def get_formset_initial(self):
+        # Build initial
+        filter_args = {self.base_through_field: self.item}
+        through_items = self.through_model.objects.filter(**filter_args).order_by('order')
+
+        initial = []
+        for item in through_items:
+            initial.append({
+                'item_to_add': getattr(item, self.related_through_field),
+                'ORDER': item.order
+            })
+
+        return initial
+
+    def error_with_message(self, message):
+        return self.render_to_response(self.get_context_data(message=message))
+
+    def formset_invalid(self, formset):
+        return self.render_to_response(self.get_context_data(formset=formset))
+
+    def post(self, request, *args, **kwargs):
+
+        formset = self.get_formset()
+        filled_formset = formset(self.request.POST)
+
+        if filled_formset.is_valid():
+            with transaction.atomic(), reversion.revisions.create_revision():
+
+                model_arglist = []
+                model_arglist_update = []
+                model_arglist_delete = []
+                change_message = []
+
+                for form in filled_formset.ordered_forms:
+                    to_add = form.cleaned_data['item_to_add']
+
+                    if to_add:
+                        model_args = {
+                            self.base_through_field: self.item,
+                            self.related_through_field: to_add,
+                            'order': form.cleaned_data['ORDER']
+                        }
+
+                        model_arglist.append(model_args)
+                        change_message.append('Added {} to {} {}'.format(to_add.name, self.item.name, self.model_base_field))
+
+                # Delete existing links
+
+                through_args = {
+                    self.base_through_field: self.item
+                }
+                self.through_model.objects.filter(**through_args).delete()
+
+                # Create new links
+                for model_args in model_arglist:
+                    self.through_model.objects.create(**model_args)
+
+                reversion.revisions.set_user(request.user)
+                reversion.revisions.set_comment(change_message)
+
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            return self.formset_invalid(filled_formset)
+
+
 class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
     """
     A view that provides a framework for altering ManyToOne relationships
@@ -263,7 +396,6 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
         num_items = getattr(self.item, self.model_base_field).count()
         formset = self.formset or self.get_formset()(
             queryset=getattr(self.item, self.model_base_field).all(),
-            initial=[{'ORDER': num_items + 1}]
             )
         context['formset'] = one_to_many_formset_filters(formset, self.item)
         return context
@@ -274,7 +406,8 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
     def get_formset(self):
 
         extra_excludes = one_to_many_formset_excludes(self.item, self.model_to_add)
-        formset = one_to_many_formset_factory(self.model_to_add, self.model_to_add_field, self.ordering_field, extra_excludes)
+        all_excludes = [self.model_to_add_field, self.ordering_field] + extra_excludes
+        formset = ordered_formset_factory(self.model_to_add, all_excludes)
 
         return formset
 
@@ -289,7 +422,7 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
         formset = self.formset
         if formset.is_valid():
             with transaction.atomic(), reversion.revisions.create_revision():
-                one_to_many_formset_save(formset, self.item, self.model_to_add_field, self.ordering_field)
+                ordered_formset_save(formset, self.item, self.model_to_add_field, self.ordering_field)
 
                 # formset.save(commit=True)
                 reversion.revisions.set_user(request.user)
@@ -298,6 +431,237 @@ class GenericAlterOneToManyView(GenericAlterManyToSomethingFormView):
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.form_invalid(form)
+
+
+class ExtraFormsetMixin:
+
+    # Mixin of utils function for adding addtional formsets to a view
+    # extra_formsets must contain formset, type, title and saveargs
+    # See EditItemView for example usage
+
+    def save_formsets(self, extra_formsets):
+        for formsetinfo in extra_formsets:
+            if formsetinfo['saveargs']:
+                ordered_formset_save(**formsetinfo['saveargs'])
+            else:
+                formsetinfo['formset'].save()
+
+    def validate_formsets(self, extra_formsets):
+        invalid = False
+
+        for formsetinfo in extra_formsets:
+            if not formsetinfo['formset'].is_valid():
+                invalid = True
+
+        return invalid
+
+    def get_formset_context(self, extra_formsets):
+        context = {}
+
+        for formsetinfo in extra_formsets:
+            type = formsetinfo['type']
+            if type == 'identifiers':
+                context['identifier_FormSet'] = formsetinfo['formset']
+            elif type == 'slot':
+                context['slots_FormSet'] = formsetinfo['formset']
+            elif type == 'weak':
+                if 'weak_formsets' not in context.keys():
+                    context['weak_formsets'] = []
+                context['weak_formsets'].append({'formset': formsetinfo['formset'], 'title': formsetinfo['title']})
+            elif type == 'through':
+                if 'through_formsets' not in context.keys():
+                    context['through_formsets'] = []
+                context['through_formsets'].append({'formset': formsetinfo['formset'], 'title': formsetinfo['title']})
+
+        return context
+
+    def get_extra_formsets(self, item=None, postdata=None):
+        # Item can be a class or an object
+        # This is so we can reuse this function in creation wizards
+
+        extra_formsets = []
+
+        if inspect.isclass(item):
+            is_class = True
+            add_item = None
+        else:
+            is_class = False
+            add_item = item
+
+        through_list = self.get_m2m_through(item)
+        for through in through_list:
+
+            if not is_class:
+                formset = self.get_order_formset(through, item, postdata)
+            else:
+                formset = self.get_order_formset(through, postdata=postdata)
+
+            extra_formsets.append({
+                'formset': formset,
+                'type': 'through',
+                'title': through['field_name'].title(),
+                'saveargs': {
+                    'formset': formset,
+                    'item': add_item,
+                    'model_to_add_field': through['item_field'],
+                    'ordering_field': 'order'
+                }
+            })
+
+        weak_list = self.get_m2m_weak(item)
+        for weak in weak_list:
+
+            if not is_class:
+                formset = self.get_weak_formset(weak, item, postdata)
+            else:
+                formset = self.get_weak_formset(weak, postdata=postdata)
+
+            title = weak['model'].__name__
+            # add spaces before capital letters
+            title = re.sub(r"\B([A-Z])", r" \1", title)
+
+            if hasattr(weak['model'], 'ordering_field'):
+                order_field = weak['model'].ordering_field
+            else:
+                order_field = 'order'
+
+            extra_formsets.append({
+                'formset': formset,
+                'type': 'weak',
+                'title': title,
+                'saveargs': {
+                    'formset': formset,
+                    'item': add_item,
+                    'model_to_add_field': weak['item_field'],
+                    'ordering_field': order_field
+                }
+            })
+
+        return extra_formsets
+
+    def get_order_formset(self, through, item=None, postdata=None):
+        excludes = ['order', through['item_field']]
+        formset = ordered_formset_factory(through['model'], excludes)
+
+        fsargs = {'prefix': through['field_name']}
+
+        if through['item_field']:
+            if item:
+                through_filter = {through['item_field']: item}
+                fsargs['queryset'] = through['model'].objects.filter(**through_filter)
+            else:
+                fsargs['queryset'] = through['model'].objects.none()
+
+        if postdata:
+            fsargs['data'] = postdata
+
+        formset_instance = formset(**fsargs)
+
+        return formset_instance
+
+    def get_weak_formset(self, weak, item=None, postdata=None):
+
+        model_to_add_field = weak['item_field']
+
+        if 'prefix' in weak:
+            fsargs = {'prefix': weak['prefix']}
+        else:
+            fsargs = {'prefix': weak['field_name']}
+
+        if item:
+            extra_excludes = one_to_many_formset_excludes(item, weak['model'])
+            fsargs['queryset'] = getattr(item, weak['field_name']).all()
+        else:
+            if issubclass(weak['model'], AbstractValue):
+                extra_excludes = ['value_meaning']
+            else:
+                extra_excludes = []
+            fsargs['queryset'] = weak['model'].objects.none()
+
+        if postdata:
+            fsargs['data'] = postdata
+
+        all_excludes = [model_to_add_field, weak['model'].ordering_field] + extra_excludes
+        formset = ordered_formset_factory(weak['model'], all_excludes)
+
+        final_formset = formset(**fsargs)
+
+        return final_formset
+
+    def get_model_field(self, model, search_model):
+        # get the field in the model that we are adding so it can be excluded from form
+        model_to_add_field = ''
+        for field in model._meta.get_fields():
+            if (field.is_relation):
+                if (field.related_model == search_model):
+                    model_to_add_field = field.name
+                    break
+
+        return model_to_add_field
+
+    def get_m2m_through(self, item):
+        through_list = []
+
+        if inspect.isclass(item):
+            check_class = item
+        else:
+            check_class = item.__class__
+
+        excludes = getattr(check_class, 'through_edit_excludes', [])
+        if not excludes:
+            excludes = []
+
+        for field in check_class._meta.get_fields():
+            if field.many_to_many:
+                if hasattr(field.remote_field, 'through'):
+                    through = field.remote_field.through
+                    if not through._meta.auto_created:
+                        item_field = self.get_model_field(through, check_class)
+                        if item_field and field.name not in excludes:
+                            through_list.append({'field_name': field.name, 'model': through, 'item_field': item_field})
+
+        return through_list
+
+    def get_m2m_weak(self, item):
+        weak_list = []
+
+        if inspect.isclass(item):
+            check_class = item
+        else:
+            check_class = item.__class__
+
+        excludes = getattr(check_class, 'edit_page_excludes', [])
+        if not excludes:
+            excludes = []
+
+        if hasattr(check_class, 'serialize_weak_entities'):
+
+            weak = check_class.serialize_weak_entities
+
+            for entity in weak:
+
+                if entity[0] not in excludes:
+
+                    try:
+                        field = check_class._meta.get_field(entity[1])
+                    except FieldDoesNotExist:
+                        if entity[1].endswith('_set'):
+                            # entity[1] contains the related name for an object
+                            # This can be different to the relation name on the model
+                            # If related_name was not set on the foreign key
+                            # this code deals with the case where it was auto generated by django
+                            try:
+                                field = check_class._meta.get_field(entity[1][:-4])
+                            except FieldDoesNotExist:
+                                continue
+                        else:
+                            continue
+
+                    item_field = self.get_model_field(field.related_model, check_class)
+                    if item_field:
+                        weak_list.append({'prefix': entity[0], 'field_name': entity[1], 'model': field.related_model, 'item_field': item_field})
+
+        return weak_list
 
 
 class ConfirmDeleteView(GenericWithItemURLView, TemplateView):

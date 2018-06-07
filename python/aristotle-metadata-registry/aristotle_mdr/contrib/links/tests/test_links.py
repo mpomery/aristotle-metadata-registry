@@ -1,14 +1,15 @@
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from django.test import TestCase
+from django.test import TestCase, tag
 
 from aristotle_mdr.contrib.links import models, perms
 from aristotle_mdr.models import ObjectClass, STATES
 from aristotle_mdr.tests import utils
-from aristotle_mdr.utils import setup_aristotle_test_environment
+from aristotle_mdr.utils import setup_aristotle_test_environment, url_slugify_concept
 
 from aristotle_mdr.tests.main.test_admin_pages import AdminPageForConcept
 from aristotle_mdr.tests.main.test_html_pages import LoggedInViewConceptPages
+from aristotle_mdr.tests.main.test_wizards import ConceptWizardPage
 
 setup_aristotle_test_environment()
 
@@ -48,6 +49,62 @@ class RelationAdminPage(AdminPageForConcept, TestCase):
         'relationrole_set-INITIAL_FORMS':0,
         'relationrole_set-MAX_NUM_FORMS':1,
     }
+
+
+class RelationCreationWizard(utils.FormsetTestUtils, ConceptWizardPage, TestCase):
+    model=models.Relation
+    extra_step2_data = {'results-arity': 2}
+
+    @tag('edit_formsets')
+    def test_weak_editor_during_create(self):
+
+        self.login_editor()
+
+        item_name = 'My New Relation'
+        step_1_data = {
+            self.wizard_form_name+'-current_step': 'initial',
+            'initial-name': item_name,
+        }
+
+        response = self.client.post(self.wizard_url, step_1_data)
+        wizard = response.context['wizard']
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(wizard['steps'].current, 'results')
+
+        step_2_data = {
+            self.wizard_form_name+'-current_step': 'results',
+            'initial-name':item_name,
+            'results-name':item_name,
+            'results-definition':"Test Definition",
+            'results-arity': 2
+        }
+
+        role_formset_data = [
+            {'name': 'parent', 'definition': 'ok', 'multiplicity': 1, 'ORDER': 0},
+            {'name': 'child', 'definition': 'good', 'multiplicity': 1, 'ORDER': 1}
+        ]
+
+        step_2_data.update(self.get_formset_postdata(role_formset_data, 'roles'))
+
+        response = self.client.post(self.wizard_url, step_2_data)
+        self.assertEqual(response.status_code, 302)
+
+        self.assertTrue(self.model.objects.filter(name=item_name).exists())
+        self.assertEqual(self.model.objects.filter(name=item_name).count(),1)
+        item = self.model.objects.filter(name=item_name).first()
+        self.assertRedirects(response,url_slugify_concept(item))
+
+        roles = item.relationrole_set.all().order_by('ordinal')
+
+        self.assertEqual(roles[0].ordinal, 0)
+        self.assertEqual(roles[0].name, 'parent')
+        self.assertEqual(roles[0].definition, 'ok')
+        self.assertEqual(roles[0].multiplicity, 1)
+
+        self.assertEqual(roles[1].ordinal, 1)
+        self.assertEqual(roles[1].name, 'child')
+        self.assertEqual(roles[1].definition, 'good')
+        self.assertEqual(roles[1].multiplicity, 1)
 
 
 class LinkTestBase(utils.LoggedInViewPages):
