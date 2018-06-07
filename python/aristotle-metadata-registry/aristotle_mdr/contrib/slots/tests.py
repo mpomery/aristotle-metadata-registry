@@ -155,6 +155,7 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
         self.assertContains(response, 'No metadata items have this slot type')
         self.assertEqual(len(response.context['object_list']), 0)
 
+
 class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):
     def test_similar_slots_page(self):
         # from django.conf import settings

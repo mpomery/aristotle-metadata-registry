@@ -1,6 +1,7 @@
 from aristotle_mdr.contrib.slots.models import Slot
 from aristotle_mdr import models as MDR
 
+
 def filter_slot_perms(slots, user, workgroup):
 
     # If slots is empty no need for further filtering
@@ -18,10 +19,12 @@ def filter_slot_perms(slots, user, workgroup):
         # Only return public slots
         return slots.filter(permission=0)
 
+
 def get_allowed_slots(concept, user):
 
     slots = Slot.objects.filter(concept=concept)
     return filter_slot_perms(slots, user, concept.workgroup)
+
 
 def concepts_with_similar_slots(user, name=None, _type=None, value=None, slot=None):
     if not (slot is not None or _type is not None or name is not None):

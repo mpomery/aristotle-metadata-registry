@@ -35,5 +35,3 @@ class Slot(TimeStampedModel):
 
     class Meta:
         ordering = ['order']
-
-
