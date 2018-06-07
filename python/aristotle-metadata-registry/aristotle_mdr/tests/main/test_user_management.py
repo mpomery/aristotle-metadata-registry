@@ -360,7 +360,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context['form'].non_field_errors(),
-            ['Activation could not be sent']
+            ['Activation email could not be sent']
         )
 
         # Try to resend to already active user

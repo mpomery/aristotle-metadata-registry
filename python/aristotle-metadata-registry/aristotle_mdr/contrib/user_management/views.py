@@ -191,17 +191,6 @@ class SignupView(SignupMixin, FormView):
             user.save()
 
             # Send Activation Email
-            token = self.registration_backend.get_token(user)
-            self.registration_backend.email_message(
-                user,
-                self.activation_subject,
-                self.activation_body,
-                token=token,
-                user_id=user.id,
-                accept_url_name=self.accept_url_name,
-                config=fetch_aristotle_settings(),
-                request=self.request
-            ).send()
             self.send_activation(user)
 
             # Show message
