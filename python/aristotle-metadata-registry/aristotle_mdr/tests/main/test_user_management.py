@@ -186,7 +186,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             response = self.client.get(reverse('aristotle-user:signup_register'))
             self.assertEqual(response.status_code, 200)
             self.assertFalse('form' in response.context)
-            self.assertTrue('message' in response.context)
+            self.assertTrue('error_message' in response.context)
 
         # With signup enabled
         mock_settings = MagicMock(return_value={'registry': {'SELF_SIGNUP': {'enabled': True}}})
@@ -297,6 +297,13 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             'password_confirm': 'verynice'
         }
 
+        mock_settings = MagicMock(return_value={'registry': {'SELF_SIGNUP': {'enabled': False}}})
+        with patch('aristotle_mdr.contrib.user_management.views.fetch_aristotle_settings', mock_settings):
+            # Test trying to activate with signup disabled
+            response = self.client.get(reverse('aristotle-user:signup_activate', args=['0', '3-4']))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.context['error_message'], 'Self Signup is not enabled')
+
         mock_settings = MagicMock(return_value={'registry': {'SELF_SIGNUP': {'enabled': True}}})
         with patch('aristotle_mdr.contrib.user_management.views.fetch_aristotle_settings', mock_settings):
 
@@ -312,7 +319,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             # Test trying to activate with an invalid code
             response = self.client.get(reverse('aristotle-user:signup_activate', args=['0', '3-4']))
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.context['message'], 'Account could not be activated')
+            self.assertEqual(response.context['error_message'], 'Account could not be activated')
 
             # Test trying to activate an already active account
             user = get_user_model().objects.get(email='bestuser@example.com')
@@ -322,12 +329,8 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
 
             response = self.client.get(accept_url)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.context['message'], 'Account could not be activated')
+            self.assertEqual(response.context['error_message'], 'Account could not be activated')
 
-        # Test trying to activate with signup disabled
-        response = self.client.get(accept_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['message'], 'Self Signup is not enabled')
 
     def test_resend_activation(self):
 
@@ -377,7 +380,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             {'email': 'inactive@example.com'}
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['message'], 'Email has been sent')
+        self.assertTrue(response.context['message'].startswith('Success'))
 
         self.assertEqual(len(mail.outbox), 1)
 
