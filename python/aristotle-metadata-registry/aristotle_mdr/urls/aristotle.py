@@ -19,7 +19,7 @@ from django.utils.translation import ugettext_lazy as _
 
 urlpatterns=[
     url(r'^$', views.SmartRoot.as_view(
-        unauthenticated_pattern='aristotle_mdr:home'
+        unauthenticated_pattern='aristotle_mdr:home',
         authenticated_pattern='aristotle_mdr:userHome'
     ), name='smart_root'),
     url(r'^home/?$', TemplateView.as_view(template_name='aristotle_mdr/static/home.html'), name="home"),
