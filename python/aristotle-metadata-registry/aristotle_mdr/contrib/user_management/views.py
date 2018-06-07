@@ -158,7 +158,7 @@ class SignupView(SignupMixin, FormView):
         self.get_signup_settings(request)
 
         if not self.signup_enabled:
-            return self.render_to_response({'message': 'Self Signup is not enabled'})
+            return self.render_to_response({'error_message': 'Self Signup is not enabled'})
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -224,11 +224,11 @@ class SignupActivateView(SignupMixin, TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
     def signup_disabled_message(self):
-        return self.render_to_response({'message': 'Self Signup is not enabled'})
+        return self.render_to_response({'error_message': 'Self Signup is not enabled'})
 
     def signup_error_message(self):
         return self.render_to_response({
-            'message': 'Account could not be activated',
+            'error_message': 'Account could not be activated',
             'resend_button': True
         })
 
@@ -289,7 +289,9 @@ class ResendActivationView(SignupMixin, FormView):
             form.add_error(None, 'Activation email could not be sent')
             return self.form_invalid(form)
 
-        # Send Activation Email
-        self.send_activation(user)
+        if user:
+            self.send_activation(user)
 
-        return self.render_to_response({'message': 'Email has been sent'})
+        return self.render_to_response(
+            {'message': 'Success, an activation link has been sent to your email. Follow the link to continue'}
+        )
