@@ -100,7 +100,7 @@ class SignupMixin:
         self.registration_backend = BaseBackend()
         super().__init__(*args, **kwargs)
 
-    def send_activation(self, user)
+    def send_activation(self, user):
         # Send Activation Email
         token = self.registration_backend.get_token(user)
         self.registration_backend.email_message(
@@ -114,11 +114,8 @@ class SignupMixin:
             request=self.request
         ).send()
 
-    def get_signup_settings(self):
+    def get_signup_settings(self, request):
         aristotle_settings = fetch_aristotle_settings()
-
-        if request.user.is_authenticated:
-            return HttpResponseRedirect(self.if_logged_in_url)
 
         try:
             signup_settings = aristotle_settings['registry']['SELF_SIGNUP']
@@ -150,8 +147,15 @@ class SignupView(SignupMixin, FormView):
         self.user_model = get_user_model()
         self.if_logged_in_url = reverse('aristotle_mdr:userHome')
 
+    def get_context_data(self, *args, **kwargs):
+        kwargs.update({'resend_button': True})
+        return super().get_context_data(*args, **kwargs)
+
     def dispatch(self, request, *args, **kwargs):
-        self.get_signup_settings()
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(self.if_logged_in_url)
+
+        self.get_signup_settings(request)
 
         if not self.signup_enabled:
             return self.render_to_response({'message': 'Self Signup is not enabled'})
@@ -182,6 +186,7 @@ class SignupView(SignupMixin, FormView):
         if success:
             # Save inactive user
             user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
             user.is_active = False
             user.save()
 
@@ -207,7 +212,7 @@ class SignupView(SignupMixin, FormView):
             return self.form_invalid(form)
 
 
-class SignupActivateView(SingupMixin, TemplateView):
+class SignupActivateView(SignupMixin, TemplateView):
 
     template_name = "aristotle_mdr/users_management/self_invite.html"
 
@@ -222,7 +227,7 @@ class SignupActivateView(SingupMixin, TemplateView):
         self.users_to_notify = self.user_model.objects.filter(is_superuser=True)
 
     def dispatch(self, request, *args, **kwargs):
-        self.get_signup_settings()
+        self.get_signup_settings(request)
 
         if not self.signup_enabled:
             return self.signup_disabled_message()

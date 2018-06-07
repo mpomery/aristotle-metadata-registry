@@ -134,9 +134,11 @@ class BaseAristotleInvitationBackend(InvitationBackend):
         if user.is_active:
             return False
         token = self.get_token(user)
+        aristotle_settings = fetch_aristotle_settings()
         kwargs.update({'token': token})
         kwargs.update({'sender': sender})
         kwargs.update({'user_id': user.pk})
+        kwargs.update({'config': aristotle_settings})
         self.email_message(user, self.invitation_subject, self.invitation_body, **kwargs).send()
         return True
 

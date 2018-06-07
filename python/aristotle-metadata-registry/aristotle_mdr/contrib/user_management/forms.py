@@ -48,8 +48,12 @@ class ResendActivationForm(forms.Form):
 
 class UserRegistrationForm(forms.ModelForm):
 
+    password = forms.CharField(
+        max_length=128,
+        widget=forms.PasswordInput
+    )
     password_confirm = forms.CharField(
-        max_length=30,
+        max_length=128,
         widget=forms.PasswordInput
     )
 
@@ -67,4 +71,4 @@ class UserRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ['email', 'short_name', 'full_name', 'password']
+        fields = ['email', 'short_name', 'full_name']
