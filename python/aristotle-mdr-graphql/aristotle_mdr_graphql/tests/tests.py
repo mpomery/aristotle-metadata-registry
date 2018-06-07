@@ -99,24 +99,23 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         self.assertEqual(len(edges), 1)
         self.assertEqual(edges[0]['node']['name'], self.oc.name)
 
-# Disable icontains and iexact tests for now
-#    def test_query_icontains(self):
-#
-#        self.login_editor()
-#        response_json = self.post_query('{ metadata (name_Icontains: \"object\") { edges { node { name } } } }')
-#        edges = response_json['data']['metadata']['edges']
-#
-#        self.assertEqual(len(edges), 1)
-#        self.assertEqual(edges[0]['node']['name'], self.oc.name)
-#
-#    def test_query_iexact(self):
-#
-#        self.login_editor()
-#        response_json = self.post_query('{ metadata (name_Iexact: \"test object class\") { edges { node { name } } } }')
-#        edges = response_json['data']['metadata']['edges']
-#
-#        self.assertEqual(len(edges), 1)
-#        self.assertEqual(edges[0]['node']['name'], self.oc.name)
+    def test_query_icontains(self):
+
+        self.login_editor()
+        response_json = self.post_query('{ metadata (name_Icontains: \"object\") { edges { node { name } } } }')
+        edges = response_json['data']['metadata']['edges']
+
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['name'], self.oc.name)
+
+    def test_query_iexact(self):
+
+        self.login_editor()
+        response_json = self.post_query('{ metadata (name_Iexact: \"test object class\") { edges { node { name } } } }')
+        edges = response_json['data']['metadata']['edges']
+
+        self.assertEqual(len(edges), 1)
+        self.assertEqual(edges[0]['node']['name'], self.oc.name)
 
     def test_dse_query(self):
 

@@ -87,7 +87,6 @@ class Query(object):
     metadata = AristotleConceptFilterConnectionField(
         ConceptNode,
         description="Retrieve a collection of untyped metadata",
-        filterset_class=ConceptFilterSet
     )
     workgroups = AristotleFilterConnectionField(WorkgroupNode)
     # organizations = AristotleFilterConnectionField(OrganizationNode)

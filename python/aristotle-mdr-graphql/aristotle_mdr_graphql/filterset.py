@@ -16,7 +16,6 @@ class AristotleFilterSet(FilterSet):
     #     fields = cls._meta.fields
     #     exclude = cls._meta.exclude
     #     logger.warning([model,fields,exclude])
-    #     # 1/0
 
     #     # Setting exclude with no fields implies all other fields.
     #     if exclude is not None and fields is None:
@@ -48,7 +47,3 @@ class ConceptFilterSet(FilterSet):
     identifier = django_filters.CharFilter(name='identifiers__identifier', lookup_expr='iexact', distinct=True)
     identifier_namespace = django_filters.CharFilter(name='identifiers__namespace__shorthand_prefix', lookup_expr='iexact', distinct=True)
     identifier_version = django_filters.CharFilter(name='identifiers__version', lookup_expr='iexact', distinct=True)
-
-    class Meta:
-        model = _concept
-        fields = '__all__'
