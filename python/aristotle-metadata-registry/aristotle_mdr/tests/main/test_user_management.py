@@ -297,7 +297,6 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             'password_confirm': 'verynice'
         }
 
-        # Test trying to activate with signup disabled
         mock_settings = MagicMock(return_value={'registry': {'SELF_SIGNUP': {'enabled': True}}})
         with patch('aristotle_mdr.contrib.user_management.views.fetch_aristotle_settings', mock_settings):
 
@@ -307,30 +306,28 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             self.assertTrue(post_response.context['message'].startswith('Success'))
             self.assertEqual(len(mail.outbox), 1)
 
-        mock_settings = MagicMock(return_value={'registry': {'SELF_SIGNUP': {'enabled': False}}})
-        with patch('aristotle_mdr.contrib.user_management.views.fetch_aristotle_settings', mock_settings):
-
             message = mail.outbox[0].body
             accept_url = self.get_url_from_email(message)
 
+            # Test trying to activate with an invalid code
+            response = self.client.get(reverse('aristotle-user:signup_activate', args=['0', '3-4']))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.context['message'], 'Account could not be activated')
+
+            # Test trying to activate an already active account
+            user = get_user_model().objects.get(email='bestuser@example.com')
+            self.assertEqual(user.is_active, False)
+            user.is_active = True
+            user.save()
+
             response = self.client.get(accept_url)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.context['message'], 'Self Signup is not enabled')
+            self.assertEqual(response.context['message'], 'Account could not be activated')
 
-        # Test trying to activate with an invalid code
-        response = self.client.get(reverse('aristotle-user:signup_activate', args=['0', '3-4']))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['message'], 'Account could not be activated')
-
-        # Test trying to activate an already active account
-        user = get_user_model().objects.get(email='bestuser@example.com')
-        self.assertEqual(user.is_active, False)
-        user.is_active = True
-        user.save()
-
+        # Test trying to activate with signup disabled
         response = self.client.get(accept_url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['message'], 'Account could not be activated')
+        self.assertEqual(response.context['message'], 'Self Signup is not enabled')
 
     def test_resend_activation(self):
 
@@ -371,7 +368,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context['form'].non_field_errors(),
-            ['Activation could not be sent']
+            ['Activation email could not be sent']
         )
 
         # Resend to an inactive user
