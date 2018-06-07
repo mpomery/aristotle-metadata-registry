@@ -34,7 +34,7 @@ def move_field_to_slot(apps, schema_editor, field_name):
                 slot.objects.create(
                     name=field_name,
                     concept=concept,
-                    value=concept.synonyms
+                    value=getattr(concept, field_name)
                 )
     else:
         print("Data migration could not be completed")
@@ -48,10 +48,20 @@ def move_slot_to_field(apps, schema_editor, field_name, maxlen=200):
         slot = None
 
     if slot:
+        _concept = apps.get_model('aristotle_mdr', '_concept')
+
         for s in slot.objects.all():
             if s.name == field_name and len(s.value) < maxlen:
-                setattr(s.concept, field_name, s.value)
-                s.concept.save()
+
+                try:
+                    concept = _concept.objects.get(pk=s.concept.pk)
+                except concept.DoesNotExist:
+                    concept = None
+                    print('Could not find concept with id {} Found through slot {}'.format(s.concept.pk, s))
+
+                if concept:
+                    setattr(concept, field_name, s.value)
+                    concept.save()
     else:
         print('Reverse data migration could not be completed')
 
