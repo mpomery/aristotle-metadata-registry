@@ -19,6 +19,43 @@ class classproperty(object):
         return self.fget(owner_cls)
 
 
+def move_field_to_slot(apps, schema_editor, field_name):
+
+    try:
+        slot = apps.get_model('aristotle_mdr_slots', 'Slot')
+    except LookupError:
+        slot = None
+
+    if slot:
+        _concept = apps.get_model('aristotle_mdr', '_concept')
+
+        for concept in _concept.objects.all():
+            if getattr(concept, field_name):
+                slot.objects.create(
+                    name=field_name,
+                    concept=concept,
+                    value=concept.synonyms
+                )
+    else:
+        print("Data migration could not be completed")
+
+
+def move_slot_to_field(apps, schema_editor, field_name, maxlen=200):
+
+    try:
+        slot = apps.get_model('aristotle_mdr_slots', 'Slot')
+    except LookupError:
+        slot = None
+
+    if slot:
+        for s in slot.objects.all():
+            if s.name == field_name and len(s.value) < maxlen:
+                setattr(s.concept, field_name, s.value)
+                s.concept.save()
+    else:
+        print('Reverse data migration could not be completed')
+
+
 def create_uuid_objects(app_label, model_name, migrate_self=True):
     def inner(apps, schema_editor):
         from aristotle_mdr.models import UUID, baseAristotleObject
