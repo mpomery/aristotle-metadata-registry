@@ -20,14 +20,32 @@ in or tracked for changes.
 ## Running tests in this environment
 
 * Step 1: From this directory run `docker-compose up`
-* Step 2: `docker-compose exec web bash`
-* Step 3: From this docker bash console execute the desired test. It is recommended that the
-  correct `DJANGO_SETTINGS_MODULE` is exported or prefixed in this environment
+* Step 2: `docker-compose exec web command_to_run`
 
   For example to run all Aristotle tests, run:
 
-        DJANGO_SETTINGS_MODULE=aristotle_mdr.tests.settings.settings django-admin test aristotle_mdr.tests
+        docker-compose exec web django-admin test aristotle_mdr.tests --settings=aristotle_mdr.tests.settings.settings
 
   Or to run a single class of tests, run:
 
-        DJANGO_SETTINGS_MODULE=aristotle_mdr.tests.settings.settings django-admin test aristotle_mdr.tests.main.test_html_pages.AnonymousUserViewingThePages
+        docker-compose exec web django-admin test aristotle_mdr.tests.main.test_html_pages.AnonymousUserViewingThePages --settings=aristotle_mdr.tests.settings.settings
+
+* Step 3 (optional): It is possible to execute bash in the docker container using:
+  
+        docker-compose exec web bash
+
+    From this bash console the tests can also be run, and the test commands can be
+    shorter by setting the correct `DJANGO_SETTINGS_MODULE`, either by exporting the
+    correct environment variable:
+    
+        export DJANGO_SETTINGS_MODULE=aristotle_mdr.tests.settings.settings
+        django-admin test aristotle_mdr.tests
+    
+    or prefixing ahead of the command:
+  
+        DJANGO_SETTINGS_MODULE=aristotle_mdr.tests.settings.settings django-admin test aristotle_mdr.tests
+  
+
+Note: We encourage the use of `docker-compose exec web` over `docker run` as we anticipate
+adding extra services (workers, advnaced caches, etc...) around Aristotle that will make 
+docker-compose easier for testing around.

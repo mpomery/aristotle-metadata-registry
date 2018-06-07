@@ -14,7 +14,7 @@ django-tools = "*"
 [packages]
 django = "~=1.11.0"
 django-haystack = "~=2.7.0"
-django-notifications-hq = "~=1.3.0"
+django-notifications-hq = "~=1.4.0"
 
 aristotle-metadata-registry = {editable = true, path = "../python/aristotle-metadata-registry/"}
 aristotle-mdr-api = {editable = true, path = "../python/aristotle-mdr-api/"}
