@@ -17,6 +17,13 @@ production.
 Running this will create 'docker/data' directory in the repository that will not be checked
 in or tracked for changes.
 
+## Testing the server
+
+* Step 1: From this directory run `docker-compose up`
+* Step 2: Prepare static files and database: `docker-compose exec web make prepare_server`
+* Step 3: Browse to your localhost (or server address)
+* Step 4: If running with debug off, restart the server to refresh whitenoise - `docker-compose restart web`
+
 ## Running tests in this environment
 
 * Step 1: From this directory run `docker-compose up`

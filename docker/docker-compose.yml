@@ -9,6 +9,7 @@ services:
     command: sh ./sh/entrypoint/web.sh
     environment:
       - DJANGO_SETTINGS_MODULE=settings
+      - PYTHONPATH=.
     ports:
       - "8080:8000"
     volumes:

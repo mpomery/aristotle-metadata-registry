@@ -1,8 +1,7 @@
-database:
+prepare_server:
 	django-admin migrate
-	django-admin compile_and_collect
+	django-admin compile_and_collect_static
 	django-admin load_aristotle_help
-	django-admin createcachetable
 
 metadata:
 	curl https://raw.githubusercontent.com/aristotle-mdr/user-documentation/draft/server/fixtures/users.yaml > /tmp/users.yaml
