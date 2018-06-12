@@ -112,8 +112,7 @@ class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
         self.assertEqual(response.status_code,200)
 
     def do_test_for_issue333(self,response):
-        self.assertContains(response, self.extra_wg.name)
-        self.assertTrue(response.content.decode('utf-8').count(self.extra_wg.name) == 1)
+        self.assertTrue(self.extra_wg in response.context['form'].fields['workgroup'].queryset)
 
     def test_editor_can_make_object(self):
         self.login_editor()
@@ -184,7 +183,7 @@ class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
             state=models.STATES.standard,
             user=self.su
         )
-        
+
         self.login_editor()
         self.assertTrue(self.item_existing.can_view(self.editor))
         form_data = {
@@ -198,7 +197,7 @@ class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
         print(wizard['form'].errors)
         self.assertTrue(len(wizard['form'].errors.keys()) == 0)
         self.assertTrue(self.item_existing in response.context['duplicate_items'])
-        
+
         # Existing item should show up in the "similar results page"
         self.assertContains(response, self.item_existing.definition)
 
@@ -217,7 +216,7 @@ class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
                 state=models.STATES.standard,
                 user=self.su
             )
-        
+
         self.login_editor()
         self.assertTrue(self.item_existing.can_view(self.editor))
         form_data = {
@@ -230,13 +229,13 @@ class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
         wizard = response.context['wizard']
         self.assertTrue(len(wizard['form'].errors.keys()) == 0)
         self.assertFalse('duplicate_items' in response.context.keys())
-        
+
         self.assertTrue(
             self.item_existing.pk in [
                 x.object.pk for x in response.context['similar_items']
             ]
         )
-        
+
         # Existing item should show up in the "similar results page"
         self.assertContains(response, self.item_existing.definition)
 

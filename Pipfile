@@ -1,0 +1,32 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+django = "==1.11.12"
+django-haystack = "==2.7.0"
+django-notifications-hq = "==1.4"
+aristotle-metadata-registry = {path = "./python/aristotle-metadata-registry", editable = true}
+aristotle-dataset-extensions = {path = "./python/aristotle-dataset-extensions", editable = true}
+aristotle-glossary = {path = "./python/aristotle-glossary/", editable = true}
+aristotle-mdr-api = {path = "./python/aristotle-mdr-api", editable = true}
+aristotle-mdr-graphql = {path = "./python/aristotle-mdr-graphql", editable = true}
+aristotle-pdf-downloads = {path = "./python/aristotle-pdf-downloads", editable = true}
+comet-indicator-registry = {path = "./python/comet-indicator-registry", editable = true}
+mallard-questionnaire-registry = {path = "./python/mallard-questionnaire-registry", editable = true}
+
+[dev-packages]
+
+coverage = "*"
+Whoosh = "*"
+python-decouple = "*"
+dj-database-url = "*"
+"flake8" = "*"
+django-tools = "*"
+mock = "*"
+wcag-zoo = "*"
+django-silk = "*"

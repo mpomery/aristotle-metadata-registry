@@ -105,11 +105,17 @@ def user_can_edit(user, item):
 
     return _can_edit
 
-
+# TODO remove this
 def user_is_editor(user, workgroup=None):
     if user.is_anonymous():
         return False
     return user.is_active
+
+
+def user_can_submit_to_workgroup(user, workgroup):
+    submitter = workgroup in user.submitter_in.all()
+    steward = workgroup in user.steward_in.all()
+    return submitter or steward
 
 
 def user_is_registrar(user, ra=None):

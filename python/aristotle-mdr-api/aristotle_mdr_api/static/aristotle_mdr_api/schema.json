@@ -1,0 +1,59 @@
+{
+  "type": "object",
+  "title": "Permissions",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "title": "Metadata",
+      "description": "Metadata",
+      "properties": {
+        "read": {
+          "title": "Read",
+          "type": "boolean",
+          "format": "checkbox"
+        },
+        "write": {
+          "title": "Write",
+          "type": "boolean",
+          "format": "checkbox"
+        }
+      }
+    },
+    "search": {
+      "type": "object",
+      "title": "Search",
+      "description": "Search Metadata",
+      "properties": {
+        "read": {
+          "title": "Read",
+          "type": "boolean",
+          "format": "checkbox"
+        }
+      }
+    },
+    "organization": {
+      "type": "object",
+      "title": "Organization",
+      "description": "Organization Access",
+      "properties": {
+        "read": {
+          "title": "Read",
+          "type": "boolean",
+          "format": "checkbox"
+        }
+      }
+    },
+    "ra": {
+      "type": "object",
+      "title": "Registration Authority",
+      "description": "Registration Authority Access",
+      "properties": {
+        "read": {
+          "title": "Read",
+          "type": "boolean",
+          "format": "checkbox"
+        }
+      }
+    }
+  }
+}
