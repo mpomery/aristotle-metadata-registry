@@ -3,6 +3,8 @@ import logging
 
 from aristotle_mdr import perms
 from aristotle_mdr import models as mdr_models
+from aristotle_mdr.contrib.slots import models as slots_models
+from aristotle_mdr.contrib.slots.utils import filter_slot_perms
 from aristotle_dse import models as dse_models
 from django.db.models import Model
 from django.db.models.manager import Manager
@@ -21,11 +23,12 @@ class AristotleResolver(object):
         # If object is a django model
         if isinstance(retval, Model):
 
-            # Use user_can_view to determine if we display
-            if perms.user_can_view(info.context.user, retval):
-                return retval
-            else:
-                return None
+            if isinstance(retval, mdr_models._concept):
+                # Use user_can_view to determine if we display
+                if perms.user_can_view(info.context.user, retval):
+                    return retval
+
+            return None
 
         elif isinstance(retval, Manager):
 
@@ -33,10 +36,13 @@ class AristotleResolver(object):
             # Can safely return restricted queryset
             queryset = retval.get_queryset()
 
+            if queryset.model == slots_models.Slot:
+                return queryset
+
             if hasattr(queryset, 'visible'):
                 return queryset.visible(info.context.user)
             else:
-                return queryset
+                return filter_slot_perms(queryset, info.context.user)
 
         elif isinstance(retval, QuerySet):
 
