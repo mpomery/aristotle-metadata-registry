@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4378de9b7fe8e27db14bb6100cf33e9016e41a0ec0fe394a5c00239168b8a9f3"
+            "sha256": "0ab612c6ac2e34c772123baf6367c0bc58c823e297c3c0c189f4ade80a5a2fe0"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -68,10 +68,10 @@
         },
         "autobahn": {
             "hashes": [
-                "sha256:4f83dfb044bf72312d15f0632c4cf625de3c93912797a00801bd1564560c651e",
-                "sha256:fc88885b44fd2f42d962d7ea6a1c9baf3d1551adddb92acc861be17418183fa0"
+                "sha256:2f41bfc512ec482044fa8cfa74182118dedd87e03b3494472d9ff1b5a1e27d24",
+                "sha256:83e050f0e0783646dbf6da60fe837f4f825c241080d2b5f080002ae6885b036f"
             ],
-            "version": "==18.5.2"
+            "version": "==18.6.1"
         },
         "automat": {
             "hashes": [
@@ -248,9 +248,9 @@
         },
         "django-ckeditor": {
             "hashes": [
-                "sha256:b49eb630a260eb17dd225ea38b42d58fabc9a8dbbc898224c61f9a570c29e961"
+                "sha256:cdb6cee86df1d16933ae3c5219fa0a7273797823a8ca9a13a7359384765c7b5d"
             ],
-            "version": "==5.4.0"
+            "version": "==5.5.0"
         },
         "django-filter": {
             "hashes": [
@@ -312,7 +312,6 @@
             "hashes": [
                 "sha256:bbf1fbc7c7accfe79c1cf2da5fde96cd3e27e22d27108e6f368a91b26ef75450"
             ],
-            "index": "pypi",
             "version": "==1.4.0"
         },
         "django-organizations": {
@@ -359,9 +358,10 @@
         },
         "djangorestframework-composed-permissions": {
             "hashes": [
-                "sha256:eb1595e5f001a14d4711e7813f812c76ebddc23249c477b2e3fae2140abedf06"
+                "sha256:955abe2bca6ce6b1fe9503edad6d26a1c4e6982a91dd5b3e2b908e85aadd45d7",
+                "sha256:baaab3b5213294b42d0503004f095fd6db42a0f8fa7eb6b43b6b1f3eb8d84c27"
             ],
-            "version": "==0.1"
+            "version": "==0.2"
         },
         "docutils": {
             "hashes": [
@@ -939,10 +939,10 @@
         },
         "pbr": {
             "hashes": [
-                "sha256:680bf5ba9b28dd56e08eb7c267991a37c7a5f90a92c2e07108829931a50ff80a",
-                "sha256:6874feb22334a1e9a515193cba797664e940b763440c88115009ec323a7f2df5"
+                "sha256:3747c6f017f2dc099986c325239661948f9f5176f6880d9fdef164cb664cd665",
+                "sha256:a9c27eb8f0e24e786e544b2dbaedb729c9d8546342b5a6818d8eda098ad4340d"
             ],
-            "version": "==4.0.3"
+            "version": "==4.0.4"
         },
         "premailer": {
             "hashes": [

@@ -9,7 +9,6 @@ name = "pypi"
 
 django = "==1.11.12"
 django-haystack = "==2.7.0"
-django-notifications-hq = "==1.4"
 aristotle-metadata-registry = {path = "./python/aristotle-metadata-registry", editable = true}
 aristotle-dataset-extensions = {path = "./python/aristotle-dataset-extensions", editable = true}
 aristotle-glossary = {path = "./python/aristotle-glossary/", editable = true}
