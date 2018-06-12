@@ -2,6 +2,11 @@ Changelog
 
 - 2.0.x
     - Removed official support for Windows & MSSQL
+    - Rest API token authentication
+    - Simplified configuration for testing
+    - Ability to order Data Elements within Data Element Derivations
+    - Ability to order Slots and Identifiers
+    - Slots now have permissions (Public, Private, Workgroup)
 
 - 2.0.0
     - **Dependency notes:**
