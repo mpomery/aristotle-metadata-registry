@@ -20,24 +20,32 @@ class AristotleResolver(object):
 
         # If object is a django model
         if isinstance(retval, Model):
-    
+
             # Use user_can_view to determine if we display
             if perms.user_can_view(info.context.user, retval):
                 return retval
             else:
                 return None
-    
+
         elif isinstance(retval, Manager):
-    
+
             # Need this for when related manager is returned when querying object.related_set
             # Can safely return restricted queryset
-            return retval.get_queryset().visible(info.context.user)
-    
+            queryset = retval.get_queryset()
+
+            if hasattr(queryset, 'visible'):
+                return queryset.visible(info.context.user)
+            else:
+                return queryset
+
         elif isinstance(retval, QuerySet):
-    
+
             # In case a queryset is returned
-            return retval.visible(info.context.user)
-    
+            if hasattr(retval, 'visible'):
+                return retval.visible(info.context.user)
+            else:
+                return retval
+
         return retval
 
     def __call__(self, *args, **kwargs):
@@ -57,7 +65,6 @@ class ValueDomainResolver(AristotleResolver):
         retval = getattr(root, attname, default_value)
         logger.debug(str([
             type(retval), isinstance(retval, QuerySet)
-            
         ]))
         if root.can_view(info.context.user):
             if isinstance(retval, Manager) and issubclass(retval.model, mdr_models.AbstractValue):
@@ -73,7 +80,6 @@ class DataSetSpecificationResolver(AristotleResolver):
         retval = getattr(root, attname, default_value)
         logger.debug(str([
             retval, type(retval), isinstance(retval, QuerySet)
-            
         ]))
         if root.can_view(info.context.user):
             if isinstance(retval, Manager) and issubclass(retval.model, dse_models.DSSInclusion):

@@ -6,11 +6,14 @@ from graphene import Field
 from django.db import models
 
 from aristotle_mdr import models as mdr_models
+from aristotle_mdr.contrib.identifiers import models as ident_models
+from aristotle_mdr.contrib.slots import models as slot_models
 from aristotle_mdr_graphql.fields import AristotleFilterConnectionField, AristotleConceptFilterConnectionField
 from aristotle_mdr_graphql.types import AristotleObjectType
 from aristotle_mdr_graphql.utils import type_from_model, type_from_concept_model
 
 from aristotle_mdr_graphql import resolvers
+from aristotle_mdr_graphql.filterset import ConceptFilterSet
 
 
 class StatusNode(DjangoObjectType):
@@ -45,6 +48,11 @@ DataTypeNode = type_from_concept_model(mdr_models.DataType)
 ConceptualDomainNode = type_from_concept_model(mdr_models.ConceptualDomain)
 ValueMeaningNode = type_from_model(mdr_models.ValueMeaning)
 
+# Slots and Identifiers
+
+ScopedIdentifierNode = type_from_model(ident_models.ScopedIdentifier)
+SlotNode = type_from_model(slot_models.Slot)
+
 class ValueMeaningNode(DjangoObjectType):
     class Meta:
         model = mdr_models.ValueMeaning
@@ -78,7 +86,7 @@ class Query(object):
 
     metadata = AristotleConceptFilterConnectionField(
         ConceptNode,
-        description="Retrieve a collection of untyped metadata"
+        description="Retrieve a collection of untyped metadata",
     )
     workgroups = AristotleFilterConnectionField(WorkgroupNode)
     # organizations = AristotleFilterConnectionField(OrganizationNode)
