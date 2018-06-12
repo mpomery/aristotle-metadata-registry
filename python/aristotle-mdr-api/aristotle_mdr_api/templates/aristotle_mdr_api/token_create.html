@@ -1,0 +1,58 @@
+{% extends 'aristotle_mdr_api/base.html' %}
+
+{% block extra_head_scripts %}
+{{ block.super }}
+{% if key %}
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+{% endif %}
+{% endblock %}
+
+{% block api_content %}
+
+{% if error %}
+<div class="alert alert-danger">
+<p>{{ error }}</p>
+</div>
+{% endif %}
+
+{% if message %}
+<div class="alert alert-success">
+<p>{{ message }}</p>
+</div>
+{% endif %}
+
+{% if key %}
+<p>Success! Your API key is <span id="key">{{ key }}</span> <button id="copybutton" class="btn btn-default btn-sm" data-clipboard-target="#key">Copy</button></p>
+<p>Be sure to copy your new token. As you will not be able to view it again</p>
+<script>
+if (ClipboardJS.isSupported()) {
+  new ClipboardJS('#copybutton');
+} else {
+  $('#copybutton').remove()
+}
+</script>
+{% endif %}
+
+{% if display_regenerate %}
+<div class="alert alert-warning">
+<p>This will generate a new key for this token. Invalidating the old one</p>
+<a class="btn btn-default" href="{% url 'token_auth:token_regenerate' token_id %}">Regenerate Token</a>
+</div>
+{% endif %}
+
+{% if form %}
+<form method="post">
+  {% csrf_token %}
+  {% for field in form %}
+  {{ field.errors }}
+  <h3>{{ field.label }}</h3>
+  {{ field }}
+  {% endfor %}
+  <input class="btn btn-primary" type='submit' value='{{ submit_text }}' />
+  <a class="btn btn-default" href="{% url 'token_auth:token_list' %}">Back</a>
+</form>
+{% else %}
+<a class="btn btn-default" href="{% url 'token_auth:token_list' %}">Back</a>
+{% endif %}
+
+{% endblock %}

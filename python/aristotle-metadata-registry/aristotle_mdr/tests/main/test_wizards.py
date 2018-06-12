@@ -114,8 +114,7 @@ class ConceptWizardPage(HaystackReindexMixin, utils.LoggedInViewPages):
         self.assertEqual(response.status_code,200)
 
     def do_test_for_issue333(self,response):
-        self.assertContains(response, self.extra_wg.name)
-        self.assertTrue(response.content.decode('utf-8').count(self.extra_wg.name) == 1)
+        self.assertTrue(self.extra_wg in response.context['form'].fields['workgroup'].queryset)
 
     def test_editor_can_make_object(self):
         self.login_editor()

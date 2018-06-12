@@ -8,6 +8,7 @@ from rest_framework.views  import APIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.decorators import detail_route
+from rest_framework.permissions import IsAuthenticated
 
 from django.forms import model_to_dict
 from aristotle_mdr import models, perms
@@ -60,6 +61,8 @@ class ConceptTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = ContentType.objects.filter(app_label__in=aristotle_apps).all()
     serializer_class = ConceptTypeSerializer
+
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         """

@@ -15,6 +15,7 @@ from aristotle_mdr.utils import setup_aristotle_test_environment
 
 setup_aristotle_test_environment()
 
+# This wont run on test aristotle_mdr.test because it is not prefixed with test_
 
 MEDIA_TYPES = [
     [],
