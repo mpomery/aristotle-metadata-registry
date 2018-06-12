@@ -1,4 +1,4 @@
-{% load i18n aristotle_help %}
+{% load i18n aristotle_help static %}
 
 
 {% if form.errors or slots_FormSet.errors or slots_FormSet.non_form_errors %}
@@ -153,6 +153,9 @@
         {% endfor %}
         {% if weak_formsets %}
             {% include 'aristotle_mdr/create/weak_editor.html' with formsets=weak_formsets %}
+        {% endif %}
+        {% if through_formsets %}
+            {% include 'aristotle_mdr/create/weak_editor.html' with formsets=through_formsets %}
         {% endif %}
         </div>
         {% endif %}

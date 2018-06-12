@@ -33,6 +33,7 @@ from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 from aristotle_mdr.utils import get_concepts_for_apps, fetch_aristotle_settings, fetch_aristotle_downloaders
 from aristotle_mdr.views.utils import generate_visibility_matrix
+from aristotle_mdr.contrib.slots.utils import get_allowed_slots
 
 from haystack.views import FacetedSearchView
 
@@ -139,11 +140,15 @@ def render_if_condition_met(request, condition, objtype, iid, model_slug=None, n
     from reversion.models import Version
     last_edit = Version.objects.get_for_object(item).first()
 
+    # Only display viewable slots
+    slots = get_allowed_slots(item, request.user)
+
     default_template = "%s/concepts/%s.html" % (item.__class__._meta.app_label, item.__class__._meta.model_name)
     return render(
         request, [default_template, item.template],
         {
             'item': item,
+            'slots': slots,
             # 'view': request.GET.get('view', '').lower(),
             'isFavourite': isFavourite,
             'last_edit': last_edit

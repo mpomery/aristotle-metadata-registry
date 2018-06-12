@@ -224,18 +224,6 @@ class DataSetSpecification(aristotle.models.concept):
         null=True,
         help_text=_("Indiciates if the ordering for a dataset is must match exactly the order laid out in the specification.")
         )
-    data_elements = ConceptManyToManyField(
-        aristotle.models.DataElement,
-        blank=True,
-        through='DSSDEInclusion'
-        )
-    clusters = ConceptManyToManyField(
-        'self',
-        through='DSSClusterInclusion',
-        blank=True,
-        null=True,
-        symmetrical=False
-        )
     collection_method = aristotle.models.RichTextField(
         blank=True,
         help_text=_('')
@@ -264,6 +252,16 @@ class DataSetSpecification(aristotle.models.concept):
             dss=self,
             defaults=kwargs
             )
+
+    @property
+    def clusters(self):
+        ids = self.dssclusterinclusion_set.all().values_list('dss', flat=True)
+        return self.__class__.objects.filter(id__in=ids)
+
+    @property
+    def data_elements(self):
+        ids = self.dssdeinclusion_set.all().values_list('data_element', flat=True)
+        return aristotle.models.DataElement.objects.filter(id__in=ids)
 
     @property
     def registry_cascade_items(self):
