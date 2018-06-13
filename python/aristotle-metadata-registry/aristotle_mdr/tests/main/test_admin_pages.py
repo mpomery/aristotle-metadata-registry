@@ -497,7 +497,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
         short_name = utils.id_generator()
         data = {
             'name': short_name,
-            'definition':"test",
+            'definition':"admin_page_test_oc_has_submitter",
             "workgroup":self.wg1.id,
             'statuses-TOTAL_FORMS': 0,
             'statuses-INITIAL_FORMS': 0 # no substatuses
@@ -510,7 +510,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
             data
         )
         new_item = self.itemType.objects.get(name=short_name)
-        self.assertEqual(new_item.name,"admin_page_test_oc_has_submitter")
+        self.assertEqual(new_item.definition,"admin_page_test_oc_has_submitter")
         self.assertEqual(new_item.submitter,self.editor)
 
         self.login_superuser()
