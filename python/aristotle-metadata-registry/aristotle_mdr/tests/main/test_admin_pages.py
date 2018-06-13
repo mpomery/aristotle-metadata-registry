@@ -496,10 +496,9 @@ class AdminPageForConcept(utils.LoggedInViewPages):
 
         short_name = utils.id_generator()
         data = {
-            'name':"admin_page_test_oc_has_submitter",
+            'name': short_name,
             'definition':"test",
             "workgroup":self.wg1.id,
-            'short_name': short_name,
             'statuses-TOTAL_FORMS': 0,
             'statuses-INITIAL_FORMS': 0 # no substatuses
         }
@@ -510,7 +509,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
             reverse("admin:%s_%s_add"%(self.itemType._meta.app_label,self.itemType._meta.model_name)),
             data
         )
-        new_item = self.itemType.objects.get(short_name=short_name)
+        new_item = self.itemType.objects.get(name=short_name)
         self.assertEqual(new_item.name,"admin_page_test_oc_has_submitter")
         self.assertEqual(new_item.submitter,self.editor)
 
