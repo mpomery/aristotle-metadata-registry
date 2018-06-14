@@ -164,32 +164,33 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
         #from aristotle_mdr_api.token_auth.models import AristotleToken
         self.make_newoc_public()
 
-        self.client.logout()
-        url = '/api/v3/metadata/' + str(self.newoc.uuid) + '/?format=json'
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 401)
+        for version in ['v2', 'v3']:
+            self.client.logout()
+            url = '/api/' + version + '/metadata/' + str(self.newoc.uuid) + '/?format=json'
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 401)
 
-        self.login_regular_user()
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+            self.login_regular_user()
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
 
-        response_data = json.loads(response.content)
-        self.assertEqual(len(response_data['slots']), 2)
-        slots_names = [slot['name'] for slot in response_data['slots']]
-        self.assertTrue('public' in slots_names)
-        self.assertTrue('auth' in slots_names)
+            response_data = json.loads(response.content)
+            self.assertEqual(len(response_data['slots']), 2)
+            slots_names = [slot['name'] for slot in response_data['slots']]
+            self.assertTrue('public' in slots_names)
+            self.assertTrue('auth' in slots_names)
 
-        self.client.logout()
-        self.login_editor()
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+            self.client.logout()
+            self.login_editor()
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
 
-        response_data = json.loads(response.content)
-        self.assertEqual(len(response_data['slots']), 3)
-        slots_names = [slot['name'] for slot in response_data['slots']]
-        self.assertTrue('public' in slots_names)
-        self.assertTrue('auth' in slots_names)
-        self.assertTrue('work' in slots_names)
+            response_data = json.loads(response.content)
+            self.assertEqual(len(response_data['slots']), 3)
+            slots_names = [slot['name'] for slot in response_data['slots']]
+            self.assertTrue('public' in slots_names)
+            self.assertTrue('auth' in slots_names)
+            self.assertTrue('work' in slots_names)
 
 class TestSlotsPagesLoad(utils.LoggedInViewPages, TestCase):
     def test_similar_slots_page(self):

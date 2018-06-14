@@ -57,38 +57,32 @@ class ConceptDetailSerializer(ConceptSerializerBase):
     links = serializers.SerializerMethodField()
     statuses = serializers.SerializerMethodField()
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.pyserializer = Serializer()
+        self.serialized_object = self.get_serialized_object(self.instance)
 
-    object_cache = {}
     def get_serialized_object(self, instance):
-        if instance.item.uuid not in self.object_cache.keys():
-            self.object_cache[instance.item.uuid] = Serializer().serialize([instance.item])[0]
-        return self.object_cache[instance.item.uuid]
+        return self.pyserializer.serialize([instance.item], context=self.context)[0]
 
     class Meta:
         model = models._concept
         fields = standard_fields+('fields','statuses','ids','slots', 'links')
 
     def get_extra_fields(self, instance):
-        obj = self.get_serialized_object(instance)
-        return obj.get('fields',[])
+        return self.serialized_object.get('fields',[])
 
     def get_identifiers(self, instance):
-        obj = self.get_serialized_object(instance)
-        return obj.get('identifiers',[])
+        return self.serialized_object.get('identifiers',[])
 
     def get_slots(self, instance):
-        obj = self.get_serialized_object(instance)
-        return obj.get('slots', [])
+        return self.serialized_object.get('slots', [])
 
     def get_links(self, instance):
-        obj = self.get_serialized_object(instance)
-        from aristotle_mdr.contrib.links import models as link_models
-        return obj.get('links', [])
+        return self.serialized_object.get('links', [])
 
     def get_statuses(self, instance):
-        obj = self.get_serialized_object(instance)
-        return obj.get('statuses',[])
-
+        return self.serialized_object.get('statuses',[])
 
 class ConceptViewSet(
     UUIDLookupModelMixin,
