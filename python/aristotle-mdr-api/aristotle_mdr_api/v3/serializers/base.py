@@ -19,6 +19,8 @@ from django.core.serializers.python import Serializer as PySerializer
 from aristotle_mdr import models as MDR
 from django.core.serializers.json import Serializer as JSONSerializer
 
+from aristotle_mdr.contrib.slots.utils import get_allowed_slots
+
 import uuid
 import datetime
 from reversion import revisions as reversion
@@ -78,9 +80,20 @@ class Serializer(PySerializer):
             ]
 
         if 'aristotle_mdr.contrib.slots' in settings.INSTALLED_APPS:
+
+            try:
+                user = self.options['context']['request'].user
+            except KeyError:
+                user = None
+
+            if user:
+                allowed_slots = get_allowed_slots(obj, user)
+            else:
+                allowed_slots = []
+
             data['slots'] = [
                 {'name': slot.name, 'type': slot.type, 'value': slot.value }
-                for slot in obj.slots.all()
+                for slot in allowed_slots
             ]
 
         # if 'aristotle_mdr.contrib.links' in settings.INSTALLED_APPS:
