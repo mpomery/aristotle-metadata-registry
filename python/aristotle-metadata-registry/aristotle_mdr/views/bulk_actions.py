@@ -33,7 +33,7 @@ class BulkAction(FormView):
         return actions.get(action, None)
 
     def post(self, request, *args, **kwargs):
-        url = request.GET.get("next", "/")
+        url = request.GET.get("next", reverse("aristotle:home"))
         message = ""
         action = self.get_action()
 

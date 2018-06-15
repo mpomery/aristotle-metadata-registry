@@ -56,3 +56,6 @@ whoosh_index/
 src/
 /static/
 /docs/_build
+
+# skip including docker data directory
+docker/data
