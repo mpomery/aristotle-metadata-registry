@@ -383,14 +383,12 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
 
 class SlotTestCase(BaseSlotsTestCase, TestCase):
 
-    @tag('runthis')
     def test_slot_view_perms_api(self):
         # Test slot permissions on apis
 
         self.make_newoc_public()
 
         for version in ['v2', 'v3']:
-            print('we on version {}'.format(version))
             self.client.logout()
             url = '/api/' + version + '/metadata/' + str(self.newoc.uuid) + '/?format=json'
             response = self.client.get(url)
