@@ -237,7 +237,8 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
         slot = slots_models.Slot.objects.create(
             name='Test slot',
             concept=self.oc,
-            value='Test Value'
+            value='Test Value',
+            permission=0
         )
 
         # Add identifier
@@ -258,13 +259,13 @@ class GraphqlFunctionalTests(BaseGraphqlTestCase, TestCase):
 
         querytext = (
             '{ metadata (name: "Test Object Class") { edges { node { name slots { edges { node { name } } }'
-            ' identifiers { edges { node { identifier } } } } } } }'
+            ' identifiers { identifier } } } } }'
         )
 
         json_response = self.post_query(querytext)
         edges = json_response['data']['metadata']['edges']
         self.assertEqual(edges[0]['node']['slots']['edges'][0]['node']['name'], 'Test slot')
-        self.assertEqual(edges[0]['node']['identifiers']['edges'][0]['node']['identifier'], 'Test Identifier')
+        self.assertEqual(edges[0]['node']['identifiers'][0]['identifier'], 'Test Identifier')
 
     def test_identifier_filters(self):
 

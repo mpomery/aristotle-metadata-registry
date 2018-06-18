@@ -37,12 +37,10 @@ class AristotleResolver(object):
             queryset = retval.get_queryset()
 
             if queryset.model == slots_models.Slot:
-                return queryset
+                return filter_slot_perms(queryset, info.context.user)
 
             if hasattr(queryset, 'visible'):
                 return queryset.visible(info.context.user)
-            else:
-                return filter_slot_perms(queryset, info.context.user)
 
         elif isinstance(retval, QuerySet):
 

@@ -50,7 +50,10 @@ ValueMeaningNode = type_from_model(mdr_models.ValueMeaning)
 
 # Slots and Identifiers
 
-ScopedIdentifierNode = type_from_model(ident_models.ScopedIdentifier)
+class ScopedIdentifierNode(DjangoObjectType):
+    class Meta:
+        model = ident_models.ScopedIdentifier
+
 SlotNode = type_from_model(slot_models.Slot)
 
 class ValueMeaningNode(DjangoObjectType):
