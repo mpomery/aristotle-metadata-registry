@@ -1,6 +1,7 @@
 Changelog
 
 - 2.0.x
+    - Changed how root URL `aristotle.example.com/` resolves: for anonymous users it redirects to `aristotle.example.com/home`, for logged in users it redirects to `aristotle.example.com/account/home/`
     - Removed official support for Windows & MSSQL
     - Rest API token authentication
     - Simplified configuration for testing
