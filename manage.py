@@ -2,11 +2,21 @@
 
 import os
 import sys
-print(sys.version)
 
 if __name__ == "__main__":
     if 'test' in sys.argv:
-        os.environ['DJANGO_SETTINGS_MODULE'] = "aristotle_mdr.tests.settings.settings"
+        testindex = sys.argv.index('test')
+        after = sys.argv[testindex+1]
+
+        module = after.split('.')[0]
+
+        print(module)
+
+        if module == 'aristotle_mdr':
+            os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aristotle_mdr.tests.settings.settings")
+        else:
+            os.environ.setdefault("DJANGO_SETTINGS_MODULE", module + ".tests.settings")
+
     elif 'schemamigration' in sys.argv:
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aristotle_mdr.tests.settings.settings")
     else:
