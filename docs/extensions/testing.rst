@@ -6,10 +6,22 @@ Aristotle uses tox and django's unit test framework for testing
 Running tests locally
 ---------------------
 
+Docker
+^^^^^^
+
+For running tests on a local docker environemnt refer to https://github.com/aristotle-mdr/aristotle-metadata-registry/docker
+
+Tox
+^^^
+
 Tests can be run locally running tox with an optional environment argument e.g. ``tox -e dj1.11-test-linux-db-sqlite-search-whoosh``.
 
-To run invidual tests you can first set the ``DJANGO_SETTINGS_MODULE`` enviroment variable to the settings module you want to use and then
-run ``tox -e localtest`` with your django-admin arguments e.g. ``tox -e localtest aristotle_mdr.test.main.test_html_pages``
+Virtualenv
+^^^^^^^^^^
+
+* To run tests in a virtualenv, first set the ``DJANGO_SETTINGS_MODULE`` enviroment variable to the settings module you want to use 
+* Install dev requirements with ``pipenv install --dev``
+* Run tests with ``pipenv run django-admin test aristotle_mdr``. Replacing aristotle_mdr with a full test path if needed
 
 Adding extension modules to our automated testing
 -------------------------------------------------
