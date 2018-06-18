@@ -58,7 +58,11 @@ class ConceptDetailSerializer(ConceptSerializerBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.pyserializer = Serializer()
-        self.serialized_object = self.get_serialized_object(self.instance)
+
+        if self.instance:
+            self.serialized_object = self.get_serialized_object(self.instance)
+        else:
+            self.serialized_object = {}
 
     def get_serialized_object(self, instance):
         return self.pyserializer.serialize([instance.item], context=self.context)[0]
