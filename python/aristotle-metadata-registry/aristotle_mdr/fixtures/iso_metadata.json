@@ -436,7 +436,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "symbol": "cm",
       "responsible_organisation": "",
@@ -452,7 +451,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "symbol": "mm",
       "responsible_organisation": "",
@@ -468,7 +466,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "symbol": "Celsius",
       "responsible_organisation": "",
@@ -484,7 +481,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "symbol": "s",
       "responsible_organisation": "",
@@ -500,7 +496,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "symbol": "min",
       "responsible_organisation": "",
@@ -516,7 +511,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "symbol": "h",
       "responsible_organisation": "",
@@ -532,7 +526,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "symbol": "D",
       "responsible_organisation": "",
@@ -548,7 +541,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "symbol": "Y",
       "responsible_organisation": "",
@@ -564,7 +556,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "symbol": "g",
       "responsible_organisation": "",
@@ -580,7 +571,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "symbol": "Kg",
       "responsible_organisation": "",
@@ -596,7 +586,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "responsible_organisation": "",
       "comments": "",
@@ -610,7 +599,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "responsible_organisation": "",
       "comments": "",
@@ -624,7 +612,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "responsible_organisation": "",
       "comments": "",
@@ -638,7 +625,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "responsible_organisation": "",
       "comments": "",
@@ -652,7 +638,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "responsible_organisation": "",
       "comments": "",

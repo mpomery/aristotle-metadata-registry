@@ -31,9 +31,6 @@
             {% for ident in item.identifiers.all %}
                 <dd><a href="{{ident.namespace.naming_authority.get_absolute_url}}">{{ ident.prefix }}</a>:{{ ident.identifier }}:{{ ident.version }}</dd>
             {% endfor %}
-            {% if item.short_name %}
-            <dt class="visible-xs">{% trans 'Short name'%}</dt><dd class="visible-xs">{{ item.short_name }}</dd>
-            {% endif %}
             {% if item.version %}
             <dt class="visible-xs">{% trans 'Version'%}</dt><dd class="visible-xs">{{ item.version }}</dd>
             {% endif %}
