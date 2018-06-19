@@ -221,7 +221,12 @@ class SignupView(SignupMixin, FormView):
                 self.send_activation(user)
             else:
                 # Send password reset email
-                self.send_password_reset(user.email, self.request)
+                existing = self.user_model.objects.get(email=user.email)
+
+                if existing.is_active:
+                    self.send_password_reset(user.email, self.request)
+                else:
+                    self.send_activation(existing)
 
             # Show message
             return self.render_to_response(
@@ -316,12 +321,11 @@ class ResendActivationView(SignupMixin, FormView):
         try:
             user = user_model.objects.get(email=email, is_active=False)
         except user_model.DoesNotExist:
-            form.add_error(None, 'Activation email could not be sent')
-            return self.form_invalid(form)
+            user = None
 
         if user:
             self.send_activation(user)
 
         return self.render_to_response(
-            {'message': 'Success, an activation link has been sent to your email. Follow the link to continue'}
+            {'message': 'If you have singed up with the email previously an activation link has been sent to your email. Follow the link to continue'}
         )

@@ -23,6 +23,18 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             'password_confirm': '1234'
         }
 
+        self.inactive_user = self.user_model.objects.create(
+            email='inactive@example.com',
+            password='1234',
+            is_active=False
+        )
+
+        self.active_user = self.user_model.objects.create(
+            email='active@example.com',
+            password='1234',
+            is_active=True
+        )
+
         super().setUp()
 
     def get_url_from_email(self, email_content):
@@ -216,7 +228,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
     @tag('runthis')
-    def test_self_registration_page_information_leak(self):
+    def test_self_registration_page_existing_user(self):
         # Test wether the page reveals that a user already exists
 
         existing_user = self.user_model.objects.create_user(
@@ -239,6 +251,17 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             self.assertEqual(len(mail.outbox), 1)
             self.assertTrue(mail.outbox[0].subject.startswith('Password reset'))
 
+            # Test trying to signup with an inactive user
+
+            existing_data.update({'email': 'inactive@example.com'})
+            post_response = self.client.post(reverse('aristotle-user:signup_register'), existing_data)
+            self.assertEqual(post_response.status_code, 200)
+            self.assertFalse('form' in post_response.context)
+            self.assertTrue('message' in post_response.context)
+
+            self.assertEqual(len(mail.outbox), 2)
+            self.assertTrue(mail.outbox[1].subject.endswith('Activation'))
+
     def test_self_registration_email_whitelist(self):
 
         # With email whilelist set
@@ -258,7 +281,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             bad_data.update({'email': 'someguy@hellokitty.com'})
             post_response = self.client.post(reverse('aristotle-user:signup_register'), bad_data)
             self.assertTrue(post_response.status_code, 200)
-            self.assertTrue(post_response.context['message'].startswith('Success'))
+            self.assertTrue(post_response.context['message'].endswith('Success'))
 
 
         self.assertEqual(len(mail.outbox), 2)
@@ -340,20 +363,6 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
 
     def test_resend_activation(self):
 
-        user_model = get_user_model()
-
-        inactive_user = user_model.objects.create(
-            email='inactive@example.com',
-            password='1234',
-            is_active=False
-        )
-
-        active_user = user_model.objects.create(
-            email='active@example.com',
-            password='1234',
-            is_active=True
-        )
-
         response = self.client.get(reverse('aristotle-user:signup_resend'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['title'], 'Resend Activation')
@@ -364,10 +373,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             {'email': 'i_dont_even_exist@example.com'}
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.context['form'].non_field_errors(),
-            ['Activation email could not be sent']
-        )
+        self.assertTrue('message' in response.context)
 
         # Try to resend to already active user
         response = self.client.post(
