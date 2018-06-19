@@ -234,7 +234,10 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             post_response = self.client.post(reverse('aristotle-user:signup_register'), existing_data)
             self.assertEqual(post_response.status_code, 200)
             self.assertFalse('form' in post_response.context)
+            self.assertTrue('message' in post_response.context)
 
+            self.assertEqual(len(mail.outbox), 1)
+            self.assertTrue(mail.outbox[0].subject.startswith('Password reset'))
 
     def test_self_registration_email_whitelist(self):
 

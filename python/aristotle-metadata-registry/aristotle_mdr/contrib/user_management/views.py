@@ -1,11 +1,14 @@
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import PasswordResetForm
 from django.urls import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, TemplateView, FormView, View
 from django.db.models import Q
+from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from organizations.backends.defaults import BaseBackend
 from organizations.backends.tokens import RegistrationTokenGenerator
@@ -135,6 +138,20 @@ class SignupMixin:
 
         return self.signup_enabled
 
+    def send_password_reset(self, user_email, request):
+
+        form = PasswordResetForm({'email': user_email})
+
+        if form.is_valid():
+            form.save(
+                request=request,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                use_https=True
+            )
+            return True
+        else:
+            return False
+
 
 class SignupView(SignupMixin, FormView):
 
@@ -184,14 +201,27 @@ class SignupView(SignupMixin, FormView):
                 success = False
 
         if success:
-            # Save inactive user
             user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
-            user.is_active = False
-            user.save()
+            user.email = form.cleaned_data['email']
 
-            # Send Activation Email
-            self.send_activation(user)
+            # Validate unique
+            unique = True
+            try:
+                user.validate_unique()
+            except ValidationError:
+                unique = False
+
+            if unique:
+                # Save inactive user
+                user.set_password(form.cleaned_data['password'])
+                user.is_active = False
+                user.save()
+
+                # Send Activation Email
+                self.send_activation(user)
+            else:
+                # Send password reset email
+                self.send_password_reset(user.email, self.request)
 
             # Show message
             return self.render_to_response(

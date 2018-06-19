@@ -56,6 +56,9 @@ class UserRegistrationForm(forms.ModelForm):
         max_length=128,
         widget=forms.PasswordInput
     )
+    email = forms.EmailField(
+        max_length=254
+    )
 
     def clean(self):
         password = self.cleaned_data.get('password')
@@ -71,4 +74,4 @@ class UserRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ['email', 'short_name', 'full_name']
+        fields = ['short_name', 'full_name']
