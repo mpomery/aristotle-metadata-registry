@@ -5,6 +5,7 @@ from aristotle_mdr import models as mdr_models
 from aristotle_dse import models as dse_models
 from aristotle_mdr.contrib.slots import models as slots_models
 from aristotle_mdr.contrib.identifiers import models as ident_models
+from aristotle_mdr.contrib.slots.tests import BaseSlotsTestCase
 from comet import models as comet_models
 from graphene.test import Client as QLClient
 
@@ -433,3 +434,37 @@ class GraphqlPermissionsTests(BaseGraphqlTestCase, TestCase):
         json_response = self.post_query('{ metadata { submitter } }', 400)
         self.assertTrue('errors' in json_response.keys())
         self.assertFalse('data' in json_response.keys())
+
+
+class GraphqlSlotsTests(BaseSlotsTestCase, BaseGraphqlTestCase, TestCase):
+
+    def check_slots(self, gql_response, slots):
+        slots_edges = gql_response['data']['metadata']['edges'][0]['node']['slots']['edges']
+        self.assertEqual(len(slots_edges), len(slots))
+
+        returned_slots = [edge['node']['name'] for edge in slots_edges]
+
+        for slot in slots:
+            self.assertTrue(slot in returned_slots)
+
+    def test_graphql_slots(self):
+
+        self.make_newoc_public()
+
+        # Test query anon
+        self.client.logout()
+        query = '{ metadata (name: "testoc") { edges { node { slots { edges { node { name } } } } } } }'
+        json_response = self.post_query(query, 200)
+        self.check_slots(json_response, ['public'])
+
+        # Test query auth
+        self.client.logout()
+        self.login_regular_user()
+        json_response = self.post_query(query, 200)
+        self.check_slots(json_response, ['public', 'auth'])
+
+        # Test query user in wg
+        self.client.logout()
+        self.login_editor()
+        json_response = self.post_query(query, 200)
+        self.check_slots(json_response, ['public', 'auth', 'work'])
