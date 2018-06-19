@@ -227,7 +227,6 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
 
         self.assertEqual(len(mail.outbox), 1)
 
-    @tag('runthis')
     def test_self_registration_page_existing_user(self):
         # Test wether the page reveals that a user already exists
 
@@ -262,6 +261,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             self.assertEqual(len(mail.outbox), 2)
             self.assertTrue(mail.outbox[1].subject.endswith('Activation'))
 
+    @tag('failed')
     def test_self_registration_email_whitelist(self):
 
         # With email whilelist set
@@ -281,7 +281,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             bad_data.update({'email': 'someguy@hellokitty.com'})
             post_response = self.client.post(reverse('aristotle-user:signup_register'), bad_data)
             self.assertTrue(post_response.status_code, 200)
-            self.assertTrue(post_response.context['message'].endswith('Success'))
+            self.assertTrue(post_response.context['message'].startswith('Success'))
 
 
         self.assertEqual(len(mail.outbox), 2)
@@ -381,10 +381,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             {'email': 'active@example.com'}
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.context['form'].non_field_errors(),
-            ['Activation email could not be sent']
-        )
+        self.assertEqual(len(mail.outbox), 0)
 
         # Resend to an inactive user
         response = self.client.post(
@@ -392,7 +389,7 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
             {'email': 'inactive@example.com'}
         )
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context['message'].startswith('Success'))
+        self.assertTrue('activation link has been sent' in response.context['message'])
 
         self.assertEqual(len(mail.outbox), 1)
 
