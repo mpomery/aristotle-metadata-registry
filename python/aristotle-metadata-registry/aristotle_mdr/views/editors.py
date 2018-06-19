@@ -8,20 +8,26 @@ from django.views.generic import (
 import reversion
 
 from aristotle_mdr.utils import (
-    concept_to_clone_dict,
+    concept_to_clone_dict, construct_change_message_extra_formsets,
     construct_change_message, url_slugify_concept, is_active_module
 )
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
 
 from aristotle_mdr.views.utils import ObjectLevelPermissionRequiredMixin
+from aristotle_mdr.contrib.identifiers.models import ScopedIdentifier
+from aristotle_mdr.contrib.slots.models import Slot
+from aristotle_mdr.contrib.slots.utils import get_allowed_slots
 
 import logging
 
 from aristotle_mdr.contrib.generic.forms import (
-    one_to_many_formset_factory, one_to_many_formset_save,
-    one_to_many_formset_excludes, one_to_many_formset_filters
+    one_to_many_formset_excludes, one_to_many_formset_filters,
+    ordered_formset_factory, ordered_formset_save,
 )
+from aristotle_mdr.contrib.generic.views import ExtraFormsetMixin
+
+
 import re
 
 logger = logging.getLogger(__name__)
@@ -48,7 +54,7 @@ class ConceptEditFormView(ObjectLevelPermissionRequiredMixin):
         return context
 
 
-class EditItemView(ConceptEditFormView, UpdateView):
+class EditItemView(ExtraFormsetMixin, ConceptEditFormView, UpdateView):
     template_name = "aristotle_mdr/actions/advanced_editor.html"
     permission_required = "aristotle_mdr.user_can_edit"
 
@@ -68,172 +74,104 @@ class EditItemView(ConceptEditFormView, UpdateView):
         })
         return kwargs
 
+    def get_extra_formsets(self, item=None, postdata=None):
+
+        extra_formsets = super().get_extra_formsets(item, postdata)
+
+        if self.slots_active:
+            slot_formset = self.get_slots_formset()(
+                queryset=Slot.objects.filter(concept=self.item.id),
+                instance=self.item.concept,
+                data=postdata
+            )
+
+            extra_formsets.append({
+                'formset': slot_formset,
+                'title': 'Slots',
+                'type': 'slot',
+                'saveargs': None
+            })
+
+        if self.identifiers_active:
+            id_formset = self.get_identifier_formset()(
+                queryset=ScopedIdentifier.objects.filter(concept=self.item.id),
+                instance=self.item.concept,
+                data=postdata
+            )
+
+            extra_formsets.append({
+                'formset': id_formset,
+                'title': 'Identifiers',
+                'type': 'identifiers',
+                'saveargs': None
+            })
+
+        return extra_formsets
+
     def post(self, request, *args, **kwargs):
         form = self.get_form()
-        slot_formset = None
+        extra_formsets = self.get_extra_formsets(self.item, request.POST)
+
         self.object = self.item
 
         if form.is_valid():
+            item = form.save(commit=False)
+            change_comments = form.data.get('change_comments', None)
+            form_invalid = False
+        else:
+            form_invalid = True
+
+        formsets_invalid = self.validate_formsets(extra_formsets)
+        invalid = form_invalid or formsets_invalid
+
+        if invalid:
+            return self.form_invalid(form, formsets=extra_formsets)
+        else:
             with transaction.atomic(), reversion.revisions.create_revision():
-                item = form.save(commit=False)
 
-                has_change_comments = form.data.get('change_comments', False)
-                change_comments = form.data.get('change_comments', "")
-                changed_formsets = []
-                if self.slots_active:
-                    slot_formset = self.get_slots_formset()(request.POST, request.FILES, item.concept)
-                    if slot_formset.is_valid():
-
-                        # Save the slots
-                        slot_formset.save()
-
-                        changed_formsets.append(slot_formset)
-
-                    else:
-                        return self.form_invalid(form, slots_FormSet=slot_formset)
-
-                if self.identifiers_active:
-                    id_formset = self.get_identifier_formset()(request.POST, request.FILES, item.concept)
-                    if id_formset.is_valid():
-
-                        # Save the slots
-                        id_formset.save()
-
-                        changed_formsets.append(id_formset)
-
-                    else:
-                        return self.form_invalid(form, identifier_FormSet=id_formset)
-
-                if (hasattr(self.item, 'serialize_weak_entities')):
-                    # if weak formset is active
-                    weak = self.item.serialize_weak_entities
-
-                    for entity in weak:
-
-                        formset_info = self.get_weak_formset(entity)
-
-                        weak_formset = formset_info['formset'](request.POST, request.FILES, prefix=formset_info['prefix'])
-
-                        if weak_formset.is_valid():
-                            one_to_many_formset_save(weak_formset, self.item, formset_info['model_field'], formset_info['ordering'])
-
-                            changed_formsets.append(weak_formset)
-
-                        else:
-                            return self.form_invalid(form, weak_formset=weak_formset)
+                # Save formsets
+                self.save_formsets(extra_formsets)
 
                 # save the change comments
-                if not has_change_comments:
-                    change_comments += construct_change_message(request, form, changed_formsets)
+                if not change_comments:
+                    change_comments = construct_change_message_extra_formsets(request, form, extra_formsets)
 
                 reversion.revisions.set_user(request.user)
                 reversion.revisions.set_comment(change_comments)
+
+                # Save item
                 form.save_m2m()
                 item.save()
-                return HttpResponseRedirect(url_slugify_concept(self.item))
 
-        return self.form_invalid(form)
+            return HttpResponseRedirect(url_slugify_concept(self.item))
 
     def get_slots_formset(self):
         from aristotle_mdr.contrib.slots.forms import slot_inlineformset_factory
-        return slot_inlineformset_factory(model=self.model)
+        return slot_inlineformset_factory()
 
     def get_identifier_formset(self):
-        from aristotle_mdr.contrib.identifiers.models import ScopedIdentifier
+        from aristotle_mdr.contrib.identifiers.forms import identifier_inlineformset_factory
+        return identifier_inlineformset_factory()
 
-        return inlineformset_factory(
-            MDR._concept, ScopedIdentifier,
-            can_delete=True,
-            fields=('concept', 'namespace', 'identifier', 'version'),
-            extra=1,
-            )
-
-    def get_weak_model_field(self, field_model):
-        # get the field in the model that we are adding so it can be excluded from form
-        model_to_add_field = ''
-        for field in field_model._meta.get_fields():
-            if (field.is_relation):
-                if (field.related_model == self.model):
-                    model_to_add_field = field.name
-                    break
-
-        return model_to_add_field
-
-    def get_weak_formset(self, entity):
-
-        # where entity is an entry in serialize_weak_entities
-
-        field_model = getattr(self.item, entity[1]).model
-        model_to_add_field = self.get_weak_model_field(field_model)
-
-        extra_excludes = one_to_many_formset_excludes(self.item, field_model)
-        formset = one_to_many_formset_factory(field_model, model_to_add_field, field_model.ordering_field, extra_excludes)
-        formset_info = {
-            'formset': formset,
-            'model_field': model_to_add_field,
-            'prefix': entity[0],
-            'ordering': field_model.ordering_field,
-        }
-
-        return formset_info
-
-    def form_invalid(self, form, slots_FormSet=None, identifier_FormSet=None, weak_formset=None):
+    def form_invalid(self, form, formsets=None):
         """
         If the form is invalid, re-render the context data with the
         data-filled form and errors.
         """
-        return self.render_to_response(self.get_context_data(form=form, slots_FormSet=slots_FormSet, weak_formset=weak_formset))
+
+        return self.render_to_response(self.get_context_data(form=form, formsets=formsets))
 
     def get_context_data(self, *args, **kwargs):
-        from aristotle_mdr.contrib.slots.models import Slot
+
         context = super().get_context_data(*args, **kwargs)
-        if self.slots_active and kwargs.get('slots_FormSet', None):
-            context['slots_FormSet'] = kwargs['slots_FormSet']
+
+        if 'formsets' in kwargs:
+            extra_formsets = kwargs['formsets']
         else:
-            context['slots_FormSet'] = self.get_slots_formset()(
-                queryset=Slot.objects.filter(concept=self.item.id),
-                instance=self.item.concept
-                )
-        from aristotle_mdr.contrib.identifiers.models import ScopedIdentifier
-        if self.identifiers_active and kwargs.get('identifier_FormSet', None):
-            context['identifier_FormSet'] = kwargs['identifier_FormSet']
-        else:
-            context['identifier_FormSet'] = self.get_identifier_formset()(
-                queryset=ScopedIdentifier.objects.filter(concept=self.item.id),
-                instance=self.item.concept
-                )
+            extra_formsets = self.get_extra_formsets(self.item)
 
-        if (hasattr(self.item, 'serialize_weak_entities')):
-            if kwargs.get('weak_formset', None):
-                # Will only display the formset that produced an error
-                weak_formset = kwargs['weak_formset']
-                title = 'Edit ' + weak_formset.model.__name__
-                formsets = [{'formset': weak_formset, 'title': title}]
-                context['weak_formsets'] = formsets
-            else:
-                weak = self.item.serialize_weak_entities
-                formsets = []
-                for entity in weak:
-                    # query weak entity
-                    queryset = getattr(self.item, entity[1]).all()
-
-                    formset = self.get_weak_formset(entity)['formset']
-
-                    weak_formset = formset(
-                        queryset=queryset,
-                        initial=[{'ORDER': queryset.count() + 1}],
-                        prefix=entity[0]
-                    )
-
-                    weak_formset = one_to_many_formset_filters(weak_formset, self.item)
-
-                    title = 'Edit ' + queryset.model.__name__
-                    # add spaces before capital letters
-                    title = re.sub(r"\B([A-Z])", r" \1", title)
-
-                    formsets.append({'formset': weak_formset, 'title': title})
-
-                context['weak_formsets'] = formsets
+        fscontext = self.get_formset_context(extra_formsets)
+        context.update(fscontext)
 
         context['show_slots_tab'] = self.slots_active
         context['show_id_tab'] = self.identifiers_active

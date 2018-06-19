@@ -25,6 +25,63 @@ def model_to_dict(item):
     return dict((k, v) for (k, v) in mtd(item).items() if v is not None)
 
 
+def get_management_forms(item, slots=False, identifiers=False, item_is_model=False):
+
+    d = {}
+
+    if slots:
+        d['slots-TOTAL_FORMS'] = 0
+        d['slots-INITIAL_FORMS'] = 0
+        d['slots-MIN_NUM_FORMS'] = 0
+        d['slots-MAX_NUM_FORMS'] = 0
+
+    if identifiers:
+        d['identifiers-TOTAL_FORMS'] = 0
+        d['identifiers-INITIAL_FORMS'] = 0
+        d['identifiers-MIN_NUM_FORMS'] = 0
+        d['identifiers-MAX_NUM_FORMS'] = 1
+
+    if hasattr(item, 'serialize_weak_entities'):
+        weak = item.serialize_weak_entities
+        for entity in weak:
+            d['%s-TOTAL_FORMS'%entity[0]] = 0
+            d['%s-INITIAL_FORMS'%entity[0]] = 0
+            d['%s-MIN_NUM_FORMS'%entity[0]] = 0
+            d['%s-MAX_NUM_FORMS'%entity[0]] = 1000
+
+    add_through_forms = False
+    if not item_is_model:
+        if isinstance(item, models.DataElementDerivation):
+            add_through_forms = True
+    else:
+        if issubclass(item, models.DataElementDerivation):
+            add_through_forms = True
+
+    if add_through_forms:
+        prefixes = ['derives', 'inputs']
+        for pre in prefixes:
+            d['%s-TOTAL_FORMS'%pre] = 0
+            d['%s-INITIAL_FORMS'%pre] = 0
+            d['%s-MIN_NUM_FORMS'%pre] = 0
+            d['%s-MAX_NUM_FORMS'%pre] = 1000
+
+    return d
+
+
+def get_admin_management_forms(item_class):
+
+    d = {}
+    if issubclass(item_class, models.DataElementDerivation):
+        prefixes = ['dedderivesthrough_set', 'dedinputsthrough_set']
+        for pre in prefixes:
+            d['%s-TOTAL_FORMS'%pre] = 0
+            d['%s-INITIAL_FORMS'%pre] = 0
+            d['%s-MIN_NUM_FORMS'%pre] = 0
+            d['%s-MAX_NUM_FORMS'%pre] = 1000
+
+    return d
+
+
 def model_to_dict_with_change_time(item, fetch_time=None):
     """
     This constructs a dictionary from a model, with a last_fetched value as well
@@ -35,24 +92,8 @@ def model_to_dict_with_change_time(item, fetch_time=None):
     d = model_to_dict(item)
     d['last_fetched'] = str(fetch_time)
 
-    # Add slots management form
-    d['slots-TOTAL_FORMS'] = 0
-    d['slots-INITIAL_FORMS'] = 0
-    d['slots-MIN_NUM_FORMS'] = 0
-    d['slots-MAX_NUM_FORMS'] = 0
-
-    d['identifiers-TOTAL_FORMS'] = 0
-    d['identifiers-INITIAL_FORMS'] = 0
-    d['identifiers-MIN_NUM_FORMS'] = 0
-    d['identifiers-MAX_NUM_FORMS'] = 1
-
-    if hasattr(item, 'serialize_weak_entities'):
-        weak = item.serialize_weak_entities
-        for entity in weak:
-            d['%s-TOTAL_FORMS'%entity[0]] = 0
-            d['%s-INITIAL_FORMS'%entity[0]] = 0
-            d['%s-MIN_NUM_FORMS'%entity[0]] = 0
-            d['%s-MAX_NUM_FORMS'%entity[0]] = 1
+    mfs = get_management_forms(item, slots=True, identifiers=True)
+    d.update(mfs)
 
     return d
 
@@ -604,3 +645,32 @@ class LoggedInViewPages(object):
                 print('failed, keep trying - %s',i)
                 sleep(i) # sleep for progressively longer, just to give it a fighting chance to finish.
         self.assertEqual(*args)
+
+
+class FormsetTestUtils:
+
+    def get_formset_postdata(self, datalist, prefix='form', initialforms=0):
+
+        postdata = {}
+        # Add data
+        index = 0
+        for data in datalist:
+            for key in data.keys():
+                postkey = '{}-{}-{}'.format(prefix, index, key)
+                postdata[postkey] = data[key]
+            index += 1
+
+        # Add management form
+        postdata['{}-INITIAL_FORMS'.format(prefix)] = initialforms
+        postdata['{}-TOTAL_FORMS'.format(prefix)] = index
+        postdata['{}-MIN_NUM_FORMS'.format(prefix)] = 0
+        postdata['{}-MAX_NUM_FORMS'.format(prefix)] = 1000
+
+        return postdata
+
+    def post_formset(self, url, extra_postdata={}, **kwargs):
+
+        postdata = self.get_formset_postdata(**kwargs)
+        postdata.update(extra_postdata)
+        response = self.client.post(url, postdata)
+        return response

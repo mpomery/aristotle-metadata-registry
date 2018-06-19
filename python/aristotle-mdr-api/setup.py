@@ -33,7 +33,8 @@ setup(
         'djangorestframework>=3.0',
         'django-rest-swagger',
         'django_filter',
-        # 'aristotle-metadata-registry'
+        'django-jsonforms',
+        'djangorestframework-composed-permissions'
     ]
 
 )

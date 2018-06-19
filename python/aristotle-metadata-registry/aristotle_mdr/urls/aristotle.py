@@ -11,6 +11,7 @@ import aristotle_mdr.models as models
 from aristotle_mdr.contrib.generic.views import (
     GenericAlterOneToManyView,
     GenericAlterManyToManyView,
+    GenericAlterManyToManyOrderView,
     generic_foreign_key_factory_view
 )
 
@@ -18,7 +19,11 @@ from django.utils.translation import ugettext_lazy as _
 
 
 urlpatterns=[
-    url(r'^$', TemplateView.as_view(template_name='aristotle_mdr/static/home.html'), name="home"),
+    url(r'^$', views.SmartRoot.as_view(
+        unauthenticated_pattern='aristotle_mdr:home',
+        authenticated_pattern='aristotle_mdr:userHome'
+    ), name='smart_root'),
+    url(r'^home/?$', TemplateView.as_view(template_name='aristotle_mdr/static/home.html'), name="home"),
     url(r'^manifest.json$', TemplateView.as_view(template_name='meta/manifest.json', content_type='application/json')),
     url(r'^robots.txt$', TemplateView.as_view(template_name='meta/robots.txt', content_type='text/plain')),
     url(r'^sitemap.xml$', views.sitemaps.main, name='sitemap_xml'),
@@ -59,13 +64,13 @@ urlpatterns=[
             form_title=_('Change Value Meanings')
         ), name='value_meanings_edit'),
     url(r'^item/(?P<iid>\d+)/dataelementderivation/change_inputs/?$',
-        GenericAlterManyToManyView.as_view(
+        GenericAlterManyToManyOrderView.as_view(
             model_base=models.DataElementDerivation,
             model_to_add=models.DataElement,
             model_base_field='inputs'
         ), name='dataelementderivation_change_inputs'),
     url(r'^item/(?P<iid>\d+)/dataelementderivation/change_derives/?$',
-        GenericAlterManyToManyView.as_view(
+        GenericAlterManyToManyOrderView.as_view(
             model_base=models.DataElementDerivation,
             model_to_add=models.DataElement,
             model_base_field='derives'

@@ -2,13 +2,14 @@
 sudo: false
 
 # We're having issues on the default Trusty setup, lets wait for now
-dist: precise
+dist: trusty
 
 language: python
 python: 3.6
 
 install:
-  - pip install tox codecov coveralls
+  - pip install codecov coveralls
+  - pip install 'tox>=3.0'
 
 defaults:
   - &main_test_script
@@ -35,7 +36,7 @@ defaults:
         git diff --name-only HEAD...$TRAVIS_BRANCH
         echo "TRAVIS_BRANCH to HEAD"
         git diff --name-only $TRAVIS_BRANCH...HEAD
-        ./scripts/tox_if.sh $MODULE dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH
+        ./scripts/tox_if.sh dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH-module_$MODULE
     services:
       - postgresql
       - redis-server
@@ -44,9 +45,10 @@ defaults:
     addons:
       apt:
         sources:
-          - elasticsearch-2.x
+          - elasticsearch-5.x
         packages:
           - elasticsearch
+          - libmariadbclient-dev
       code_climate:
         repo_token: ac63d774ebdd641ef502acf1588b36248726a28a50e4e1f4ba4295a157477f54
       mariadb: '10.1'
@@ -58,7 +60,7 @@ defaults:
   - &test_accessibility_py36
     stage: accessibility
     python: 3.6
-    script: ./scripts/tox_if.sh $MODULE ally-$ALLY
+    script: ./scripts/tox_if.sh dj1.11-linux-ally-$ALLY-module_amr
 
   - &deploy_stage
     stage: deploy-it
@@ -81,31 +83,29 @@ jobs:
   include:
     - stage: stylecheck
       python: 3.6
-      env: MODULE=aristotle-metadata-registry
-      script: cd $TRAVIS_BUILD_DIR/python/$MODULE && tox -e flake8 --skip-missing-interpreters
+      script: tox -e flake8 --skip-missing-interpreters
 
     - stage: documentation
       python: 3.6
-      env: MODULE=aristotle-metadata-registry
-      script: ./scripts/tox_if.sh $MODULE docs
+      script: ./scripts/tox_if.sh docs
 
     - stage: testing-aristotle-mdr
-      env: DJANGO_VERSION='1.11'  DB=sqlite  SEARCH=elastic MODULE=aristotle-metadata-registry
+      env: DJANGO_VERSION='1.11'  DB=sqlite  SEARCH=elastic MODULE=amr
       <<: *main_test_script_py36
     - stage: testing-aristotle-mdr
-      env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic MODULE=aristotle-metadata-registry
+      env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=elastic MODULE=amr
       <<: *main_test_script_py36
     - stage: testing-aristotle-mdr
-      env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh MODULE=aristotle-metadata-registry
+      env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh MODULE=amr
       <<: *main_test_script_py36
     - stage: testing-aristotle-mdr
-      env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=whoosh MODULE=aristotle-metadata-registry
+      env: DJANGO_VERSION='1.11'  DB=postgres  SEARCH=whoosh MODULE=amr
       <<: *main_test_script_py36
     - stage: testing-aristotle-mdr
-      env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=whoosh MODULE=aristotle-metadata-registry
+      env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=whoosh MODULE=amr
       <<: *main_test_script_py36
     - stage: testing-aristotle-mdr
-      env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic MODULE=aristotle-metadata-registry
+      env: DJANGO_VERSION='1.11'  DB=mariadb   SEARCH=elastic MODULE=amr
       <<: *main_test_script_py36
 
       # Possible failures:
@@ -117,19 +117,23 @@ jobs:
     #   <<: *main_test_script_py36
 
     - stage: testing-modules
-      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-dataset-extensions
+      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=dse
       <<: *main_test_script_py36
 
     - stage: testing-modules
-      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=comet-indicator-registry
+      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=cir
       <<: *main_test_script_py36
 
     - stage: testing-modules
-      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-pdf-downloads
+      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=apd
       <<: *main_test_script_py36
 
     - stage: testing-modules
-      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=aristotle-mdr-graphql
+      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=gql
+      <<: *main_test_script_py36
+
+    - stage: testing-modules
+      env: DJANGO_VERSION='1.11'  DB=postgres   SEARCH=elastic MODULE=api
       <<: *main_test_script_py36
 
   # Test Accessibility
@@ -147,17 +151,5 @@ jobs:
         on:
           branch: master
 
-    - <<: *deploy_stage
-      deploy:
-        <<: *deploy_step
-        server: https://test.pypi.org/legacy/
-        on:
-          all_branches: true
-
-  # allow_failures:
-  #   - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=whoosh   VARIANT=haystack
-  #   - env: DJANGO_VERSION='1.11'  DB=sqlite    SEARCH=elastic  VARIANT=haystack
-
 after_success:
   - ./scripts/coverage_reporter.sh $MODULE
-

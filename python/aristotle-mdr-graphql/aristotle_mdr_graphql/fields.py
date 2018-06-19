@@ -4,7 +4,8 @@ from graphene_django.utils import maybe_queryset
 from django.db import models
 import django_filters
 
-from aristotle_mdr_graphql.filterset import AristotleFilterSet
+from aristotle_mdr_graphql.filterset import (AristotleFilterSet,
+                                             ConceptFilterSet)
 
 
 class AristotleFilterConnectionField(DjangoFilterConnectionField):
@@ -47,12 +48,11 @@ class AristotleConceptFilterConnectionField(AristotleFilterConnectionField):
     def __init__(self, type, *args, **kwargs):
 
         extrameta = {
-            'filterset_base_class': AristotleFilterSet,
-            # 'filter_fields': ['name'],
+            'filterset_base_class': ConceptFilterSet,
         }
 
         kwargs.update({'extra_filter_meta': extrameta})
         if "description" not in kwargs.keys():
             kwargs['description'] = "Look up a collection of " + str(type._meta.model.get_verbose_name_plural())
 
-        super().__init__(type, *args, **kwargs)
+        super(AristotleFilterConnectionField, self).__init__(type, *args, **kwargs)

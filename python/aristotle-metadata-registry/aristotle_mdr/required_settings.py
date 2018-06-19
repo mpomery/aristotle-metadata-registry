@@ -10,7 +10,7 @@ MEDIA_ROOT = os.getenv('aristotlemdr__MEDIA_ROOT', os.path.join(BASE_DIR, "media
 TEMPLATES_DIRS = [os.path.join(BASE_DIR, 'templates')]
 FIXTURES_DIRS = [os.path.join(BASE_DIR, 'fixtures')]
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: don't run with debug turned on in production!!
 DEBUG = True
 
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases

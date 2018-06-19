@@ -3,31 +3,32 @@
 {% block content %}
 
 <a class="sr-only" onclick="addSlot()" href="?extra=1" accesskey='r'>Add a slot (adding a slot does not save changes)</a>
-    {% with formset=slots_FormSet %}
+{% with formset=slots_FormSet %}
 
     {{ formset.management_form }}
-    <table id="" class="form table  table-hover">
-    {% with formset.forms.0 as slot_form %}
-      <thead><tr>
-            <th>{% trans 'Slot name' %}</th>
-            <th>{% trans 'Type' %}</th>
-            <th>{% trans 'Value' %}</th>
-            <th>{% trans 'Delete' %}</th>
-      </tr></thead>
-    {% endwith %}
-    <tbody id="slotsTable">
+    <table class="form table table-hover">
+      <thead>
+        <tr>
+          <th></th>
+          <th>{% trans 'Slot name' %}</th>
+          <th>{% trans 'Type' %}</th>
+          <th>{% trans 'Value' %}</th>
+          <th>{% trans 'Permission' %}</th>
+          <th>{% trans 'Delete' %}</th>
+        </tr>
+      </thead>
+    <tbody id="slots" class="draggableTable">
     {% for slot_form in formset.forms %}
       <tr class="moveablerow">
 
-          {# <td title="Drag to reorder"><i class="fa fa-bars grabber"></i></td> #}
+          <td title="Drag to reorder"><i class="fa fa-bars grabber"></i>
+            {% for hidden in slot_form.hidden_fields %}
+            {{ hidden }}
+            {% endfor %}
+          </td>
+
           {% for field in slot_form.visible_fields %}
             <td>
-            {# Include the hidden fields in the form #}
-            {% if forloop.first %}
-              {% for hidden in slot_form.hidden_fields %}
-              {{ hidden }}
-              {% endfor %}
-            {% endif %}
               {{ field.errors.as_ul }}
               {{ field }}
             </td>

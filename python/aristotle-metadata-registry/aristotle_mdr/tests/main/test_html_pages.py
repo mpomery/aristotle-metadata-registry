@@ -6,6 +6,7 @@ from django.db.models.fields import CharField, TextField
 
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
+import aristotle_mdr.contrib.identifiers.models as ident_models
 from aristotle_mdr.utils import url_slugify_concept
 from aristotle_mdr.forms.creation_wizards import (
     WorkgroupVerificationMixin,
@@ -16,17 +17,24 @@ import datetime
 
 from aristotle_mdr.utils import setup_aristotle_test_environment
 
+from aristotle_mdr.templatetags.aristotle_tags import get_dataelements_from_m2m
+
 
 setup_aristotle_test_environment()
 
 
+def setUpModule():
+    from django.core.management import call_command
+    call_command('load_aristotle_help', verbosity=0, interactive=False)
+
+
 class AnonymousUserViewingThePages(TestCase):
     def test_homepage(self):
-        response = self.client.get("/")
-        self.assertEqual(response.status_code,200)
+        response = self.client.get(reverse('aristotle:smart_root'))
+        self.assertRedirects(response, reverse('aristotle:home'))
 
     def test_notifications_for_anon_users(self):
-        response = self.client.get("/")
+        response = self.client.get(reverse('aristotle:home'))
         self.assertEqual(response.status_code,200)
         # Make sure notifications library isn't loaded for anon users as they'll never have notifications.
         self.assertNotContains(response, "notifications/notify.js")
@@ -56,11 +64,15 @@ class AnonymousUserViewingThePages(TestCase):
         response = self.client.get(url_slugify_concept(item))
         self.assertEqual(response.status_code,200)
 
-def setUpModule():
-    from django.core.management import call_command
-    call_command('load_aristotle_help', verbosity=0, interactive=False)
 
-class LoggedInViewConceptPages(utils.LoggedInViewPages):
+class LoggedInViewHTMLPages(utils.LoggedInViewPages, TestCase):
+    def test_homepage(self):
+        self.login_editor()
+        response = self.client.get(reverse('aristotle:smart_root'))
+        self.assertRedirects(response, reverse('aristotle:userHome'))
+
+
+class LoggedInViewConceptPages(utils.LoggedInViewPages, utils.FormsetTestUtils):
     defaults = {}
     def setUp(self):
         super().setUp()
@@ -225,26 +237,96 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages):
         updated_name = updated_item['name'] + " updated!"
         updated_item['name'] = updated_name
 
-        # Add slots management form
-        updated_item['slots-TOTAL_FORMS'] = 1
-        updated_item['slots-INITIAL_FORMS'] = 0
-        updated_item['slots-MIN_NUM_FORMS'] = 0
-        updated_item['slots-MAX_NUM_FORMS'] = 1
+        formset_data = [
+            {
+                'concept': self.item1.pk,
+                'name': 'extra',
+                'type': 'string',
+                'value': 'test slot value',
+                'order': 0,
+                'permission': 0,
+            },
+            {
+                'concept': self.item1.pk,
+                'name': 'more_extra',
+                'type': 'string',
+                'value': 'an even better test slot value',
+                'order': 1,
+                'permission': 0,
+            }
+        ]
+        slot_formset_data = self.get_formset_postdata(formset_data, 'slots')
 
-        updated_item['slots-0-concept'] = self.item1.pk
-        updated_item['slots-0-name'] = 'extra'
-        updated_item['slots-0-type'] = None
-        updated_item['slots-0-value'] = 'test slot value'
+        updated_item.update(slot_formset_data)
 
         response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
         self.item1 = self.itemType.objects.get(pk=self.item1.pk)
 
         self.assertRedirects(response,url_slugify_concept(self.item1))
-        self.assertEqual(self.item1.slots.count(),1)
+        self.assertEqual(self.item1.slots.count(),2)
 
         response = self.client.get(reverse('aristotle:edit_item',args=[self.item1.id]))
         self.assertContains(response, 'test slot value')
+        self.assertContains(response, 'an even better test slot value')
 
+        slots = self.item1.slots.all()
+        self.assertEqual(slots[0].name, 'extra')
+        self.assertEqual(slots[0].order, 0)
+        self.assertEqual(slots[1].name, 'more_extra')
+        self.assertEqual(slots[1].order, 1)
+
+    def test_submitter_can_save_via_edit_page_with_identifiers(self):
+
+        self.login_editor()
+        response = self.client.get(reverse('aristotle:edit_item',args=[self.item1.id]))
+        self.assertEqual(response.status_code,200)
+
+        self.assertEqual(self.item1.slots.count(),0)
+
+        updated_item = utils.model_to_dict_with_change_time(response.context['item'])
+        updated_name = updated_item['name'] + " updated!"
+        updated_item['name'] = updated_name
+
+        namespace = ident_models.Namespace.objects.create(
+            naming_authority=self.ra,
+            shorthand_prefix='pre'
+        )
+
+        formset_data = [
+            {
+                'concept': self.item1.pk,
+                'namespace': namespace.pk,
+                'identifier': 'YE',
+                'version': 1,
+                'order': 0
+            },
+            {
+                'concept': self.item1.pk,
+                'namespace': namespace.pk,
+                'identifier': 'RE',
+                'version': 1,
+                'order': 1
+            }
+        ]
+        ident_formset_data = self.get_formset_postdata(formset_data, 'identifiers')
+
+        updated_item.update(ident_formset_data)
+
+        response = self.client.post(reverse('aristotle:edit_item',args=[self.item1.id]), updated_item)
+        self.item1 = self.itemType.objects.get(pk=self.item1.pk)
+
+        self.assertRedirects(response,url_slugify_concept(self.item1))
+        self.assertEqual(self.item1.identifiers.count(),2)
+
+        response = self.client.get(reverse('aristotle:item',args=[self.item1.id]), follow=True)
+        self.assertContains(response, 'pre</a>:YE:1')
+        self.assertContains(response, 'pre</a>:RE:1')
+
+        idents = self.item1.identifiers.all()
+        self.assertEqual(idents[0].identifier, 'YE')
+        self.assertEqual(idents[0].order, 0)
+        self.assertEqual(idents[1].identifier, 'RE')
+        self.assertEqual(idents[1].order, 1)
 
     def test_submitter_cannot_save_via_edit_page_if_other_saves_made(self):
         from datetime import timedelta
@@ -1413,6 +1495,29 @@ class ConceptualDomainViewPage(LoggedInViewConceptPages, TestCase):
                 order=i,
             )
 
+    @tag('edit_formsets')
+    def test_edit_formset_error_display(self):
+
+        self.login_editor()
+
+        edit_url = 'aristotle:edit_item'
+        response = self.client.get(reverse(edit_url,args=[self.item1.id]))
+        self.assertEqual(response.status_code, 200)
+
+        data = utils.model_to_dict_with_change_time(self.item1)
+
+        # submit an item with a blank name
+        valuemeaning_formset_data = [
+            {'name': '', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 0},
+            {'name': 'Test2', 'definition': 'test defn', 'start_date': '1999-01-01', 'end_date': '2090-01-01', 'ORDER': 1}
+        ]
+        data.update(self.get_formset_postdata(valuemeaning_formset_data, 'value_meaning', 0))
+        response = self.client.post(reverse(edit_url,args=[self.item1.id]), data)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(response.context['weak_formsets'][0]['formset'].errors[0], {'name': ['This field is required.']})
+        self.assertContains(response, 'This field is required.')
+
 
 class DataElementConceptViewPage(LoggedInViewConceptPages, TestCase):
     url_name='dataElementConcept'
@@ -1580,6 +1685,13 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
 
         self.login_editor()
 
+        management_form = {
+            'form-INITIAL_FORMS': 0,
+            'form-TOTAL_FORMS': 1,
+            'form-MIN_NUM_FORMS': 0,
+            'form-MAX_NUM_FORMS': 1000
+        }
+
         self.assertFalse(self.de2.can_view(self.editor))
 
         response = self.client.get(
@@ -1587,18 +1699,30 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         )
         self.assertEqual(response.status_code,200)
 
+        postdata = management_form.copy()
+        postdata['form-0-item_to_add'] = self.de2.pk
+        postdata['form-0-ORDER'] = 0
+        #postdata['form-TOTAL_FORMS'] = 2
+
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
-            {'items_to_add': [self.de2.pk]}
+            postdata
         )
         self.item1 = self.itemType.objects.get(pk=self.item1.pk)
         self.assertTrue(self.de2 not in getattr(self.item1, attr).all())
         self.assertEqual(response.status_code,200)
         self.assertContains(response, 'Select a valid choice')
 
+        postdata = management_form.copy()
+        postdata['form-0-item_to_add'] = self.de1.pk
+        postdata['form-0-ORDER'] = 0
+        postdata['form-1-item_to_add'] = self.de2.pk
+        postdata['form-1-ORDER'] = 1
+        postdata['form-TOTAL_FORMS'] = 2
+
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
-            {'items_to_add': [self.de1.pk, self.de2.pk]},
+            postdata,
             follow=True
         )
         self.assertTrue(self.de2 not in getattr(self.item1, attr).all())
@@ -1606,18 +1730,30 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
         self.assertEqual(response.status_code,200)
 
         # user can see OC1, but its the wrong type so expect failure
+
+        postdata = management_form.copy()
+        postdata['form-0-item_to_add'] = self.de1.pk
+        postdata['form-0-ORDER'] = 0
+        postdata['form-1-item_to_add'] = self.oc1.pk
+        postdata['form-1-ORDER'] = 1
+        postdata['form-TOTAL_FORMS'] = 2
+
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
-            {'items_to_add': [self.de1.pk, self.oc1.pk]},
+            postdata,
             follow=True
         )
         self.assertTrue(self.de2 not in getattr(self.item1, attr).all())
         self.assertContains(response, 'Select a valid choice')
         self.assertEqual(response.status_code,200)
 
+        postdata = management_form.copy()
+        postdata['form-0-item_to_add'] = self.de1.pk
+        postdata['form-0-ORDER'] = 0
+
         response = self.client.post(
             reverse(url, args=[self.item1.pk]),
-            {'items_to_add': [self.de1.pk]},
+            postdata
         )
         self.assertTrue(self.de1 in getattr(self.item1, attr).all())
         self.assertEqual(response.status_code,302)
@@ -1634,6 +1770,206 @@ class DataElementDerivationViewPage(LoggedInViewConceptPages, TestCase):
             url="aristotle_mdr:dataelementderivation_change_inputs",
             attr='inputs',
         )
+
+    def derivation_m2m_formset(self, url, attr, prefix='form', item_add_field='item_to_add', add_itemdata=False, extra_postdata=None):
+
+        self.de1 = models.DataElement.objects.create(name='DE1 - visible',definition="my definition",workgroup=self.wg1)
+        self.de2 = models.DataElement.objects.create(name='DE2 - visible',definition="my definition",workgroup=self.wg1)
+        self.de3 = models.DataElement.objects.create(name='DE3 - visible',definition="my definition",workgroup=self.wg1)
+
+        self.login_editor()
+
+        management_form = {
+            '{}-INITIAL_FORMS'.format(prefix): 0,
+            '{}-TOTAL_FORMS'.format(prefix): 1,
+            '{}-MIN_NUM_FORMS'.format(prefix): 0,
+            '{}-MAX_NUM_FORMS'.format(prefix): 1000
+        }
+
+        if extra_postdata:
+            management_form.update(extra_postdata)
+
+        # Post 3 items
+        postdata = management_form.copy()
+
+        if add_itemdata:
+            postdata.update(utils.model_to_dict_with_change_time(self.item1))
+
+        postdata['{}-0-{}'.format(prefix, item_add_field)] = self.de3.pk
+        postdata['{}-0-ORDER'.format(prefix)] = 0
+        postdata['{}-1-{}'.format(prefix, item_add_field)] = self.de1.pk
+        postdata['{}-1-ORDER'.format(prefix)] = 1
+        postdata['{}-2-{}'.format(prefix, item_add_field)] = self.de2.pk
+        postdata['{}-2-ORDER'.format(prefix)] = 2
+        postdata['{}-TOTAL_FORMS'.format(prefix)] = 3
+
+        response = self.client.post(
+            reverse(url, args=[self.item1.pk]),
+            postdata
+        )
+
+        self.assertRedirects(response, self.item1.get_absolute_url())
+
+        items = getattr(self.item1, attr).all()
+        self.assertTrue(self.de1 in items)
+        self.assertTrue(self.de2 in items)
+        self.assertTrue(self.de3 in items)
+
+        # Load page to check loading of existing data and preserved order
+
+        response = self.client.get(reverse(url, args=[self.item1.pk]))
+        self.assertEqual(response.status_code, 200)
+
+        if not add_itemdata:
+            # If m2m specific form
+            formset_initial = response.context['formset'].initial
+
+            self.assertEqual(len(formset_initial), 3)
+            for data in formset_initial:
+                self.assertTrue(data['ORDER'] in [0,1,2])
+                if data['ORDER'] == 0:
+                    self.assertEqual(data['{}'.format(item_add_field)], self.de3)
+                elif data['ORDER'] == 1:
+                    self.assertEqual(data['{}'.format(item_add_field)], self.de1)
+                elif data['ORDER'] == 2:
+                    self.assertEqual(data['{}'.format(item_add_field)], self.de2)
+
+        if attr == 'derives':
+            through_model = models.DedDerivesThrough
+        else:
+            through_model = models.DedInputsThrough
+
+        # Check order with through table
+        self.assertEqual(through_model.objects.count(), 3)
+        self.assertEqual(through_model.objects.get(order=0).data_element, self.de3)
+        self.assertEqual(through_model.objects.get(order=1).data_element, self.de1)
+        self.assertEqual(through_model.objects.get(order=2).data_element, self.de2)
+
+
+        # Change order and delete
+        postdata = management_form.copy()
+
+        if add_itemdata:
+            postdata.update(utils.model_to_dict_with_change_time(self.item1))
+
+        postdata['{}-0-{}'.format(prefix, item_add_field)] = self.de3.pk
+        postdata['{}-0-id'.format(prefix)] = through_model.objects.get(data_element=self.de3).pk
+        postdata['{}-0-ORDER'.format(prefix)] = 0
+        postdata['{}-0-DELETE'.format(prefix)] = 'checked'
+        postdata['{}-1-{}'.format(prefix, item_add_field)] = self.de2.pk
+        postdata['{}-1-id'.format(prefix)] = through_model.objects.get(data_element=self.de2).pk
+        postdata['{}-1-ORDER'.format(prefix)] = 1
+        postdata['{}-2-{}'.format(prefix, item_add_field)] = self.de1.pk
+        postdata['{}-2-id'.format(prefix)] = through_model.objects.get(data_element=self.de1).pk
+        postdata['{}-2-ORDER'.format(prefix)] = 2
+        postdata['{}-TOTAL_FORMS'.format(prefix)] = 3
+        postdata['{}-INITIAL_FORMS'.format(prefix)] = 3
+
+        response = self.client.post(
+            reverse(url, args=[self.item1.pk]),
+            postdata
+        )
+        print(response.status_code)
+
+        self.assertRedirects(response, self.item1.get_absolute_url())
+
+        items = getattr(self.item1, attr).all()
+        self.assertTrue(items.count(), 2)
+        self.assertTrue(self.de1 in items)
+        self.assertTrue(self.de2 in items)
+        self.assertFalse(self.de3 in items)
+
+        # Load page to check order
+
+        response = self.client.get(reverse(url, args=[self.item1.pk]))
+        self.assertEqual(response.status_code, 200)
+
+        formset_initial = response.context['formset'].initial
+
+        if not add_itemdata:
+            # If m2m specific form
+            self.assertEqual(len(formset_initial), 2)
+            for data in formset_initial:
+                self.assertTrue(data['ORDER'] in [1,2])
+                if data['ORDER'] == 1:
+                    self.assertEqual(data['{}'.format(item_add_field)], self.de2)
+                elif data['ORDER'] == 2:
+                    self.assertEqual(data['{}'.format(item_add_field)], self.de1)
+
+        # Check order with through table
+        self.assertEqual(through_model.objects.count(), 2)
+        self.assertEqual(through_model.objects.get(order=1).data_element, self.de2)
+        self.assertEqual(through_model.objects.get(order=2).data_element, self.de1)
+
+    @tag('edit_formsets')
+    def test_derivation_inputs_formset(self):
+        self.derivation_m2m_formset(
+            url="aristotle_mdr:dataelementderivation_change_inputs",
+            attr='inputs',
+        )
+
+    @tag('edit_formsets')
+    def test_derivation_derives_formset(self):
+        self.derivation_m2m_formset(
+            url="aristotle_mdr:dataelementderivation_change_derives",
+            attr='derives',
+        )
+
+    @tag('edit_formsets')
+    def test_derivation_inputs_formset_editor(self):
+
+        self.derivation_m2m_formset(
+            url="aristotle_mdr:edit_item",
+            attr="inputs",
+            prefix="inputs",
+            item_add_field="data_element",
+            add_itemdata=True,
+        )
+
+    @tag('edit_formsets')
+    def test_derivation_derives_formset_editor(self):
+
+        self.derivation_m2m_formset(
+            url="aristotle_mdr:edit_item",
+            attr="derives",
+            prefix="derives",
+            item_add_field="data_element",
+            add_itemdata=True,
+        )
+
+    def test_derivation_item_page(self):
+
+        de1 = models.DataElement.objects.create(name='DE1 Name',definition="my definition",workgroup=self.wg1)
+        de2 = models.DataElement.objects.create(name='DE2 Name',definition="my definition",workgroup=self.wg1)
+        de3 = models.DataElement.objects.create(name='DE3 Name',definition="my definition",workgroup=self.wg1)
+        ded = models.DataElementDerivation.objects.create(name='DED Name', definition='my definition', workgroup=self.wg1)
+
+        ded_derives_1 = models.DedDerivesThrough.objects.create(data_element_derivation=ded, data_element=de1, order=0)
+        ded_derives_2 = models.DedDerivesThrough.objects.create(data_element_derivation=ded, data_element=de2, order=1)
+        ded_derives_3 = models.DedDerivesThrough.objects.create(data_element_derivation=ded, data_element=de3, order=2)
+
+        ded_inputs_1 = models.DedInputsThrough.objects.create(data_element_derivation=ded, data_element=de3, order=0)
+        ded_inputs_1 = models.DedInputsThrough.objects.create(data_element_derivation=ded, data_element=de2, order=1)
+        ded_inputs_1 = models.DedInputsThrough.objects.create(data_element_derivation=ded, data_element=de1, order=2)
+
+        self.login_editor()
+        response = self.client.get(reverse("aristotle:item", args=[ded.pk]), follow=True)
+
+        self.assertEqual(response.status_code, 200)
+
+        # Check the template tag that was used returned the correct data
+
+        item = response.context['item']
+
+        des = get_dataelements_from_m2m(item, "inputs")
+        self.assertEqual(des[0].pk, de3.pk)
+        self.assertEqual(des[1].pk, de2.pk)
+        self.assertEqual(des[2].pk, de1.pk)
+
+        des = get_dataelements_from_m2m(item, "derives")
+        self.assertEqual(des[0].pk, de1.pk)
+        self.assertEqual(des[1].pk, de2.pk)
+        self.assertEqual(des[2].pk, de3.pk)
 
 
 class LoggedInViewUnmanagedPages(utils.LoggedInViewPages):

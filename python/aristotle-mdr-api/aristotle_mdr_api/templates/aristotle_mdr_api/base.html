@@ -16,11 +16,12 @@
   </div>
 </div>
 
-<p>
-The following versions of the API are available on this server:
+{% block api_content %}
+
+<h3>The following versions of the API are available on this server:</h3>
 <ul class="list-group">
   <li class="list-group-item">
-    <strong><a href='{% url "aristotle_api_root" %}/v3'>API v3</a></strong>
+    <strong><a href='{% url "aristotle_api_root" %}v3'>API v3</a></strong>
     <p>
       About Version 3:
       <ul>
@@ -29,21 +30,34 @@ The following versions of the API are available on this server:
       <li>Added the <code>/about/</code> route to give basic public details about the registry</li>
       </ul>
     </p>
-    <a href='{% url "aristotle_api_root" %}/v2/schemas'>View the schema for the v3 endpoint</a>
+    <a href='{% url "aristotle_api_root" %}v2/schemas'>View the schema for the v3 endpoint</a>
   </li>
   <li class="list-group-item">
-    <strong><a href='{% url "aristotle_api_root" %}/v2'>API v2</a></strong>
+    <strong><a href='{% url "aristotle_api_root" %}v2'>API v2</a></strong>
     <p>
     </p>
-    <a href='{% url "aristotle_api_root" %}/v2/schemas'>View the schema for the v2 endpoint</a>
+    <a href='{% url "aristotle_api_root" %}v2/schemas'>View the schema for the v2 endpoint</a>
   </li>
 </ul>
 
-</p>
+
+<h3>Authentication</h3>
+<ul class="list-group">
+  <li class="list-group-item">
+    <a href="{% url 'token_auth:token_list' %}">Token Management Page</a>
+    <p>Create and manage API access tokens</p>
+    <p>This will be required to access the API from external applications</p>
+  </li>
+  <li class="list-group-item">
+    <a href="{% url 'friendly_login' %}">Login</a>
+    <p>Login to an account for session authentication</p>
+  </li>
+</ul>
 
 To see a full list of endpoints review the
-<a href='{% url "aristotle_api_root" %}/schemas'>Aristotle API Swagger documentation</a>
+<a href='{% url "aristotle_api_root" %}schemas'>Aristotle API Swagger documentation</a>
 
+{% endblock %}
 
 
 {% endblock %}

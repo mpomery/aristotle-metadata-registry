@@ -130,20 +130,21 @@ class MonoRepoPackageFinder(PackageFinder):
         for d in os.listdir(py_path):
             if os.path.isdir(os.path.join(py_path, d)):
                 setup_py_path = os.path.join(py_path, d, "setup.py")
-                with open(setup_py_path, "r") as f:
-                    import ast
-                    t = compile(f.read(), setup_py_path, 'exec', ast.PyCF_ONLY_AST)
-                    for node in t.body:
-                        if isinstance(node, ast.Expr):
-                            c = node.value
-                            for k in getattr(c, "keywords", []):
-                                if k.arg == "install_requires" and isinstance(k.value, ast.List) :
-                                    v = ast.literal_eval(k.value)
-                                    for v in ast.literal_eval(k.value):
-                                        yield(v)
-                                    continue
-                        else:
-                            pass
+                if os.path.isfile(os.path.join(setup_py_path)): 
+                    with open(setup_py_path, "r") as f:
+                        import ast
+                        t = compile(f.read(), setup_py_path, 'exec', ast.PyCF_ONLY_AST)
+                        for node in t.body:
+                            if isinstance(node, ast.Expr):
+                                c = node.value
+                                for k in getattr(c, "keywords", []):
+                                    if k.arg == "install_requires" and isinstance(k.value, ast.List) :
+                                        v = ast.literal_eval(k.value)
+                                        for v in ast.literal_eval(k.value):
+                                            yield(v)
+                                        continue
+                            else:
+                                pass
 
 
 setup(
