@@ -8,6 +8,7 @@ Changelog
     - Ability to order Data Elements within Data Element Derivations
     - Ability to order Slots and Identifiers
     - Slots now have permissions (Public, Private, Workgroup)
+    - Removal of short name
 
 - 2.0.0
     - **Dependency notes:**
