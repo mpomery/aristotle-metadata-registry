@@ -298,10 +298,10 @@
         },
         "django-jsonforms": {
             "hashes": [
-                "sha256:4943658059d899c154600679ee5bfcc7667fa6f30738090843a61f378c27ccba",
-                "sha256:bccedd38118c974535a13771bb599f5464b2f53b6b16d7c4c51b71a644a646c9"
+                "sha256:ba9d470e4867d310b6a128f1c846a737a9f7eecce2040e5028f2420685332b0c",
+                "sha256:f57690a1335b2342b31e425f35310243c8658c9d67818c182885dafb3e684559"
             ],
-            "version": "==1.0.4"
+            "version": "==1.1.0"
         },
         "django-model-utils": {
             "hashes": [
