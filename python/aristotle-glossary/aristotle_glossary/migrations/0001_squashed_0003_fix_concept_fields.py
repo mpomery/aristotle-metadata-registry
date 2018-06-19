@@ -6,8 +6,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [(b'aristotle_glossary', '0001_initial'), (b'aristotle_glossary', '0002_auto_20160425_0143'), (b'aristotle_glossary', '0003_fix_concept_fields')]
-
     dependencies = [
         ('aristotle_mdr', '0020_add_uuids'),
     ]
