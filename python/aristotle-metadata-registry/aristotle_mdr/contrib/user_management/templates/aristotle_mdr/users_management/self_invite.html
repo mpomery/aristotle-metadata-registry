@@ -39,7 +39,7 @@
           {% if title %}
             <h1 class="block text-center">{{ title }}</h1>
           {% else %}
-            <h1 class="block text-center">{{ config.registry.SELF_SIGNUP.message|default:"Signup" }}</h1>
+            <h1 class="block text-center">{{ config.SELF_SIGNUP.message|default:"Signup" }}</h1>
           {% endif %}
 
           <div class="account-wall">

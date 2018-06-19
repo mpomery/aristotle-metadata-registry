@@ -121,12 +121,9 @@ class SignupMixin:
         aristotle_settings = fetch_aristotle_settings()
 
         try:
-            signup_settings = aristotle_settings['registry']['SELF_SIGNUP']
+            signup_settings = aristotle_settings['SELF_SIGNUP']
         except KeyError:
-            try:
-                signup_settings = aristotle_settings['SELF_SIGNUP']
-            except KeyError:
-                signup_settings = None
+            signup_settings = None
 
         if signup_settings:
             # Check if user self signup is enabled
