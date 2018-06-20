@@ -37,6 +37,14 @@ class FriendlyLoginView(LoginView):
         return context
 
 
+class ProfileView(LoginRequiredMixin, DetailView):
+
+    template_name='aristotle_mdr/user/userProfile.html'
+
+    def get_object(self, *args, **kwargs):
+        return self.request.user
+
+
 @login_required
 def home(request):
     from reversion.models import Revision

@@ -1,0 +1,31 @@
+{% extends "aristotle_mdr/user/userHome.html" %}
+
+{% block title %}Profile{% endblock %}
+{% block sidebar %}
+    {% include "aristotle_mdr/user/userSideBar.html" with activeTab='edit' %}
+{% endblock %}
+
+{% block page %}
+<h1>Profile</h1>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th>Email</th>
+      <td>{{ object.email }}</td>
+    </tr>
+    <tr>
+      <th>Short Name</th>
+      <td>{{ object.short_name }}</td>
+    </tr>
+    <tr>
+      <th>Full Name</th>
+      <td>{{ object.full_name }}</td>
+    </tr>
+  </tbody>
+</table>
+<ul class="list-unstyled">
+  <li><a href="{% url 'aristotle_mdr:userEdit' %}">Edit Details</a></li>
+  <li><a href="{% url 'password_change' %}">Change Password</a></li>
+</ul>
+{% endblock %}
