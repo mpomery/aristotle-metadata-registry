@@ -56,19 +56,14 @@ function reload_notifications() {
 }
 
 function mark_all_unread() {
-    var r = new XMLHttpRequest();
-    var mark_all_as_read_url = '/account/notifications/mark-all-as-read/'
-    r.open("GET", notify_mark_all_unread_url, true);
-    r.onreadystatechange = function () {
-        if (r.readyState != 4 || r.status != 200) {
-            return;
-        }
-        var badge = document.getElementById(notify_badge_id);
-        if (badge) {
-            badge.innerHTML = 0;
-        }
+  var notify_mark_all_unread_url = '/account/notifications/api/mark-all-as-read/'
+
+  $.getJSON(notify_mark_all_unread_url, function (data) {
+    if (data.status == 'success') {
+      reload_notifications()
     }
-    r.send();
+  })
+
 }
 
 $(document).ready(function() {
