@@ -9,10 +9,17 @@ function fetch_api_data(callback, num) {
       var full_url = apiurl + '?max=' + num
 
       setTimeout(function() {
-        $.getJSON(full_url, function(data) {
-          callback(data)
-          loading_notifications = false
-          suppressLoadingBlock = false
+        $.ajax({
+          url: full_url, 
+          dataType: "json",
+          success: callback,
+          complete: function() {
+            loading_notifications = false
+            suppressLoadingBlock = false
+          },
+          error: function() {
+            display_notify_error()
+          }
         })
       }, 500)
     }
@@ -68,7 +75,7 @@ function reload_notifications() {
 
     menu.innerHTML = ""
 
-    // Add the loading icon
+    // Make loading icon li element
     var listelement = document.createElement('li')
     var centerdiv = document.createElement('div')
     var icon = document.createElement('i')
@@ -77,8 +84,8 @@ function reload_notifications() {
     centerdiv.appendChild(icon)
     listelement.appendChild(centerdiv)
 
-    // Add text
-    textelement = make_dropdown_item('Fetching Notifications')
+    // Make text element
+    textelement = make_dropdown_item('Fetching Notifications...')
 
     menu.append(listelement)
     menu.append(textelement)
@@ -89,7 +96,7 @@ function reload_notifications() {
 
 }
 
-function display_error() {
+function display_notify_error() {
     var menu = $('.notify-menu')[0]
     menu.innerHTML = ""
 
