@@ -1,7 +1,15 @@
+var loading_notifications = false
+
 function fetch_api_data(callback, num) {
-    var apiurl='/account/notifications/api/unread_list/'
-    var full_url = apiurl + '?max=' + num
-    $.getJSON(full_url, callback)
+    if (!loading_notifications) {
+      loading_notifications = true;
+      var apiurl='/account/notifications/api/unread_list/'
+      var full_url = apiurl + '?max=' + num
+      $.getJSON(full_url, function(data) {
+        callback(data)
+        loading_notifications = false
+      })
+    }
 }
 
 // Callback for notify menu
@@ -37,21 +45,23 @@ function update_notification_badge(data) {
 }
 
 function reload_notifications() {
-  var menu = $('.notify-menu')[0]
+  if (!loading_notifications) {
+    var menu = $('.notify-menu')[0]
 
-  // Add the loading icon
-  var listelement = document.createElement('li')
-  var centerdiv = document.createElement('div')
-  var icon = document.createElement('i')
-  centerdiv.className = 'text-center'
-  icon.className = 'fa fa-refresh fa-spin'
-  listelement.id = 'notify-loading'
-  centerdiv.appendChild(icon)
-  listelement.appendChild(centerdiv)
-  menu.prepend(listelement)
+    // Add the loading icon
+    var listelement = document.createElement('li')
+    var centerdiv = document.createElement('div')
+    var icon = document.createElement('i')
+    centerdiv.className = 'text-center'
+    icon.className = 'fa fa-refresh fa-spin'
+    listelement.id = 'notify-loading'
+    centerdiv.appendChild(icon)
+    listelement.appendChild(centerdiv)
+    menu.prepend(listelement)
 
-  // Perform update
-  fetch_api_data(fill_aristotle_notification_menu, 5) 
+    // Perform update
+    fetch_api_data(fill_aristotle_notification_menu, 5)
+  }
 
 }
 
