@@ -7,13 +7,14 @@ function fetch_api_data(callback, num) {
       suppressLoadingBlock = true
       var apiurl='/account/notifications/api/unread_list/'
       var full_url = apiurl + '?max=' + num
+
       setTimeout(function() {
-      $.getJSON(full_url, function(data) {
-        callback(data)
-        loading_notifications = false
-        suppressLoadingBlock = false
-      })
-      }, 1000)
+        $.getJSON(full_url, function(data) {
+          callback(data)
+          loading_notifications = false
+          suppressLoadingBlock = false
+        })
+      }, 500)
     }
 
 }
@@ -50,11 +51,22 @@ function update_notification_badge(data) {
   })
 }
 
+function make_dropdown_item(text) {
+    var textelement = document.createElement('li')
+    var linkelement = document.createElement('a')
+    var text = document.createTextNode(text)
+    linkelement.href = "#"
+    linkelement.appendChild(text)
+    textelement.appendChild(linkelement)
+
+    return textelement
+}
+
 function reload_notifications() {
   if (!loading_notifications) {
     var menu = $('.notify-menu')[0]
 
-    //menu.innerHTML = ""
+    menu.innerHTML = ""
 
     // Add the loading icon
     var listelement = document.createElement('li')
@@ -62,15 +74,29 @@ function reload_notifications() {
     var icon = document.createElement('i')
     centerdiv.className = 'text-center'
     icon.className = 'fa fa-refresh fa-spin'
-    listelement.id = 'notify-loading'
     centerdiv.appendChild(icon)
     listelement.appendChild(centerdiv)
-    menu.prepend(listelement)
+
+    // Add text
+    textelement = make_dropdown_item('Fetching Notifications')
+
+    menu.append(listelement)
+    menu.append(textelement)
 
     // Perform update
     fetch_api_data(fill_aristotle_notification_menu, 5)
   }
 
+}
+
+function display_error() {
+    var menu = $('.notify-menu')[0]
+    menu.innerHTML = ""
+
+    // Add text
+    list_element = make_dropdown_item('Notifications could not be retrieved')
+
+    menu.append(list_element)
 }
 
 function mark_all_unread() {
