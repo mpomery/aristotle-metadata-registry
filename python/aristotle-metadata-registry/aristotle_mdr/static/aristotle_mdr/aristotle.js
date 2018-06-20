@@ -6,7 +6,6 @@ $(document).ready(function() {
     $('.modal').on('hidden.bs.modal', function(e)
     {
         if (!$(this).hasClass('exclude-scrap')) {
-          console.log(this)
           $(this).removeData();
           x = $(this).find('.modal-content > *');
           //console.log(x)
@@ -53,7 +52,9 @@ $(document).ajaxComplete(function(event, request, settings) {
 
 // OVerrides callback for notify menu
 function fill_aristotle_notification_menu(data) {
-    var menu = document.getElementById(notify_menu_id);
+    var menu = $('.notify-menu')[0]
+    console.log(menu)
+    console.log(data)
     if (menu) {
         menu.innerHTML = "";
         if (consecutive_misfires < 10) {
