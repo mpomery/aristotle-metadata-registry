@@ -1,15 +1,21 @@
 var loading_notifications = false
 
 function fetch_api_data(callback, num) {
+
     if (!loading_notifications) {
       loading_notifications = true;
+      suppressLoadingBlock = true
       var apiurl='/account/notifications/api/unread_list/'
       var full_url = apiurl + '?max=' + num
+      setTimeout(function() {
       $.getJSON(full_url, function(data) {
         callback(data)
         loading_notifications = false
+        suppressLoadingBlock = false
       })
+      }, 1000)
     }
+
 }
 
 // Callback for notify menu
@@ -48,6 +54,8 @@ function reload_notifications() {
   if (!loading_notifications) {
     var menu = $('.notify-menu')[0]
 
+    //menu.innerHTML = ""
+
     // Add the loading icon
     var listelement = document.createElement('li')
     var centerdiv = document.createElement('div')
@@ -77,9 +85,6 @@ function mark_all_unread() {
 }
 
 $(document).ready(function() {
-  // Perform initial notification loading
-  fetch_api_data(update_notification_badge, 5) 
-
   // Set up reload on click
   $('#header_menu_button_notifications').click(reload_notifications)
 })
