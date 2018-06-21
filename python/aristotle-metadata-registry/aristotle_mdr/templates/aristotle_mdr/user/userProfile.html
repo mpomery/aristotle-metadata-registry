@@ -8,24 +8,72 @@
 {% block page %}
 <h1>Profile</h1>
 
-<table class="table">
-  <tbody>
-    <tr>
-      <th>Email</th>
-      <td>{{ object.email }}</td>
-    </tr>
-    <tr>
-      <th>Short Name</th>
-      <td>{{ object.short_name }}</td>
-    </tr>
-    <tr>
-      <th>Full Name</th>
-      <td>{{ object.full_name }}</td>
-    </tr>
-  </tbody>
-</table>
-<ul class="list-unstyled">
-  <li><a href="{% url 'aristotle_mdr:userEdit' %}">Edit Details</a></li>
-  <li><a href="{% url 'password_change' %}">Change Password</a></li>
-</ul>
+<div class="row">
+  <div class="col-md-4">
+    <p>Picture Here</p>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Actions
+      </div>
+      <div class="list-group">
+        <a class="list-group-item" href="{% url 'password_change' %}">Change Password</a>
+      </div>
+    </div>
+
+  </div>
+  <div class="col-md-8">
+
+    <h2>{{ object.full_name }}</h2>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Personal Info
+        <a class="button button-default pull-right" href="{% url 'aristotle_mdr:userEdit' %}">
+          Edit
+          <i class="fa fa-pencil" aria-hidden="true"></i>
+        </a>
+      </div>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Email</th>
+            <td>{{ object.email }}</td>
+          </tr>
+          <tr>
+            <th>Short Name</th>
+            <td>{{ object.short_name }}</td>
+          </tr>
+          <tr>
+            <th>Full Name</th>
+            <td>{{ object.full_name }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Favourites
+      </div>
+      <div class="list-group">
+        {% for item in object.profile.favourites.all %}
+        <a href="{% url 'aristotle_mdr:item_uuid' item.uuid %}" class="list-group-item">{{ item.name }}</a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Workgroups
+      </div>
+      <ul class="list-group">
+        {% for workgoup in object.profile.workgroups %}
+          <li class="list-group-item">{{ workgroup.name }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+</div>
 {% endblock %}
