@@ -83,7 +83,7 @@ jobs:
   include:
     - stage: stylecheck
       python: 3.6
-      script: tox -e flake8 --skip-missing-interpreters
+      script: tox -e flake8
 
     - stage: documentation
       python: 3.6
