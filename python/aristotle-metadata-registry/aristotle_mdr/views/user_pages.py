@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, ListView, UpdateView
+from django.views.generic import DetailView, ListView, UpdateView, FormView
 
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
@@ -265,6 +265,16 @@ class EditView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('aristotle:userHome')
+
+    def form_valid(self, form):
+
+        self.object = form.save()
+
+        profile = self.object.profile
+        profile.profilePicture = form.cleaned_data['profile_picture']
+        profile.save()
+
+        return HttpResponseRedirect(self.get_success_url())
 
 
 @login_required

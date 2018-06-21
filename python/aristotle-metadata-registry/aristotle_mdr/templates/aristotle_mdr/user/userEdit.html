@@ -9,17 +9,13 @@
 {% block page %}
     <h1>Edit my account details</h1>
     {{ form.errors }}
-    <form method="post">{% csrf_token %}
-    {% if saved %}
-    <div class="message info">
-    </div>
-    {% endif %}
-    {{ form.as_p }}
+    <form enctype="multipart/form-data" method="post">{% csrf_token %}
+      {{ form.as_p }}
 
-    <div class="modal-footer">
-        <a class="btn btn-default" href="{% url 'aristotle:userHome' %}"><i class="fa fa-times fa-fw"></i>Cancel</a>
-        <button type="submit" class="btn btn-primary" value="Save changes"><i class="fa fa-check  fa-fw"></i> Save changes</button>
-    </div>
-</form>
+      <div class="modal-footer">
+          <a class="btn btn-default" href="{% url 'aristotle:userHome' %}"><i class="fa fa-times fa-fw"></i>Cancel</a>
+          <button type="submit" class="btn btn-primary" value="Save changes"><i class="fa fa-check  fa-fw"></i> Save changes</button>
+      </div>
+    </form>
 
 {% endblock %}

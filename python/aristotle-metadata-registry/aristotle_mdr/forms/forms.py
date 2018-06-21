@@ -205,6 +205,8 @@ class CompareConceptsForm(forms.Form):
 
 class EditUserForm(ModelForm):
 
+    profile_picture = forms.FileField()
+
     class Meta:
 
         model = get_user_model()

@@ -1341,6 +1341,20 @@ class PossumProfile(models.Model):
         related_name='favourited_by',
         blank=True
     )
+    profilePictureWidth = models.IntegerField(
+        blank=True,
+        null=True
+    )
+    profilePictureHeight = models.IntegerField(
+        blank=True,
+        null=True
+    )
+    profilePicture = models.ImageField(
+        height_field='profilePictureHeight',
+        width_field='profilePictureWidth',
+        blank=True,
+        null=True
+    )
 
     # Override save for inline creation of objects.
     # http://stackoverflow.com/questions/2813189/django-userprofile-with-unique-foreign-key-in-django-admin
