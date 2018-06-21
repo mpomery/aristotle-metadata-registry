@@ -266,6 +266,15 @@ class EditView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse('aristotle:userHome')
 
+    def get_initial(self):
+        initial = super().get_initial()
+
+        initial.update({
+            'profile_picture': self.object.profile.profilePicture
+        })
+
+        return initial
+
     def form_valid(self, form):
 
         self.object = form.save()
