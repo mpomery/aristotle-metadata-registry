@@ -1360,8 +1360,7 @@ class PossumProfile(models.Model):
         width_field='profilePictureWidth',
         blank=True,
         null=True,
-        max_upload_size=1024**3, # 10 MB
-        js_checker=True
+        max_upload_size=1024**3, # 10 MB js_checker=True
     )
 
     # Override save for inline creation of objects.
@@ -1372,6 +1371,7 @@ class PossumProfile(models.Model):
             self.id = existing.id  # Force update instead of insert.
         except PossumProfile.DoesNotExist:  # pragma: no cover
             pass
+
         models.Model.save(self, *args, **kwargs)
 
     @property

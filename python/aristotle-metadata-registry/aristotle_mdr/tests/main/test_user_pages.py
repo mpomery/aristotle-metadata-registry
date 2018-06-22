@@ -412,7 +412,7 @@ class UserProfileTests(TestCase):
         # Get initial form data
         initial = response.context['form'].initial
 
-        path_to_pic = os.path.join(settings.BASE_DIR, 'aristotle_mdr/static/aristotle_mdr/images/aristotle_small.png')
+        path_to_pic = os.path.join(settings.BASE_DIR, 'aristotle_mdr/static/aristotle_mdr/images/aristotle.png')
 
         with open(path_to_pic, mode='br') as fp:
             initial.update({'profile_picture': fp})
@@ -423,7 +423,7 @@ class UserProfileTests(TestCase):
         user = get_user_model().objects.get(email='newuser@example.com')
 
         self.assertTrue(user.profile.profilePicture)
-        self.assertTrue(user.profile.profilePicture.name.startswith('aristotle_small'))
-        self.assertTrue(user.profile.profilePictureWidth)
+        self.assertTrue(user.profile.profilePicture.name.startswith('aristotle'))
+        self.assertEqual(user.profile.profilePictureWidth, 256)
         self.assertTrue(user.profile.profilePictureHeight)
 

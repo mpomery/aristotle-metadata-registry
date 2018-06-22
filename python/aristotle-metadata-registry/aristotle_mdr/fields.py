@@ -26,8 +26,8 @@ from django.db.models.fields import (
     TextField
 )
 
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from constrainedfilefield.fields import ConstrainedImageField
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image
 import io
 
@@ -86,7 +86,7 @@ class ConvertedConstrainedImageField(ConstrainedImageField):
         self.result_size = kwargs.pop('size', (256, 256))
 
     def clean(self, *args, **kwargs):
-        # Data is an ImageFieldFile object
+        # data is an ImageFieldFile object
         data = super().clean(*args, **kwargs)
 
         filename = data.name
@@ -98,18 +98,16 @@ class ConvertedConstrainedImageField(ConstrainedImageField):
         im = im.rotate(180)
         im.thumbnail(self.result_size, Image.ANTIALIAS)
         im = im.rotate(180)
-        # Verify
+
         im.save(bytesio, 'png')
 
         imagefile = InMemoryUploadedFile(
             file=bytesio,
             field_name=data.file.field_name,
-            name=data.file.name,
+            name=filename,
             content_type='image/png',
             size=bytesio.getbuffer().nbytes,
-            charset=data.file.charset
+            charset=None
         )
 
-        data.file = imagefile
-
-        return data
+        return imagefile

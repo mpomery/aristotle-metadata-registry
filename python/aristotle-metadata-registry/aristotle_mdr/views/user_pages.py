@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, ListView, UpdateView, FormView
+from django.core.exceptions import ValidationError
 
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
@@ -285,8 +286,18 @@ class EditView(LoginRequiredMixin, UpdateView):
         profile = self.object.profile
         profile.profilePicture = form.cleaned_data['profile_picture']
 
-        profile.full_clean()
-        profile.save()
+        save = True
+        # Perform model validation on profile
+        try:
+            profile.full_clean()
+        except ValidationError:
+            save = False
+
+        if save:
+            profile.save()
+        else:
+            form.add_error('profile_picture', 'Image could not be saved')
+            return self.form_invalid(form)
 
         return HttpResponseRedirect(self.get_success_url())
 
