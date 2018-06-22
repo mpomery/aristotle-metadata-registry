@@ -4,8 +4,8 @@ prepare_server:
 	django-admin load_aristotle_help
 
 metadata:
-	curl https://raw.githubusercontent.com/aristotle-mdr/user-documentation/draft/server/fixtures/users.yaml > /tmp/users.yaml
-	curl https://raw.githubusercontent.com/aristotle-mdr/user-documentation/draft/server/fixtures/test_metadata.yaml > /tmp/metadata.yaml
+	curl https://raw.githubusercontent.com/aristotle-mdr/user-documentation/draft/python/server/docs_server/fixtures/users.yaml > /tmp/users.yaml
+	curl https://raw.githubusercontent.com/aristotle-mdr/user-documentation/draft/python/server/docs_server/fixtures/test_metadata.yaml > /tmp/metadata.yaml
 	django-admin loaddata /tmp/users.yaml
 	django-admin loaddata /tmp/metadata.yaml
 
