@@ -1,12 +1,14 @@
-from django.test import TestCase, tag
+from django.test import TestCase, tag, Client
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.urls import reverse
+from django.conf import settings
 
 import aristotle_mdr.tests.utils as utils
 from aristotle_mdr import models
 import datetime
 import json
+import os
 
 from aristotle_mdr.utils import setup_aristotle_test_environment
 
@@ -361,3 +363,62 @@ class UserDashRecentItems(utils.LoggedInViewPages, TestCase):
         self.assertEqual(len(response.context['recentdata']), Revision.objects.filter(user=self.editor).count())
 
         self.assertContains(response, "Changed name")
+
+
+@tag('userprofile')
+class UserProfileTests(TestCase):
+
+    def setUp(self):
+
+        self.newuser = get_user_model().objects.create_user(
+            email='newuser@example.com',
+            password='verysecure',
+            short_name='new',
+            full_name='new user'
+        )
+        self.client = Client()
+
+    def login_newuser(self):
+        self.client.logout()
+        response = self.client.post(reverse('friendly_login'), {'username': 'newuser@example.com', 'password': 'verysecure'})
+        self.assertEqual(response.status_code, 302)
+        return response
+
+    def test_load_profile(self):
+
+        self.login_newuser()
+        response = self.client.get(reverse('aristotle_mdr:userProfile'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_load_edit_page(self):
+
+        self.login_newuser()
+        response = self.client.get(reverse('aristotle_mdr:userEdit'))
+        self.assertEqual(response.status_code, 200)
+
+        # Check initial is set properly
+        initial = response.context['form'].initial
+        self.assertEqual(initial['email'], 'newuser@example.com')
+        self.assertEqual(initial['short_name'], 'new')
+        self.assertEqual(initial['full_name'], 'new user')
+        self.assertFalse('profilePicture' in initial)
+
+    def test_profile_upload(self):
+
+        self.login_newuser()
+        response = self.client.get(reverse('aristotle_mdr:userEdit'))
+        self.assertEqual(response.status_code, 200)
+
+        # Get initial form data
+        initial = response.context['form'].initial
+
+        path_to_pic = os.path.join(settings.BASE_DIR, 'aristotle_mdr/static/aristotle_mdr/images/aristotle_small.png')
+
+        with open(path_to_pic, mode='br') as fp:
+            initial.update({'profile_picture': fp})
+
+            response = self.client.post(reverse('aristotle_mdr:userEdit'), initial)
+            self.assertEqual(response.status_code, 302)
+
+
+

@@ -269,9 +269,12 @@ class EditView(LoginRequiredMixin, UpdateView):
     def get_initial(self):
         initial = super().get_initial()
 
-        initial.update({
-            'profile_picture': self.object.profile.profilePicture
-        })
+        profilepic = self.object.profile.profilePicture
+
+        if profilepic:
+            initial.update({
+                'profile_picture': profilepic
+            })
 
         return initial
 

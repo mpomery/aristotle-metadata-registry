@@ -10,7 +10,9 @@
 
 <div class="row">
   <div class="col-md-4">
-    <img class="img-responsive img-thumbnail" src="{{ object.profile.profilePicture.url }}"></img>
+    {% if object.profile.profilePicture %}
+      <img class="img-responsive img-thumbnail" src="{{ object.profile.profilePicture.url }}"></img>
+    {% endif %}
 
     <div class="panel panel-default">
       <div class="panel-heading">
