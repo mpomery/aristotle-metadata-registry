@@ -284,6 +284,8 @@ class EditView(LoginRequiredMixin, UpdateView):
 
         profile = self.object.profile
         profile.profilePicture = form.cleaned_data['profile_picture']
+
+        profile.full_clean()
         profile.save()
 
         return HttpResponseRedirect(self.get_success_url())

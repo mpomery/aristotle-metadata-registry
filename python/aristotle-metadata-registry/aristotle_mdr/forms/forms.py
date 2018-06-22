@@ -205,7 +205,7 @@ class CompareConceptsForm(forms.Form):
 
 class EditUserForm(ModelForm):
 
-    profile_picture = forms.FileField()
+    profile_picture = MDR.PossumProfile._meta.get_field('profilePicture').formfield()
 
     class Meta:
 

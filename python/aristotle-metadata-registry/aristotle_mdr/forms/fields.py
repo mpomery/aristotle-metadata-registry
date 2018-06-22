@@ -1,22 +1,5 @@
 from django.forms.models import ModelMultipleChoiceField
-from constrainedfilefield.fields import ConstrainedImageField
 
-class ConvertedConstrainedImageField(ConstrainedImageField):
-
-    def __init__(*args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.result_size = kwargs.pop('size', (256, 256))
-
-    def clean(self, *args, **kwargs):
-        data = super().clean(*args, **kwargs)
-
-        filedata = data.file.read()
-
-        im = Image.open(filedata)
-        im = im.rotate(180)
-        im.thumbnail(self.result_size, Image.ANTIALIAS)
-        im = im.rotate(180)
-        im.save('squirrel.safe.png')
 
 class ReviewChangesChoiceField(ModelMultipleChoiceField):
 

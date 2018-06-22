@@ -420,5 +420,10 @@ class UserProfileTests(TestCase):
             response = self.client.post(reverse('aristotle_mdr:userEdit'), initial)
             self.assertEqual(response.status_code, 302)
 
+        user = get_user_model().objects.get(email='newuser@example.com')
 
+        self.assertTrue(user.profile.profilePicture)
+        self.assertTrue(user.profile.profilePicture.name.startswith('aristotle_small'))
+        self.assertTrue(user.profile.profilePictureWidth)
+        self.assertTrue(user.profile.profilePictureHeight)
 

@@ -30,7 +30,13 @@ from aristotle_mdr.utils import (
 )
 from aristotle_mdr import comparators
 
-from .fields import ConceptForeignKey, ConceptManyToManyField, ShortTextField
+from .fields import (
+    ConceptForeignKey,
+    ConceptManyToManyField,
+    ShortTextField,
+    ConvertedConstrainedImageField
+)
+
 from .managers import (
     MetadataItemManager, ConceptManager,
     ReviewRequestQuerySet, WorkgroupQuerySet
@@ -1349,11 +1355,13 @@ class PossumProfile(models.Model):
         blank=True,
         null=True
     )
-    profilePicture = models.ImageField(
+    profilePicture = ConvertedConstrainedImageField(
         height_field='profilePictureHeight',
         width_field='profilePictureWidth',
         blank=True,
-        null=True
+        null=True,
+        max_upload_size=1024**3, # 10 MB
+        js_checker=True
     )
 
     # Override save for inline creation of objects.

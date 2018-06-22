@@ -26,6 +26,11 @@ from django.db.models.fields import (
     TextField
 )
 
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from constrainedfilefield.fields import ConstrainedImageField
+from PIL import Image
+import io
+
 
 class ConceptOneToOneRel(OneToOneRel):
     pass
@@ -72,3 +77,39 @@ class ShortTextField(TextField):
         defaults = {'widget': forms.TextInput}
         defaults.update(kwargs)
         return super().formfield(**defaults)
+
+
+class ConvertedConstrainedImageField(ConstrainedImageField):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.result_size = kwargs.pop('size', (256, 256))
+
+    def clean(self, *args, **kwargs):
+        # Data is an ImageFieldFile object
+        data = super().clean(*args, **kwargs)
+
+        filename = data.name
+        pythonfile = data.file.file
+
+        bytesio = io.BytesIO()
+
+        im = Image.open(pythonfile)
+        im = im.rotate(180)
+        im.thumbnail(self.result_size, Image.ANTIALIAS)
+        im = im.rotate(180)
+        # Verify
+        im.save(bytesio, 'png')
+
+        imagefile = InMemoryUploadedFile(
+            file=bytesio,
+            field_name=data.file.field_name,
+            name=data.file.name,
+            content_type='image/png',
+            size=bytesio.getbuffer().nbytes,
+            charset=data.file.charset
+        )
+
+        data.file = imagefile
+
+        return data
