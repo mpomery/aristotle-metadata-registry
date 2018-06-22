@@ -30,6 +30,7 @@ from constrainedfilefield.fields import ConstrainedImageField
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image
 import io
+import os
 
 
 class ConceptOneToOneRel(OneToOneRel):
@@ -89,7 +90,8 @@ class ConvertedConstrainedImageField(ConstrainedImageField):
         # data is an ImageFieldFile object
         data = super().clean(*args, **kwargs)
 
-        filename = data.name
+        filename = os.path.splitext(data.name)[0]
+        filename = filename + '.png'
         pythonfile = data.file.file
 
         bytesio = io.BytesIO()
