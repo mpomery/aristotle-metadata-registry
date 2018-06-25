@@ -265,3 +265,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     # include other password validators here
 ]
+
+# GeoIP
+GEOIP_PATH = os.path.join(BASE_DIR, 'aristotle_mdr/vendor/geoip')

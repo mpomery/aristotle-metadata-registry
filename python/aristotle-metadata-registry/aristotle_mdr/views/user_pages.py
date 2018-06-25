@@ -10,7 +10,12 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, ListView, UpdateView, FormView
+from django.views.generic import (DetailView,
+                                  ListView,
+                                  UpdateView,
+                                  FormView,
+                                  TemplateView)
+
 from django.core.exceptions import ValidationError
 
 from aristotle_mdr import forms as MDRForms
@@ -39,22 +44,23 @@ class FriendlyLoginView(LoginView):
         return context
 
 
-class ProfileView(LoginRequiredMixin, DetailView):
+class ProfileView(LoginRequiredMixin, TemplateView):
 
     template_name='aristotle_mdr/user/userProfile.html'
 
     def get_sessions(self, user):
         return user.session_set.filter(expire_date__gt=datetime.now())
 
-    def get_object(self, *args, **kwargs):
-        return self.request.user
-
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
 
-        sessions = self.get_sessions(self.object)
+        user = self.request.user
+
+        sessions = self.get_sessions(user)
         context.update({
-            'sessions': sessions
+            'user': user,
+            'sessions': sessions,
+            'session_key': self.request.session.session_key
         })
 
         return context

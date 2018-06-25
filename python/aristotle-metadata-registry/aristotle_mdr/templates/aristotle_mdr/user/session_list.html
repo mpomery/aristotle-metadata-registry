@@ -1,5 +1,8 @@
 {% load user_sessions i18n %}
 
+{% trans "<em>unknown on unknown</em>" as unknown_on_unknown %}
+{% trans "<em>unknown</em>" as unknown %}
+
 <table class="table">
     <thead>
       <tr>
@@ -11,8 +14,8 @@
     </thead>
     {% for object in object_list %}
       <tr {% if object.session_key == session_key %}class="active"{% endif %}>
-        <td>{{ object.ip|location }} <small>({{ object.ip }})</small></td>
-        <td>{{ object.user_agent|device }}</td>
+        <td>{{ object.ip|location|default_if_none:unknown|safe }} <small>({{ object.ip }})</small></td>
+        <td>{{ object.user_agent|device|default_if_none:unknown_on_unknown|safe }}</td>
         <td>
           {% if object.session_key == session_key %}
             {% blocktrans with time=object.last_activity|timesince %}{{ time }} ago (this session){% endblocktrans %}
