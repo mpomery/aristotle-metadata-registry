@@ -391,7 +391,6 @@ class UserProfileTests(TestCase):
         with open(path_to_pic, mode='br') as fp:
             formdata.update({'profile_picture': fp})
             response = self.client.post(reverse('aristotle_mdr:userEdit'), formdata)
-            import pdb; pdb.set_trace()
             self.assertEqual(response.status_code, code)
 
         return response
@@ -446,3 +445,16 @@ class UserProfileTests(TestCase):
         initial.update({'profile_picture-clear': 'on'})
 
         response = self.client.post(reverse('aristotle_mdr:userEdit'), initial)
+
+    @tag('newtest')
+    def test_save_without_changes(self):
+
+        self.login_newuser()
+
+        initial = self.get_initial()
+        response = self.post_with_profile_picture(initial)
+
+        # Post form again, with no changes
+        complete_initial = self.get_initial()
+        response = self.client.post(reverse('aristotle_mdr:userEdit'), initial)
+        self.assertEqual(response.status_code, 302)

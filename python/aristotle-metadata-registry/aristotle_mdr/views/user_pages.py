@@ -304,26 +304,31 @@ class EditView(LoginRequiredMixin, UpdateView):
         self.object = form.save()
 
         profile = self.object.profile
+        save_profile = True
 
         picture = form.cleaned_data['profile_picture']
 
         if picture:
-            profile.profilePicture = picture
+            if 'profile_picture' in form.changed_data:
+                profile.profilePicture = picture
+            else:
+                save_profile = False
         else:
             profile.profilePicture = None
 
-        save = True
         # Perform model validation on profile
-        try:
-            profile.full_clean()
-        except ValidationError:
-            save = False
+        if save_profile:
+            valid = True
+            try:
+                profile.full_clean()
+            except ValidationError:
+                valid = False
 
-        if save:
-            profile.save()
-        else:
-            form.add_error('profile_picture', 'Image could not be saved')
-            return self.form_invalid(form)
+            if valid:
+                profile.save()
+            else:
+                form.add_error('profile_picture', 'Image could not be saved')
+                return self.form_invalid(form)
 
         return HttpResponseRedirect(self.get_success_url())
 
