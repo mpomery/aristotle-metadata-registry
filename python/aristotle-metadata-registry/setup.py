@@ -90,6 +90,10 @@ setup(
         # File upload
         'django-constrainedfilefield[filetype]',
 
+        # User sessions
+        'django-user-sessions',
+        'geoip2',
+
     ],
 
 )
