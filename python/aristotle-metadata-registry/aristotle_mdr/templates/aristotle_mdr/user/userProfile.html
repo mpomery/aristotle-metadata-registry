@@ -13,9 +13,7 @@
     {% if object.profile.profilePicture %}
       <img class="img-responsive img-thumbnail" src="{{ user.profile.profilePicture.url }}"></img>
     {% else %}
-    <div class="img-thumbnail">
-      <i class="fg fa fa-5x fa-user-circle" style="padding:90px" aria-hidden="true"></i>
-    </div>
+      <img class="img-responsive img-thumbnail" src="{% url 'aristotle_mdr:dynamic_profile_picture' user.id %}"></img>
     {% endif %}
 
     <div class="panel panel-default">
@@ -47,7 +45,7 @@
             <td>{{ user.email }}</td>
           </tr>
           <tr>
-            <th>Short Name</th>
+            <th>Display Name</th>
             <td>{{ user.short_name }}</td>
           </tr>
           <tr>
