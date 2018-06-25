@@ -301,25 +301,27 @@ class EditView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
 
+        # Save user object
         self.object = form.save()
 
         profile = self.object.profile
-        save_profile = True
 
         picture = form.cleaned_data['profile_picture']
+        picture_update = True
 
         if picture:
             if 'profile_picture' in form.changed_data:
                 profile.profilePicture = picture
             else:
-                save_profile = False
+                picture_update = False
         else:
             profile.profilePicture = None
 
         # Perform model validation on profile
-        if save_profile:
+        if picture_update:
             valid = True
             try:
+                # Resize and format change done on clean
                 profile.full_clean()
             except ValidationError:
                 valid = False
