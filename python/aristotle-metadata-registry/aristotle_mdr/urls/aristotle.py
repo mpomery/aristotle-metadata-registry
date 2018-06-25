@@ -191,6 +191,8 @@ urlpatterns=[
 
     url(r'^accessibility/?$', TemplateView.as_view(template_name='aristotle_mdr/static/accessibility.html'), name="accessibility"),
 
+    url(r'user/(?P<uid>\d+)/profilePicture.svg', views.user_pages.profile_picture, name="dynamic_profile_picture"),
+
     url(
         r'^search/?$',
         search_view_factory(

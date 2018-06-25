@@ -25,6 +25,7 @@ from aristotle_mdr.utils import fetch_metadata_apps
 from aristotle_mdr.utils import get_aristotle_url
 
 import json
+import random
 from datetime import datetime
 
 
@@ -55,7 +56,6 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(*args, **kwargs)
 
         user = self.request.user
-
         sessions = self.get_sessions(user)
         context.update({
             'user': user,
@@ -434,3 +434,27 @@ def workgroup_archives(request):
         workgroups = workgroups.filter(Q(name__icontains=text_filter) | Q(definition__icontains=text_filter))
     context = {'filter': text_filter}
     return paginated_workgroup_list(request, workgroups, "aristotle_mdr/user/userWorkgroupArchives.html", context)
+
+
+def profile_picture(request, uid):
+
+    template_name = 'aristotle_mdr/user/profile_picture.svg'
+
+    # Seed with user id
+    random.seed(uid)
+
+    colors = []
+    for i in range(2):
+        colors.append('#{0:X}'.format(random.randint(0, 0xFFFFFF)))
+
+    context = {
+        'toga_color': colors[0],
+        'headshot_color': colors[1]
+    }
+
+    return render(
+        request,
+        template_name,
+        context=context,
+        content_type='image/svg+xml'
+    )
