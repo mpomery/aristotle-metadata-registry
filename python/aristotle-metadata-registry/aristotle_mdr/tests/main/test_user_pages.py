@@ -446,7 +446,6 @@ class UserProfileTests(TestCase):
 
         response = self.client.post(reverse('aristotle_mdr:userEdit'), initial)
 
-    @tag('newtest')
     def test_save_without_changes(self):
 
         self.login_newuser()
@@ -458,3 +457,26 @@ class UserProfileTests(TestCase):
         complete_initial = self.get_initial()
         response = self.client.post(reverse('aristotle_mdr:userEdit'), initial)
         self.assertEqual(response.status_code, 302)
+
+    def test_default_profile_picture(self):
+
+        # check page load
+        response = self.client.get(reverse('aristotle_mdr:dynamic_profile_picture', args=[3]))
+        self.assertEqual(response.status_code, 200)
+
+        three_toga_color = response.context['toga_color']
+        three_headshot_color = response.context['headshot_color']
+
+        # check diffent args returns new colors
+        response = self.client.get(reverse('aristotle_mdr:dynamic_profile_picture', args=[4]))
+        self.assertEqual(response.status_code, 200)
+
+        self.assertNotEqual(three_toga_color, response.context['toga_color'])
+        self.assertNotEqual(three_headshot_color, response.context['headshot_color'])
+
+        # check second request with same args returns same colors
+        response = self.client.get(reverse('aristotle_mdr:dynamic_profile_picture', args=[3]))
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(three_toga_color, response.context['toga_color'])
+        self.assertEqual(three_headshot_color, response.context['headshot_color'])
