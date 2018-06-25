@@ -304,7 +304,13 @@ class EditView(LoginRequiredMixin, UpdateView):
         self.object = form.save()
 
         profile = self.object.profile
-        profile.profilePicture = form.cleaned_data['profile_picture']
+
+        picture = form.cleaned_data['profile_picture']
+
+        if picture:
+            profile.profilePicture = picture
+        else:
+            profile.profilePicture = None
 
         save = True
         # Perform model validation on profile

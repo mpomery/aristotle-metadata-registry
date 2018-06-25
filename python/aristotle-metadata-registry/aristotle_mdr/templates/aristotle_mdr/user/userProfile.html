@@ -10,11 +10,16 @@
 
 <div class="row">
   <div class="col-md-3">
-    {% if object.profile.profilePicture %}
-      <img class="img-responsive img-thumbnail" src="{{ user.profile.profilePicture.url }}"></img>
-    {% else %}
-      <img class="img-responsive img-thumbnail" src="{% url 'aristotle_mdr:dynamic_profile_picture' user.id %}"></img>
-    {% endif %}
+    
+    <div class="panel panel-default">
+      <div class="panel-body">
+        {% if user.profile.profilePicture %}
+          <img class="img-responsive" src="{{ user.profile.profilePicture.url }}"></img>
+        {% else %}
+          <img class="img-responsive" src="{% url 'aristotle_mdr:dynamic_profile_picture' user.id %}"></img>
+        {% endif %}
+      </div>
+    </div>
 
     <div class="panel panel-default">
       <div class="panel-heading">

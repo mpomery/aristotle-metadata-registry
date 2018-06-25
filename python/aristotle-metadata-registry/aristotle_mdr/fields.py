@@ -86,9 +86,10 @@ class ConvertedConstrainedImageField(ConstrainedImageField):
         super().__init__(*args, **kwargs)
         self.result_size = kwargs.pop('size', (256, 256))
 
-    def clean(self, *args, **kwargs):
+    def clean(self, value, *args, **kwargs):
+
         # data is an ImageFieldFile object
-        data = super().clean(*args, **kwargs)
+        data = super().clean(value, *args, **kwargs)
 
         filename = os.path.splitext(data.name)[0]
         filename = filename + '.png'

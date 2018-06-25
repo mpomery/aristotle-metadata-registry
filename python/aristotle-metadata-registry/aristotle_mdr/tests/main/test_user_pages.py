@@ -384,6 +384,26 @@ class UserProfileTests(TestCase):
         self.assertEqual(response.status_code, 302)
         return response
 
+    def post_with_profile_picture(self, formdata, code=302):
+
+        path_to_pic = os.path.join(settings.BASE_DIR, 'aristotle_mdr/static/aristotle_mdr/images/aristotle.png')
+
+        with open(path_to_pic, mode='br') as fp:
+            formdata.update({'profile_picture': fp})
+            response = self.client.post(reverse('aristotle_mdr:userEdit'), formdata)
+            import pdb; pdb.set_trace()
+            self.assertEqual(response.status_code, code)
+
+        return response
+
+    def get_initial(self):
+        response = self.client.get(reverse('aristotle_mdr:userEdit'))
+        self.assertEqual(response.status_code, 200)
+
+        # Get initial form data
+        initial = response.context['form'].initial
+        return initial
+
     def test_load_profile(self):
 
         self.login_newuser()
@@ -406,19 +426,9 @@ class UserProfileTests(TestCase):
     def test_profile_upload(self):
 
         self.login_newuser()
-        response = self.client.get(reverse('aristotle_mdr:userEdit'))
-        self.assertEqual(response.status_code, 200)
 
-        # Get initial form data
-        initial = response.context['form'].initial
-
-        path_to_pic = os.path.join(settings.BASE_DIR, 'aristotle_mdr/static/aristotle_mdr/images/aristotle.png')
-
-        with open(path_to_pic, mode='br') as fp:
-            initial.update({'profile_picture': fp})
-
-            response = self.client.post(reverse('aristotle_mdr:userEdit'), initial)
-            self.assertEqual(response.status_code, 302)
+        initial = self.get_initial()
+        response = self.post_with_profile_picture(initial)
 
         user = get_user_model().objects.get(email='newuser@example.com')
 
@@ -427,3 +437,13 @@ class UserProfileTests(TestCase):
         self.assertEqual(user.profile.profilePictureWidth, 256)
         self.assertTrue(user.profile.profilePictureHeight)
 
+    @tag('upfailing')
+    def test_profile_upload_with_clear(self):
+
+        self.login_newuser()
+
+        initial = self.get_initial()
+
+        initial.update({'profile_picture-clear': 'on'})
+
+        response = self.client.post(reverse('aristotle_mdr:userEdit'), initial)

@@ -1356,10 +1356,10 @@ class PossumProfile(models.Model):
         null=True
     )
     profilePicture = ConvertedConstrainedImageField(
-        height_field='profilePictureHeight',
-        width_field='profilePictureWidth',
         blank=True,
         null=True,
+        height_field='profilePictureHeight',
+        width_field='profilePictureWidth',
         max_upload_size=1024**3, # 10 MB
         js_checker=True
     )
