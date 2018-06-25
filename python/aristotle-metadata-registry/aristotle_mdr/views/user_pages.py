@@ -20,6 +20,7 @@ from aristotle_mdr.utils import fetch_metadata_apps
 from aristotle_mdr.utils import get_aristotle_url
 
 import json
+from datetime import datetime
 
 
 class FriendlyLoginView(LoginView):
@@ -42,8 +43,21 @@ class ProfileView(LoginRequiredMixin, DetailView):
 
     template_name='aristotle_mdr/user/userProfile.html'
 
+    def get_sessions(self, user):
+        return user.session_set.filter(expire_date__gt=datetime.now())
+
     def get_object(self, *args, **kwargs):
         return self.request.user
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        sessions = self.get_sessions(self.object)
+        context.update({
+            'sessions': sessions
+        })
+
+        return context
 
 
 @login_required

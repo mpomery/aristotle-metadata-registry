@@ -9,7 +9,7 @@
 <h1>Profile</h1>
 
 <div class="row">
-  <div class="col-md-4">
+  <div class="col-md-3">
     {% if object.profile.profilePicture %}
       <img class="img-responsive img-thumbnail" src="{{ object.profile.profilePicture.url }}"></img>
     {% endif %}
@@ -24,7 +24,7 @@
     </div>
 
   </div>
-  <div class="col-md-8">
+  <div class="col-md-9">
 
     <h2>{{ object.full_name }}</h2>
 
@@ -56,25 +56,11 @@
 
     <div class="panel panel-default">
       <div class="panel-heading">
-        Favourites
+        Sessions
       </div>
-      <div class="list-group">
-        {% for item in object.profile.favourites.all %}
-        <a href="{% url 'aristotle_mdr:item_uuid' item.uuid %}" class="list-group-item">{{ item.name }}</a>
-        {% endfor %}
-      </div>
+      {% include 'aristotle_mdr/user/session_list.html' with object_list=sessions %}
     </div>
 
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        Workgroups
-      </div>
-      <ul class="list-group">
-        {% for workgoup in object.profile.workgroups %}
-          <li class="list-group-item">{{ workgroup.name }}</li>
-        {% endfor %}
-      </ul>
-    </div>
 
   </div>
 </div>
