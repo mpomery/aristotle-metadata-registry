@@ -3,12 +3,16 @@ Changelog
 - 2.0.x
     - Changed how root URL `aristotle.example.com/` resolves: for anonymous users it redirects to `aristotle.example.com/home`, for logged in users it redirects to `aristotle.example.com/account/home/`
     - Removed official support for Windows & MSSQL
-    - Rest API token authentication
     - Simplified configuration for testing
     - Ability to order Data Elements within Data Element Derivations
     - Ability to order Slots and Identifiers
     - Slots now have permissions (Public, Private, Workgroup)
     - Removal of short name
+    - Minor design of Metadata InfoBox when showing last updating user
+    
+    - API changes
+      - Rest API token authentication
+
 
 - 2.0.0
     - **Dependency notes:**

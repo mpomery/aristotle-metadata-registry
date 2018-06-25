@@ -116,7 +116,7 @@ class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
         (None, {'fields': ['name', 'definition', 'workgroup']}),
         ('Additional names', {
             'classes': ('grp-collapse grp-closed',),
-            'fields': ['short_name', 'version']
+            'fields': ['version']
         }),
         # ('Registry', {'fields': ['workgroup']}),
         ('Relationships', {

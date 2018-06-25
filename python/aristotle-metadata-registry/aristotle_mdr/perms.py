@@ -105,6 +105,7 @@ def user_can_edit(user, item):
 
     return _can_edit
 
+
 # TODO remove this
 def user_is_editor(user, workgroup=None):
     if user.is_anonymous():

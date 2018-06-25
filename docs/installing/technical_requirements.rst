@@ -5,7 +5,6 @@ The Aristotle Metadata Registry is built on the Django framework which supports 
 operating systems and databases. While Aristotle-MDR should support most of these
 only a small set of configurations have been thoroughly tested on the
 `Travis-CI <https://travis-ci.org/aristotle-mdr/aristotle-metadata-registry/>`_
-or `Appveyor <https://ci.appveyor.com/project/LegoStormtroopr/aristotle-metadata-registry-361e5>`_
 continuous integration systems as "supported infrastucture".
 
 Operating system support
