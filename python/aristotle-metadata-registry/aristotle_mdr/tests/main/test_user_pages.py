@@ -437,7 +437,6 @@ class UserProfileTests(TestCase):
         self.assertEqual(user.profile.profilePictureWidth, 256)
         self.assertTrue(user.profile.profilePictureHeight)
 
-    @tag('upfailing')
     def test_profile_upload_with_clear(self):
 
         self.login_newuser()
