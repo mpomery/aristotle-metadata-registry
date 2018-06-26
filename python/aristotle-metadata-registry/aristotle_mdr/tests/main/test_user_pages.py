@@ -409,6 +409,17 @@ class UserProfileTests(TestCase):
         response = self.client.get(reverse('aristotle_mdr:userProfile'))
         self.assertEqual(response.status_code, 200)
 
+    def test_load_profile_content(self):
+        self.login_newuser()
+        response = self.client.get(reverse('aristotle_mdr:userProfile'))
+
+        # check dynamic picture loaded
+        dynamic_picture_url = reverse('aristotle_mdr:dynamic_profile_picture', args=[self.newuser.id])
+        self.assertContains(response, dynamic_picture_url)
+
+        # check sessions context
+        self.assertEqual(len(response.context['sessions']), 1)
+
     def test_load_edit_page(self):
 
         self.login_newuser()
