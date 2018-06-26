@@ -214,5 +214,3 @@ class EditUserForm(ModelForm):
         labels = {
             'short_name': 'Display Name'
         }
-
-

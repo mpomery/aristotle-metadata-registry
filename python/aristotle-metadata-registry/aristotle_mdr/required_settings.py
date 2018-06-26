@@ -104,7 +104,7 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions', # Here for easyaudit compatibility
+    'django.contrib.sessions',  # Here for easyaudit compatibility
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
