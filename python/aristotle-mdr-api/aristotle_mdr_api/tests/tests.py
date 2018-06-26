@@ -4,6 +4,7 @@ from django.urls import reverse
 from aristotle_mdr.tests import utils
 from aristotle_mdr_api.token_auth.models import AristotleToken
 from aristotle_mdr import models
+from aristotle_mdr.contrib.slots.tests import BaseSlotsTestCase
 
 from rest_framework.test import APIClient
 
@@ -378,3 +379,39 @@ class TokenTestCase(utils.LoggedInViewPages, TestCase):
         print(content['errors'][0]['message'])
         self.assertTrue('You don\'t have permission' in content['errors'][0]['message'])
         self.assertTrue('Test WG 1 Workgroup' in content['errors'][0]['message'])
+
+
+class SlotTestCase(BaseSlotsTestCase, TestCase):
+
+    def test_slot_view_perms_api(self):
+        # Test slot permissions on apis
+
+        self.make_newoc_public()
+
+        for version in ['v2', 'v3']:
+            self.client.logout()
+            url = '/api/' + version + '/metadata/' + str(self.newoc.uuid) + '/?format=json'
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 401)
+
+            self.login_regular_user()
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
+            response_data = json.loads(response.content)
+            self.assertEqual(len(response_data['slots']), 2)
+            slots_names = [slot['name'] for slot in response_data['slots']]
+            self.assertTrue('public' in slots_names)
+            self.assertTrue('auth' in slots_names)
+
+            self.client.logout()
+            self.login_editor()
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
+            response_data = json.loads(response.content)
+            self.assertEqual(len(response_data['slots']), 3)
+            slots_names = [slot['name'] for slot in response_data['slots']]
+            self.assertTrue('public' in slots_names)
+            self.assertTrue('auth' in slots_names)
+            self.assertTrue('work' in slots_names)

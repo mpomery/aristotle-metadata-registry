@@ -59,3 +59,9 @@ src/
 
 # skip including docker data directory
 docker/data
+
+# Virtualenv
+.venv
+
+#vim
+.vim-django
