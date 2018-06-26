@@ -4,6 +4,10 @@ Changelog
     - Changed how root URL `aristotle.example.com/` resolves: for anonymous users it redirects to `aristotle.example.com/home`, for logged in users it redirects to `aristotle.example.com/account/home/`
     - Removed official support for Windows & MSSQL
     - Minor design of Metadata InfoBox when showing last updating user
+    - Fix glossary migrations
+
+    - UI
+      - Improved notifications loading
 
 - 2.0.0
     - **Dependency notes:**
