@@ -4,7 +4,7 @@ Aristotle Metadata Registry (Aristotle-MDR)
 
 |aristotle-logo|
 
-|tci-build-status| |docs| |coveralls| |demoserver| |codeclimate| |av-build-status| |wcagzoo|
+|tci-build-status| |docs| |coveralls| |demoserver| |codeclimate| |wcagzoo|
 
 Introduction and mission statement
 ----------------------------------
@@ -128,11 +128,6 @@ About the badges (plus some extras):
     :alt: Travis-CI build status
     :scale: 100%
     :target: https://travis-ci.org/aristotle-mdr/aristotle-metadata-registry
-
-.. |av-build-status| image:: https://ci.appveyor.com/api/projects/status/1swylnist5i9ogb2/branch/master?svg=true
-    :alt: Appveyor build status
-    :scale: 100%
-    :target: https://ci.appveyor.com/project/LegoStormtroopr/aristotle-metadata-registry-361e5/branch/develop
 
 .. |docs| image:: https://readthedocs.org/projects/aristotle-metadata-registry/badge/?version=latest
     :alt: Documentation Status
