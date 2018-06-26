@@ -74,7 +74,7 @@ class BaseSlotsTestCase(utils.LoggedInViewPages):
         review.concepts.add(self.newoc)
         self.ra.register(self.newoc, self.ra.public_state, self.registrar)
 
-        
+
 class SlotsPermissionTests(BaseSlotsTestCase, TestCase):
 
     def test_item_page_permissions(self):
