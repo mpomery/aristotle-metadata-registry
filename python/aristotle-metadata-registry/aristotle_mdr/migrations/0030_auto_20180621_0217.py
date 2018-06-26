@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-
+import aristotle_mdr.fields
 
 class Migration(migrations.Migration):
 
@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='possumprofile',
             name='profilePicture',
-            field=models.ImageField(blank=True, height_field='profilePictureHeight', null=True, upload_to='', width_field='profilePictureWidth'),
+            field=aristotle_mdr.fields.ConvertedConstrainedImageField(blank=True, height_field='profilePictureHeight', js_checker=True, max_upload_size=1073741824, mime_lookup_length=4096, null=True, upload_to='', width_field='profilePictureWidth'),
         ),
         migrations.AddField(
             model_name='possumprofile',
