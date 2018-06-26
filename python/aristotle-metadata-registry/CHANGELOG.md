@@ -9,6 +9,7 @@ Changelog
     - Ability to order Slots and Identifiers
     - Slots now have permissions (Public, Private, Workgroup)
     - Removal of short name
+    - Minor design of Metadata InfoBox when showing last updating user
 
 - 2.0.0
     - **Dependency notes:**

@@ -439,7 +439,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": 19,
       "responsible_organisation": "",
       "comments": "",
@@ -453,7 +452,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "responsible_organisation": "",
       "comments": "",
@@ -467,7 +465,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "responsible_organisation": "",
       "comments": "",
@@ -481,7 +478,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "responsible_organisation": "",
       "comments": "",
@@ -495,7 +491,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "responsible_organisation": "",
       "comments": "",
@@ -509,7 +504,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "responsible_organisation": "",
       "comments": "",
@@ -523,7 +517,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "symbol": "",
       "responsible_organisation": "",
@@ -539,7 +532,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "symbol": "",
       "responsible_organisation": "",
@@ -556,7 +548,6 @@
     "fields": {
       "unit_of_measure": 17,
       "submitting_organisation": "",
-      "short_name": "",
       "format": "X[XX]",
       "superseded_by": null,
       "responsible_organisation": "",
@@ -576,7 +567,6 @@
     "fields": {
       "unit_of_measure": 17,
       "submitting_organisation": "",
-      "short_name": "",
       "format": "X",
       "superseded_by": null,
       "responsible_organisation": "",
@@ -647,7 +637,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "objectClass": 19,
       "superseded_by": null,
       "responsible_organisation": "",
@@ -664,7 +653,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "objectClass": 19,
       "superseded_by": null,
       "responsible_organisation": "",
@@ -681,7 +669,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "objectClass": 19,
       "superseded_by": null,
       "responsible_organisation": "",
@@ -698,7 +685,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "objectClass": 19,
       "superseded_by": null,
       "responsible_organisation": "",
@@ -715,7 +701,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "responsible_organisation": "",
       "comments": "",
@@ -731,7 +716,6 @@
   {
     "fields": {
       "submitting_organisation": "",
-      "short_name": "",
       "superseded_by": null,
       "responsible_organisation": "",
       "comments": "",
