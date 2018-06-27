@@ -10,7 +10,6 @@ from aristotle_mdr.perms import user_can_edit
 from aristotle_mdr.forms.creation_wizards import UserAwareForm
 from aristotle_mdr.forms.fields import ReviewChangesChoiceField
 from aristotle_mdr.contrib.autocomplete import widgets
-from aristotle_mdr import perms
 
 from django.forms.models import modelformset_factory
 

@@ -3,6 +3,7 @@ import aristotle_mdr.models as MDR
 from aristotle_mdr.utils import status_filter
 from aristotle_mdr.widgets.widgets import TableCheckboxSelect
 from django.urls import reverse
+from aristotle_mdr import perms
 
 
 class ReviewChangesChoiceField(ModelMultipleChoiceField):
