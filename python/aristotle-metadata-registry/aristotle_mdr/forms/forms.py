@@ -13,7 +13,6 @@ from aristotle_mdr.contrib.autocomplete import widgets
 from aristotle_mdr import perms
 
 from django.forms.models import modelformset_factory
-from django.urls import reverse
 
 from .utils import RegistrationAuthorityMixin
 

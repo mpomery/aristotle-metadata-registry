@@ -2,6 +2,7 @@ from django.forms.models import ModelMultipleChoiceField
 import aristotle_mdr.models as MDR
 from aristotle_mdr.utils import status_filter
 from aristotle_mdr.widgets.widgets import TableCheckboxSelect
+from django.urls import reverse
 
 
 class ReviewChangesChoiceField(ModelMultipleChoiceField):
