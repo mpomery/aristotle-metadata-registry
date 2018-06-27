@@ -119,6 +119,8 @@ INSTALLED_APPS = (
 
     'notifications',
     'organizations',
+
+    'constrainedfilefield',
 )
 
 USE_L10N = True
