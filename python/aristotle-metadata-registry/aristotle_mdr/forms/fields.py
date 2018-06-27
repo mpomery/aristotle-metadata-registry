@@ -3,6 +3,7 @@ import aristotle_mdr.models as MDR
 from aristotle_mdr.utils import status_filter
 from aristotle_mdr.widgets.widgets import TableCheckboxSelect
 
+
 class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
     def __init__(self, queryset, static_content, ra, user, **kwargs):
