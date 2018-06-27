@@ -26,7 +26,6 @@ from aristotle_mdr.utils import get_aristotle_url
 
 import json
 import random
-from datetime import datetime
 
 
 class FriendlyLoginView(LoginView):
@@ -50,7 +49,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
     template_name='aristotle_mdr/user/userProfile.html'
 
     def get_sessions(self, user):
-        return user.session_set.filter(expire_date__gt=datetime.now())
+        return user.session_set.filter(expire_date__gt=datetime.datetime.now())
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
