@@ -10,11 +10,12 @@ from aristotle_mdr.utils import setup_aristotle_test_environment
 from aristotle_mdr.contrib.slots.utils import concepts_with_similar_slots
 
 import datetime
+import json
 
 setup_aristotle_test_environment()
 
 
-class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
+class BaseSlotsTestCase(utils.LoggedInViewPages):
 
     def setUp(self):
         super().setUp()
@@ -73,7 +74,8 @@ class SlotsPermissionTests(utils.LoggedInViewPages, TestCase):
         review.concepts.add(self.newoc)
         self.ra.register(self.newoc, self.ra.public_state, self.registrar)
 
-    # ------ tests ------
+
+class SlotsPermissionTests(BaseSlotsTestCase, TestCase):
 
     def test_item_page_permissions(self):
 

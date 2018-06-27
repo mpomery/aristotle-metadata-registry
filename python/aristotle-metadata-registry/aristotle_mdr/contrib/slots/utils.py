@@ -2,7 +2,7 @@ from aristotle_mdr.contrib.slots.models import Slot
 from aristotle_mdr import models as MDR
 
 
-def filter_slot_perms(slots, user, workgroup):
+def filter_slot_perms(slots, user, workgroup=None):
 
     # If slots is empty no need for further filtering
     if not slots:
