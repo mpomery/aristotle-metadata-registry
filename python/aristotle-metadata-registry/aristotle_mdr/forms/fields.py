@@ -1,6 +1,7 @@
 from django.forms.models import ModelMultipleChoiceField
 import aristotle_mdr.models as MDR
 
+
 class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
     def __init__(self, queryset, static_content, ra, user, **kwargs):
