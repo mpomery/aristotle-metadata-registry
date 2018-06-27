@@ -377,6 +377,7 @@ class UserProfileTests(TestCase):
             full_name='new user'
         )
         self.client = Client()
+        self.basedir = os.path.dirname(os.path.dirname(__file__))
 
     def login_newuser(self):
         self.client.logout()
@@ -386,7 +387,7 @@ class UserProfileTests(TestCase):
 
     def post_with_profile_picture(self, formdata, code=302):
 
-        path_to_pic = os.path.join(settings.BASE_DIR, 'aristotle_mdr/static/aristotle_mdr/images/aristotle.png')
+        path_to_pic = os.path.join(self.basedir, 'fixtures/aristotle.png')
 
         with open(path_to_pic, mode='br') as fp:
             formdata.update({'profile_picture': fp})
@@ -466,7 +467,7 @@ class UserProfileTests(TestCase):
 
         # Post form again, with no changes
         complete_initial = self.get_initial()
-        response = self.client.post(reverse('aristotle_mdr:userEdit'), initial)
+        response = self.client.post(reverse('aristotle_mdr:userEdit'), complete_initial)
         self.assertEqual(response.status_code, 302)
 
     def test_default_profile_picture(self):
