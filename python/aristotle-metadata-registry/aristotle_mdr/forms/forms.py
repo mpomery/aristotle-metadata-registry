@@ -5,13 +5,11 @@ from django.contrib.auth import get_user_model
 from django.forms import ModelForm
 
 from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
-from aristotle_mdr.widgets.widgets import TableCheckboxSelect
 import aristotle_mdr.models as MDR
 from aristotle_mdr.perms import user_can_edit
 from aristotle_mdr.forms.creation_wizards import UserAwareForm
 from aristotle_mdr.forms.fields import ReviewChangesChoiceField
 from aristotle_mdr.contrib.autocomplete import widgets
-from aristotle_mdr.utils import status_filter
 from aristotle_mdr import perms
 
 from django.forms.models import modelformset_factory
