@@ -1,5 +1,5 @@
 from django.forms.models import ModelMultipleChoiceField
-
+import aristotle_mdr.models as MDR
 
 class ReviewChangesChoiceField(ModelMultipleChoiceField):
 
