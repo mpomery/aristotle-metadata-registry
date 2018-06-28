@@ -4,7 +4,9 @@
 {% load notifications_tags %}
 <a class="sr-only" accesskey="j" href="#content">Skip to content</a>
 <a class="sr-only" accesskey="l" href="{% url 'aristotle:accessibility' %}#accesskeys">Learn about the access keys available for {{ config.SITE_NAME }}</a>
+{% block header_navtag %}
 <nav class="main navbar navbar-inverse">
+{% endblock %}
 <div class="container-fluid" role="navigation">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
