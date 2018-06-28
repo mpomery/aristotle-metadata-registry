@@ -14,9 +14,9 @@
     <div class="panel panel-default">
       <div class="panel-body">
         {% if user.profile.profilePicture %}
-          <img class="img-responsive" src="{{ user.profile.profilePicture.url }}"></img>
+          <img class="img-responsive" src="{{ user.profile.profilePicture.url }}" alt="Profile Picture"></img>
         {% else %}
-          <img class="img-responsive" src="{% url 'aristotle_mdr:dynamic_profile_picture' user.id %}"></img>
+          <img class="img-responsive" src="{% url 'aristotle_mdr:dynamic_profile_picture' user.id %}" alt="Profile Picture"></img>
         {% endif %}
       </div>
     </div>
