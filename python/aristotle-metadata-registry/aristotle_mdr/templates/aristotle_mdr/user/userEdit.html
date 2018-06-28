@@ -15,7 +15,6 @@
 {% block outerpage %}
     <div class="col-md-6">
       <h1>Edit my account details</h1>
-      {% bootstrap_form_errors form %}
       <form enctype="multipart/form-data" method="post">{% csrf_token %}
         {% bootstrap_form form %}
 

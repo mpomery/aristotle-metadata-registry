@@ -284,7 +284,7 @@ class EditView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
     def get_success_url(self):
-        return reverse('aristotle:userHome')
+        return reverse('aristotle:userProfile')
 
     def get_initial(self):
         initial = super().get_initial()
@@ -319,16 +319,21 @@ class EditView(LoginRequiredMixin, UpdateView):
         # Perform model validation on profile
         if picture_update:
             valid = True
+            invalid_message = ''
             try:
                 # Resize and format change done on clean
                 profile.full_clean()
-            except ValidationError:
+            except ValidationError as e:
                 valid = False
+                if 'profilePicture' in e.message_dict:
+                    invalid_message = e.message_dict['profilePicture']
+                else:
+                    invalid_message = e
 
             if valid:
                 profile.save()
             else:
-                form.add_error('profile_picture', 'Image could not be saved')
+                form.add_error('profile_picture', 'Image could not be saved. {}'.format(invalid_message))
                 return self.form_invalid(form)
 
         return HttpResponseRedirect(self.get_success_url())

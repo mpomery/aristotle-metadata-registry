@@ -1360,7 +1360,8 @@ class PossumProfile(models.Model):
         null=True,
         height_field='profilePictureHeight',
         width_field='profilePictureWidth',
-        max_upload_size=1024**3,  # 10 MB
+        max_upload_size=(1024**2)*10,  # 10 MB
+        content_types=['image/jpg', 'image/png', 'image/bmp', 'image/jpeg'],
         js_checker=True
     )
 
