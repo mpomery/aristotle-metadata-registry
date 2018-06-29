@@ -1414,6 +1414,15 @@ class PossumProfile(models.Model):
         return perms.user_is_registrar(self.user)
 
     @property
+    def is_ra_manager(self):
+        user = self.user
+        if user.is_anonymous():
+            return False
+        if user.is_superuser:
+            return True
+        return RegistrationAuthority.objects.filter(managers__pk=user.pk).count() > 0
+
+    @property
     def discussions(self):
         return DiscussionPost.objects.filter(
             workgroup__in=self.myWorkgroups.all()
