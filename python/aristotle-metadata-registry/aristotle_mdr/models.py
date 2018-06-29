@@ -226,7 +226,11 @@ class RegistrationAuthority(Organization):
     """
     template = "aristotle_mdr/organization/registrationAuthority.html"
     active = models.BooleanField(
-        default=True
+        default=True,
+        choices = (
+            (True, 'True'),
+            (False, 'False')
+        )
     )
     locked_state = models.IntegerField(
         choices=STATES,

@@ -259,14 +259,6 @@ class RegistrationAuthorityAdmin(admin.ModelAdmin):
     list_filter = ['created', 'modified']
     filter_horizontal = ['managers', 'registrars']
 
-    true_false_choices = (
-        (True, 'True'),
-        (False, 'False')
-    )
-    formfield_overrides = {
-        BooleanField: {'widget': widgets.Select(choices=true_false_choices)}
-    }
-
     fieldsets = [
         (None, {'fields': ['name', 'definition', 'active']}),
         ('Members', {'fields': ['managers', 'registrars']}),
