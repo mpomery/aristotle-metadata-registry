@@ -97,12 +97,14 @@ INSTALLED_APPS = (
     'dal',
     'dal_select2',
 
+    'user_sessions',
+
     'haystack',
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    'django.contrib.sessions',  # Here for easyaudit compatibility
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
@@ -117,6 +119,8 @@ INSTALLED_APPS = (
 
     'notifications',
     'organizations',
+
+    'constrainedfilefield',
 )
 
 USE_L10N = True
@@ -124,7 +128,7 @@ USE_TZ = True
 USE_I18N = True
 
 MIDDLEWARE = [
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'user_sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -137,9 +141,11 @@ MIDDLEWARE = [
     # 'reversion.middleware.RevisionMiddleware',
 ]
 
+SESSION_ENGINE = 'user_sessions.backends.db'
 
 ROOT_URLCONF = 'aristotle_mdr.urls'
 LOGIN_REDIRECT_URL = '/account/home'
+LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/login'
 LOGOUT_URL = '/logout'
 
@@ -261,3 +267,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     # include other password validators here
 ]
+
+# GeoIP
+GEOIP_PATH = os.path.join(BASE_DIR, 'aristotle_mdr/vendor/geoip')

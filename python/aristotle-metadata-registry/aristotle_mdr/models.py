@@ -30,7 +30,13 @@ from aristotle_mdr.utils import (
 )
 from aristotle_mdr import comparators
 
-from .fields import ConceptForeignKey, ConceptManyToManyField, ShortTextField
+from .fields import (
+    ConceptForeignKey,
+    ConceptManyToManyField,
+    ShortTextField,
+    ConvertedConstrainedImageField
+)
+
 from .managers import (
     MetadataItemManager, ConceptManager,
     ReviewRequestQuerySet, WorkgroupQuerySet
@@ -1341,6 +1347,23 @@ class PossumProfile(models.Model):
         related_name='favourited_by',
         blank=True
     )
+    profilePictureWidth = models.IntegerField(
+        blank=True,
+        null=True
+    )
+    profilePictureHeight = models.IntegerField(
+        blank=True,
+        null=True
+    )
+    profilePicture = ConvertedConstrainedImageField(
+        blank=True,
+        null=True,
+        height_field='profilePictureHeight',
+        width_field='profilePictureWidth',
+        max_upload_size=((1024**2) * 10),  # 10 MB
+        content_types=['image/jpg', 'image/png', 'image/bmp', 'image/jpeg'],
+        js_checker=True
+    )
 
     # Override save for inline creation of objects.
     # http://stackoverflow.com/questions/2813189/django-userprofile-with-unique-foreign-key-in-django-admin
@@ -1350,6 +1373,7 @@ class PossumProfile(models.Model):
             self.id = existing.id  # Force update instead of insert.
         except PossumProfile.DoesNotExist:  # pragma: no cover
             pass
+
         models.Model.save(self, *args, **kwargs)
 
     @property

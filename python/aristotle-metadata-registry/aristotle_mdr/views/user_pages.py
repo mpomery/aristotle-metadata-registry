@@ -10,7 +10,13 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, ListView, UpdateView
+from django.views.generic import (DetailView,
+                                  ListView,
+                                  UpdateView,
+                                  FormView,
+                                  TemplateView)
+
+from django.core.exceptions import ValidationError
 
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
@@ -19,6 +25,7 @@ from aristotle_mdr.utils import fetch_metadata_apps
 from aristotle_mdr.utils import get_aristotle_url
 
 import json
+import random
 
 
 class FriendlyLoginView(LoginView):
@@ -33,6 +40,27 @@ class FriendlyLoginView(LoginView):
 
         if self.request.GET.get('welcome', '') == 'true':
             context.update({'welcome': True})
+
+        return context
+
+
+class ProfileView(LoginRequiredMixin, TemplateView):
+
+    template_name='aristotle_mdr/user/userProfile.html'
+
+    def get_sessions(self, user):
+        return user.session_set.filter(expire_date__gt=datetime.datetime.now())
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        user = self.request.user
+        sessions = self.get_sessions(user)
+        context.update({
+            'user': user,
+            'sessions': sessions,
+            'session_key': self.request.session.session_key
+        })
 
         return context
 
@@ -256,7 +284,59 @@ class EditView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
     def get_success_url(self):
-        return reverse('aristotle:userHome')
+        return reverse('aristotle:userProfile')
+
+    def get_initial(self):
+        initial = super().get_initial()
+
+        profilepic = self.object.profile.profilePicture
+
+        if profilepic:
+            initial.update({
+                'profile_picture': profilepic
+            })
+
+        return initial
+
+    def form_valid(self, form):
+
+        # Save user object
+        self.object = form.save()
+
+        profile = self.object.profile
+
+        picture = form.cleaned_data['profile_picture']
+        picture_update = True
+
+        if picture:
+            if 'profile_picture' in form.changed_data:
+                profile.profilePicture = picture
+            else:
+                picture_update = False
+        else:
+            profile.profilePicture = None
+
+        # Perform model validation on profile
+        if picture_update:
+            valid = True
+            invalid_message = ''
+            try:
+                # Resize and format change done on clean
+                profile.full_clean()
+            except ValidationError as e:
+                valid = False
+                if 'profilePicture' in e.message_dict:
+                    invalid_message = e.message_dict['profilePicture']
+                else:
+                    invalid_message = e
+
+            if valid:
+                profile.save()
+            else:
+                form.add_error('profile_picture', 'Image could not be saved. {}'.format(invalid_message))
+                return self.form_invalid(form)
+
+        return HttpResponseRedirect(self.get_success_url())
 
 
 @login_required
@@ -371,3 +451,27 @@ def workgroup_archives(request):
         workgroups = workgroups.filter(Q(name__icontains=text_filter) | Q(definition__icontains=text_filter))
     context = {'filter': text_filter}
     return paginated_workgroup_list(request, workgroups, "aristotle_mdr/user/userWorkgroupArchives.html", context)
+
+
+def profile_picture(request, uid):
+
+    template_name = 'aristotle_mdr/user/profile_picture.svg'
+
+    # Seed with user id
+    random.seed(uid)
+
+    colors = []
+    for i in range(2):
+        colors.append('#{0:X}'.format(random.randint(0, 0xFFFFFF)))
+
+    context = {
+        'toga_color': colors[0],
+        'headshot_color': colors[1]
+    }
+
+    return render(
+        request,
+        template_name,
+        context=context,
+        content_type='image/svg+xml'
+    )

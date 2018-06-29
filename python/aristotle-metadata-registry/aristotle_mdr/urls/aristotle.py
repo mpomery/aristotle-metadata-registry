@@ -145,6 +145,7 @@ urlpatterns=[
     url(r'^account/admin/?$', views.user_pages.admin_tools, name='userAdminTools'),
     url(r'^account/admin/statistics/?$', views.user_pages.admin_stats, name='userAdminStats'),
     url(r'^account/edit/?$', views.user_pages.EditView.as_view(), name='userEdit'),
+    url(r'^account/profile/?$', views.user_pages.ProfileView.as_view(), name='userProfile'),
     url(r'^account/recent/?$', views.user_pages.recent, name='userRecentItems'),
     url(r'^account/favourites/?$', views.user_pages.favourites, name='userFavourites'),
     url(r'^account/reviews/?$', views.user_pages.my_review_list, name='userMyReviewRequests'),
@@ -190,6 +191,8 @@ urlpatterns=[
     url(r'^about/(?P<template>.+)/?$', views.DynamicTemplateView.as_view(), name="about"),
 
     url(r'^accessibility/?$', TemplateView.as_view(template_name='aristotle_mdr/static/accessibility.html'), name="accessibility"),
+
+    url(r'user/(?P<uid>\d+)/profilePicture.svg', views.user_pages.profile_picture, name="dynamic_profile_picture"),
 
     url(
         r'^search/?$',
