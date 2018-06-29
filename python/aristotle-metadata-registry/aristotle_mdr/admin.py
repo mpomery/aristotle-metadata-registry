@@ -5,6 +5,8 @@ from django.contrib.admin.filters import RelatedFieldListFilter
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.db.models import BooleanField
+from django.forms import widgets
 
 import aristotle_mdr.models as MDR
 import aristotle_mdr.forms as MDRForms
@@ -257,8 +259,16 @@ class RegistrationAuthorityAdmin(admin.ModelAdmin):
     list_filter = ['created', 'modified']
     filter_horizontal = ['managers', 'registrars']
 
+    true_false_choices = (
+        (True, 'True'),
+        (False, 'False')
+    )
+    formfield_overrides = {
+        BooleanField: {'widget': widgets.Select(choices=true_false_choices)}
+    }
+
     fieldsets = [
-        (None, {'fields': ['name', 'definition']}),
+        (None, {'fields': ['name', 'definition', 'active']}),
         ('Members', {'fields': ['managers', 'registrars']}),
         ('Visibility and control', {'fields': ['locked_state', 'public_state']}),
         ('Status descriptions',

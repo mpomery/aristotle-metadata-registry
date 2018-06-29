@@ -225,6 +225,9 @@ class RegistrationAuthority(Organization):
     (8.1.5.1) association class.
     """
     template = "aristotle_mdr/organization/registrationAuthority.html"
+    active = models.BooleanField(
+        default=True
+    )
     locked_state = models.IntegerField(
         choices=STATES,
         default=STATES.candidate
