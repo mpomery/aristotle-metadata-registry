@@ -109,7 +109,7 @@ class ListRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, Lis
 
     def dispatch(self, request, *args, **kwargs):
         super().dispatch(request, *args, **kwargs)
-        ras = MDR.RegistrationAuthority.objects.filter(active=True)
+        ras = MDR.RegistrationAuthority.objects.all()
 
         text_filter = request.GET.get('filter', "")
         if text_filter:

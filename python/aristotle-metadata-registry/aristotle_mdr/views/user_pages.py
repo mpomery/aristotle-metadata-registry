@@ -14,13 +14,16 @@ from django.views.generic import (DetailView,
                                   ListView,
                                   UpdateView,
                                   FormView,
-                                  TemplateView)
+                                  TemplateView,
+                                  View)
 
 from django.core.exceptions import ValidationError
 
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
-from aristotle_mdr.views.utils import paginated_list, paginated_workgroup_list
+from aristotle_mdr.views.utils import (paginated_list,
+                                       paginated_workgroup_list,
+                                       paginated_registration_authority_list)
 from aristotle_mdr.utils import fetch_metadata_apps
 from aristotle_mdr.utils import get_aristotle_url
 
@@ -356,6 +359,29 @@ def registrar_tools(request):
         raise PermissionDenied
     page = render(request, "aristotle_mdr/user/userRegistrarTools.html")
     return page
+
+
+class RegistrarTools(LoginRequiredMixin, View):
+
+    template_name = "aristotle_mdr/user/registration_authority/list_all.html"
+    model = MDR.RegistrationAuthority
+
+    def get_queryset(self):
+        # Return all the ra's a user is a manager of
+        #return self.request.user.organization_manager_in.all()
+        return MDR.RegistrationAuthority.objects.filter(managers__pk=self.request.user.pk)
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        return paginated_registration_authority_list(
+            request,
+            queryset,
+            self.template_name,
+            {
+                'hide_add_button': True,
+                'title_text': 'Your Registration Authorities'
+            }
+        )
 
 
 @login_required
