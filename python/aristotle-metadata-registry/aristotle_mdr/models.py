@@ -230,7 +230,8 @@ class RegistrationAuthority(Organization):
         choices = (
             (True, 'True'),
             (False, 'False')
-        )
+        ),
+        help_text='<span class="bg-danger">This will disable all further registration actions</span>'
     )
     locked_state = models.IntegerField(
         choices=STATES,

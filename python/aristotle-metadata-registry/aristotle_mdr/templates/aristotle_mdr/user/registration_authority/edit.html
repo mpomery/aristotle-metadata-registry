@@ -16,7 +16,12 @@
 <form action="" method="POST">
 {% csrf_token %}
 <table class="table">
-{{ form.as_table }}
+{% for field in form %}
+  <tr>
+    <th>{{ field.label_tag }} {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}</th>
+    <td>{{ field.errors }} {{ field }}</td>
+  </tr>
+{% endfor %}
 </table>
 <a class="btn btn-danger" href="{% url 'aristotle:registrationauthority_details' item.id %}">Cancel</a>
 <button class="btn btn-primary" type="submit">Save changes</button>
