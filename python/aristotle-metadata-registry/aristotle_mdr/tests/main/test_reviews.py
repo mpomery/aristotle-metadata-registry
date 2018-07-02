@@ -656,5 +656,18 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
 
     @tag('inactive_ra')
     def test_cannot_accept_rr_with_inactive_ra(self):
-        pass
+        self.login_editor()
 
+        response = self.post_public_rr(self.item3)
+        self.assertEqual(self.item3.review_requests.count(),1)
+        review = self.item3.review_requests.all()[0]
+
+        response = self.client.post(reverse('aristotle:userReviewAccept',args=[review.pk]),
+            {
+                'review_accept-response': "I can accept this!",
+                'review_accept_view-current_step': 'review_accept',
+                'submit_skip': 'value',
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.item3.review_requests.count(),1)
