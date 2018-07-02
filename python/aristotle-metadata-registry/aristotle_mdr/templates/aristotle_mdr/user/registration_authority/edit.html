@@ -1,5 +1,6 @@
 {% extends "aristotle_mdr/user/userHome.html" %}
 {% load i18n %}
+{% load bootstrap3 %}
 
 {% block collapse-link %}
     <i class="fa fa-users fa-fw"></i> All Registration Authorities </a>
@@ -16,12 +17,7 @@
 <form action="" method="POST">
 {% csrf_token %}
 <table class="table">
-{% for field in form %}
-  <tr>
-    <th>{{ field.label_tag }} {% if field.help_text %}<small>{{ field.help_text|safe }}</small>{% endif %}</th>
-    <td>{{ field.errors }} {{ field }}</td>
-  </tr>
-{% endfor %}
+  {{ form.as_table }}
 </table>
 <a class="btn btn-danger" href="{% url 'aristotle:registrationauthority_details' item.id %}">Cancel</a>
 <button class="btn btn-primary" type="submit">Save changes</button>
