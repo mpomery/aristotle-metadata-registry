@@ -950,7 +950,7 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages, utils.FormsetTestUtils):
         self.assertTrue(self.item1.is_registered)
         self.assertTrue(self.item1.is_public())
 
-    @tag('inactive_ra', 'changestatus', 'newtest')
+    @tag('inactive_ra', 'changestatus')
     def test_registrar_cant_change_status_with_inactive_ra(self):
 
         self.login_registrar()
