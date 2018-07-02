@@ -38,6 +38,19 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         else:
             self.assertTrue(item.current_statuses().count() == 0)
 
+    def post_public_rr(self, item):
+        response = self.client.post(
+            reverse('aristotle:request_review',args=[item.id]),
+            {
+                'registrationAuthorities': [str(self.ra.id)],
+                'state': self.ra.public_state,
+                'cascadeRegistration': 0,
+                'changeDetails': "Please review this",
+                'registrationDate':datetime.date(2010,1,1)
+            }
+        )
+        return response
+
     def test_viewer_cannot_request_review_for_private_item(self):
         self.login_viewer()
 
@@ -63,16 +76,7 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.assertEqual(response.status_code,200)
 
         self.assertEqual(self.item1.review_requests.count(),0)
-        response = self.client.post(
-            reverse('aristotle:request_review',args=[self.item1.id]),
-            {
-                'registrationAuthorities': [str(self.ra.id)],
-                'state': self.ra.public_state,
-                'cascadeRegistration': 0,
-                'changeDetails': "Please review this",
-                'registrationDate':datetime.date(2010,1,1)
-            }
-        )
+        response = self.post_public_rr(self.item1)
 
         self.assertRedirects(response,url_slugify_concept(self.item1))
         self.assertEqual(self.item1.review_requests.count(),1)
@@ -636,3 +640,21 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
         self.assertTrue(self.editor.notifications.count() == editor_num_notifications)
 
         self.assertTrue(self.viewer.notifications.first().target == review)
+
+    @tag('inactive_ra')
+    def test_cannot_create_rr_against_incative_ra(self):
+        self.login_editor()
+        self.ra.active = False
+        self.ra.save()
+
+        self.assertEqual(self.item1.review_requests.count(),0)
+
+        response = self.post_public_rr(self.item1)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('registrationAuthorities' in response.context['form'].errors)
+        self.assertEqual(self.item1.review_requests.count(),0)
+
+    @tag('inactive_ra')
+    def test_cannot_accept_rr_with_inactive_ra(self):
+        pass
+
