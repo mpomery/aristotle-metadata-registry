@@ -227,7 +227,7 @@ class RegistrationAuthority(Organization):
     template = "aristotle_mdr/organization/registrationAuthority.html"
     active = models.BooleanField(
         default=True,
-        choices = (
+        choices=(
             (True, 'True'),
             (False, 'False')
         ),
