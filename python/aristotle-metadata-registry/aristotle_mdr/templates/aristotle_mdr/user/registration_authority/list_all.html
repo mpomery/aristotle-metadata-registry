@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block sidebar %}
-    {% include "aristotle_mdr/user/userSideBar.html" with activeTab='adminTools' %}
+{% include "aristotle_mdr/user/userSideBar.html" with activeTab=activeTab|default:'adminTools' %}
 {% endblock %}
 
 {% block page %}

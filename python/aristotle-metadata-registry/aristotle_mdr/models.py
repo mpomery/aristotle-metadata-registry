@@ -390,21 +390,22 @@ class RegistrationAuthority(Organization):
         return {'success': [item], 'failed': []}
 
     def _register(self, item, state, user, *args, **kwargs):
-        changeDetails = kwargs.get('changeDetails', "")
-        # If registrationDate is None (like from a form), override it with
-        # todays date.
-        registrationDate = kwargs.get('registrationDate', None) \
-            or timezone.now().date()
-        until_date = kwargs.get('until_date', None)
+        if self.active:
+            changeDetails = kwargs.get('changeDetails', "")
+            # If registrationDate is None (like from a form), override it with
+            # todays date.
+            registrationDate = kwargs.get('registrationDate', None) \
+                or timezone.now().date()
+            until_date = kwargs.get('until_date', None)
 
-        Status.objects.create(
-            concept=item,
-            registrationAuthority=self,
-            registrationDate=registrationDate,
-            state=state,
-            changeDetails=changeDetails,
-            until_date=until_date
-        )
+            Status.objects.create(
+                concept=item,
+                registrationAuthority=self,
+                registrationDate=registrationDate,
+                state=state,
+                changeDetails=changeDetails,
+                until_date=until_date
+            )
 
     def list_roles_for_user(self, user):
         roles = []

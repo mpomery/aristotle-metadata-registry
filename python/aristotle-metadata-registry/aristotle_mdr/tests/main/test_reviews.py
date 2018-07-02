@@ -658,9 +658,17 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
     def test_cannot_accept_rr_with_inactive_ra(self):
         self.login_editor()
 
+        # Create review request
         response = self.post_public_rr(self.item3)
         self.assertEqual(self.item3.review_requests.count(),1)
         review = self.item3.review_requests.all()[0]
+
+        # Make ra inactive
+        self.ra.active = False
+        self.ra.save()
+
+        response = self.client.get(reverse('aristotle:userReviewAccept',args=[review.pk]))
+        self.assertEqual(response.status_code, 404)
 
         response = self.client.post(reverse('aristotle:userReviewAccept',args=[review.pk]),
             {
@@ -669,5 +677,28 @@ class ReviewRequestActionsPage(utils.LoggedInViewPages, TestCase):
                 'submit_skip': 'value',
             })
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 404)
         self.assertEqual(self.item3.review_requests.count(),1)
+
+    @tag('inactive_ra')
+    def test_reviews_hidden_from_lists_when_ra_inactive(self):
+        self.login_viewer()
+
+        # Create review request
+        response = self.post_public_rr(self.item1)
+        self.assertEqual(self.item1.review_requests.count(),1)
+
+        # Make ra inactive
+        self.ra.active = False
+        self.ra.save()
+
+        # My review requests
+        response = self.client.get(reverse('aristotle_mdr:userMyReviewRequests'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['reviews']), 0)
+
+        # Registrar Review list
+        self.login_registrar()
+        response  = self.client.get(reverse('aristotle_mdr:userReadyForReview'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['reviews']), 0)
