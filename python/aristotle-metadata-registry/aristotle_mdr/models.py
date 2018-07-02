@@ -231,7 +231,7 @@ class RegistrationAuthority(Organization):
             (True, 'True'),
             (False, 'False')
         ),
-        help_text='<div class="alert alert-warning" role="alert">Setting this to False will disable all further registration actions</div>'
+        help_text='<div id="active-alert" class="alert alert-warning" role="alert">Setting this to False will disable all further registration actions</div>'
     )
     locked_state = models.IntegerField(
         choices=STATES,
