@@ -5,6 +5,10 @@ Changelog
     - Removed official support for Windows & MSSQL
     - Minor design of Metadata InfoBox when showing last updating user
     - Fix glossary migrations
+    - Added a user profile page
+    - Option allowing users to self signup to a registry
+    - Rest API token authentication with token management page allowing users to create and revoke tokens with cutomisable permissions
+    - Removal of short_name
 
     - UI
       - Improved notifications loading
