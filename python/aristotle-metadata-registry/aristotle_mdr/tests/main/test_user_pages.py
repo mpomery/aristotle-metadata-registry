@@ -185,8 +185,6 @@ class UserHomePages(utils.LoggedInViewPages, TestCase):
         self.check_generic_pages()
 
         # A viewer, has no registrar permissions:
-        response = self.client.get(reverse('aristotle:userRegistrarTools',))
-        self.assertEqual(response.status_code,403)
         response = self.client.get(reverse('aristotle:userReadyForReview',))
         self.assertEqual(response.status_code,403)
 
