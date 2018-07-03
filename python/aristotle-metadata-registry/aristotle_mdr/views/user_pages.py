@@ -360,7 +360,9 @@ class RegistrarTools(LoginRequiredMixin, View):
 
     def get_queryset(self):
         # Return all the ra's a user is a manager of
-        return MDR.RegistrationAuthority.objects.filter(managers__pk=self.request.user.pk)
+        manager = Q(managers__pk=self.request.user.pk)
+        registrar = Q(registrars__pk=self.request.user.pk)
+        return MDR.RegistrationAuthority.objects.filter(manager | registrar)
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
