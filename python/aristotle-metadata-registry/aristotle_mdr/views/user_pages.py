@@ -358,12 +358,6 @@ class RegistrarTools(LoginRequiredMixin, View):
     template_name = "aristotle_mdr/user/registration_authority/list_all.html"
     model = MDR.RegistrationAuthority
 
-    def dispatch(self, request, **args, **kwargs):
-        if not request.user.profile.is_registrar:
-            raise PermissionDenied
-        else:
-            return super().dispatch(request, *args, **kwargs)
-
     def get_queryset(self):
         # Return all the ra's a user is a manager of
         return MDR.RegistrationAuthority.objects.filter(managers__pk=self.request.user.pk)
