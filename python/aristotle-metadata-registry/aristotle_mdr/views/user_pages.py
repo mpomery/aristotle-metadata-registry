@@ -455,7 +455,7 @@ def workgroup_archives(request):
 
 def profile_picture(request, uid):
 
-    template_name = 'aristotle_mdr/user/profile_picture.svg'
+    template_name = 'aristotle_mdr/user/user-head.svg'
 
     # Seed with user id
     random.seed(uid)
