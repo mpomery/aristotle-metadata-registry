@@ -4,7 +4,9 @@
 {% load notifications_tags %}
 <a class="sr-only" accesskey="j" href="#content">Skip to content</a>
 <a class="sr-only" accesskey="l" href="{% url 'aristotle:accessibility' %}#accesskeys">Learn about the access keys available for {{ config.SITE_NAME }}</a>
+{% block header_navtag %}
 <nav class="main navbar navbar-inverse">
+{% endblock %}
 <div class="container-fluid" role="navigation">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -14,7 +16,9 @@
         <span class="icon-bar"></span>
       </button>
       <a href="{% url 'aristotle:home' %}" id="logo">
+        {% block header_logo %}
         <img height="50px" src="{% static config.SITE_BRAND %}" alt="{{ config.SITE_NAME }}" title="{{ config.SITE_NAME }}">
+        {% endblock %}
       </a>
     </div>
 
@@ -38,6 +42,9 @@
                 </div>
             </form>
         {% endif %}
+
+        {% block extra_header %}
+        {% endblock %}
 
         <ul class="nav navbar-nav navbar-right">
             <li >
