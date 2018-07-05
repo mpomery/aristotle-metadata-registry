@@ -495,11 +495,12 @@ class UserProfileTests(TestCase):
 @tag('inactive_ra', 'newtest')
 class RegistrationAuthorityPages(utils.LoggedInViewPages, TestCase):
 
-    def test_inactive_ra_not_in_all_ra_list(self):
+    def test_inactive_ra_inactive_in_all_ra_list(self):
 
         response = self.client.get(reverse('aristotle_mdr:all_registration_authorities'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['registrationAuthorities']), 1)
+        self.assertNotContains(response, '(inactive)')
 
         # Deactivate ra
         self.ra.active = False
@@ -508,7 +509,8 @@ class RegistrationAuthorityPages(utils.LoggedInViewPages, TestCase):
         # Check that removed from list
         response = self.client.get(reverse('aristotle_mdr:all_registration_authorities'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context['registrationAuthorities']), 0)
+        self.assertEqual(len(response.context['registrationAuthorities']), 1)
+        self.assertContains(response, '(inactive)')
 
     def test_ra_shows_as_inactive_in_registrartools(self):
 
