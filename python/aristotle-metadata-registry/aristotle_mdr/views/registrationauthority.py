@@ -38,7 +38,7 @@ def organization(request, iid, *args, **kwargs):
 
 
 def all_registration_authorities(request):
-    ras = MDR.RegistrationAuthority.objects.filter(active=True).order_by('name')
+    ras = MDR.RegistrationAuthority.objects.order_by('name')
     return render(request, "aristotle_mdr/organization/all_registration_authorities.html", {'registrationAuthorities': ras})
 
 
