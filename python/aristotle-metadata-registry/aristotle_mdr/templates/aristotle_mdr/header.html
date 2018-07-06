@@ -2,6 +2,7 @@
 {% load bootstrap3 %}
 {% load static from staticfiles %}
 {% load notifications_tags %}
+{% load aristotle_tags %}
 <a class="sr-only" accesskey="j" href="#content">Skip to content</a>
 <a class="sr-only" accesskey="l" href="{% url 'aristotle:accessibility' %}#accesskeys">Learn about the access keys available for {{ config.SITE_NAME }}</a>
 {% block header_navtag %}
@@ -161,20 +162,26 @@
                 {% live_notify_list list_class="dropdown-menu notify-menu" %}
             </li>
             <li>
-                <a id="header_menu_button_logout" href="{% url 'logout' %}?next={{request.path}}" title="{% trans 'Log out'%}">
+                {% url 'aristotle_mdr:home' as home_url %}
+                {% url 'aristotle_mdr:userHome' as user_home_url %}
+                {% ifeq request.path user_home_url val=home_url default=request.path as redirect_url %}
+                <a id="header_menu_button_logout" href="{% url 'logout' %}?next={{redirect_url}}" title="{% trans 'Log out'%}">
                     <i class="fa fa-sign-out fa-fw"></i>
                     <span class="visible-xs-inline">{% trans 'Log out' %}</span>
                 </a>
             </li>
         {% else %}
             <li>
-            <a id="header_menu_button_login" href="{% url 'friendly_login' %}?next={{request.path}}">
-                <i class="fa fa-sign-in fa-lg"></i>  {% trans 'Log in'%}
-            </a>
+                {% url 'aristotle_mdr:home' as home_url %}
+                {% url 'aristotle_mdr:userHome' as user_home_url %}
+                {% ifeq request.path home_url val=user_home_url default=request.path as redirect_url %}
+                <a id="header_menu_button_login" href="{% url 'friendly_login' %}?next={{redirect_url}}">
+                    <i class="fa fa-sign-in fa-lg"></i>  {% trans 'Log in'%}
+                </a>
             </li>
             {% if config.SELF_SIGNUP.enabled %}
             <li>
-            <a id="header_menu_button_login" href="{% url 'aristotle-user:signup_register' %}">
+            <a id="header_menu_button_signup" href="{% url 'aristotle-user:signup_register' %}">
                 <i class="fa fa-user-plus"></i>  {% trans 'Sign Up' %}
             </a>
             </li>

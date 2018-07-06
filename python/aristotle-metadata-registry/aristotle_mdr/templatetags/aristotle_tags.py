@@ -174,8 +174,8 @@ def paginator_get(request, pageNumber, pop=''):
 
 
 @register.simple_tag
-def ifeq(a, b, val):
-    return val if a == b else ""
+def ifeq(a, b, val, default=""):
+    return val if a == b else default
 
 
 @register.simple_tag
