@@ -9,6 +9,7 @@ Changelog
     - Option allowing users to self signup to a registry
     - Rest API token authentication with token management page allowing users to create and revoke tokens with cutomisable permissions
     - Removal of short_name
+    - Registration Authorities can now be retired
 
     - UI
       - Improved notifications loading
