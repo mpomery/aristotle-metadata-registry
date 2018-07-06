@@ -3,16 +3,23 @@ Changelog
 - 2.0.x
     - Changed how root URL `aristotle.example.com/` resolves: for anonymous users it redirects to `aristotle.example.com/home`, for logged in users it redirects to `aristotle.example.com/account/home/`
     - Removed official support for Windows & MSSQL
+    - Simplified configuration for testing
+    - Ability to order Data Elements within Data Element Derivations
+    - Ability to order Slots and Identifiers
+    - Slots now have permissions (Public, Private, Workgroup)
+    - Removal of short name
     - Minor design of Metadata InfoBox when showing last updating user
     - Fix glossary migrations
     - Added a user profile page
     - Option allowing users to self signup to a registry
-    - Rest API token authentication with token management page allowing users to create and revoke tokens with cutomisable permissions
     - Removal of short_name
     - Registration Authorities can now be retired
 
     - UI
       - Improved notifications loading
+    
+    - API changes
+      - Rest API token authentication
 
 - 2.0.0
     - **Dependency notes:**

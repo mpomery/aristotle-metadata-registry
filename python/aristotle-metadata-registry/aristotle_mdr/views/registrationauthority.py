@@ -13,6 +13,7 @@ from aristotle_mdr.views.utils import (
     RoleChangeView,
     MemberRemoveFromGroupView
 )
+from aristotle_mdr import perms
 
 import logging
 
@@ -128,6 +129,14 @@ class DetailsRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, 
     pk_url_kwarg = 'iid'
     context_object_name = "item"
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data()
+
+        is_manager = perms.user_is_registation_authority_manager(self.request.user, self.object)
+        context.update({'is_manager': is_manager})
+
+        return context
+
 
 class MembersRegistrationAuthority(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = MDR.RegistrationAuthority
@@ -151,6 +160,7 @@ class EditRegistrationAuthority(LoginRequiredMixin, ObjectLevelPermissionRequire
     fields = [
         'name',
         'definition',
+        'active',
         'locked_state',
         'public_state',
         'notprogressed',

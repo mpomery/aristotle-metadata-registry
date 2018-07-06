@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block sidebar %}
-    {% include "aristotle_mdr/user/userSideBar.html" with activeTab='adminTools' %}
+    {% include "aristotle_mdr/user/userSideBar.html" with activeTab='registrarTools' %}
 {% endblock %}
 
 {% block page %}
@@ -54,7 +54,7 @@
               </button>
               <ul class="dropdown-menu pull-right">
                 <li>
-                    <a href="{% url 'aristotle:registrationauthority_member_remove' item.id  member.pk %}"
+                    <a href="{% url 'aristotle:registrationauthority_change_user_roles' item.id  member.pk %}"
                         data-toggle="modal" data-target="#ra_page_modal">Change role</a>
                 </li>
                 <li role="separator" class="divider"></li>

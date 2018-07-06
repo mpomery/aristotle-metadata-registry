@@ -10,7 +10,9 @@
 {% for state in object.statuses.all %}{{ state.state_name }} {% endfor %}
 
 {% for slot in object.slots.all %}
+{% if slot.permission == 0 %}
 {{slot.name}} {{slot.value}}
+{% endif %}
 {% endfor %}
 
 {% for identifier in object.identifiers.all %}

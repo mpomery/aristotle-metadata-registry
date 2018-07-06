@@ -30,7 +30,13 @@ from aristotle_mdr.utils import (
 )
 from aristotle_mdr import comparators
 
-from .fields import ConceptForeignKey, ConceptManyToManyField, ShortTextField
+from .fields import (
+    ConceptForeignKey,
+    ConceptManyToManyField,
+    ShortTextField,
+    ConvertedConstrainedImageField
+)
+
 from .managers import (
     MetadataItemManager, ConceptManager,
     ReviewRequestQuerySet, WorkgroupQuerySet
@@ -219,6 +225,14 @@ class RegistrationAuthority(Organization):
     (8.1.5.1) association class.
     """
     template = "aristotle_mdr/organization/registrationAuthority.html"
+    active = models.BooleanField(
+        default=True,
+        choices=(
+            (True, 'True'),
+            (False, 'False')
+        ),
+        help_text='<div id="active-alert" class="alert alert-warning" role="alert">Setting this to False will disable all further registration actions</div>'
+    )
     locked_state = models.IntegerField(
         choices=STATES,
         default=STATES.candidate
@@ -376,21 +390,22 @@ class RegistrationAuthority(Organization):
         return {'success': [item], 'failed': []}
 
     def _register(self, item, state, user, *args, **kwargs):
-        changeDetails = kwargs.get('changeDetails', "")
-        # If registrationDate is None (like from a form), override it with
-        # todays date.
-        registrationDate = kwargs.get('registrationDate', None) \
-            or timezone.now().date()
-        until_date = kwargs.get('until_date', None)
+        if self.active:
+            changeDetails = kwargs.get('changeDetails', "")
+            # If registrationDate is None (like from a form), override it with
+            # todays date.
+            registrationDate = kwargs.get('registrationDate', None) \
+                or timezone.now().date()
+            until_date = kwargs.get('until_date', None)
 
-        Status.objects.create(
-            concept=item,
-            registrationAuthority=self,
-            registrationDate=registrationDate,
-            state=state,
-            changeDetails=changeDetails,
-            until_date=until_date
-        )
+            Status.objects.create(
+                concept=item,
+                registrationAuthority=self,
+                registrationDate=registrationDate,
+                state=state,
+                changeDetails=changeDetails,
+                until_date=until_date
+            )
 
     def list_roles_for_user(self, user):
         roles = []
@@ -1341,6 +1356,23 @@ class PossumProfile(models.Model):
         related_name='favourited_by',
         blank=True
     )
+    profilePictureWidth = models.IntegerField(
+        blank=True,
+        null=True
+    )
+    profilePictureHeight = models.IntegerField(
+        blank=True,
+        null=True
+    )
+    profilePicture = ConvertedConstrainedImageField(
+        blank=True,
+        null=True,
+        height_field='profilePictureHeight',
+        width_field='profilePictureWidth',
+        max_upload_size=((1024**2) * 10),  # 10 MB
+        content_types=['image/jpg', 'image/png', 'image/bmp', 'image/jpeg'],
+        js_checker=True
+    )
 
     # Override save for inline creation of objects.
     # http://stackoverflow.com/questions/2813189/django-userprofile-with-unique-foreign-key-in-django-admin
@@ -1350,6 +1382,7 @@ class PossumProfile(models.Model):
             self.id = existing.id  # Force update instead of insert.
         except PossumProfile.DoesNotExist:  # pragma: no cover
             pass
+
         models.Model.save(self, *args, **kwargs)
 
     @property
@@ -1385,6 +1418,15 @@ class PossumProfile(models.Model):
     @property
     def is_registrar(self):
         return perms.user_is_registrar(self.user)
+
+    @property
+    def is_ra_manager(self):
+        user = self.user
+        if user.is_anonymous():
+            return False
+        if user.is_superuser:
+            return True
+        return RegistrationAuthority.objects.filter(managers__pk=user.pk).count() > 0
 
     @property
     def discussions(self):

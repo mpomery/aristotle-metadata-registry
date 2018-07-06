@@ -40,4 +40,5 @@ urlpatterns = [
     url(r'^account/password/?$', RedirectView.as_view(url='account/home/', permanent=True)),
     url(r'^account/password/change/?$', views.password_change, name='password_change'),
     url(r'^account/password/change/done/?$', views.password_change_done, name='password_change_done'),
+    url(r'', include('user_sessions.urls', 'user_sessions')),
 ]
