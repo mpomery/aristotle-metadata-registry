@@ -91,7 +91,7 @@ class RegistrationAuthorityViewSet(UUIDLookupModelMixin, viewsets.ReadOnlyModelV
 
     """%(RegistrationAuthoritySerializer.Meta.fields,)
 
-    queryset = models.RegistrationAuthority.objects.all()
+    queryset = models.RegistrationAuthority.objects.filter(active=True)
     serializer_class = RegistrationAuthoritySerializer
 
     permission_key = 'ra'

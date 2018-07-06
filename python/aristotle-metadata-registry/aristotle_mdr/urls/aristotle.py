@@ -159,7 +159,7 @@ urlpatterns=[
 
 
     url(r'^action/review/(?P<iid>\d+)?$', views.actions.SubmitForReviewView.as_view(), name='request_review'),
-    url(r'^account/registrartools/?$', views.user_pages.registrar_tools, name='userRegistrarTools'),
+    url(r'^account/registrartools/?$', views.user_pages.RegistrarTools.as_view(), name='userRegistrarTools'),
     url(r'^account/registrartools/review/?$', views.user_pages.review_list, name='userReadyForReview'),
     url(r'^account/registrartools/review/details/(?P<review_id>\d+)/?$', views.user_pages.ReviewDetailsView.as_view(), name='userReviewDetails'),
     url(r'^account/registrartools/review/accept/(?P<review_id>\d+)/?$', views.actions.ReviewAcceptView.as_view(), name='userReviewAccept'),

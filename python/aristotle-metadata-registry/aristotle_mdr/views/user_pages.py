@@ -14,13 +14,16 @@ from django.views.generic import (DetailView,
                                   ListView,
                                   UpdateView,
                                   FormView,
-                                  TemplateView)
+                                  TemplateView,
+                                  View)
 
 from django.core.exceptions import ValidationError
 
 from aristotle_mdr import forms as MDRForms
 from aristotle_mdr import models as MDR
-from aristotle_mdr.views.utils import paginated_list, paginated_workgroup_list
+from aristotle_mdr.views.utils import (paginated_list,
+                                       paginated_workgroup_list,
+                                       paginated_registration_authority_list)
 from aristotle_mdr.utils import fetch_metadata_apps
 from aristotle_mdr.utils import get_aristotle_url
 
@@ -350,19 +353,36 @@ def favourites(request):
     return paginated_list(request, items, "aristotle_mdr/user/userFavourites.html", context)
 
 
-@login_required
-def registrar_tools(request):
-    if not request.user.profile.is_registrar:
-        raise PermissionDenied
-    page = render(request, "aristotle_mdr/user/userRegistrarTools.html")
-    return page
+class RegistrarTools(LoginRequiredMixin, View):
+
+    template_name = "aristotle_mdr/user/registration_authority/list_all.html"
+    model = MDR.RegistrationAuthority
+
+    def get_queryset(self):
+        # Return all the ra's a user is a manager of
+        manager = Q(managers__pk=self.request.user.pk)
+        registrar = Q(registrars__pk=self.request.user.pk)
+        return MDR.RegistrationAuthority.objects.filter(manager | registrar)
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        return paginated_registration_authority_list(
+            request,
+            queryset,
+            self.template_name,
+            {
+                'hide_add_button': True,
+                'title_text': 'Your Registration Authorities',
+                'activeTab': 'registrarTools'
+            }
+        )
 
 
 @login_required
 def review_list(request):
     if not request.user.profile.is_registrar:
         raise PermissionDenied
-    authorities = [i[0] for i in request.user.profile.registrarAuthorities.all().values_list('id')]
+    authorities = [i[0] for i in request.user.profile.registrarAuthorities.filter(active=True).values_list('id')]
 
     # Registars can see items they have been asked to review
     q = Q(Q(registration_authority__id__in=authorities) & ~Q(status=MDR.REVIEW_STATES.cancelled))
@@ -375,7 +395,7 @@ def review_list(request):
 def my_review_list(request):
     # Users can see any items they have been asked to review
     q = Q(requester=request.user)
-    reviews = MDR.ReviewRequest.objects.visible(request.user).filter(q)
+    reviews = MDR.ReviewRequest.objects.visible(request.user).filter(q).filter(registration_authority__active=True)
     return paginated_list(request, reviews, "aristotle_mdr/user/my_review_list.html", {'reviews': reviews})
 
 

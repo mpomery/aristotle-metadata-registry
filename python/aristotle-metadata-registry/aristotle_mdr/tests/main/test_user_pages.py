@@ -185,8 +185,6 @@ class UserHomePages(utils.LoggedInViewPages, TestCase):
         self.check_generic_pages()
 
         # A viewer, has no registrar permissions:
-        response = self.client.get(reverse('aristotle:userRegistrarTools',))
-        self.assertEqual(response.status_code,403)
         response = self.client.get(reverse('aristotle:userReadyForReview',))
         self.assertEqual(response.status_code,403)
 
@@ -492,3 +490,45 @@ class UserProfileTests(TestCase):
 
         self.assertEqual(three_toga_color, response.context['toga_color'])
         self.assertEqual(three_headshot_color, response.context['headshot_color'])
+
+
+@tag('inactive_ra', 'newtest')
+class RegistrationAuthorityPages(utils.LoggedInViewPages, TestCase):
+
+    def test_inactive_ra_inactive_in_all_ra_list(self):
+
+        response = self.client.get(reverse('aristotle_mdr:all_registration_authorities'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['registrationAuthorities']), 1)
+        self.assertNotContains(response, '(inactive)')
+
+        # Deactivate ra
+        self.ra.active = False
+        self.ra.save()
+
+        # Check that removed from list
+        response = self.client.get(reverse('aristotle_mdr:all_registration_authorities'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['registrationAuthorities']), 1)
+        self.assertContains(response, '(inactive)')
+
+    def test_ra_shows_as_inactive_in_registrartools(self):
+
+        self.login_ramanager()
+
+        # Deactivate ra
+        self.ra.active = False
+        self.ra.save()
+
+        response = self.client.get(reverse('aristotle_mdr:userRegistrarTools'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Test RA')
+        self.assertContains(response, '(inactive)')
+
+
+    def test_active_in_ra_edit_form(self):
+
+        self.login_superuser()
+        response = self.client.get(reverse('aristotle_mdr:registrationauthority_edit', args=[self.ra.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('active' in response.context['form'].fields)
