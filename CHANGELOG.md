@@ -9,6 +9,14 @@ Changelog
     - Slots now have permissions (Public, Private, Workgroup)
     - Removal of short name
     - Minor design of Metadata InfoBox when showing last updating user
+    - Fix glossary migrations
+    - Added a user profile page
+    - Option allowing users to self signup to a registry
+    - Removal of short_name
+    - Registration Authorities can now be retired
+
+    - UI
+      - Improved notifications loading
     
     - API changes
       - Rest API token authentication
