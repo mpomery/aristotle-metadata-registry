@@ -45,7 +45,7 @@ setup(
         'lesscpy',
 
         'django-model-utils>=2.3.1',
-        'django-notifications-hq>=1.0',
+        'django-notifications-hq>=1.4',
         'django-braces',
         'docutils',
 
@@ -85,7 +85,14 @@ setup(
         'django-organizations',
 
         # Improved User Model
-        'django-improved-user==1.0a2'
+        'django-improved-user==1.0a2',
+
+        # File upload
+        'django-constrainedfilefield[filetype]',
+
+        # User sessions
+        'django-user-sessions',
+        'geoip2',
 
     ],
 

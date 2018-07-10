@@ -4,6 +4,7 @@ from aristotle_mdr.models import _concept, ValueDomain, ValueMeaning
 from aristotle_mdr.contrib.autocomplete import widgets
 from django.forms.models import modelformset_factory
 from django.forms import ModelChoiceField, CharField
+from django.forms.formsets import BaseFormSet
 from aristotle_mdr.widgets.bootstrap import BootstrapDateTimePicker
 from django.db.models import DateField
 from aristotle_mdr.models import AbstractValue
@@ -17,9 +18,16 @@ datePickerOptions = {
     "useCurrent": False,
     "widgetPositioning": {
         "horizontal": "left",
-        "vertical": "auto"
+        "vertical": "bottom"
     }
 }
+
+
+class HiddenOrderFormset(BaseFormSet):
+
+    def add_fields(self, form, index):
+        super().add_fields(form, index)
+        form.fields["ORDER"].widget = forms.HiddenInput()
 
 
 class HiddenOrderModelFormSet(BaseModelFormSet):
@@ -28,6 +36,9 @@ class HiddenOrderModelFormSet(BaseModelFormSet):
         super().add_fields(form, index)
         form.fields["ORDER"].widget = forms.HiddenInput()
 
+
+# Below are some util functions for creating o2m and m2m querysets
+# They are used in the generic alter views and the ExtraFormsetMixin
 
 def one_to_many_formset_excludes(item, model_to_add):
     # creates a list of extra fields to be excluded based on the item related to the weak entity
@@ -56,15 +67,12 @@ def one_to_many_formset_filters(formset, item):
     return formset
 
 
-def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field, extra_excludes=[]):
-    # creates a one to many formset
-    # model_to_add is weak entity class, model_to_add_field is the foriegn key field name
-    _widgets = {}
-    exclude_fields = [model_to_add_field, ordering_field]
-    exclude_fields += extra_excludes
+def get_aristotle_widgets(model):
 
-    for f in model_to_add._meta.fields:
-        foreign_model = model_to_add._meta.get_field(f.name).related_model
+    _widgets = {}
+
+    for f in model._meta.fields:
+        foreign_model = model._meta.get_field(f.name).related_model
         if foreign_model and issubclass(foreign_model, _concept):
             _widgets.update({
                 f.name: widgets.ConceptAutocompleteSelect(
@@ -72,13 +80,13 @@ def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field
                 )
             })
 
-        if isinstance(model_to_add._meta.get_field(f.name), DateField):
+        if isinstance(model._meta.get_field(f.name), DateField):
             _widgets.update({
                 f.name: BootstrapDateTimePicker(options=datePickerOptions)
             })
 
-    for f in model_to_add._meta.many_to_many:
-        foreign_model = model_to_add._meta.get_field(f.name).related_model
+    for f in model._meta.many_to_many:
+        foreign_model = model._meta.get_field(f.name).related_model
         if foreign_model and issubclass(foreign_model, _concept):
             _widgets.update({
                 f.name: widgets.ConceptAutocompleteSelectMultiple(
@@ -86,33 +94,41 @@ def one_to_many_formset_factory(model_to_add, model_to_add_field, ordering_field
                 )
             })
 
+    return _widgets
+
+
+def ordered_formset_factory(model, excludes=[]):
+    # Formset factory for a hidden order model formset with aristotle widgets
+    _widgets = get_aristotle_widgets(model)
+
     return modelformset_factory(
-        model_to_add,
+        model,
         formset=HiddenOrderModelFormSet,
         can_order=True,  # we assign this back to the ordering field
         can_delete=True,
-        exclude=exclude_fields,
-        # fields='__all__',
-        extra=1,
+        exclude=excludes,
+        extra=0,
         widgets=_widgets
-        )
+    )
 
 
-def one_to_many_formset_save(formset, item, model_to_add_field, ordering_field):
+def ordered_formset_save(formset, item, model_to_add_field, ordering_field):
+    # Save a formset created with the above factory
 
-    item.save()  # do this to ensure we are saving reversion records for the value domain, not just the values
-    formset.save(commit=False)
-    for form in formset.forms:
-        all_blank = not any(form[f].value() for f in form.fields if f is not ordering_field)
-        if all_blank:
-            continue
-        if form['id'].value() not in [deleted_record['id'].value() for deleted_record in formset.deleted_forms]:
-            # Don't immediately save, we need to attach the parent object
-            value = form.save(commit=False)
-            setattr(value, model_to_add_field, item)
-            if ordering_field:
-                setattr(value, ordering_field, form.cleaned_data['ORDER'])
-            value.save()
+    item.save()  # do this to ensure we are saving reversion records for the item, not just the values
+    formset.save(commit=False)  # Save formset so we have access to deleted_objects and save_m2m
+
+    for form in formset.ordered_forms:
+        # Loop through the forms so we can add the order value to the ordering field
+        # ordered_forms does not contain forms marked for deletion
+        obj = form.save(commit=False)
+        setattr(obj, model_to_add_field, item)
+        setattr(obj, ordering_field, form.cleaned_data['ORDER'])
+        obj.save()
+
     for obj in formset.deleted_objects:
+        # Delete objects marked for deletion
         obj.delete()
+
+    # Save any m2m relations on the ojects (not actually needed yet)
     formset.save_m2m()

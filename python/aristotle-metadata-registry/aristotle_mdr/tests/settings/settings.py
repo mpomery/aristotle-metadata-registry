@@ -30,8 +30,6 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 ci_runner = ""
 if 'TRAVIS' in os.environ:
     ci_runner = "Travis-CI"
-elif 'APPVEYOR' in os.environ:
-    ci_runner = "Appveyor"
 else:
     ci_runner = "Tox"
 

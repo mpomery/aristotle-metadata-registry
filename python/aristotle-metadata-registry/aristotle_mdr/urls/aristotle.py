@@ -11,6 +11,7 @@ import aristotle_mdr.models as models
 from aristotle_mdr.contrib.generic.views import (
     GenericAlterOneToManyView,
     GenericAlterManyToManyView,
+    GenericAlterManyToManyOrderView,
     generic_foreign_key_factory_view
 )
 
@@ -18,7 +19,11 @@ from django.utils.translation import ugettext_lazy as _
 
 
 urlpatterns=[
-    url(r'^$', TemplateView.as_view(template_name='aristotle_mdr/static/home.html'), name="home"),
+    url(r'^$', views.SmartRoot.as_view(
+        unauthenticated_pattern='aristotle_mdr:home',
+        authenticated_pattern='aristotle_mdr:userHome'
+    ), name='smart_root'),
+    url(r'^home/?$', TemplateView.as_view(template_name='aristotle_mdr/static/home.html'), name="home"),
     url(r'^manifest.json$', TemplateView.as_view(template_name='meta/manifest.json', content_type='application/json')),
     url(r'^robots.txt$', TemplateView.as_view(template_name='meta/robots.txt', content_type='text/plain')),
     url(r'^sitemap.xml$', views.sitemaps.main, name='sitemap_xml'),
@@ -59,13 +64,13 @@ urlpatterns=[
             form_title=_('Change Value Meanings')
         ), name='value_meanings_edit'),
     url(r'^item/(?P<iid>\d+)/dataelementderivation/change_inputs/?$',
-        GenericAlterManyToManyView.as_view(
+        GenericAlterManyToManyOrderView.as_view(
             model_base=models.DataElementDerivation,
             model_to_add=models.DataElement,
             model_base_field='inputs'
         ), name='dataelementderivation_change_inputs'),
     url(r'^item/(?P<iid>\d+)/dataelementderivation/change_derives/?$',
-        GenericAlterManyToManyView.as_view(
+        GenericAlterManyToManyOrderView.as_view(
             model_base=models.DataElementDerivation,
             model_to_add=models.DataElement,
             model_base_field='derives'
@@ -140,6 +145,7 @@ urlpatterns=[
     url(r'^account/admin/?$', views.user_pages.admin_tools, name='userAdminTools'),
     url(r'^account/admin/statistics/?$', views.user_pages.admin_stats, name='userAdminStats'),
     url(r'^account/edit/?$', views.user_pages.EditView.as_view(), name='userEdit'),
+    url(r'^account/profile/?$', views.user_pages.ProfileView.as_view(), name='userProfile'),
     url(r'^account/recent/?$', views.user_pages.recent, name='userRecentItems'),
     url(r'^account/favourites/?$', views.user_pages.favourites, name='userFavourites'),
     url(r'^account/reviews/?$', views.user_pages.my_review_list, name='userMyReviewRequests'),
@@ -147,12 +153,13 @@ urlpatterns=[
     url(r'^account/workgroups/?$', views.user_pages.workgroups, name='userWorkgroups'),
     url(r'^account/workgroups/archives/?$', views.user_pages.workgroup_archives, name='user_workgroups_archives'),
     url(r'^account/notifications(?:/folder/(?P<folder>all))?/?$', views.user_pages.inbox, name='userInbox'),
+    url(r'^account/notifications/api/mark-all-as-read/', views.notify.MarkAllReadApiView.as_view(), name='api_mark_all_read'),
 
     url(r'^account/django/(.*)?$', views.user_pages.django_admin_wrapper, name='django_admin'),
 
 
     url(r'^action/review/(?P<iid>\d+)?$', views.actions.SubmitForReviewView.as_view(), name='request_review'),
-    url(r'^account/registrartools/?$', views.user_pages.registrar_tools, name='userRegistrarTools'),
+    url(r'^account/registrartools/?$', views.user_pages.RegistrarTools.as_view(), name='userRegistrarTools'),
     url(r'^account/registrartools/review/?$', views.user_pages.review_list, name='userReadyForReview'),
     url(r'^account/registrartools/review/details/(?P<review_id>\d+)/?$', views.user_pages.ReviewDetailsView.as_view(), name='userReviewDetails'),
     url(r'^account/registrartools/review/accept/(?P<review_id>\d+)/?$', views.actions.ReviewAcceptView.as_view(), name='userReviewAccept'),
@@ -184,6 +191,8 @@ urlpatterns=[
     url(r'^about/(?P<template>.+)/?$', views.DynamicTemplateView.as_view(), name="about"),
 
     url(r'^accessibility/?$', TemplateView.as_view(template_name='aristotle_mdr/static/accessibility.html'), name="accessibility"),
+
+    url(r'user/(?P<uid>\d+)/profilePicture.svg', views.user_pages.profile_picture, name="dynamic_profile_picture"),
 
     url(
         r'^search/?$',

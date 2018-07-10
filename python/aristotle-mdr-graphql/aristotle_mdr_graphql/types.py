@@ -8,7 +8,7 @@ from graphene_django.types import DjangoObjectType
 
 logger = logging.getLogger(__name__)
 
-from aristotle_mdr_graphql import resolvers 
+from aristotle_mdr_graphql import resolvers
 
 class AristotleObjectType(DjangoObjectType):
 
@@ -19,7 +19,7 @@ class AristotleObjectType(DjangoObjectType):
 
     @classmethod
     def __init_subclass_with_meta__(cls, *args, **kwargs):
-        
+
         kwargs.update({
             'default_resolver': resolvers.aristotle_resolver,
             'interfaces': (relay.Node, ),
@@ -39,7 +39,8 @@ class AristotleConceptObjectType(DjangoObjectType):
 
     @classmethod
     def __init_subclass_with_meta__(cls, *args, **kwargs):
-        
+
+        # Default resolver is set in type_from_concept_model instead
         kwargs.update({
             # 'default_resolver': aristotle_resolver,
             'interfaces': (relay.Node, ),

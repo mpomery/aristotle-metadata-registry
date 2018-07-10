@@ -13,6 +13,8 @@ from django.forms import model_to_dict
 from aristotle_mdr import models, perms
 from aristotle_mdr.forms.search import PermissionSearchQuerySet
 
+from aristotle_mdr_api.token_auth.permissions import TokenPermissions
+
 from rest_framework import viewsets
 
 from .utils import (
@@ -44,6 +46,8 @@ class SearchViewSet(viewsets.GenericViewSet):
     serializer_class = ConceptSearchSerializer
     pagination_class = ConceptResultsPagination
     base_name="search"
+
+    permission_key = 'search'
 
 #    def get(self, request, format=None):
     def list(self, request):
@@ -89,8 +93,10 @@ class RegistrationAuthorityViewSet(UUIDLookupModelMixin, viewsets.ReadOnlyModelV
 
     """%(RegistrationAuthoritySerializer.Meta.fields,)
 
-    queryset = models.RegistrationAuthority.objects.all()
+    queryset = models.RegistrationAuthority.objects.filter(active=True)
     serializer_class = RegistrationAuthoritySerializer
+
+    permission_key = 'ra'
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
@@ -110,3 +116,5 @@ class OrganizationViewSet(UUIDLookupModelMixin, viewsets.ReadOnlyModelViewSet):
 
     queryset = models.Organization.objects.all()
     serializer_class = OrganizationSerializer
+
+    permission_key = 'organization'

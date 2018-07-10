@@ -55,37 +55,36 @@ class ConceptDetailSerializer(ConceptSerializerBase):
     links = serializers.SerializerMethodField()
     statuses = serializers.SerializerMethodField()
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.pyserializer = Serializer()
 
-    object_cache = {}
+        if self.instance:
+            self.serialized_object = self.get_serialized_object(self.instance)
+        else:
+            self.serialized_object = {}
+
     def get_serialized_object(self, instance):
-        if instance.item.uuid not in self.object_cache.keys():
-            self.object_cache[instance.item.uuid] = Serializer().serialize([instance.item])[0]
-        return self.object_cache[instance.item.uuid]
-        
+        return self.pyserializer.serialize([instance.item], context=self.context)[0]
+
     class Meta:
         model = models._concept
         fields = standard_fields+('fields','statuses','ids','slots', 'links')
 
     def get_extra_fields(self, instance):
-        obj = self.get_serialized_object(instance)
-        return obj.get('fields',[])
+        return self.serialized_object.get('fields',[])
 
     def get_identifiers(self, instance):
-        obj = self.get_serialized_object(instance)
-        return obj.get('identifiers',[])
+        return self.serialized_object.get('identifiers',[])
 
     def get_slots(self, instance):
-        obj = self.get_serialized_object(instance)
-        return obj.get('slots', [])
+        return self.serialized_object.get('slots', [])
 
     def get_links(self, instance):
-        obj = self.get_serialized_object(instance)
-        from aristotle_mdr.contrib.links import models as link_models
-        return obj.get('links', [])
+        return self.serialized_object.get('links', [])
 
     def get_statuses(self, instance):
-        obj = self.get_serialized_object(instance)
-        return obj.get('statuses',[])
+        return self.serialized_object.get('statuses',[])
 
 
 class ConceptViewSet(
@@ -93,7 +92,7 @@ class ConceptViewSet(
     UUIDLookupModelMixin,
     #mixins.RetrieveModelMixin,
                     #mixins.UpdateModelMixin,
-                    
+
                     #viewsets.ModelViewSet):
     viewsets.ReadOnlyModelViewSet):
     """
@@ -113,8 +112,7 @@ class ConceptViewSet(
     filter_backends = (concept_backend.ConceptFilterBackend,)
     filter_class = concept_backend.ConceptFilter
 
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (permissions.IsSuperuserOrReadOnly,)
+    permission_key = 'metadata'
 
 
     def get_queryset(self):
@@ -125,7 +123,7 @@ class ConceptViewSet(
 
         """
         self.queryset = self.get_content_type_for_request().objects.all()
-        
+
         queryset = super(ConceptViewSet,self).get_queryset()
         if self.request:
             concepttype = self.request.query_params.get('type', None)
@@ -170,7 +168,7 @@ class ConceptViewSet(
             class SpecialFilter(self.filter_class):
                 class Meta(self.filter_class.Meta):
                     model = content_type
-            
+
             self.filter_class = SpecialFilter
 
         return content_type
@@ -199,25 +197,32 @@ class ConceptViewSet(
             manifest = data
 
         try:
-            output = []
+            created = []
+            errors = []
             with transaction.atomic():
                 for s in Deserializer(manifest):
-                    with reversion.create_revision():
-                        output.append({
-                            'uuid': s.object.uuid,
-                            'url': s.object.get_absolute_url()
-                        })
-                        s.submitter = request.user
-                        s.object.recache_states()
-        
-                        reversion.set_user(request.user)
-                        reversion.set_comment(
-                            _("Imported using API")
-                        )
-                        s.save()
 
-            return Response({'created':output}) #stuff
+                    if perms.user_can_submit_to_workgroup(request.user, s.object.workgroup):
+                        with reversion.create_revision():
+                            created.append({
+                                'uuid': s.object.uuid,
+                                'url': s.object.get_absolute_url()
+                            })
+                            s.submitter = request.user
+                            s.object.recache_states()
+
+                            reversion.set_user(request.user)
+                            reversion.set_comment(
+                                _("Imported using API")
+                            )
+                            s.save()
+                    else:
+                        errors.append({
+                            'message': 'You don\'t have permission to create an item in the {} Workgroup'.format(s.object.workgroup)
+                        })
+
+            return Response({'created':created,'errors':errors})
         except Exception as e:
-            if 'explode' in request.query_params.keys():
+            if settings.DEBUG and 'explode' in request.query_params.keys():
                 raise
             return Response({'error': str(e)})

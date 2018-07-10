@@ -1,6 +1,7 @@
 from django import template
 
-from aristotle_mdr.contrib.slots.models import Slot, concepts_with_similar_slots
+from aristotle_mdr.contrib.slots.models import Slot
+from aristotle_mdr.contrib.slots.utils import concepts_with_similar_slots
 
 
 register = template.Library()
@@ -13,4 +14,4 @@ def count_similar(user, slot):
 
 @register.filter
 def slots_by_type(concept, name):
-    return concept.slots.filter(name=name)
+    return concept.slots.filter(name=name, permission=0)

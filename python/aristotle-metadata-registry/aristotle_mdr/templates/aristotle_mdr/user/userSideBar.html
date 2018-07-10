@@ -101,19 +101,21 @@
         <a href="{% url 'aristotle:userRoles' %}">
         <i class="fa fa-industry fa-fw"></i> My roles</a>
     </li>
-    {% if request.user.profile.is_registrar %}
+    {% if request.user.profile.is_registrar or request.user.profile.is_ra_manager %}
     <li {% ifequal activeTab "registrarTools" %}class="active"{% endifequal %}>
         <a href="{% url 'aristotle:userRegistrarTools' %}">
         <i class="fa fa-institution fa-fw"></i> {% trans "Registrar tools" %}
         </a>
-        {% ifequal activeTab "registrarTools" %}
-        <ul class="nav nav-pills nav-stacked nav-collapse dashSubMenu">
-            <li><a href="{% url 'aristotle:userReadyForReview' %}">
-                {% comment %}Translators: A link to the list of things to be reviewed.{% endcomment %}
-                <i class="fa fa-flag fa-fw"></i> {% trans 'Review list' %}
-            </a></li>
-        </ul>
-        {% endifequal %}
+        {% if request.user.profile.is_registrar %}
+          {% ifequal activeTab "registrarTools" %}
+          <ul class="nav nav-pills nav-stacked nav-collapse dashSubMenu">
+              <li><a href="{% url 'aristotle:userReadyForReview' %}">
+                  {% comment %}Translators: A link to the list of things to be reviewed.{% endcomment %}
+                  <i class="fa fa-flag fa-fw"></i> {% trans 'Review list' %}
+              </a></li>
+          </ul>
+          {% endifequal %}
+        {% endif %}
     </li>
     {% endif %}
     {% if perms.aristotle_mdr.access_aristotle_dashboard %}

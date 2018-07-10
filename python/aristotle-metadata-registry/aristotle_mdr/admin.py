@@ -5,6 +5,8 @@ from django.contrib.admin.filters import RelatedFieldListFilter
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.db.models import BooleanField
+from django.forms import widgets
 
 import aristotle_mdr.models as MDR
 import aristotle_mdr.forms as MDRForms
@@ -116,7 +118,7 @@ class ConceptAdmin(CompareVersionAdmin, admin.ModelAdmin):
         (None, {'fields': ['name', 'definition', 'workgroup']}),
         ('Additional names', {
             'classes': ('grp-collapse grp-closed',),
-            'fields': ['short_name', 'version']
+            'fields': ['version']
         }),
         # ('Registry', {'fields': ['workgroup']}),
         ('Relationships', {
@@ -258,7 +260,7 @@ class RegistrationAuthorityAdmin(admin.ModelAdmin):
     filter_horizontal = ['managers', 'registrars']
 
     fieldsets = [
-        (None, {'fields': ['name', 'definition']}),
+        (None, {'fields': ['name', 'definition', 'active']}),
         ('Members', {'fields': ['managers', 'registrars']}),
         ('Visibility and control', {'fields': ['locked_state', 'public_state']}),
         ('Status descriptions',
@@ -406,9 +408,24 @@ class aristotle_mdr_DataElementDerivationSearchIndex(conceptIndex, indexes.Index
         ).values_list('name', flat=True))
 
 
+class DedDerivesInline(admin.TabularInline):
+
+    model = MDR.DedDerivesThrough
+    verbose_name = "Derive"
+    verbose_name_plural = "Derives"
+
+
+class DedInputsInline(admin.TabularInline):
+
+    model = MDR.DedInputsThrough
+    verbose_name = "Input"
+    verbose_name_plural = "Inputs"
+
+
 register_concept(
     MDR.DataElementDerivation,
-    extra_fieldsets=[('Derivation', {'fields': ['derivation_rule', 'derives', 'inputs']})],
+    extra_fieldsets=[('Derivation', {'fields': ['derivation_rule']})],
+    extra_inlines=[DedDerivesInline, DedInputsInline],
     custom_search_index=aristotle_mdr_DataElementDerivationSearchIndex
 )
 

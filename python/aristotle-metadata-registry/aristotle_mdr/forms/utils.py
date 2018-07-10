@@ -10,7 +10,7 @@ class FormRequestMixin(object):
 class RegistrationAuthorityMixin(object):
     def set_registration_authority_field(self, field_name, qs=None):
         if qs is None:
-            qs = MDR.RegistrationAuthority.objects.all()
+            qs = MDR.RegistrationAuthority.objects.filter(active=True)
 
         ras = [(ra.id, ra.name) for ra in qs]
         self.fields[field_name].queryset = qs

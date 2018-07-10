@@ -492,21 +492,25 @@ class AdminPageForConcept(utils.LoggedInViewPages):
         # make an item
         response = self.client.get(reverse("admin:%s_%s_add"%(self.itemType._meta.app_label,self.itemType._meta.model_name)))
 
+        extra_mgmt_forms = utils.get_admin_management_forms(self.itemType)
+
         short_name = utils.id_generator()
         data = {
-            'name':"admin_page_test_oc_has_submitter",
-            'definition':"test", "workgroup":self.wg1.id,
-            'short_name': short_name,
-            'statuses-TOTAL_FORMS': 0, 'statuses-INITIAL_FORMS': 0 # no substatuses
+            'name': short_name,
+            'definition':"admin_page_test_oc_has_submitter",
+            "workgroup":self.wg1.id,
+            'statuses-TOTAL_FORMS': 0,
+            'statuses-INITIAL_FORMS': 0 # no substatuses
         }
         data.update(self.form_defaults)
+        data.update(extra_mgmt_forms)
 
         response = self.client.post(
             reverse("admin:%s_%s_add"%(self.itemType._meta.app_label,self.itemType._meta.model_name)),
             data
         )
-        new_item = self.itemType.objects.get(short_name=short_name)
-        self.assertEqual(new_item.name,"admin_page_test_oc_has_submitter")
+        new_item = self.itemType.objects.get(name=short_name)
+        self.assertEqual(new_item.definition,"admin_page_test_oc_has_submitter")
         self.assertEqual(new_item.submitter,self.editor)
 
         self.login_superuser()
@@ -517,6 +521,7 @@ class AdminPageForConcept(utils.LoggedInViewPages):
             'statuses-TOTAL_FORMS': 0, 'statuses-INITIAL_FORMS': 0, # no statuses
         })
         updated_item.update(self.form_defaults)
+        updated_item.update(extra_mgmt_forms)
 
         self.client.post(
             reverse(

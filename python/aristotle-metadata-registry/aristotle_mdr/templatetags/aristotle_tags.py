@@ -174,8 +174,8 @@ def paginator_get(request, pageNumber, pop=''):
 
 
 @register.simple_tag
-def ifeq(a, b, val):
-    return val if a == b else ""
+def ifeq(a, b, val, default=""):
+    return val if a == b else default
 
 
 @register.simple_tag
@@ -392,3 +392,16 @@ def is_active_module(module_name):
 @register.filter
 def user_roles_for_group(group, user):
     return group.list_roles_for_user(user)
+
+
+@register.filter
+def get_dataelements_from_m2m(ded, field_name):
+
+    throughmodel = getattr(ded, field_name).through
+
+    throughs = throughmodel.objects.filter(data_element_derivation=ded).select_related('data_element')
+    de_list = []
+    for through_item in throughs:
+        de_list.append(through_item.data_element)
+
+    return de_list

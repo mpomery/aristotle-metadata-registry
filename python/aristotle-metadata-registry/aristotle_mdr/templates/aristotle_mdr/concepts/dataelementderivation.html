@@ -17,8 +17,10 @@
             </header>
             <div class="panel-body">
                 <ul>
-                {% for input in item.inputs.all|can_view_iter:request.user %}
-                    <li>{% include "aristotle_mdr/helpers/inlineDetails.html" with item=input %}</li>
+                {% for input in item|get_dataelements_from_m2m:"inputs" %}
+                    {% if input|can_view:request.user %}
+                      <li>{% include "aristotle_mdr/helpers/inlineDetails.html" with item=input %}</li>
+                    {% endif %}
                 {% endfor %}
                 </ul>
             </div>
@@ -34,20 +36,22 @@
         <div class="derivation_outputs panel panel-info">
             <header class="panel-heading">
                 Output(s)
-                <a href="{% url 'aristotle_mdr:dataelementderivation_change_derives' iid=item.pk %}" 
+                <a href="{% url 'aristotle_mdr:dataelementderivation_change_derives' iid=item.pk %}"
                 class="btn btn-default btn-sm"
                 data-toggle="modal" data-target="#derivation_editor"
                 >Edit derivations</a>
             </header>
             <div class="panel-body">
                 <ul>
-                {% for output in item.derives.all|can_view_iter:request.user %}
-                    <li>{% include "aristotle_mdr/helpers/inlineDetails.html" with item=output %}</li>
+                {% for output in item|get_dataelements_from_m2m:"derives" %}
+                    {% if output|can_view:request.user %}
+                      <li>{% include "aristotle_mdr/helpers/inlineDetails.html" with item=output %}</li>
+                    {% endif %}
                 {% endfor %}
                 </ul>
             </div>
         </div>
-        
+
     </div>
 
 {% bootstrap_modal 'derivation_editor' size='md' %}

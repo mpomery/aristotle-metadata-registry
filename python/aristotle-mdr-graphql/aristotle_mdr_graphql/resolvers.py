@@ -3,6 +3,8 @@ import logging
 
 from aristotle_mdr import perms
 from aristotle_mdr import models as mdr_models
+from aristotle_mdr.contrib.slots import models as slots_models
+from aristotle_mdr.contrib.slots.utils import filter_slot_perms, get_allowed_slots
 from aristotle_dse import models as dse_models
 from django.db.models import Model
 from django.db.models.manager import Manager
@@ -20,24 +22,38 @@ class AristotleResolver(object):
 
         # If object is a django model
         if isinstance(retval, Model):
-    
-            # Use user_can_view to determine if we display
-            if perms.user_can_view(info.context.user, retval):
-                return retval
-            else:
-                return None
-    
+
+            if isinstance(retval, mdr_models._concept):
+                # Use user_can_view to determine if we display
+                if perms.user_can_view(info.context.user, retval):
+                    return retval
+
+            return None
+
         elif isinstance(retval, Manager):
-    
+
             # Need this for when related manager is returned when querying object.related_set
             # Can safely return restricted queryset
-            return retval.get_queryset().visible(info.context.user)
-    
+            queryset = retval.get_queryset()
+
+            if queryset.model == slots_models.Slot:
+                instance = getattr(retval, 'instance', None)
+                if instance:
+                    return get_allowed_slots(instance, info.context.user)
+                else:
+                    return filter_slot_perms(queryset, info.context.user)
+
+            if hasattr(queryset, 'visible'):
+                return queryset.visible(info.context.user)
+
         elif isinstance(retval, QuerySet):
-    
+
             # In case a queryset is returned
-            return retval.visible(info.context.user)
-    
+            if hasattr(retval, 'visible'):
+                return retval.visible(info.context.user)
+            else:
+                return retval
+
         return retval
 
     def __call__(self, *args, **kwargs):
@@ -57,7 +73,6 @@ class ValueDomainResolver(AristotleResolver):
         retval = getattr(root, attname, default_value)
         logger.debug(str([
             type(retval), isinstance(retval, QuerySet)
-            
         ]))
         if root.can_view(info.context.user):
             if isinstance(retval, Manager) and issubclass(retval.model, mdr_models.AbstractValue):
@@ -73,7 +88,6 @@ class DataSetSpecificationResolver(AristotleResolver):
         retval = getattr(root, attname, default_value)
         logger.debug(str([
             retval, type(retval), isinstance(retval, QuerySet)
-            
         ]))
         if root.can_view(info.context.user):
             if isinstance(retval, Manager) and issubclass(retval.model, dse_models.DSSInclusion):

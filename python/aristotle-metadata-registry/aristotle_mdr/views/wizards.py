@@ -16,9 +16,15 @@ from django.utils.translation import ugettext_lazy as _
 
 from aristotle_mdr.contrib.help.models import ConceptHelp
 from aristotle_mdr.utils import fetch_aristotle_settings, fetch_metadata_apps
+from aristotle_mdr.contrib.generic.forms import ordered_formset_save
+from aristotle_mdr.contrib.generic.views import ExtraFormsetMixin
 
 from formtools.wizard.views import SessionWizardView
 from reversion import revisions as reversion
+
+import re
+import logging
+logger = logging.getLogger(__name__)
 
 
 def make_it_clean(string):
@@ -89,7 +95,7 @@ class PermissionWizard(SessionWizardView):
         return context
 
 
-class ConceptWizard(PermissionWizard):
+class ConceptWizard(ExtraFormsetMixin, PermissionWizard):
     widgets = {}
     templates = {
         "initial": "aristotle_mdr/create/concept_wizard_1_search.html",
@@ -100,6 +106,9 @@ class ConceptWizard(PermissionWizard):
         ("initial", MDRForms.wizards.Concept_1_Search),
         ("results", MDRForms.wizards.Concept_2_Results),
     ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def get_form(self, step=None, data=None, files=None):
         if step is None:  # pragma: no cover
@@ -133,6 +142,15 @@ class ConceptWizard(PermissionWizard):
             else:
                 context.update({'similar_items': self.find_similar()})
             context['step_title'] = _('Select or create')
+
+            if 'extra_formsets' in kwargs:
+                fslist = kwargs['extra_formsets']
+            else:
+                fslist = self.get_extra_formsets(item=self.model)
+
+            fscontext = self.get_formset_context(fslist)
+            context.update(fscontext)
+
         context.update({'model_name': self.model._meta.verbose_name,
                         'model_name_plural': self.model._meta.verbose_name_plural,
                         'help': ConceptHelp.objects.filter(
@@ -144,6 +162,27 @@ class ConceptWizard(PermissionWizard):
                         'current_step': self.steps.current,
                         })
         return context
+
+    def get(self, *args, **kwargs):
+        if 'results_postdata' in self.request.session.keys():
+            self.request.session.pop('results_postdata')
+
+        return super().get(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+
+        if self.steps.current == 'results':
+            extra_formsets = self.get_extra_formsets(item=self.model, postdata=self.request.POST)
+
+            formsets_invalid = self.validate_formsets(extra_formsets)
+            print('formsets_invalid is {}'.format(formsets_invalid))
+            if formsets_invalid:
+                form = self.get_form(data=self.request.POST, files=self.request.FILES)
+                return self.render(form=form, extra_formsets=extra_formsets)
+            else:
+                self.request.session['results_postdata'] = self.request.POST
+
+        return super().post(*args, **kwargs)
 
     @reversion.create_revision()
     def done(self, form_list, **kwargs):
@@ -157,6 +196,20 @@ class ConceptWizard(PermissionWizard):
                 saved_item.submitter = self.request.user
                 saved_item.save()
                 form.save_m2m()
+
+        if 'results_postdata' in self.request.session:
+
+            extra_formsets = self.get_extra_formsets(item=self.model, postdata=self.request.session['results_postdata'])
+            formsets_invalid = self.validate_formsets(extra_formsets)
+            if not formsets_invalid:
+                final_formsets = []
+                for info in extra_formsets:
+                    info['saveargs']['item'] = saved_item
+                    final_formsets.append(info)
+
+                self.save_formsets(final_formsets)
+            self.request.session.pop('results_postdata')
+
         return HttpResponseRedirect(url_slugify_concept(saved_item))
 
     def find_duplicates(self):
