@@ -31,11 +31,6 @@ defaults:
         esac
         echo "Running script with DATABASE_URL="$DATABASE_URL
         echo "Running script with DB="$DB
-        echo $TRAVIS_BRANCH
-        echo "HEAD to TRAVIS_BRANCH"
-        git diff --name-only HEAD...$TRAVIS_BRANCH
-        echo "TRAVIS_BRANCH to HEAD"
-        git diff --name-only $TRAVIS_BRANCH...HEAD
         ./scripts/tox_if.sh dj$DJANGO_VERSION-test-linux-db-$DB-search-$SEARCH-module_$MODULE
     services:
       - postgresql
