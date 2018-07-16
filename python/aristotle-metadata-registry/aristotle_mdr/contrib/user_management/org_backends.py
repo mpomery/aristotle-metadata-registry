@@ -118,7 +118,12 @@ class BaseAristotleInvitationBackend(InvitationBackend):
             reply_to = from_email
 
         headers = {'Reply-To': reply_to}
-        kwargs.update({'sender': sender, 'user': user, 'accept_url_name': 'aristotle-user:' + self.accept_url_name})
+        kwargs.update({
+            'sender': sender,
+            'user': user,
+            'accept_url_name': 'aristotle-user:' + self.accept_url_name,
+            'request': request
+        })
 
         subject_template = loader.get_template(subject_template)
         body_template = loader.get_template(body_template)
@@ -135,10 +140,12 @@ class BaseAristotleInvitationBackend(InvitationBackend):
             return False
         token = self.get_token(user)
         aristotle_settings = fetch_aristotle_settings()
-        kwargs.update({'token': token})
-        kwargs.update({'sender': sender})
-        kwargs.update({'user_id': user.pk})
-        kwargs.update({'config': aristotle_settings})
+        kwargs.update({
+            'token': token,
+            'sender': sender,
+            'user_id': user.pk,
+            'config': aristotle_settings,
+        })
         self.email_message(user, self.invitation_subject, self.invitation_body, **kwargs).send()
         return True
 
