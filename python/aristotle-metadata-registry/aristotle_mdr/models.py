@@ -498,9 +498,9 @@ class Workgroup(registryGroup):
 
     @property
     def members(self):
-        return (self.viewers.all() \
-            | self.submitters.all() \
-            | self.stewards.all() \
+        return (self.viewers.all()
+            | self.submitters.all()
+            | self.stewards.all()
             | self.managers.all()).distinct().order_by('full_name')
 
     def can_view(self, user):
