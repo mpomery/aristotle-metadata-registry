@@ -1,5 +1,6 @@
 from braces.views import LoginRequiredMixin, PermissionRequiredMixin
 # from django.contrib.auth import get_user_model
+from collections import defaultdict
 from django.urls import reverse
 from django.db.models import Q
 from django.http import HttpResponseRedirect
@@ -106,6 +107,44 @@ class MembersView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermissi
     template_name = 'aristotle_mdr/user/workgroups/members.html'
     permission_required = "aristotle_mdr.view_workgroup"
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        viewers = self.object.viewers.all()
+        submitters = self.object.submitters.all()
+        stewards = self.object.stewards.all()
+        managers = self.object.managers.all()
+
+        roles = defaultdict(list)
+        users = {}
+
+        for user in viewers:
+            roles[user.id].append('Viewer')
+            users[user.id] = user
+
+        for user in submitters:
+            roles[user.id].append('Submitter')
+            users[user.id] = user
+
+        for user in stewards:
+            roles[user.id].append('Steward')
+            users[user.id] = user
+
+        for user in managers:
+            roles[user.id].append('Manager')
+            users[user.id] = user
+
+        userlist = []
+        for uid, user in users.items():
+            if uid in roles:
+                currentroles = ', '.join(roles[uid])
+            else:
+                currentroles = ''
+            userlist.append({'user': user, 'roles': currentroles})
+
+        userlist.sort(key=lambda x: x['user'].full_name)
+        context.update({'userlist': userlist})
+        return context
 
 class ArchiveView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermissionRequiredMixin, DetailView):
     template_name = 'aristotle_mdr/actions/archive_workgroup.html'
