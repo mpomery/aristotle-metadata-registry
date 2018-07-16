@@ -146,6 +146,7 @@ class MembersView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermissi
         context.update({'userlist': userlist})
         return context
 
+
 class ArchiveView(LoginRequiredMixin, WorkgroupContextMixin, ObjectLevelPermissionRequiredMixin, DetailView):
     template_name = 'aristotle_mdr/actions/archive_workgroup.html'
     permission_required = "aristotle_mdr.can_archive_workgroup"
