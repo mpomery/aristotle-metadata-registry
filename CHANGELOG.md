@@ -1,8 +1,9 @@
 Changelog
 
 - 2.1.1
-    - Fix to signup email url generation
-    - Fix to workgroup member list
+    - Fix to signup email url generation to ensure domain is in invite email
+    - Ensure invited users are given a valid password to ensure recovery can occur
+    - Fix to workgroup member list to improve efficiency of workgroup member page
     - Pin django-filters dependancy
 
 - 2.1.0
