@@ -90,9 +90,9 @@ class BaseAristotleInvitationBackend(InvitationBackend):
             except User.DoesNotExist:
                 # TODO break out user creation process
                 user = User.objects.create(
-                    email=email,
-                    password=get_user_model().objects.make_random_password()
+                    email=email
                 )
+                user.set_password(User.objects.make_random_password())
                 user.is_active = False
                 user.save()
             self.send_invitation(user, sender, request=request, **kwargs)
