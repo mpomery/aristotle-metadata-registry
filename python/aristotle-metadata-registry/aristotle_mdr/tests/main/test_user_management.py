@@ -1,4 +1,4 @@
-from django.test import TestCase, tag, override_settings
+from django.test import TestCase, tag, override_settings, modify_settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.core import mail
@@ -122,6 +122,30 @@ class UserManagementPages(utils.LoggedInViewPages, TestCase):
         # Test that invitations were sent
         self.assertEqual(len(mail.outbox), 2)
         self.assertTrue(mail.outbox[0].subject.startswith('You\'ve been invited'))
+
+    @modify_settings(ALLOWED_HOSTS={
+        'append': 'registry.aristotlemetadata.com'
+    })
+    def test_invite_email_url(self):
+
+        self.login_superuser()
+        self.assertEqual(len(mail.outbox), 0)
+
+        data = {
+            'email_list': 'test@example.com'
+        }
+
+        post_response = self.client.post(
+            reverse('aristotle-user:registry_invitations_create'),
+            data,
+            HTTP_HOST='registry.aristotlemetadata.com'
+        )
+        self.assertEqual(post_response.status_code, 302)
+
+        # Test that invitations were sent
+        self.assertEqual(len(mail.outbox), 1)
+
+        self.assertTrue('http://registry.aristotlemetadata.com/account' in mail.outbox[0].body)
 
     def test_accept_invitation(self):
 
