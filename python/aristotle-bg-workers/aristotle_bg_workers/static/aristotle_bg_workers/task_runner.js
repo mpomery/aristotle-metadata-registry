@@ -34,7 +34,7 @@ $(document).ready(function() {
         dataType: "json",
         global: false,
         success: function(data) {
-            console.log(data);
+            //console.log(data);
             task_status_list.html("");
             polling = processing
             for (index in data.results) {

@@ -11,7 +11,7 @@
 
 {% block page %}
 <h1><i class="fa fa-tasks"></i> {% block title %}Task history{% endblock %}</h1>
-<p><a class="btn btn-default" href="{%url 'aristotle_mdr:smart_root' %}">{% trans "Home" %}</a></p>
+<p><a class="btn btn-default" href="{%url 'aristotle_bg_workers:run_task' %}">{% trans "Back" %}</a></p>
 {% include "aristotle_bg_workers/paginated_task_list.html" with page=page_obj show_all=True %}
 
 {% endblock %}
