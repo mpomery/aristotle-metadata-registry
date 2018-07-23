@@ -121,6 +121,8 @@ INSTALLED_APPS = (
     'organizations',
 
     'constrainedfilefield',
+    'aristotle_bg_workers',
+    'django_celery_results',
 )
 
 USE_L10N = True

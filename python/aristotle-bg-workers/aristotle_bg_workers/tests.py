@@ -11,10 +11,8 @@ from aristotle_bg_workers.models import ExtraTaskInfo
 from aristotle_bg_workers.helpers import store_task
 import json
 
-from aristotle_cloud.tests import BaseAristotleCloudTestCase
-
 @override_settings(SECURE_SSL_REDIRECT=False)
-class BackgroundTaskTestCase(BaseAristotleCloudTestCase):
+class BackgroundTaskTestCase(TestCase):
 
     # These unit tests do not require a worker or broker to be running
     # As such this doesnt test celery integration

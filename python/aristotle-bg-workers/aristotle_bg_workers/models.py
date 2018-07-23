@@ -28,7 +28,7 @@ class ExtraTaskInfo(models.Model):
     )
 
     def get_absolute_url(self):
-        return reverse('aristotle_cloud:cloud_details')
+        return reverse('aristotle_mdr:smart_root')
 
     def __str__(self):
         return self.task_name
