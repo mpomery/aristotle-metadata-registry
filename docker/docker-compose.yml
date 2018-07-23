@@ -1,21 +1,6 @@
 version: '3'
 
 services:
-  web:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.dev
-    image: aristotle_metadata_registry:dev
-    command: sh ./sh/entrypoint/web.sh
-    environment:
-      - DJANGO_SETTINGS_MODULE=docker/settings.py
-      - PYTHONPATH=.
-    ports:
-      - "8080:8000"
-    volumes:
-        - ../:/usr/src/app
-        - ./data:/data
-
   redis:
     image: redis
     ports:
@@ -23,10 +8,7 @@ services:
 
   db:
     image: postgres
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: 'pgpass'
-    
+
   elasticsearch:
     # If elasticsearch won't boot, you need to run `sudo sysctl -w vm.max_map_count=262144`
     # On your host machine
@@ -51,6 +33,24 @@ services:
           memory: 1024M
     ports:
       - 9200:9200
+
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    image: aristotle_metadata_registry:dev
+    command: sh ./sh/entrypoint/web.sh
+    environment:
+      - DJANGO_SETTINGS_MODULE=settings
+      - PYTHONPATH=.
+    ports:
+      - "8080:8000"
+    volumes:
+        - ../:/usr/src/app
+        - ./data:/data
+    depends_on:
+      - db
+      - redis
 
 #  worker:
 #    image: aristotle_metadata_registry:dev
