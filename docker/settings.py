@@ -13,6 +13,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MIDDLEWARE = ['whitenoise.middleware.WhiteNoiseMiddleware'] + MIDDLEWARE
 
+DDATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'db',
+        'USER': 'postgres',
+        'PASSWORD': 'pgpass',
+        'HOST': '127.0.0.1',
+        'PORT': '5432'
+    }
+}
+
 LOGGING = {
     'version': 1,
     'formatters': {

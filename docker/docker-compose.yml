@@ -8,10 +8,59 @@ services:
     image: aristotle_metadata_registry:dev
     command: sh ./sh/entrypoint/web.sh
     environment:
-      - DJANGO_SETTINGS_MODULE=settings
+      - DJANGO_SETTINGS_MODULE=docker/settings.py
       - PYTHONPATH=.
     ports:
       - "8080:8000"
     volumes:
         - ../:/usr/src/app
         - ./data:/data
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 'pgpass'
+    
+  elasticsearch:
+    # If elasticsearch won't boot, you need to run `sudo sysctl -w vm.max_map_count=262144`
+    # On your host machine
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.8
+    container_name: elasticsearch-mdr
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+      memlock:
+        soft: -1
+        hard: -1
+    # mem_limit: 1g
+    deploy:
+      resources:
+        limits:
+          # cpus: '0.50'
+          memory: 1024M
+    ports:
+      - 9200:9200
+
+#  worker:
+#    image: aristotle_metadata_registry:dev
+#    command: celery worker --app=aristotle_bg_workers --without-heartbeat
+#    depends_on:
+#      - db
+#      - redis
+#      - web
+#      - elasticsearch
+#    links:
+#      - redis
+#    volumes:
+#        - ../:/usr/src/app
