@@ -31,6 +31,8 @@ services:
         limits:
           # cpus: '0.50'
           memory: 1024M
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
 
@@ -52,15 +54,19 @@ services:
       - db
       - redis
 
-#  worker:
-#    image: aristotle_metadata_registry:dev
-#    command: celery worker --app=aristotle_bg_workers --without-heartbeat
-#    depends_on:
-#      - db
-#      - redis
-#      - web
-#      - elasticsearch
-#    links:
-#      - redis
-#    volumes:
-#        - ../:/usr/src/app
+  worker:
+    image: aristotle_metadata_registry:dev
+    command: celery worker --app=aristotle_bg_workers --without-heartbeat
+    depends_on:
+      - db
+      - redis
+      - web
+      - elasticsearch
+    links:
+      - redis
+    volumes:
+        - ../:/usr/src/app
+
+volumes:
+  esdata1:
+    driver: local

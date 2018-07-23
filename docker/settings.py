@@ -5,7 +5,7 @@ Base settings necessary for running an Aristotle Instance in "the cloud (tm)"
 from aristotle_mdr.required_settings import *
 
 ALLOWED_HOSTS = ["*"]
-DEBUG = False
+DEBUG = True
 ARISTOTLE_SETTINGS['SITE_NAME'] = 'Aristotle Development Server'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
@@ -33,16 +33,19 @@ CACHES= {
     }
 }
 
-#HAYSTACK_CONNECTIONS = {
-#    'default': {
-#        'ENGINE': 'haystack_elasticsearch.elasticsearch5.Elasticsearch5SearchEngine',
-#        'URL': 'http://elasticsearch:9200',
-#        'INDEX_NAME': 'documents',
-#        'INCLUDE_SPELLING': True,
-#    }
-#}
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack_elasticsearch.elasticsearch5.Elasticsearch5SearchEngine',
+        'URL': 'http://elasticsearch:9200',
+        'INDEX_NAME': 'documents',
+        'INCLUDE_SPELLING': True,
+        'KWARGS': {
+            'http_auth': 'elastic:changeme'
+        }
+    }
+}
 
-#CELERY_BROKER_URL = 'redis://redis/1'
+CELERY_BROKER_URL = 'redis://redis/1'
 
 LOGGING = {
     'version': 1,
