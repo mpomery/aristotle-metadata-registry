@@ -46,6 +46,9 @@ HAYSTACK_CONNECTIONS = {
 }
 
 CELERY_BROKER_URL = 'redis://redis/1'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TASK_TRACK_STARTED = True
 
 LOGGING = {
     'version': 1,
