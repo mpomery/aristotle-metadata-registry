@@ -14,9 +14,11 @@ aristotle-mdr-graphql = {path = "./python/aristotle-mdr-graphql", editable = tru
 aristotle-pdf-downloads = {path = "./python/aristotle-pdf-downloads", editable = true}
 comet-indicator-registry = {path = "./python/comet-indicator-registry", editable = true}
 mallard-questionnaire-registry = {path = "./python/mallard-questionnaire-registry", editable = true}
+aristotle-bg-workers = {path = "./python/aristotle-bg-workers", editable = true}
 "psycopg2" = "~=2.7.0"
 "django-redis" = "*"
 "elasticsearch" = ">=5.0.0,<6.0.0"
+"django-haystack-elasticsearch" = "*"
 
 [dev-packages]
 coverage = "*"
