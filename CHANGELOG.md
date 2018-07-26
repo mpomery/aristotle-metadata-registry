@@ -1,5 +1,9 @@
 Changelog
 
+- 2.1.2
+    - Fixed editor UI Bug
+    - Improved logging of config errors
+
 - 2.1.1
     - Fix to signup email url generation to ensure domain is in invite email
     - Ensure invited users are given a valid password to ensure recovery can occur
