@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 __version_info__ = {
     'major': 2,
     'minor': 1,
-    'micro': 2,
+    'micro': 3,
     'releaselevel': 'final',
     'serial': 5
 }
