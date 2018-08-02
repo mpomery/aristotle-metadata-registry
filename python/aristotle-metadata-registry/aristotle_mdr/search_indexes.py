@@ -165,7 +165,7 @@ class conceptIndex(baseObjectIndex):
 
     def prepare_identifier(self, obj):
         identifiers = []
-        for scoped_ident in obj.identifiers.all():
+        for scoped_ident in obj.identifiers.all().select_related('namespace'):
             identifiers.append(
                 '{}/{}/{}'.format(
                     scoped_ident.namespace.shorthand_prefix,
@@ -176,4 +176,4 @@ class conceptIndex(baseObjectIndex):
         return identifiers
 
     def prepare_namespace(self, obj):
-        return [ident.namespace.shorthand_prefix for ident in obj.identifiers.all()]
+        return [ident.namespace.shorthand_prefix for ident in obj.identifiers.all().select_related('namespace')]
