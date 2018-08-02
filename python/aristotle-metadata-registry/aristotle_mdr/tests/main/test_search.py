@@ -4,6 +4,7 @@ from django.conf import settings
 import aristotle_mdr.models as models
 import aristotle_mdr.perms as perms
 import aristotle_mdr.tests.utils as utils
+from aristotle_mdr.contrib.identifiers import models as ident_models
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
@@ -702,13 +703,34 @@ class TestTokenSearch(TestCase):
         self.assertEqual(response.status_code,200)
         objs = response.context['page'].object_list
         self.assertEqual(len(objs),1)
-        self.assertTrue(objs[0].object.name,"Power")
+        self.assertEqual(objs[0].object.name,"Power")
 
         response = self.client.get(reverse('aristotle:search')+"?q=type:p")
         self.assertEqual(response.status_code,200)
         objs = response.context['page'].object_list
         self.assertEqual(len(objs),1)
-        self.assertTrue(objs[0].object.name,"Power")
+        self.assertEqual(objs[0].object.name,"Power")
+
+    def test_token_id_search(self):
+        namespace = ident_models.Namespace.objects.create(
+            naming_authority=self.ra,
+            shorthand_prefix='pre'
+        )
+
+        for xman in self.item_xmen:
+            ident = ident_models.ScopedIdentifier.objects.create(
+                namespace=namespace,
+                identifier=xman.name[:3],
+                version='1',
+                concept=xman
+            )
+
+        call_command('rebuild_index', interactive=False, verbosity=0)
+        response = self.client.get(reverse('aristotle:search')+"?q=id:pre/ice")
+        self.assertEqual(response.status_code,200)
+        objs = response.context['page'].object_list
+        self.assertEqual(len(objs),1)
+        self.assertEqual(objs[0].object.name,"iceman")
 
 
 class TestSearchDescriptions(TestCase):
