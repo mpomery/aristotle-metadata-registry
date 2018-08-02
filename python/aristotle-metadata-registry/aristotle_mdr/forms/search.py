@@ -195,6 +195,11 @@ class TokenSearchForm(FacetedSearchForm):
         'namespace'
     ]
 
+    token_shortnames = {
+        'id': 'identifier',
+        'ns': 'namespace'
+    }
+
     def prepare_tokens(self):
         try:
             query = self.cleaned_data.get('q')
@@ -207,6 +212,10 @@ class TokenSearchForm(FacetedSearchForm):
         for word in query.split(" "):
             if ":" in word:
                 opt, arg = word.split(":", 1)
+
+                if opt in self.token_shortnames:
+                    opt = self.token_shortnames[opt]
+
                 if opt in opts and opt in self.allowed_tokens:
                     kwargs[str(opt)]=arg
                 elif opt == "type":
