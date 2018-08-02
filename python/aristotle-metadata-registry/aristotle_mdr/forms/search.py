@@ -186,6 +186,7 @@ class PermissionSearchQuerySet(SearchQuerySet):
 class TokenSearchForm(FacetedSearchForm):
     token_models = []
     kwargs = {}
+    allowed_tokens = ['statuses','highest_state','name','version','identifiers']
 
     def prepare_tokens(self):
         try:
@@ -199,7 +200,7 @@ class TokenSearchForm(FacetedSearchForm):
         for word in query.split(" "):
             if ":" in word:
                 opt, arg = word.split(":", 1)
-                if opt in opts:
+                if opt in opts and opt in self.allowed_tokens:
                     kwargs[str(opt)]=arg
                 elif opt == "type":
                     # we'll allow these through and assume they meant content type
