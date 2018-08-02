@@ -186,7 +186,14 @@ class PermissionSearchQuerySet(SearchQuerySet):
 class TokenSearchForm(FacetedSearchForm):
     token_models = []
     kwargs = {}
-    allowed_tokens = ['statuses','highest_state','name','version','identifiers']
+    allowed_tokens = [
+        'statuses',
+        'highest_state',
+        'name',
+        'version',
+        'identifier',
+        'namespace'
+    ]
 
     def prepare_tokens(self):
         try:

@@ -95,7 +95,8 @@ class conceptIndex(baseObjectIndex):
     version = indexes.CharField(model_attr="version")
     submitter_id = indexes.IntegerField(model_attr="submitter_id", null=True)
     facet_model_ct = indexes.IntegerField(faceted=True)
-    identifiers = indexes.MultiValueField()
+    identifier = indexes.MultiValueField()
+    namespace = indexes.MultiValueField()
 
     template_name = "search/searchItem.html"
 
@@ -162,7 +163,7 @@ class conceptIndex(baseObjectIndex):
             return RESTRICTION['Locked']
         return RESTRICTION['Unlocked']
 
-    def prepare_identifiers(self, obj):
+    def prepare_identifier(self, obj):
         identifiers = []
         for scoped_ident in obj.identifiers.all():
             identifiers.append(
@@ -173,3 +174,6 @@ class conceptIndex(baseObjectIndex):
                 )
             )
         return identifiers
+
+    def prepare_namespace(self, obj):
+        return [ident.namespace.shorthand_prefix for ident in obj.identifiers.all()]
