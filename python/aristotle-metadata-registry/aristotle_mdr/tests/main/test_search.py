@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, tag
 from django.conf import settings
 
 import aristotle_mdr.models as models
@@ -689,6 +689,38 @@ class TestTokenSearch(TestCase):
         for item in self.item_xmen:
             self.ra.register(item,models.STATES.standard,self.su)
 
+    def add_identifiers(self):
+        namespace = ident_models.Namespace.objects.create(
+            naming_authority=self.ra,
+            shorthand_prefix='pre'
+        )
+        alt_namespace = ident_models.Namespace.objects.create(
+            naming_authority=self.ra,
+            shorthand_prefix='xmn'
+        )
+
+        for xman in self.item_xmen:
+            ident_models.ScopedIdentifier.objects.create(
+                namespace=namespace,
+                identifier=xman.name[:3],
+                version='1',
+                concept=xman
+            )
+            ident_models.ScopedIdentifier.objects.create(
+                namespace=alt_namespace,
+                identifier=xman.name[:3],
+                version='1',
+                concept=xman
+            )
+
+        call_command('rebuild_index', interactive=False, verbosity=0)
+
+    def query_search(self, searchtext):
+        query_params = '?q=' + searchtext
+        response = self.client.get(reverse('aristotle:search')+query_params)
+        self.assertEqual(response.status_code,200)
+        return response.context['page'].object_list
+
     def test_token_version_search(self):
         self.assertEqual(models.ObjectClass.objects.get(version='0.1.0').name,"wolverine")
 
@@ -711,26 +743,26 @@ class TestTokenSearch(TestCase):
         self.assertEqual(len(objs),1)
         self.assertEqual(objs[0].object.name,"Power")
 
-    def test_token_id_search(self):
-        namespace = ident_models.Namespace.objects.create(
-            naming_authority=self.ra,
-            shorthand_prefix='pre'
-        )
-
-        for xman in self.item_xmen:
-            ident = ident_models.ScopedIdentifier.objects.create(
-                namespace=namespace,
-                identifier=xman.name[:3],
-                version='1',
-                concept=xman
-            )
-
-        call_command('rebuild_index', interactive=False, verbosity=0)
-        response = self.client.get(reverse('aristotle:search')+"?q=id:pre/ice")
-        self.assertEqual(response.status_code,200)
-        objs = response.context['page'].object_list
+    @tag('id_search')
+    def test_token_id_search_specific_ns(self):
+        self.add_identifiers()
+        objs = self.query_search('id:pre/ice')
         self.assertEqual(len(objs),1)
         self.assertEqual(objs[0].object.name,"iceman")
+
+    @tag('id_search')
+    def test_token_id_search_general(self):
+        self.add_identifiers()
+        objs = self.query_search('id:ice')
+        self.assertEqual(len(objs),2)
+        self.assertEqual(objs[0].object.name,"iceman")
+        self.assertEqual(objs[1].object.name,"iceman")
+
+    @tag('id_search')
+    def test_token_namespace_search(self):
+        self.add_identifiers()
+        objs = self.query_search('ns:pre')
+        self.assertEqual(len(objs),10)
 
 
 class TestSearchDescriptions(TestCase):
