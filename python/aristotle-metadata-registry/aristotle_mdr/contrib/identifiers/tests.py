@@ -77,7 +77,6 @@ class TestIdentifiers(utils.LoggedInViewPages, TestCase):
         )
         self.assertRedirects(response, url_slugify_concept(self.meta), fetch_redirect_response=False)
 
-
     def test_fake_id_redirect(self):
         response = self.client.get(
             reverse(

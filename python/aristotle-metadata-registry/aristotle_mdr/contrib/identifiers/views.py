@@ -23,6 +23,7 @@ def scoped_identifier_redirect(request, ns_prefix, iid, version=None):
         item = objs.order_by('version').last()  # lets hope there is an order to the versions.
         return redirect(url_slugify_concept(item.item))
 
+
 def namespace_redirect(request, ns_prefix):
     search_url = reverse('aristotle_mdr:search')
-    return redirect(search_url+'?q=ns:'+ns_prefix)
+    return redirect(search_url + '?q=ns:' + ns_prefix)
