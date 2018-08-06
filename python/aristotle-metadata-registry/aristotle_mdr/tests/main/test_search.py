@@ -698,6 +698,10 @@ class TestTokenSearch(TestCase):
             naming_authority=self.ra,
             shorthand_prefix='xmn'
         )
+        self.custom_namespace = ident_models.Namespace.objects.create(
+            naming_authority=self.ra,
+            shorthand_prefix='ctm'
+        )
 
         for xman in self.item_xmen:
             ident_models.ScopedIdentifier.objects.create(
@@ -713,7 +717,13 @@ class TestTokenSearch(TestCase):
                 concept=xman
             )
 
-        call_command('rebuild_index', interactive=False, verbosity=0)
+    def add_new_identifier(self, obj, identifier, version='1'):
+        ident_models.ScopedIdentifier.objects.create(
+            namespace=self.custom_namespace,
+            identifier=identifier,
+            version=version,
+            concept=obj
+        )
 
     def query_search(self, searchtext):
         query_params = '?q=' + searchtext
@@ -745,6 +755,8 @@ class TestTokenSearch(TestCase):
 
     @tag('id_search')
     def test_token_id_search_specific_ns(self):
+        # Tests that only the identifier with the correct
+        # namespace is returned when one is specified
         self.add_identifiers()
         objs = self.query_search('id:pre/ice')
         self.assertEqual(len(objs),1)
@@ -752,18 +764,28 @@ class TestTokenSearch(TestCase):
 
     @tag('id_search')
     def test_token_id_search_general(self):
+        # Tests that if only an identifier is used, all namespaces are returned
         self.add_identifiers()
+        self.add_new_identifier(self.item_xmen[0], 'ice')
         objs = self.query_search('id:ice')
         self.assertEqual(len(objs),2)
-        self.assertEqual(objs[0].object.name,"iceman")
-        self.assertEqual(objs[1].object.name,"iceman")
 
     @tag('id_search')
     def test_token_namespace_search(self):
+        # Tests namespace search returns all in that namespace
         self.add_identifiers()
         objs = self.query_search('ns:pre')
         self.assertEqual(len(objs),10)
 
+    @tag('id_search')
+    def test_token_id_version_search(self):
+        # Tests that only correct version is returned when a version is given
+        self.add_identifiers()
+        self.add_new_identifier(self.item_xmen[0], 'test', '1')
+        self.add_new_identifier(self.item_xmen[1], 'test', '2')
+        objs = self.query_search('id:ctm/test/1')
+        self.assertEqual(len(objs),1)
+        self.assertEqual(objs[0].object.name,"wolverine")
 
 class TestSearchDescriptions(TestCase):
     """
