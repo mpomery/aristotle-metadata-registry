@@ -340,8 +340,8 @@ class LoggedInViewConceptPages(utils.LoggedInViewPages, utils.FormsetTestUtils):
         self.assertEqual(self.item1.identifiers.count(),2)
 
         response = self.client.get(reverse('aristotle:item',args=[self.item1.id]), follow=True)
-        self.assertContains(response, 'pre</a>:YE:1')
-        self.assertContains(response, 'pre</a>:RE:1')
+        self.assertContains(response, 'pre</a>/YE/1')
+        self.assertContains(response, 'pre</a>/RE/1')
 
         idents = self.item1.identifiers.all()
         self.assertEqual(idents[0].identifier, 'YE')
