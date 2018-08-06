@@ -9,8 +9,6 @@ from aristotle_mdr.utils import fetch_metadata_apps
 # Replace below with this when doing a dataload (shuts off Haystack)
 #    pass
 
-import logging
-logger = logging.getLogger(__name__)
 
 # @receiver(pre_save)
 def pre_save_clean(sender, instance, *args, **kwargs):
