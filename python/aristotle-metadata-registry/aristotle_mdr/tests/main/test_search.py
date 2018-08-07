@@ -554,7 +554,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         objs = response.context['page'].object_list
         self.assertDelayedEqual(len(objs),1)
-        self.assertTrue(objs[0].object.pk,de.pk)
+        self.assertEqual(objs[0].object.pk,de.pk)
 
     def test_values_in_conceptual_domain_search(self):
         # For bug #676
@@ -738,7 +738,7 @@ class TestTokenSearch(TestCase):
         self.assertEqual(response.status_code,200)
         objs = response.context['page'].object_list
         self.assertEqual(len(objs),1)
-        self.assertTrue(objs[0].object.name,"wolverine")
+        self.assertEqual(objs[0].object.name,"wolverine")
 
     def test_token_type_search(self):
         response = self.client.get(reverse('aristotle:search')+"?q=type:property")
