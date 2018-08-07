@@ -229,7 +229,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         # Deadpool isn't an Xman yet, still no results.
         psqs = get_permission_sqs()
         psqs = psqs.auto_query('deadpool').apply_permission_checks(self.viewer)
-        self.assertDelayedEqual(len(psqs),0)
+        self.assertEqual(len(psqs),0)
 
         with reversion.create_revision():
             dp.workgroup = self.xmen_wg
@@ -239,21 +239,21 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         # Charles is a viewer, Deadpool is in X-men, should have results now.
         psqs = get_permission_sqs()
         psqs = psqs.auto_query('deadpool').apply_permission_checks(self.viewer)
-        self.assertDelayedEqual(len(psqs),1)
+        self.assertEqual(len(psqs),1)
 
         response = self.client.get(reverse('aristotle:search')+"?q=deadpool")
         self.assertTrue(perms.user_can_view(self.viewer,dp))
-        self.assertDelayedEqual(len(response.context['page'].object_list),1)
+        self.assertEqual(len(response.context['page'].object_list),1)
         self.assertEqual(response.context['page'].object_list[0].object.item,dp)
 
         # Take away Charles viewing rights and no results again.
         self.xmen_wg.removeRoleFromUser('viewer',self.viewer)
         psqs = get_permission_sqs()
         psqs = psqs.auto_query('deadpool').apply_permission_checks(self.viewer)
-        self.assertDelayedEqual(len(psqs),0)
+        self.assertEqual(len(psqs),0)
 
         response = self.client.get(reverse('aristotle:search')+"?q=deadpool")
-        self.assertDelayedEqual(len(response.context['page'].object_list),0)
+        self.assertEqual(len(response.context['page'].object_list),0)
 
     def test_workgroup_member_search_has_valid_facets(self):
         self.logout()
@@ -412,13 +412,13 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
         self.assertEqual(response.status_code,200)
-        self.assertDelayedEqual(len(response.context['page'].object_list),1)
+        self.assertEqual(len(response.context['page'].object_list),1)
 
         self.logout()
         self.login_editor()
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
         self.assertEqual(response.status_code,200)
-        self.assertDelayedEqual(len(response.context['page'].object_list),0)
+        self.assertEqual(len(response.context['page'].object_list),0)
 
 
     def test_user_can_search_own_content_and_other_content(self):
@@ -448,13 +448,13 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
         self.assertEqual(response.status_code,200)
-        self.assertDelayedEqual(len(response.context['page'].object_list),1)
+        self.assertEqual(len(response.context['page'].object_list),1)
 
         self.logout()
         self.login_editor()
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
         self.assertEqual(response.status_code,200)
-        self.assertDelayedEqual(len(response.context['page'].object_list),0)
+        self.assertEqual(len(response.context['page'].object_list),0)
 
         # Get item
         item = models.ObjectClass.objects.get(name='pokemon')
@@ -462,7 +462,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
         self.assertEqual(response.status_code,200)
-        self.assertDelayedEqual(len(response.context['page'].object_list),1)
+        self.assertEqual(len(response.context['page'].object_list),1)
 
 
     def test_facet_search(self):
@@ -490,7 +490,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
 
         objs = response.context['page'].object_list
-        self.assertDelayedEqual(len(objs),3)
+        self.assertEqual(len(objs),3)
         extra_facets = response.context['form'].extra_facet_fields
 
         self.assertTrue(len(extra_facets) == 2)
@@ -502,30 +502,30 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
 
         psqs = get_permission_sqs()
         psqs = psqs.auto_query('pokemon').apply_permission_checks(self.su)
-        self.assertDelayedEqual(len(psqs),3)
+        self.assertEqual(len(psqs),3)
 
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
         objs = response.context['page'].object_list
-        self.assertDelayedEqual(len(objs),3)
+        self.assertEqual(len(objs),3)
 
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon&f=object_class::%s"%oc.name)
 
         objs = response.context['page'].object_list
-        self.assertDelayedEqual(len(objs),2)
+        self.assertEqual(len(objs),2)
         self.assertTrue(de.pk in [o.object.pk for o in objs])
         self.assertTrue(dec.pk in [o.object.pk for o in objs])
 
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon&f=data_element_concept::%s"%dec.name.replace(' ','+'))
 
         objs = response.context['page'].object_list
-        self.assertDelayedEqual(len(objs),2)
+        self.assertEqual(len(objs),2)
         self.assertTrue(de.pk in [o.object.pk for o in objs])
         self.assertTrue(dec.pk in [o.object.pk for o in objs])
 
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon&models=aristotle_mdr.dataelement&f=data_element_concept::%s"%dec.name.replace(' ','+'))
 
         objs = response.context['page'].object_list
-        self.assertDelayedEqual(len(objs),1)
+        self.assertEqual(len(objs),1)
         self.assertTrue(de.pk in [o.object.pk for o in objs])
         self.assertTrue(dec.pk not in [o.object.pk for o in objs])
 
@@ -548,12 +548,12 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon")
 
         objs = response.context['page'].object_list
-        self.assertDelayedEqual(len(objs),2)
+        self.assertEqual(len(objs),2)
 
         response = self.client.get(reverse('aristotle:search')+"?q=pokemon&models=aristotle_mdr.dataelement")
 
         objs = response.context['page'].object_list
-        self.assertDelayedEqual(len(objs),1)
+        self.assertEqual(len(objs),1)
         self.assertEqual(objs[0].object.pk,de.pk)
 
     def test_values_in_conceptual_domain_search(self):
@@ -658,7 +658,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         random_wg.delete()
 
 
-class TestTokenSearch(utils.LoggedInViewPages, TestCase):
+class TestTokenSearch(TestCase):
     def tearDown(self):
         call_command('clear_index', interactive=False, verbosity=0)
 
@@ -669,8 +669,6 @@ class TestTokenSearch(utils.LoggedInViewPages, TestCase):
         super().setUp()
         import haystack
         haystack.connections.reload('default')
-
-        self.su = get_user_model().objects.create_superuser('super@example.com','user')
 
         self.ra = models.RegistrationAuthority.objects.create(name="Kelly Act")
         self.registrar = get_user_model().objects.create_user('william.styker@weaponx.mil','mutantsMustDie')
@@ -759,7 +757,7 @@ class TestTokenSearch(utils.LoggedInViewPages, TestCase):
         # namespace is returned when one is specified
         self.add_identifiers()
         objs = self.query_search('id:pre/ice')
-        self.assertDelayedEqual(len(objs),1)
+        self.assertEqual(len(objs),1)
         self.assertEqual(objs[0].object.name,"iceman")
 
     @tag('id_search')
@@ -768,14 +766,14 @@ class TestTokenSearch(utils.LoggedInViewPages, TestCase):
         self.add_identifiers()
         self.add_new_identifier(self.item_xmen[0], 'ice')
         objs = self.query_search('id:ice')
-        self.assertDelayedEqual(len(objs),2)
+        self.assertEqual(len(objs),2)
 
     @tag('id_search')
     def test_token_namespace_search(self):
         # Tests namespace search returns all in that namespace
         self.add_identifiers()
         objs = self.query_search('ns:pre')
-        self.assertDelayedEqual(len(objs),10)
+        self.assertEqual(len(objs),10)
 
     @tag('id_search')
     def test_token_id_version_search(self):
@@ -784,7 +782,7 @@ class TestTokenSearch(utils.LoggedInViewPages, TestCase):
         self.add_new_identifier(self.item_xmen[0], 'test', '1')
         self.add_new_identifier(self.item_xmen[1], 'test', '2')
         objs = self.query_search('id:ctm/test/1')
-        self.assertDelayedEqual(len(objs),1)
+        self.assertEqual(len(objs),1)
         self.assertEqual(objs[0].object.name,"wolverine")
 
 class TestSearchDescriptions(TestCase):
