@@ -18,6 +18,8 @@ from django.utils import timezone
 import string
 import random
 
+import unittest
+
 setup_aristotle_test_environment()
 
 
@@ -753,6 +755,8 @@ class TestTokenSearch(TestCase):
         self.assertEqual(objs[0].object.name,"Power")
 
     @tag('id_search')
+    @unittest.skipIf('WhooshEngine' in settings.HAYSTACK_CONNECTIONS['default']['ENGINE'],
+                     'Searching within a multivalue string is not supported in whoosh')
     def test_token_id_search_specific_ns(self):
         # Tests that only the identifier with the correct
         # namespace is returned when one is specified
@@ -762,11 +766,13 @@ class TestTokenSearch(TestCase):
         self.assertEqual(objs[0].object.name,"iceman")
 
     @tag('id_search')
+    @unittest.skipIf('WhooshEngine' in settings.HAYSTACK_CONNECTIONS['default']['ENGINE'],
+                     'Searching within a multivalue string is not supported in whoosh')
     def test_token_id_search_general(self):
         # Tests that if only an identifier is used, all namespaces are returned
         self.add_identifiers()
         self.add_new_identifier(self.item_xmen[0], 'ice')
-        objs = self.query_search('id:ice')
+        objs = self.query_search('id:*/ice')
         self.assertEqual(len(objs),2)
 
     @tag('id_search')
