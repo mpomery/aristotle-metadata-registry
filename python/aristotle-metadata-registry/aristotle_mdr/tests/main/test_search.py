@@ -658,7 +658,7 @@ class TestSearch(utils.LoggedInViewPages,TestCase):
         random_wg.delete()
 
 
-class TestTokenSearch(TestCase):
+class TestTokenSearch(utils.LoggedInViewPages, TestCase):
     def tearDown(self):
         call_command('clear_index', interactive=False, verbosity=0)
 
@@ -759,7 +759,7 @@ class TestTokenSearch(TestCase):
         # namespace is returned when one is specified
         self.add_identifiers()
         objs = self.query_search('id:pre/ice')
-        self.assertEqual(len(objs),1)
+        self.assertDelayedEqual(len(objs),1)
         self.assertEqual(objs[0].object.name,"iceman")
 
     @tag('id_search')
@@ -768,14 +768,14 @@ class TestTokenSearch(TestCase):
         self.add_identifiers()
         self.add_new_identifier(self.item_xmen[0], 'ice')
         objs = self.query_search('id:ice')
-        self.assertEqual(len(objs),2)
+        self.assertDelayedEqual(len(objs),2)
 
     @tag('id_search')
     def test_token_namespace_search(self):
         # Tests namespace search returns all in that namespace
         self.add_identifiers()
         objs = self.query_search('ns:pre')
-        self.assertEqual(len(objs),10)
+        self.assertDelayedEqual(len(objs),10)
 
     @tag('id_search')
     def test_token_id_version_search(self):
@@ -784,7 +784,7 @@ class TestTokenSearch(TestCase):
         self.add_new_identifier(self.item_xmen[0], 'test', '1')
         self.add_new_identifier(self.item_xmen[1], 'test', '2')
         objs = self.query_search('id:ctm/test/1')
-        self.assertEqual(len(objs),1)
+        self.assertDelayedEqual(len(objs),1)
         self.assertEqual(objs[0].object.name,"wolverine")
 
 class TestSearchDescriptions(TestCase):
