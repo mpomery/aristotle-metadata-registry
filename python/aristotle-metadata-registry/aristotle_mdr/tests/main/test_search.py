@@ -670,6 +670,7 @@ class TestTokenSearch(TestCase):
         import haystack
         haystack.connections.reload('default')
 
+        self.su = get_user_model().objects.create_superuser('super@example.com','user')
         self.ra = models.RegistrationAuthority.objects.create(name="Kelly Act")
         self.registrar = get_user_model().objects.create_user('william.styker@weaponx.mil','mutantsMustDie')
         self.ra.giveRoleToUser('registrar',self.registrar)
