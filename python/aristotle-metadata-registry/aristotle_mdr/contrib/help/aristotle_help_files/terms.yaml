@@ -1,0 +1,11 @@
+- model: aristotle_mdr_help.helppage
+  fields:
+    title: Terms Of Service
+    app_label: aristotle_mdr
+    language: en
+    slug: terms
+    body: >
+      <ul>
+        <li>Terms Of Service Stub</li>
+      </ul>
+      
